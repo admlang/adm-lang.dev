@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examples — adm</title>
+<meta name="description" content="Annotated ADM code examples.">
+<link rel="icon" type="image/svg+xml" href="assets/adm.svg">
+<link rel="canonical" href="https://adm-lang.dev/examples.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="adm">
+<meta property="og:title" content="adm examples">
+<meta property="og:description" content="Annotated ADM code examples — pattern matching, contracts, transactions, concurrency, SIMD, and custom annotations.">
+<meta property="og:url" content="https://adm-lang.dev/examples.html">
+<meta property="og:image" content="https://adm-lang.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="adm examples">
+<meta name="twitter:description" content="Annotated ADM code examples — pattern matching, contracts, transactions, concurrency, SIMD, and custom annotations.">
+<meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/adm.svg" alt="ADM" class="brand-mark">
+      <span class="brand-name"><span class="brand-sub">programming language</span></span>
+    </a>
+    <nav class="nav">
+      <a href="docs.html">Docs</a>
+      <a href="examples.html" class="nav-active">Examples</a>
+      <a href="modules.html">Modules</a>
+      <a class="nav-icon" href="https://github.com/admlang" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+        </svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs-layout">
+
+  <aside class="docs-sidebar">
+    <nav class="docs-nav" id="docs-nav">
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#hello">Hello, World</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#interpolation">String Interpolation</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#collections">Arrays &amp; Maps</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#regex">Regex</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#bignum">Big Numbers</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#pattern-matching">Pattern Matching</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#errors">Error Handling</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#contracts">Contracts</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#transactions">Transactions</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#generics">Generics</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#operators">Operator Overloading</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#lambdas">Lambdas</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#parallel">Parallel Loops</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#async">Async &amp; Channels</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#service">Services</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#annotations">Custom Annotations</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#simd">SIMD</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#ffi">C Interop</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#testing">Tests</a></div>
+    </nav>
+  </aside>
+
+  <main class="docs-content">
+
+    <section class="docs-section" id="hello">
+      <h2>Hello, World</h2>
+      <p>Every application declares <code>def new(args string[]) int</code> — its return value is the process exit code.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">main.adm</span>
+        </div>
+        <pre><code>application Hello {
+	def new(args string[]) int {
+		println("Hello, 🌍")
+		return 0
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="interpolation">
+      <h2>String Interpolation</h2>
+      <p>
+        Any expression goes inside <code>{}</code>. A value whose type implements <code>str()</code>
+        formats itself — no explicit conversion needed.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">interpolation.adm</span>
+        </div>
+        <pre><code>module greet {
+	interface IStringer {
+		def str() string
+	}
+
+	type Thing {
+		def str() string {
+			return "Thing"
+		}
+	}
+}
+
+application Interpolation {
+	use greet
+
+	def new(args string[]) int {
+		let n = 3
+		let t = greet.Thing{}
+		let si greet.IStringer = t
+
+		println("n={n}")              // n=3
+		println("t={t}")              // t=Thing
+		println("sum={n + n * 2}")     // sum=9
+		return 0
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="collections">
+      <h2>Arrays &amp; Maps</h2>
+      <p>
+        Arrays support set-style operators and whole-array arithmetic; slices are views into the same
+        storage. Maps iterate as key/value pairs.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">collections.adm</span>
+        </div>
+        <pre><code>application Collections {
+	def new(args string[]) int {
+		let a = int[1, 2, 3, 4]
+		let b = int[3, 4, 5, 6]
+
+		println(a &amp; b)        // [3, 4]     intersection
+		println(a | b)        // [1..6]     union
+		println(a - b)        // [1, 2]     difference
+		println(a[-2:])       // [3, 4]     last two
+
+		a[:] *= 10            // scale every element in place
+		println(a)            // [10, 20, 30, 40]
+
+		let stock = map&lt;string, int&gt;{
+			"widget": 12,
+			"gasket": 3,
+		}
+
+		stock["bolt"] = 40
+		for let (name, count) in stock {
+			println("{name}: {count}")
+		}
+		return 0
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="regex">
+      <h2>Regex</h2>
+      <p>
+        Regexes are a primitive with their own literal syntax, not a library type — flags go after the
+        closing slash, and captures are referenced as <code>$1</code>, <code>$2</code> in replacements.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">regex.adm</span>
+        </div>
+        <pre><code>application Regex {
+	def new(args string[]) int {
+		let r = /[0-9]+/
+
+		r.test("a1b")                // true
+		r.matchAll("a1b22c")          // ["1", "22"]
+		r.split("a1b22c")             // ["a", "b", "c"]
+		r.replace("a1b22c", "X", -1)  // "aXbXc"
+
+		// the g flag replaces every match without a count
+		let rg = /[0-9]+/g
+		rg.replace("a1b22c", "X")      // "aXbXc"
+
+		// capture groups, reordered in the replacement
+		let cap = /(a)([0-9]+)/
+		cap.replace("a12 b a3", "$2-$1", -1)  // "12-a b 3-a"
+
+		// strings accept a regex directly
+		"hello123".contains(/[0-9]+/)     // true
+		return 0
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="bignum">
+      <h2>Big Numbers</h2>
+      <p>
+        <code>bigint</code> is arbitrary-precision and uses the same operators as any other number —
+        no special call syntax for arithmetic that would overflow a machine integer.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">bignum.adm</span>
+        </div>
+        <pre><code>application BigNumbers {
+	def new(args string[]) int {
+		let x bigint = bigint(0x1234567890abcdef)
+		let y bigint = bigint(7)
+
+		// exponentiation on a value far past 64 bits
+		let z bigint = (x**3) - (3*x) + y
+
+		if (x &lt; z) &amp;&amp; (z != x) {
+			println(z)
+		}
+		return 0
+	}
+}</code></pre>
+      </div>
+      <p>A literal too large for <code>int</code> infers <code>bigint</code> on its own — no cast needed.</p>
+    </section>
+
+    <section class="docs-section" id="pattern-matching">
+      <h2>Pattern Matching</h2>
+      <p>
+        <code>match</code> destructures tuples and struct shapes, and each case can carry a guard after
+        a <code>;</code>.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">matching.adm</span>
+        </div>
+        <pre><code>module shapes {
+	struct User {
+		id    int
+		email string
+	}
+
+	def classify(x int) string {
+		match x {
+			case 0:
+				return "zero"
+			case (n); n &gt; 0:
+				return "positive: {n}"
+			default:
+				return "negative"
+		}
+	}
+
+	def sum(t (int, int)) int {
+		match t {
+			case (a, b):
+				return a + b
+			default:
+				return 0
+		}
+	}
+
+	def userId(u User) int {
+		match u {
+			case {id int, email string}; id &gt; 0:
+				return id
+			default:
+				return 0
+		}
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="errors">
+      <h2>Error Handling</h2>
+      <p>
+        A function that can fail returns <code>!T</code>. <code>try</code> propagates the error to the
+        caller; <code>onerror recover</code> handles it locally.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">errors.adm</span>
+        </div>
+        <pre><code>module inventory {
+	struct Item {
+		name  string
+		stock int
+	}
+
+	def restock(item Item, qty int) !Item {
+		if qty &lt;= 0 {
+			fail "quantity must be positive"
+		}
+		return Item{name: item.name, stock: item.stock + qty}
+	}
+}
+
+application Warehouse {
+	use inventory
+
+	def new(args string[]) int {
+		let item = inventory.Item{name: "widget", stock: 12}
+
+		// recover with a fallback value
+		let a = inventory.restock(item, -1) onerror recover item
+
+		// inspect the error before deciding
+		let b = inventory.restock(item, 8) onerror (err error) {
+			println("restock failed: {err.message}")
+			recover item
+		}
+
+		println(b.stock)
+		return 0
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="contracts">
+      <h2>Contracts</h2>
+      <p>
+        <code>expects</code> runs before the body, <code>provides</code> runs after — on every return
+        path. A failed assertion becomes an error, so the function returns <code>!T</code>.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">contracts.adm</span>
+        </div>
+        <pre><code>module accounts {
+	def withdraw(balance int, amount int) !int {
+		expects {
+			assert amount &gt; 0 onerror fail "amount must be positive"
+			assert amount &lt;= balance onerror fail "insufficient funds"
+		}
+
+		let remaining = balance - amount
+		return remaining
+
+		provides {
+			assert remaining &gt;= 0
+			assert remaining &lt; balance
+		}
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="transactions">
+      <h2>Transactions</h2>
+      <p>
+        A function declares how to save and undo its own state with <code>begin</code> and
+        <code>rollback</code>. Those blocks lie dormant until the function is called from inside a
+        <code>transaction</code> — then any <code>fail</code> unwinds every rollback automatically.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">transactions.adm</span>
+        </div>
+        <pre><code>application Ledger {
+	let state int = 0
+
+	def apply(x int) {
+		begin {
+			state = state + x
+		}
+
+		rollback {
+			state = state - x
+		}
+
+		state = state + 1
+	}
+
+	def boom() !int {
+		fail "boom"
+	}
+
+	def run() !none {
+		transaction {
+			apply(5)
+			let v = try boom()   // fails — every rollback runs
+			println(v)
+		} onerror (err error) {
+			println("rolled back: {err.message}")
+			recover none
+		}
+		return none
+	}
+
+	def new(args string[]) int {
+		try run()
+		return 0
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="generics">
+      <h2>Generics</h2>
+      <p>
+        A <code>where</code> block adds members that only exist when the type argument satisfies the
+        constraint — <code>User&lt;Admin&gt;</code> has <code>permissions</code>,
+        <code>User&lt;string&gt;</code> doesn't.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">generics.adm</span>
+        </div>
+        <pre><code>module demo {
+	struct Pair&lt;A, B&gt; {
+		first  A
+		second B
+	}
+
+	type Box&lt;T&gt; {
+		value T
+
+		def new(v T) { self.value = v }
+		def get() T { return self.value }
+	}
+
+	type Admin {}
+	type Account {}
+
+	type User&lt;T&gt; {
+		name string
+
+		where T is Admin | Account {
+			permissions string[]
+
+			def tag() string { return "privileged" }
+		}
+	}
+
+	def run() int {
+		let p Pair&lt;int, string&gt; = Pair&lt;int, string&gt;{first: 1, second: "hi"}
+
+		let b = new Box&lt;int&gt;(10)
+		let c = new Box&lt;string&gt;("x")
+
+		let u User&lt;Admin&gt; = new(name="bob")
+		return b.get() + c.get().len() + u.permissions.len()
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="operators">
+      <h2>Operator Overloading</h2>
+      <p>
+        An <code>infix</code> method binds a type to an operator symbol, so instances of it work with
+        ordinary operator syntax — including shifts and rotations.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">infix.adm</span>
+        </div>
+        <pre><code>module bits {
+	type Flags {
+		value int
+
+		infix def | (other Flags) Flags {
+			return Flags{value: value | other.value}
+		}
+
+		infix def &amp; (other Flags) Flags {
+			return Flags{value: value &amp; other.value}
+		}
+
+		infix def &lt;&lt;&lt; (count int) Flags {
+			return Flags{value: value &lt;&lt;&lt; count}
+		}
+	}
+}
+
+application Bits {
+	use bits
+
+	def new(args string[]) int {
+		let read  = bits.Flags{value: 1}
+		let write = bits.Flags{value: 2}
+
+		let rw = read | write     // calls infix def |
+		let hi = rw &lt;&lt;&lt; 4          // calls infix def &lt;&lt;&lt;
+
+		// the standard library does this too — strings repeat with *
+		println("ha" * 3)          // hahaha
+		return 0
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="lambdas">
+      <h2>Lambdas</h2>
+      <p>
+        <code>param =&gt; expr</code> is shorthand for an anonymous function. Parameter types are
+        inferred when the callback's shape is already known.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">lambdas.adm</span>
+        </div>
+        <pre><code>application Lambdas {
+	def new(args string[]) int {
+		let a = int[1, 2, 3]
+
+		let doubled = a.mapElem(v =&gt; v * 2)
+		let labels  = a.mapElem(v =&gt; sprint(v))
+
+		// an anonymous function that names itself can recurse
+		let fib = def fib(n int) int {
+			return n when n &lt; 2
+			return fib(n-1) + fib(n-2)
+		}
+
+		println(doubled.len())
+		println(fib(10))
+		return 0
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="parallel">
+      <h2>Parallel Loops</h2>
+      <p>
+        <code>forall</code> spreads iterations across every available CPU core. Order isn't
+        guaranteed; <code>finish</code> runs once all workers are done.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">parallel.adm</span>
+        </div>
+        <pre><code>application Parallel {
+	def new(args string[]) int {
+		let values = [10, 20, 30, 40]
+
+		forall let (idx, v) in values {
+			println("worker got {v} at {idx}")
+		} finish {
+			println("all workers done")
+		}
+
+		return 0
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="async">
+      <h2>Async &amp; Channels</h2>
+      <p>
+        <code>await</code> composes with <code>&amp;&amp;</code>/<code>||</code> over completion state:
+        <code>||</code> resumes on the first to finish, <code>&amp;&amp;</code> waits for both.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">concurrency.adm</span>
+        </div>
+        <pre><code>module work {
+	async def slow() int {
+		let acc = 0
+		for let i in 0..2000000 {
+			acc = i
+		}
+		return 7
+	}
+
+	async def fast() string {
+		return "ok"
+	}
+}
+
+application Concurrency {
+	use work
+
+	def new(args string[]) int {
+		let a = work.slow()
+		let b = work.fast()
+
+		// resume as soon as either finishes
+		let first = await (a || b)
+		println("string won") when first is string
+
+		// futures can be cancelled or given a deadline
+		let stuck = work.slow().timeout(50ms)
+		let dropped = work.slow().cancel()
+
+		// a channel between workers
+		let ch channel&lt;int&gt; = new(size=4)
+		ch &lt;- 42
+		ch.close()
+
+		select {
+			case ch:
+				println(&lt;-ch)
+			default:
+				println("nothing ready")
+		}
+
+		// or drain a channel in parallel across cores
+		forall let v in ch {
+			println(v)
+		} empty {
+			println("channel was empty")
+		}
+		return 0
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="service">
+      <h2>Services</h2>
+      <p>
+        <code>@commit()</code> mutates service state and emits a typed event; <code>@on</code> subscribes
+        to it. <code>@query()</code> reads a snapshot.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">service.adm</span>
+        </div>
+        <pre><code>module demo {
+	use std.services::(*)
+
+	service Storage {
+		opened int
+
+		@query()
+		def openCount() int {
+			return opened
+		}
+
+		@commit()
+		def open(id int) int {
+			opened += 1
+			return id
+		}
+	}
+
+	@on(Storage.open)
+	def logOpen(ev Event&lt;int&gt;) {
+		println("opened {ev.result}, total {Storage.openCount()}")
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="annotations">
+      <h2>Custom Annotations</h2>
+      <p>
+        <code>meta def</code> defines a new annotation. The first parameter's context type decides
+        what it can decorate — and a parameter annotation can rewrite the argument before the body
+        ever runs:
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">param_meta.adm</span>
+        </div>
+        <pre><code>module demo {
+	use std.reflection as reflection
+
+	meta def setTo(ctx reflection.ParameterMetaContext, value int) {
+		ctx.set(value)
+	}
+
+	def id(@setTo(42) x int) int {
+		return x
+	}
+
+	def run() bool {
+		return id(1) == 42   // the argument was rewritten on the way in
+	}
+}</code></pre>
+      </div>
+
+      <p>
+        Annotations are also discoverable at runtime, so a registry can find everything tagged with a
+        given annotation without any string lookups or manual registration:
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">discovery.adm</span>
+        </div>
+        <pre><code>module demo {
+	use std.reflection
+
+	meta def mark(target reflection.DeclarationMetaContext, name string) {}
+
+	@mark("t")
+	type Thing {}
+
+	@mark("f")
+	def handler(x int) int {
+		return x
+	}
+
+	def run() int {
+		let hits = reflection.attrs(mark)
+		return hits.len()   // 2 — the type and the function
+	}
+}</code></pre>
+      </div>
+
+      <p>And metadata attached by an annotation stays readable at runtime, which is how the JSON encoder finds its field names:</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">field_meta.adm</span>
+        </div>
+        <pre><code>module demo {
+	use std.reflection as reflection
+	use std.data.encoding as encoding
+
+	type T {
+		@encoding.json(name="a", omitempty=true)
+		x int
+	}
+
+	def run() bool {
+		let t = T{x: 1}
+		let md = reflection.fieldMetadataOf(t, "x")
+		return md.load("encoder.json.name") == "a"
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="simd">
+      <h2>SIMD</h2>
+      <p>
+        <code>vec4&lt;T&gt;</code> and friends map to hardware SIMD where available — arithmetic runs
+        across all lanes at once, and comparisons return a mask for branchless selection.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">simd.adm</span>
+        </div>
+        <pre><code>application Simd {
+	def new(args string[]) int {
+		let data = float[1.0, 2.0, 3.0, 4.0]
+
+		let v vec4&lt;float&gt;
+		let a = v.load(data, 0)
+
+		let w vec4&lt;float&gt;
+		let b = w.splat(2.0)
+
+		let scaled = a * b          // all four lanes at once
+		let big    = a.gt(b)        // mask4&lt;float&gt;
+		let picked = big.blend(a, b) // branchless select
+
+		scaled.store(data, 0)
+		return 0
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="ffi">
+      <h2>C Interop</h2>
+      <p>
+        Annotate a module and every body-less <code>def</code> inside binds to that library — this is
+        how the standard library's OpenGL bindings work.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">ffi.adm</span>
+        </div>
+        <pre><code>@link("GL")
+module gl {
+	const GL_TRIANGLES uint32 = 0x00000004
+
+	def glClear(mask uint32);
+	def glViewport(x, y, width, height int);
+}
+
+@c("libm.so")
+module libm {
+	def sin(x float64) float64;
+	def cos(x float64) float64;
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="testing">
+      <h2>Tests</h2>
+      <p>
+        <code>check</code> suites live next to the code they verify. They're type-checked with the rest
+        of the program and dropped from release builds.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">path_test.adm</span>
+        </div>
+        <pre><code>module std.os {
+	check "Path" {
+		@test()
+		def TestExtension() {
+			assert extension("/path/to/file.txt") == "txt"
+			assert extension("file") == ""
+		}
+
+		@benchmark()
+		def BenchBase() {
+			base("/path/to/file.txt")
+		}
+	}
+}</code></pre>
+      </div>
+      <p>Run them with <code>adm test</code>, or benchmarks with <code>adm test --bench</code>.</p>
+    </section>
+
+  </main>
+
+</div>
+
+<script src="docs.js"></script>
+<script src="highlight.js"></script>
+</body>
+</html>

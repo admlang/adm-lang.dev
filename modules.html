@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modules — adm</title>
+<meta name="description" content="ADM standard library module reference.">
+<link rel="icon" type="image/svg+xml" href="assets/adm.svg">
+<link rel="canonical" href="https://adm-lang.dev/modules.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="adm">
+<meta property="og:title" content="adm standard library">
+<meta property="og:description" content="Reference for the ADM standard library modules under the std namespace.">
+<meta property="og:url" content="https://adm-lang.dev/modules.html">
+<meta property="og:image" content="https://adm-lang.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="adm standard library">
+<meta name="twitter:description" content="Reference for the ADM standard library modules under the std namespace.">
+<meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/adm.svg" alt="ADM" class="brand-mark">
+      <span class="brand-name"><span class="brand-sub">programming language</span></span>
+    </a>
+    <nav class="nav">
+      <a href="docs.html">Docs</a>
+      <a href="examples.html">Examples</a>
+      <a href="modules.html" class="nav-active">Modules</a>
+      <a class="nav-icon" href="https://github.com/admlang" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+        </svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs-layout">
+
+  <aside class="docs-sidebar">
+    <nav class="docs-nav" id="docs-nav">
+
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#overview">Overview</a></div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#core">Core</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#std-strings">std.strings</a></li>
+          <li><a class="docs-nav-sub" href="#std-bytes">std.bytes</a></li>
+          <li><a class="docs-nav-sub" href="#std-math">std.math</a></li>
+          <li><a class="docs-nav-sub" href="#std-time">std.time</a></li>
+          <li><a class="docs-nav-sub" href="#std-errors">std.errors</a></li>
+          <li><a class="docs-nav-sub" href="#std-collections">std.collections</a></li>
+          <li><a class="docs-nav-sub" href="#std-validations">std.validations</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#system">System</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#std-os">std.os</a></li>
+          <li><a class="docs-nav-sub" href="#std-io">std.io</a></li>
+          <li><a class="docs-nav-sub" href="#std-mem">std.mem</a></li>
+          <li><a class="docs-nav-sub" href="#std-sync">std.sync</a></li>
+          <li><a class="docs-nav-sub" href="#std-services">std.services</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#data">Data</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#std-data">std.data</a></li>
+          <li><a class="docs-nav-sub" href="#std-crypto">std.crypto</a></li>
+          <li><a class="docs-nav-sub" href="#std-formats">std.formats</a></li>
+          <li><a class="docs-nav-sub" href="#std-proto">std.proto</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#net-group">Networking</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#std-net">std.net</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#graphics">Graphics &amp; UI</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#std-ui">std.ui</a></li>
+          <li><a class="docs-nav-sub" href="#std-gfx">std.gfx</a></li>
+          <li><a class="docs-nav-sub" href="#std-simd">std.simd</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#tooling">Tooling</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#std-testing">std.testing</a></li>
+          <li><a class="docs-nav-sub" href="#std-reflection">std.reflection</a></li>
+          <li><a class="docs-nav-sub" href="#std-cli">std.cli</a></li>
+          <li><a class="docs-nav-sub" href="#std-metrics">std.metrics</a></li>
+          <li><a class="docs-nav-sub" href="#std-i18n">std.i18n</a></li>
+          <li><a class="docs-nav-sub" href="#std-interop">std.interop</a></li>
+        </ul>
+      </div>
+
+    </nav>
+  </aside>
+
+  <main class="docs-content">
+
+    <section class="docs-section" id="overview">
+      <h2>Standard Library</h2>
+      <p>
+        The standard library ships with the compiler under the <code>std</code> namespace. Import any
+        of it with <a href="docs.html#use-imports"><code>use</code></a>:
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">imports.adm</span>
+        </div>
+        <pre><code>use std.strings
+use std.net.http
+use std.data.encoding::(json)</code></pre>
+      </div>
+      <p class="docs-placeholder">
+        Per-module API reference is being generated — the pages below are placeholders for now.
+      </p>
+    </section>
+
+    <section class="docs-section" id="core">
+      <h2>Core</h2>
+      <div class="docs-sub" id="std-strings">
+        <h3><code>std.strings</code></h3>
+        <p class="docs-placeholder">Text manipulation, searching, and formatting. Reference coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-bytes">
+        <h3><code>std.bytes</code></h3>
+        <p class="docs-placeholder">Byte buffers and readers. Reference coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-math">
+        <h3><code>std.math</code></h3>
+        <p class="docs-placeholder">Numeric functions plus <code>std.math.geom</code> for geometry types. Reference coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-time">
+        <h3><code>std.time</code></h3>
+        <p class="docs-placeholder">Clocks, durations, formatting, and cron expressions. Reference coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-errors">
+        <h3><code>std.errors</code></h3>
+        <p class="docs-placeholder">Error construction, wrapping, and inspection. Reference coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-collections">
+        <h3><code>std.collections</code></h3>
+        <p class="docs-placeholder">Sorting and searching over collections. Reference coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-validations">
+        <h3><code>std.validations</code></h3>
+        <p class="docs-placeholder">Input validation helpers and validating parameter annotations. Reference coming soon.</p>
+      </div>
+    </section>
+
+    <section class="docs-section" id="system">
+      <h2>System</h2>
+      <div class="docs-sub" id="std-os">
+        <h3><code>std.os</code></h3>
+        <p class="docs-placeholder">Filesystem, paths, processes, and environment. Reference coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-io">
+        <h3><code>std.io</code></h3>
+        <p class="docs-placeholder">Readers, writers, and streaming primitives. Reference coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-mem">
+        <h3><code>std.mem</code></h3>
+        <p class="docs-placeholder">Low-level memory operations. Reference coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-sync">
+        <h3><code>std.sync</code></h3>
+        <p class="docs-placeholder">Synchronization primitives beyond channels. Reference coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-services">
+        <h3><code>std.services</code></h3>
+        <p class="docs-placeholder">
+          Service manager plus the builtin services listed under
+          <a href="docs.html#services">Services</a>. Reference coming soon.
+        </p>
+      </div>
+    </section>
+
+    <section class="docs-section" id="data">
+      <h2>Data</h2>
+      <div class="docs-sub" id="std-data">
+        <h3><code>std.data</code></h3>
+        <p class="docs-placeholder">Encoding (JSON, XML, YAML), compression, databases, and data structures. Reference coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-crypto">
+        <h3><code>std.crypto</code></h3>
+        <p class="docs-placeholder">Hashes, ciphers, random, and UUIDs. Reference coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-formats">
+        <h3><code>std.formats</code></h3>
+        <p class="docs-placeholder">Image, audio, video, font, archive, and document formats. Reference coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-proto">
+        <h3><code>std.proto</code></h3>
+        <p class="docs-placeholder">Protocol definitions and code generation. Reference coming soon.</p>
+      </div>
+    </section>
+
+    <section class="docs-section" id="net-group">
+      <h2>Networking</h2>
+      <div class="docs-sub" id="std-net">
+        <h3><code>std.net</code></h3>
+        <p class="docs-placeholder">
+          TCP, UDP, DNS, and higher-level protocol clients and servers — HTTP, SSH, SMTP, FTP, LDAP,
+          IRC. Reference coming soon.
+        </p>
+      </div>
+    </section>
+
+    <section class="docs-section" id="graphics">
+      <h2>Graphics &amp; UI</h2>
+      <div class="docs-sub" id="std-ui">
+        <h3><code>std.ui</code></h3>
+        <p class="docs-placeholder">
+          Components and renderers backing the <a href="docs.html#ui">UI</a> constructs. Reference coming soon.
+        </p>
+      </div>
+      <div class="docs-sub" id="std-gfx">
+        <h3><code>std.gfx</code></h3>
+        <p class="docs-placeholder">Canvas drawing, color, and rendering. Reference coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-simd">
+        <h3><code>std.simd</code></h3>
+        <p class="docs-placeholder">
+          Documented surface over the <a href="docs.html#vectors">vector types</a> — loads, stores,
+          and lane operations. Reference coming soon.
+        </p>
+      </div>
+    </section>
+
+    <section class="docs-section" id="tooling">
+      <h2>Tooling</h2>
+      <div class="docs-sub" id="std-testing">
+        <h3><code>std.testing</code></h3>
+        <p class="docs-placeholder">
+          Lifecycle hooks and attributes for <a href="docs.html#testing">check suites</a>. Reference coming soon.
+        </p>
+      </div>
+      <div class="docs-sub" id="std-reflection">
+        <h3><code>std.reflection</code></h3>
+        <p class="docs-placeholder">
+          Meta contexts, runtime type info, and discovery — the machinery behind
+          <a href="docs.html#attributes">attributes</a>. Reference coming soon.
+        </p>
+      </div>
+      <div class="docs-sub" id="std-cli">
+        <h3><code>std.cli</code></h3>
+        <p class="docs-placeholder">Argument parsing, flags, and terminal output. Reference coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-metrics">
+        <h3><code>std.metrics</code></h3>
+        <p class="docs-placeholder">Counters, gauges, and metric publishing. Reference coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-i18n">
+        <h3><code>std.i18n</code></h3>
+        <p class="docs-placeholder">Localization catalogs and message formatting. Reference coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-interop">
+        <h3><code>std.interop</code></h3>
+        <p class="docs-placeholder">
+          Helpers for <a href="docs.html#interop">foreign function interfaces</a>. Reference coming soon.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+</div>
+
+<script src="docs.js"></script>
+<script src="highlight.js"></script>
+</body>
+</html>
