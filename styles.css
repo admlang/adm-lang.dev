@@ -518,6 +518,109 @@ code, pre, .code-window {
   font-size: 14.5px;
 }
 
+/* Service / annotation API entries */
+
+.api-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--border);
+}
+
+.api-item {
+  margin: 0;
+  padding: 12px 0 13px;
+  border-bottom: 1px solid var(--border);
+}
+
+.api-head {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.api-sig {
+  font-size: 13.5px;
+  word-break: break-word;
+}
+
+.docs-content .api-doc {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.docs-content .api-note {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: var(--text-muted);
+  border-left: 2px solid var(--border);
+  padding-left: 10px;
+}
+
+.docs-content .api-targets {
+  margin: 0 0 10px;
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+
+.api-siglist {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 13.5px;
+  overflow-x: auto;
+}
+
+.api-siglist code {
+  background: none;
+  border: 0;
+  padding: 0;
+  white-space: pre;
+}
+
+.api-tag {
+  flex: none;
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--bg-alt);
+  vertical-align: middle;
+}
+
+.api-query {
+  color: #4f7fb8;
+  border-color: #4f7fb855;
+  background: #4f7fb814;
+}
+
+.api-commit {
+  color: #b07d3f;
+  border-color: #b07d3f55;
+  background: #b07d3f14;
+}
+
+.api-emit {
+  color: #8e6bb0;
+  border-color: #8e6bb055;
+  background: #8e6bb014;
+}
+
+.api-planned {
+  font-weight: 600;
+  text-transform: none;
+}
+
 @media (max-width: 900px) {
   .docs-layout {
     grid-template-columns: 1fr;

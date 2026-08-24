@@ -30,6 +30,7 @@
     <nav class="nav">
       <a href="docs.html" class="nav-active">Docs</a>
       <a href="examples.html">Examples</a>
+      <a href="services.html">Services</a>
       <a href="modules.html">Modules</a>
       <a class="nav-icon" href="https://github.com/admlang" target="_blank" rel="noopener" aria-label="GitHub">
         <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">
@@ -2604,7 +2605,11 @@ def log(evt Event&lt;string&gt;) {
         since nothing ever operates on a service like a value. A service can still be <code>internal</code>
         or <code>partial</code> like anything else.
       </p>
-      <p>ADM ships a set of builtin services that cover the platform surface every application needs:</p>
+      <p>
+        ADM ships a set of builtin services that cover the platform surface every application
+        needs. Every method signature and every annotation they provide is listed in the
+        <a href="services.html">services reference</a>.
+      </p>
       <table class="docs-table">
         <tr><th>Service</th><th>Description</th></tr>
         <tr><td>Application</td><td>Application details (PID, executable path, start time, uptime) and lifecycle methods (exit/restart).</td></tr>

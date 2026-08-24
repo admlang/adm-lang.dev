@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Services — adm</title>
+<meta name="description" content="Reference for the builtin ADM services and their annotations.">
+<link rel="icon" type="image/svg+xml" href="assets/adm.svg">
+<link rel="canonical" href="https://adm-lang.dev/services.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="adm">
+<meta property="og:title" content="adm services">
+<meta property="og:description" content="Every builtin ADM service, its query/commit/emit methods, and the annotations it ships.">
+<meta property="og:url" content="https://adm-lang.dev/services.html">
+<meta property="og:image" content="https://adm-lang.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="adm services">
+<meta name="twitter:description" content="Every builtin ADM service, its query/commit/emit methods, and the annotations it ships.">
+<meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/adm.svg" alt="ADM" class="brand-mark">
+      <span class="brand-name"><span class="brand-sub">programming language</span></span>
+    </a>
+    <nav class="nav">
+      <a href="docs.html">Docs</a>
+      <a href="examples.html">Examples</a>
+      <a href="services.html" class="nav-active">Services</a>
+      <a href="modules.html">Modules</a>
+      <a class="nav-icon" href="https://github.com/admlang" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+        </svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs-layout">
+
+  <aside class="docs-sidebar">
+    <nav class="docs-nav" id="docs-nav">
+
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#overview">Overview</a></div>
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#builtin">Builtin services</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#svc-application"><code>Application</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-cache"><code>Cache</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-config"><code>Config</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-debugger"><code>Debugger</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-devices"><code>Devices</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-diagnostics"><code>Diagnostics</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-i18n"><code>I18n</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-ipc"><code>IPC</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-logging"><code>Logging</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-messaging"><code>Messaging</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-network"><code>Network</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-policy"><code>Policy</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-runtime"><code>Runtime</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-scheduler"><code>Scheduler</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-storage"><code>Storage</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-telemetry"><code>Telemetry</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-ui"><code>UI</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-vault"><code>Vault</code></a></li>
+        </ul>
+      </div>
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#annotations">Annotations</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#meta-cache"><code>@cache</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-cacheinvalidate"><code>@cacheInvalidate</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-config"><code>@config</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-trace"><code>@trace</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-noinline"><code>@noInline</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-nooptimize"><code>@noOptimize</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-trackcaller"><code>@trackCaller</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-watch"><code>@watch</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-metric"><code>@metric</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-measurecount"><code>@measureCount</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-measuretime"><code>@measureTime</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-measureerrors"><code>@measureErrors</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-measureconcurrency"><code>@measureConcurrency</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-log"><code>@log</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-logcontext"><code>@logContext</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-sensitive"><code>@sensitive</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-policy"><code>@policy</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-requires"><code>@requires</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-cron"><code>@cron</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-at"><code>@at</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-after"><code>@after</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-runevery"><code>@runEvery</code></a></li>
+        </ul>
+      </div>
+
+    </nav>
+  </aside>
+
+  <main class="docs-content">
+
+    <section class="docs-section" id="overview">
+      <h2>Services</h2>
+      <p>
+        The builtin services are always available — no import of an instance, no construction. The
+        ADM service manager starts them before <code>application.new</code> runs and stops them on
+        shutdown, so calling one is just <code>Cache.get("k")</code>. For the language rules behind
+        <code>service</code> declarations, see <a href="docs.html#services">Services</a> in the docs.
+      </p>
+      <p>Every public method is one of three kinds:</p>
+      <table class="docs-table">
+        <tr>
+          <td><span class="api-tag api-query">query</span></td>
+          <td>Reads a snapshot of the service's state. Never <code>async</code>.</td>
+        </tr>
+        <tr>
+          <td><span class="api-tag api-commit">commit</span></td>
+          <td>Mutates state and emits a typed event. Implicitly <code>atomic</code>.</td>
+        </tr>
+        <tr>
+          <td><span class="api-tag api-emit">emit</span></td>
+          <td>
+            Describes an event's shape only — you subscribe to it with
+            <code>@on(Service.method)</code> and never call it.
+          </td>
+        </tr>
+      </table>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage.adm</span>
+        </div>
+        <pre><code>use std.services::(Cache, Diagnostics)
+use std.metrics::(Counter)
+
+def warm(email string) !none {
+	Cache.set("user.{email}", email, ttl = 5m)
+
+	let hits = try Diagnostics.register&lt;Counter&gt;("cache.warm")
+	hits.inc()
+	return none
+}
+
+@on(Cache.expired)
+def onExpiry(evt Event&lt;string&gt;) {
+	println("expired {evt.result}")
+}</code></pre>
+      </div>
+      <p>
+        Services also ship <a href="#annotations">annotations</a> — <code>@cache</code>,
+        <code>@metric</code>, <code>@measureTime</code> and friends — that wrap a declaration instead
+        of being called. Import them by name (<code>use std.services::(cache)</code>). An annotation
+        that accepts more than one kind of target must be written qualified
+        (<code>use std.services</code> then <code>@services.trace()</code>), because a by-name import
+        narrows it to a single target.
+      </p>
+      <p class="docs-placeholder">
+        Signatures on this page are generated from the standard library source. Some services are
+        still filling in method bodies; annotations whose behavior is not wired up yet are marked
+        <span class="api-tag api-planned">planned</span>.
+      </p>
+    </section>
+
+    <section class="docs-section" id="builtin">
+      <h2>Builtin services</h2>
+      <div class="docs-sub" id="svc-application">
+        <h3><code>Application</code></h3>
+        <p>Identity and lifecycle of the running application.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def pid() int</code></div>
+            <p class="api-doc">Returns process id of the application</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def executablePath() string</code></div>
+            <p class="api-doc">Returns path to the application executable.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def startTime() Time</code></div>
+            <p class="api-doc">Returns time when the application process started.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def name() string</code></div>
+            <p class="api-doc">Returns resolved application name.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def version() string</code></div>
+            <p class="api-doc">Returns application version, or an empty string if the application is not versioned.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def build() string</code></div>
+            <p class="api-doc">Returns application build number, or an empty string if unavailable.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def instanceId() string</code></div>
+            <p class="api-doc">Returns identifier of the current application instance.</p>
+            <p class="api-doc">The identifier is unique to this running instance and changes between runs.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def arguments() string[]</code></div>
+            <p class="api-doc">Returns command-line arguments passed to the application.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def uptime() duration</code></div>
+            <p class="api-doc">Returns how long the application has been running.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def shutdown(code int = 0) !none</code></div>
+            <p class="api-doc">Requests graceful application shutdown.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def shuttingDown() bool</code></div>
+            <p class="api-doc">Returns whether graceful application shutdown has been requested.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def shutdownRequested(code int) int</code></div>
+            <p class="api-doc">Emitted when graceful application shutdown is requested.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def exit(code int)</code></div>
+            <p class="api-doc">Terminates the application using the specified exit code.</p>
+          </li>
+        </ul>
+      </div>
+      <div class="docs-sub" id="svc-cache">
+        <h3><code>Cache</code></h3>
+        <p>Fast in-memory cache with TTL, idle expiration, glob selectors, and size limits.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">atomic def set(key string, value any, ttl ?duration = none, idle ?duration = none)</code></div>
+            <p class="api-doc">Stores a key-value pair with optional TTL and idle expiration.</p>
+            <p class="api-doc">TTL defines the maximum lifetime of the key. Idle defines how long the key may remain unused before expiring.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def get(key string) ?any</code></div>
+            <p class="api-doc">Returns the value associated with the key.</p>
+            <p class="api-doc">Accessing the key resets its idle timer if idle expiration is configured. Returns none if the key does not exist or has expired.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def get(keys string[]) map&lt;string, any&gt;</code></div>
+            <p class="api-doc">Returns the values associated with the specified keys.</p>
+            <p class="api-doc">Accessing a key resets its idle timer if idle expiration is configured.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def get(selector Glob) map&lt;string, any&gt;</code></div>
+            <p class="api-doc">Returns the values associated with keys matching the selector.</p>
+            <p class="api-doc">Accessing a matched key resets its idle timer if idle expiration is configured. Unlike string keys, Glob values are interpreted as key patterns.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">atomic def delete(key string)</code></div>
+            <p class="api-doc">Removes the specified key from the cache.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">atomic def delete(keys string[])</code></div>
+            <p class="api-doc">Removes the specified keys from the cache.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">atomic def delete(selector Glob) int</code></div>
+            <p class="api-doc">Removes all keys matching the selector returning the number of items deleted.</p>
+            <p class="api-doc">Unlike string keys, Glob values are interpreted as key patterns.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">atomic def renew(key string, ttl ?duration = none, idle ?duration = none)</code></div>
+            <p class="api-doc">Updates the key's expiration settings.</p>
+            <p class="api-doc">If TTL is provided, the key's TTL is reset from the current time. If idle is provided, the key's idle duration is updated and its idle timer is reset.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">atomic def renew(selector Glob, ttl ?duration = none, idle ?duration = none) int</code></div>
+            <p class="api-doc">Updates the expiration settings of all keys matching the selector returning the number if items renewed.</p>
+            <p class="api-doc">If TTL is provided, each matched key's TTL is reset from the current time. If idle is provided, each matched key's idle duration is updated and its idle timer is reset.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">atomic def take(key string) ?any</code></div>
+            <p class="api-doc">Returns the value associated with the key and removes the key from the cache.</p>
+            <p class="api-doc">Returns none if the key does not exist or has expired.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">atomic def touch(key string)</code></div>
+            <p class="api-doc">Marks the key as accessed.</p>
+            <p class="api-doc">Resets the key's idle timer without changing its TTL.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">atomic def touch(keys string[])</code></div>
+            <p class="api-doc">Marks the specified keys as accessed.</p>
+            <p class="api-doc">Resets each key's idle timer without changing its TTL.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">atomic def touch(selector Glob) int</code></div>
+            <p class="api-doc">Marks all keys matching the selector as accessed returning the number of items modified</p>
+            <p class="api-doc">Resets each matched key's idle timer without changing its TTL.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def has(key string) bool</code></div>
+            <p class="api-doc">Returns whether the key exists and has not expired.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def has(keys string[]) map&lt;string, bool&gt;</code></div>
+            <p class="api-doc">Returns whether each specified key exists and has not expired.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def has(selector Glob) bool</code></div>
+            <p class="api-doc">Returns whether at least one existing key matches the selector.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def ttl(key string) ?duration</code></div>
+            <p class="api-doc">Returns the remaining TTL of the key.</p>
+            <p class="api-doc">Returns none if the key does not exist or has no TTL configured.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def ttl(keys string[]) map&lt;string, ?duration&gt;</code></div>
+            <p class="api-doc">Returns the remaining TTL of each specified key.</p>
+            <p class="api-doc">A value is none if the key does not exist or has no TTL configured.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def ttl(selector Glob) map&lt;string, ?duration&gt;</code></div>
+            <p class="api-doc">Returns the remaining TTL of each key matching the selector.</p>
+            <p class="api-doc">A value is none if the matched key has no TTL configured.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def idle(key string) ?duration</code></div>
+            <p class="api-doc">Returns the remaining idle time of the key.</p>
+            <p class="api-doc">Returns none if the key does not exist or has no idle expiration configured.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def idle(keys string[]) map&lt;string, ?duration&gt;</code></div>
+            <p class="api-doc">Returns the remaining idle time of each specified key.</p>
+            <p class="api-doc">A value is none if the key does not exist or has no idle expiration configured.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def idle(selector Glob) map&lt;string, ?duration&gt;</code></div>
+            <p class="api-doc">Returns the remaining idle time of each key matching the selector.</p>
+            <p class="api-doc">A value is none if the matched key has no idle expiration configured.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def keys() string[]</code></div>
+            <p class="api-doc">Returns all keys currently present in the cache.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def keys(selector Glob) string[]</code></div>
+            <p class="api-doc">Returns all keys matching the selector.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def size() int</code></div>
+            <p class="api-doc">Returns the number of keys currently present in the cache.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def size(selector Glob) int</code></div>
+            <p class="api-doc">Returns the number of keys matching the selector.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">atomic def clear()</code></div>
+            <p class="api-doc">Removes all keys from the cache.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def expired(key string) string</code></div>
+            <p class="api-doc">Emitted when a key expires.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def deleted(key string) string</code></div>
+            <p class="api-doc">Emitted when a key is explicitly deleted.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def created(key string) string</code></div>
+            <p class="api-doc">Emitted when a new key is created.</p>
+          </li>
+        </ul>
+      </div>
+      <div class="docs-sub" id="svc-config">
+        <h3><code>Config</code></h3>
+        <p>Layered configuration with profiles, typed reads, and reload events.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def switchProfile(profile ?string) !none</code></div>
+            <p class="api-doc">Switches the active configuration profile and reloads all sources.</p>
+            <p class="api-doc">The profile is changed only if the resulting configuration can be loaded successfully. Otherwise, the current profile and configuration remain active.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def profile() ?string</code></div>
+            <p class="api-doc">Returns the currently active configuration profile.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def get(key string) ?any</code></div>
+            <p class="api-doc">Returns the effective value associated with the key.</p>
+            <p class="api-doc">Returns none if the key is not defined by any source.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def get&lt;T&gt;(key string) !?T</code></div>
+            <p class="api-doc">Returns the effective value associated with the key converted to T.</p>
+            <p class="api-doc">Returns none if the key is not defined by any source.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def has(key string) bool</code></div>
+            <p class="api-doc">Returns whether an effective value exists for the key.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def set(key string, value any)</code></div>
+            <p class="api-doc">Sets a runtime override for the key.</p>
+            <p class="api-doc">Runtime overrides have precedence over configured sources and are not written back to the source that originally provided the value.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def reset(key string)</code></div>
+            <p class="api-doc">Removes the runtime override for the key.</p>
+            <p class="api-doc">The effective value falls back to the highest-precedence configured source that defines the key.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def reload() !none</code></div>
+            <p class="api-doc">Reloads all configured sources and recomputes the effective configuration.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def sources() ConfigSourceConfig[]</code></div>
+            <p class="api-doc">Returns the configured sources in precedence order.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def source(name string) ?ConfigSourceConfig</code></div>
+            <p class="api-doc">Returns the configured source with the specified name.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def sourceOf(key string) ?ConfigSource</code></div>
+            <p class="api-doc">Returns the source currently providing the effective value for the key.</p>
+            <p class="api-doc">Returns none if the value is a runtime override or the key does not exist.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def lastLoaded() time.Time</code></div>
+            <p class="api-doc">Returns the last time the effective configuration was successfully loaded.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def changed(change ConfigChange) ConfigChange</code></div>
+            <p class="api-doc">Emitted when the effective value of a configuration key changes.</p>
+            <p class="api-doc">Source changes that do not alter the effective value do not emit this event.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def reloadFailed(event ConfigReloadError) ConfigReloadError</code></div>
+            <p class="api-doc">Emitted when a configuration source cannot be reloaded.</p>
+            <p class="api-doc">The current effective configuration remains unchanged.</p>
+          </li>
+        </ul>
+      </div>
+      <div class="docs-sub" id="svc-debugger">
+        <h3><code>Debugger</code></h3>
+        <p>Profiling, tracing, heap snapshots, and debug control.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def profileStart(kind ProfileKind) !ProfileId</code></div>
+            <p class="api-doc">Starts collecting profiling data of the specified kind.</p>
+            <p class="api-doc">Returns an identifier that can be used to stop the profiling session.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def profileStop(id ProfileId) !Profile</code></div>
+            <p class="api-doc">Stops the specified profiling session and returns the collected profile.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def traceStart() !TraceId</code></div>
+            <p class="api-doc">Starts recording runtime execution events.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def traceStop(id TraceId) !Trace</code></div>
+            <p class="api-doc">Stops the specified trace and returns the recorded data.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def gc() !none</code></div>
+            <p class="api-doc">Triggers a garbage collection cycle.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def stackTrace() errors.StackTrace</code></div>
+            <p class="api-doc">Returns the current stack trace for the calling execution.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def heapSnapshot() !HeapSnapshot</code></div>
+            <p class="api-doc">Captures a snapshot of the current heap.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def pause() !none</code></div>
+            <p class="api-doc">Pauses execution when an interactive debugger is attached.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def watched(event WatchEvent) WatchEvent</code></div>
+            <p class="api-doc">Emitted when an access matches an active debugger watch.</p>
+            <p class="api-doc">The event is emitted for reads, writes, or both according to the watch mode configured on the watched field or variable.</p>
+          </li>
+        </ul>
+      </div>
+      <div class="docs-sub" id="svc-devices">
+        <h3><code>Devices</code></h3>
+        <p>Cameras, microphones, USB, and other attached hardware.</p>
+        <p class="docs-placeholder">Planned — no public methods yet.</p>
+      </div>
+      <div class="docs-sub" id="svc-diagnostics">
+        <h3><code>Diagnostics</code></h3>
+        <p>Named metric registry — counters, gauges, histograms, and toggles.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def register&lt;T: Metric&gt;(name string) !T</code></div>
+            <p class="api-doc">Registers a metric under the specified name.</p>
+            <p class="api-doc">If a metric with the same name and type already exists, it is returned. Fails if the name is already registered with a different metric type.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def get(name string) ?Metric</code></div>
+            <p class="api-doc">Returns the metric registered under the specified name.</p>
+            <p class="api-doc">Returns none if no metric with that name exists.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def has(name string) bool</code></div>
+            <p class="api-doc">Returns whether a metric with the specified name is registered.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def list() map&lt;string, Metric&gt;</code></div>
+            <p class="api-doc">Returns all registered metrics.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def names() string[]</code></div>
+            <p class="api-doc">Returns all registered metric names.</p>
+          </li>
+        </ul>
+      </div>
+      <div class="docs-sub" id="svc-i18n">
+        <h3><code>I18n</code></h3>
+        <p>Locale selection and message catalogs.</p>
+        <p class="docs-placeholder">Planned — no public methods yet.</p>
+      </div>
+      <div class="docs-sub" id="svc-ipc">
+        <h3><code>IPC</code></h3>
+        <p>Inter-process communication between ADM applications.</p>
+        <p class="docs-placeholder">Planned — no public methods yet.</p>
+      </div>
+      <div class="docs-sub" id="svc-logging">
+        <h3><code>Logging</code></h3>
+        <p>Leveled logging with structured fields.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def debug(message string, fields map&lt;string, any&gt; = {}) !none</code></div>
+            <p class="api-doc">Writes a log entry at debug level.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def info(message string, fields map&lt;string, any&gt; = {}) !none</code></div>
+            <p class="api-doc">Writes a log entry at info level.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def warning(message string, fields map&lt;string, any&gt; = {}) !none</code></div>
+            <p class="api-doc">Writes a log entry at warning level.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def error(message string, fields map&lt;string, any&gt; = {}) !none</code></div>
+            <p class="api-doc">Writes a log entry at error level.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def fatal(message string, fields map&lt;string, any&gt; = {}) !none</code></div>
+            <p class="api-doc">Writes a log entry at fatal level.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def log(level LogLevel, message string, fields map&lt;string, any&gt; = {}) !none</code></div>
+            <p class="api-doc">Writes a log entry at the specified level.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def level() LogLevel</code></div>
+            <p class="api-doc">Returns current minimum log level.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setLevel(level LogLevel)</code></div>
+            <p class="api-doc">Sets minimum log level.</p>
+            <p class="api-doc">Log entries below this level are discarded before being routed to writers.</p>
+          </li>
+        </ul>
+      </div>
+      <div class="docs-sub" id="svc-messaging">
+        <h3><code>Messaging</code></h3>
+        <p>In-memory queues and topics.</p>
+        <p class="docs-placeholder">Planned — no public methods yet.</p>
+      </div>
+      <div class="docs-sub" id="svc-network">
+        <h3><code>Network</code></h3>
+        <p>Sockets, addressing, name resolution, and socket options.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def socket(domain net.SocketDomain, typ net.SocketType) !net.Socket</code></div>
+            <p class="api-doc">Create a socket and return a high-level `std.net.Socket` wrapper.</p>
+            <p class="api-doc">The runtime always passes `protocol = 0` to the OS: the selected protocol is derived from `(domain, typ)` by the platform (e.g. IPv4+Stream → TCP, IPv4+Datagram → UDP, Unix+Stream → unix stream).</p>
+            <p class="api-doc">The returned socket owns its file descriptor; callers must `close()` it (or hand it to a wrapper that will close it).</p>
+            <p class="api-doc">Errors: - The returned ADM `error.code` is typically an errno-derived string like `std.net.EAddrInUse`, `std.net.EConnRefused`, `std.net.ETimedOut`, ... - The error message prefixes the failing operation (e.g. `socket: ...`).</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def socketFd(domain net.SocketDomain, typ net.SocketType) !int</code></div>
+            <p class="api-doc">Create a socket and return its raw file descriptor.</p>
+            <p class="api-doc">Prefer `socket()` unless you intentionally want to bypass `std.net.Socket` wrappers (e.g. integrating with `std.os` FD APIs).</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def bind(fd int, addr string) !none</code></div>
+            <p class="api-doc">Bind a socket FD to a local address.</p>
+            <p class="api-doc">Address formats are shared across bind/connect/dial/sendTo: - IPv4:  `"host:port"` or `":port"` (host may be empty to bind all) - IPv6:  `"[host]:port"` or `"[]:port"` (host may be empty to bind all) - Unix:  `"/absolute/path"` (only valid for Unix-domain sockets)</p>
+            <p class="api-doc">Notes: - `":0"` selects an ephemeral port; use `localAddr(fd)` after binding to discover the chosen port. - Unix-domain binds do not unlink existing paths; if the path exists you must remove it yourself before binding.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def connect(fd int, addr string, timeout duration = 30s) !none</code></div>
+            <p class="api-doc">Connect a socket FD to a remote endpoint.</p>
+            <p class="api-doc">`timeout` applies to the connect handshake. The runtime uses a non-blocking connect + poll, and restores the original file status flags before returning.</p>
+            <p class="api-doc">On timeout, this returns an `ETIMEDOUT` error. The socket FD remains valid and should usually be closed unless the caller intends to retry/inspect it.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def accept(fd int) !int</code></div>
+            <p class="api-doc">Accept a new connection from a listening stream socket FD.</p>
+            <p class="api-doc">Returns the accepted connection as a new file descriptor; the caller owns the returned FD and must close it.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def close(fd int) !none</code></div>
+            <p class="api-doc">Close a socket FD.</p>
+            <p class="api-doc">Closing an already-closed FD is an OS error; `std.net` wrappers typically expose `close()` and forward to this method.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def listen(fd int, backlog int) !none</code></div>
+            <p class="api-doc">Mark a bound stream socket as a listener.</p>
+            <p class="api-doc">`backlog` is passed through to the OS; its effective value may be clamped by the platform.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def write(fd int, data byte[], timeout duration = 30s) !int</code></div>
+            <p class="api-doc">Write bytes to a connected stream socket FD.</p>
+            <p class="api-doc">Returns the number of bytes written; short writes are normal and callers must loop if they need to send the full buffer (see `std.net.Connection.writeAll`).</p>
+            <p class="api-doc">`timeout` bounds the wait for the FD to become writable, not an end-to-end "flush to peer" guarantee.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def read(fd int, data byte[], timeout duration = 30s) !int</code></div>
+            <p class="api-doc">Read bytes from a connected stream socket FD.</p>
+            <p class="api-doc">Returns the number of bytes read (0 indicates EOF / peer shutdown).</p>
+            <p class="api-doc">`timeout` bounds the wait for the FD to become readable.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def resolve(dns string) !string[]</code></div>
+            <p class="api-doc">Resolve a DNS name to IP literals (IPv4 and/or IPv6).</p>
+            <p class="api-doc">The returned strings never include ports. For "host:port" parsing and socket endpoint construction, see `std.net.Address`.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def dialStream(addr string, timeout duration = 30s) !int</code></div>
+            <p class="api-doc">Resolve + connect a stream socket and return a connected file descriptor.</p>
+            <p class="api-doc">This is the lowest-level "dial" helper: it returns a raw FD so higher-level wrappers (`std.net.dialStream`, connection pools, etc.) can build on it.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def sendTo(fd int, data byte[], addr string, timeout duration = 30s) !int</code></div>
+            <p class="api-doc">Send a datagram to a remote address (UDP / Unix datagram).</p>
+            <p class="api-doc">Returns the number of bytes sent. For datagrams this is usually either `data.len()` or an error.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def recvFrom(fd int, data byte[], timeout duration = 30s) !(int, string)</code></div>
+            <p class="api-doc">Receive a datagram and return the byte count and sender address string.</p>
+            <p class="api-doc">The returned address uses the same string format accepted by `sendTo` and `std.net.Address.parse`.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def shutdown(fd int, how int = 2) !none</code></div>
+            <p class="api-doc">Shutdown one or both halves of a connection.</p>
+            <p class="api-doc">`how` values: - 0: read half (further reads fail/EOF) - 1: write half (further writes fail) - 2: both (full shutdown)</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setReuseAddr(fd int, enabled bool = true) !none</code></div>
+            <p class="api-doc">Enable or disable SO_REUSEADDR.</p>
+            <p class="api-doc">This is typically required for servers that need to restart quickly.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setNoDelay(fd int, enabled bool = true) !none</code></div>
+            <p class="api-doc">Enable or disable TCP_NODELAY (TCP only).</p>
+            <p class="api-doc">For non-TCP sockets this may fail with an OS error.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setKeepAlive(fd int, enabled bool = true) !none</code></div>
+            <p class="api-doc">Enable or disable SO_KEEPALIVE.</p>
+            <p class="api-doc">Keepalive behavior is OS-configured; this only toggles it.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setReusePort(fd int, enabled bool = true) !none</code></div>
+            <p class="api-doc">Enable or disable SO_REUSEPORT when supported by the platform.</p>
+            <p class="api-doc">Some OSes do not expose this option; in that case this returns an error.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setLinger(fd int, enabled bool, seconds int = 0) !none</code></div>
+            <p class="api-doc">Control SO_LINGER.</p>
+            <p class="api-doc">When enabled, `seconds` controls how long the OS may block during `close` in an attempt to deliver queued data.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setRecvBuf(fd int, bytes int) !none</code></div>
+            <p class="api-doc">Set SO_RCVBUF.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setSendBuf(fd int, bytes int) !none</code></div>
+            <p class="api-doc">Set SO_SNDBUF.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setSockOptInt(fd int, level int, opt int, val int) !none</code></div>
+            <p class="api-doc">Set an integer socket option.</p>
+            <p class="api-doc">This is the escape hatch for options not yet wrapped by `std.net.Socket`. `level` and `opt` are passed directly to the OS (POSIX `setsockopt`).</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def getSockOptInt(fd int, level int, opt int) !int</code></div>
+            <p class="api-doc">Read an integer socket option.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def localAddr(fd int) !string</code></div>
+            <p class="api-doc">Return the local endpoint of a socket FD, formatted as an address string.</p>
+            <p class="api-doc">For stream sockets, this is useful after binding `:0` to discover the chosen ephemeral port. For Unix sockets, this is typically the bound path.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def remoteAddr(fd int) !string</code></div>
+            <p class="api-doc">Return the remote endpoint of a connected socket FD, formatted as an address string.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def publicAddr() !string</code></div>
+            <p class="api-doc">Returns the host's public address as seen from outside the local network.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def netIface() !net.NetInterface[]</code></div>
+            <p class="api-doc">Enumerate local network interfaces.</p>
+            <p class="api-doc">This is for host introspection (binding decisions, diagnostics, etc). It does not attempt to map interfaces into `std.net.Address` because interface addresses are not endpoints (no ports).</p>
+            <p class="api-doc">`flags` uses the ADM-stable `std.net.NetIface*` bit constants.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def sockets() SocketInfo[]</code></div>
+            <p class="api-doc">Returns runtime information for all sockets owned by the Network service.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def socketInfo(fd int) ?SocketInfo</code></div>
+            <p class="api-doc">Returns runtime information for the specified socket.</p>
+          </li>
+        </ul>
+      </div>
+      <div class="docs-sub" id="svc-policy">
+        <h3><code>Policy</code></h3>
+        <p>Permissions and policy decisions.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def requirePermissions(permissions string[]) !none</code></div>
+            <p class="api-doc">Requires the specified permissions, prompting the user when a decision is missing.</p>
+            <p class="api-doc">Fails if any permission is denied.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def revokePermissions(permissions string[]) !none</code></div>
+            <p class="api-doc">Revokes the specified permissions for the current application.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def hasPermissions(permissions string[]) bool</code></div>
+            <p class="api-doc">Returns whether every specified permission is currently granted.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def register(registration PolicyRegistration) !none</code></div>
+            <p class="api-doc">Registers policy rules, validators, and resolvers for this application.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def evaluate(request PolicyRequest) !PolicyDecision</code></div>
+            <p class="api-doc">Evaluates the specified policy request and returns the complete decision, including the rule and reason that produced it.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def require(request PolicyRequest) !none</code></div>
+            <p class="api-doc">Evaluates the specified policy request.</p>
+            <p class="api-doc">Returns successfully when allowed. When denied, fails with an error describing the policy decision.</p>
+          </li>
+        </ul>
+      </div>
+      <div class="docs-sub" id="svc-runtime">
+        <h3><code>Runtime</code></h3>
+        <p>The ADM runtime itself — host info, memory, environment, service registry.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def systemInfo() SystemInfo</code></div>
+            <p class="api-doc">Returns information about the host system running the ADM runtime.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def workingDir() string</code></div>
+            <p class="api-doc">Returns current process working directory.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def memoryUsage() MemoryUsage</code></div>
+            <p class="api-doc">Returns memory usage statistics for the current ADM runtime.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def sizeOf(val any) int</code></div>
+            <p class="api-doc">Returns the value's deep retained footprint in bytes. Runtime object and allocation headers, collection capacity, and recursively retained values are included; shared allocations are counted once. UTF-8 string storage is counted even for literals, while unrelated static/external storage is not.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def getEnv(key string) ?string</code></div>
+            <p class="api-doc">Returns value of the specified environment variable.</p>
+            <p class="api-doc">Returns none when the variable is not defined.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def services() ServiceInfo[]</code></div>
+            <p class="api-doc">Returns runtime information for all registered services.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def serviceInfo(name service) ?ServiceInfo</code></div>
+            <p class="api-doc">Returns runtime information for the specified service.</p>
+            <p class="api-doc">Returns none if the service is not registered with the runtime.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setEnv(key string, value string) !none</code></div>
+            <p class="api-doc">Sets value of the specified environment variable for the current process.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def serviceStatusChanged(change ServiceStatusChange) ServiceStatusChange</code></div>
+            <p class="api-doc">Emitted when runtime status of a registered service changes.</p>
+          </li>
+        </ul>
+      </div>
+      <div class="docs-sub" id="svc-scheduler">
+        <h3><code>Scheduler</code></h3>
+        <p>Cron, one-shot, and repeating schedules.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def cron(cronExpression string, name string = "") !ScheduleId</code></div>
+            <p class="api-doc">Creates a recurring schedule using a cron expression.</p>
+            <p class="api-doc">Returns the identifier of the created schedule.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def runAt(timestamp time.Time, name string = "") !ScheduleId</code></div>
+            <p class="api-doc">Creates a one-time schedule that runs at the specified time.</p>
+            <p class="api-doc">The timestamp must be in the future. Returns the identifier of the created schedule.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def runAfter(dur duration, name string = "") !ScheduleId</code></div>
+            <p class="api-doc">Creates a one-time schedule that runs after the specified duration.</p>
+            <p class="api-doc">The duration must be greater than zero. Returns the identifier of the created schedule.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def runEvery(interval duration, name string = "") !ScheduleId</code></div>
+            <p class="api-doc">Creates a recurring schedule that runs at the specified interval.</p>
+            <p class="api-doc">The interval must be greater than zero. Returns the identifier of the created schedule.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def cancel(id ScheduleId) !none</code></div>
+            <p class="api-doc">Cancels and removes the specified schedule.</p>
+            <p class="api-doc">Fails when the schedule does not exist.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def pause(id ScheduleId) !none</code></div>
+            <p class="api-doc">Pauses the specified schedule.</p>
+            <p class="api-doc">Pausing does not alter the schedule or its next execution time. While paused, due executions are skipped.</p>
+            <p class="api-doc">Fails when the schedule does not exist.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def resume(id ScheduleId) !none</code></div>
+            <p class="api-doc">Resumes the specified paused schedule.</p>
+            <p class="api-doc">Resuming does not alter or restart the schedule. Future executions continue according to the schedule's original timing.</p>
+            <p class="api-doc">Executions that became due while the schedule was paused are not replayed.</p>
+            <p class="api-doc">Fails when the schedule does not exist.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def list() Schedule[]</code></div>
+            <p class="api-doc">Returns all registered schedules.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def get(id ScheduleId) ?Schedule</code></div>
+            <p class="api-doc">Returns the schedule with the specified identifier.</p>
+            <p class="api-doc">Returns none when the schedule does not exist.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def next(id ScheduleId) ?time.Time</code></div>
+            <p class="api-doc">Returns the next execution time of the specified schedule.</p>
+            <p class="api-doc">Returns none when the schedule does not exist or is not enabled.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def trigger(id ScheduleId) ScheduleId</code></div>
+            <p class="api-doc">Emitted when a schedule becomes due.</p>
+            <p class="api-doc">Consumers are responsible for performing the work associated with the schedule.</p>
+          </li>
+        </ul>
+      </div>
+      <div class="docs-sub" id="svc-storage">
+        <h3><code>Storage</code></h3>
+        <p>Files, directories, disks, and I/O metrics.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def open(path string, mode string) !int</code></div>
+            <p class="api-doc">Open a file or folder at the given path with the specified mode.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def fileOpened(path string) string</code></div>
+            <p class="api-doc">Emitted after a file is opened.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def close(fd int) !none</code></div>
+            <p class="api-doc">Closes an open file handle.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def write(fd int, data byte[]) !int</code></div>
+            <p class="api-doc">Writes bytes at the handle's current position and returns how many were written.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def read(fd int, data byte[]) !int</code></div>
+            <p class="api-doc">Reads into the buffer from the handle's current position and returns how many bytes were read.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def readFile(path string) !byte[]</code></div>
+            <p class="api-doc">Reads a whole file into memory.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def writeFile(path string, data byte[]) !none</code></div>
+            <p class="api-doc">Writes the bytes to a file, replacing any existing content.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def seek(fd int, offset int64, whence int) !int64</code></div>
+            <p class="api-doc">Moves the handle's position and returns the new absolute offset.</p>
+            <p class="api-doc">Whence follows the Whence enum: start, current, or end.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def readAt(fd int, data byte[], offset int64) !int</code></div>
+            <p class="api-doc">Reads into the buffer starting at an absolute offset, leaving the handle's position unchanged.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def writeAt(fd int, data byte[], offset int64) !int</code></div>
+            <p class="api-doc">Writes bytes at an absolute offset, leaving the handle's position unchanged.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def truncate(fd int, size int64) !none</code></div>
+            <p class="api-doc">Resizes the file to the given size, padding with zero bytes when it grows.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def exists(path string) !bool</code></div>
+            <p class="api-doc">Returns whether a file or directory exists at the path.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def remove(path string) !none</code></div>
+            <p class="api-doc">Removes a file.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def rename(oldPath string, newPath string) !none</code></div>
+            <p class="api-doc">Renames or moves a file or directory.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def mkdir(path string) !none</code></div>
+            <p class="api-doc">Creates a directory, including any missing parents.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def rmdir(path string) !none</code></div>
+            <p class="api-doc">Removes an empty directory.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def readDir(path string, depth int = 0) !os.DirEntry[]</code></div>
+            <p class="api-doc">Lists the entries of a directory.</p>
+            <p class="api-doc">Depth 0 lists the directory itself; a larger depth descends that many levels.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def delete(path string) !none</code></div>
+            <p class="api-doc">Delete a file or a folder at the given path</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def stat(path string) !os.FileInfo</code></div>
+            <p class="api-doc">Returns size, mode, and timestamps for a path.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def openedFiles()</code></div>
+            <p class="api-doc">Return a list of opened file descriptors.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def chmod(file string, mode int64) !none</code></div>
+            <p class="api-doc">Changes a file's permission bits.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def metrics(fd ?int)</code></div>
+            <p class="api-doc">Return read/write metrics for a file descriptor if a fd is provided or for all if not</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def freeSpace(disk string)</code></div>
+            <p class="api-doc">Get the free space on a specific disk.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def disks()</code></div>
+            <p class="api-doc">List of all available disks.</p>
+          </li>
+        </ul>
+      </div>
+      <div class="docs-sub" id="svc-telemetry">
+        <h3><code>Telemetry</code></h3>
+        <p>Telemetry export.</p>
+        <p class="docs-placeholder">Planned — no public methods yet.</p>
+      </div>
+      <div class="docs-sub" id="svc-ui">
+        <h3><code>UI</code></h3>
+        <p>Windows, the renderer, and input events.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def openWindow(cfg r.WindowConfig) !r.Window</code></div>
+            <p class="api-doc">Create a new window using the currently configured renderer backend. The returned window handle is stable for the lifetime of the window.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def openWindow&lt;T: component&gt;(root T, cfg r.WindowConfig) !r.Window</code></div>
+            <p class="api-doc">Open a window and register a root component that the UI service will render.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def openDefaultWindow() !r.Window</code></div>
+            <p class="api-doc">Open a window using `UIConfig.defaultWindow`.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def openDefaultWindow&lt;T: component&gt;(root T) !r.Window</code></div>
+            <p class="api-doc">Open a window using `UIConfig.defaultWindow` and register a root component.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def closeWindow(win r.Window) !none</code></div>
+            <p class="api-doc">Close a previously opened window.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setWindowTitle(win r.Window, title string) !none</code></div>
+            <p class="api-doc">Sets a window's title.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setWindowIcon(win r.Window, icon image.Image) !none</code></div>
+            <p class="api-doc">Sets a window's icon.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def windows() r.Window[]</code></div>
+            <p class="api-doc">Snapshot of currently tracked windows.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def pollPlatformEvents(win r.Window) !r.PlatformEvent[]</code></div>
+            <p class="api-doc">pollPlatformEvents retrieves low-level events for a given window from the configured renderer. This does not emit any `std.ui` events; use pumpEvents/pumpAll to translate + emit.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">async def run&lt;T: component&gt;(root T, cfg r.WindowConfig) !none</code></div>
+            <p class="api-doc">run opens a window for `root` and blocks (async) until the user closes it. This is a convenience entrypoint for apps that want a single main window.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">async def run&lt;T: component&gt;(root T) !none</code></div>
+            <p class="api-doc">run opens a window for `root` using `UIConfig.defaultWindow` and blocks until close.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def pumpEvents(win r.Window) !r.PlatformEvent[]</code></div>
+            <p class="api-doc">pumpEvents polls the platform renderer for `win` and emits high-level UI events. The returned list is the raw platform events consumed.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def pumpAll() !none</code></div>
+            <p class="api-doc">pumpAll polls every tracked window and emits high-level UI events.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def click(evt ui.ClickEvent) ui.ClickEvent</code></div>
+            <p class="api-doc">Emits a click event resolved to a target component/selector.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def mouseMove(evt ui.MouseMoveEvent) ui.MouseMoveEvent</code></div>
+            <p class="api-doc">Emits a pointer move event resolved to a target component/selector.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def mouseWheel(evt ui.MouseWheelEvent) ui.MouseWheelEvent</code></div>
+            <p class="api-doc">Emits a scroll event (wheel / trackpad).</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def resize(evt ui.ResizeEvent) ui.ResizeEvent</code></div>
+            <p class="api-doc">Emits a resize event for a window.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def close(evt ui.CloseEvent) ui.CloseEvent</code></div>
+            <p class="api-doc">Emits a close request event.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def keyDown(evt ui.KeyEvent) ui.KeyEvent</code></div>
+            <p class="api-doc">Emits a key down event.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def keyUp(evt ui.KeyEvent) ui.KeyEvent</code></div>
+            <p class="api-doc">Emits a key up event.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def textInput(evt ui.TextInputEvent) ui.TextInputEvent</code></div>
+            <p class="api-doc">Emits text input events (character input).</p>
+          </li>
+        </ul>
+      </div>
+      <div class="docs-sub" id="svc-vault">
+        <h3><code>Vault</code></h3>
+        <p>Encrypted storage for secrets.</p>
+        <p class="docs-placeholder">Planned — no public methods yet.</p>
+      </div>
+    </section>
+
+    <section class="docs-section" id="annotations">
+      <h2>Annotations</h2>
+      <p>
+        Each entry shows the annotation as it is written at a use site — the meta context
+        parameter and any type parameter inferred from the target are not spelled out.
+      </p>
+      <div class="docs-sub" id="meta-cache">
+        <h3><code>@cache</code></h3>
+        <p class="api-targets"><strong>Cache</strong> · targets methods</p>
+        <pre class="api-siglist"><code>@cache(key string, ttl ?duration = none, idle ?duration = none, refresh = false)</code></pre>
+        <p class="api-doc">Caches the result of the annotated method under the specified key.</p>
+        <p class="api-doc">If a cached value exists, it is returned without executing the method. When refresh is true, the method is always executed and the cached value is replaced with its result.</p>
+        <p class="api-doc">TTL defines the maximum lifetime of the cached result. Idle defines how long the cached result may remain unused before expiring.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">cache.adm</span>
+          </div>
+          <pre><code>use std.services::(cache)
+
+@cache("user.{email}", ttl = 5m)
+def loadUser(email string) !User {
+	return try db.fetchUser(email)
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-cacheinvalidate">
+        <h3><code>@cacheInvalidate</code></h3>
+        <p class="api-targets"><strong>Cache</strong> · targets methods</p>
+        <pre class="api-siglist"><code>@cacheInvalidate(key ...Glob)
+@cacheInvalidate(key ...string)</code></pre>
+        <p class="api-doc">Invalidates all cache keys matching the specified glob selectors after the annotated method executes.</p>
+        <p class="api-doc">Glob patterns may contain template expressions evaluated using the method's arguments.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">cacheinvalidate.adm</span>
+          </div>
+          <pre><code>@cacheInvalidate("user.{email}")
+def renameUser(email string, name string) !none {
+	return try db.rename(email, name)
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-config">
+        <h3><code>@config</code> <span class="api-tag api-planned">planned</span></h3>
+        <p class="api-targets"><strong>Config</strong> · targets variables, fields</p>
+        <pre class="api-siglist"><code>@config(key string, defaultValue ?any = none)</code></pre>
+        <p class="api-doc">Binds the annotated variable to the effective configuration value.</p>
+        <p class="api-doc">The target's type determines the expected configuration value type. An optional target resolves to none when the key is not defined. A non-optional target causes configuration loading to fail when no value or default value is available.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">config.adm</span>
+          </div>
+          <pre><code>use std.services::(config)
+
+@config("server.port", 8080)
+let port = 0</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-trace">
+        <h3><code>@trace</code> <span class="api-tag api-planned">planned</span></h3>
+        <p class="api-targets"><strong>Debugger</strong> · targets functions, methods</p>
+        <pre class="api-siglist"><code>@trace()</code></pre>
+        <p class="api-doc">Marks the annotated function for detailed debugger tracing.</p>
+        <p class="api-doc">When a trace session is active, the debugger records execution information for the function, such as invocation time, duration, caller relationships, returned errors, and other runtime events available to the debugger.</p>
+        <p class="api-doc">The annotation does not start or stop a trace session. Trace collection is controlled through Debugger.traceStart() and Debugger.traceStop().</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">trace.adm</span>
+          </div>
+          <pre><code>use std.services
+
+@services.trace()
+def handleRequest(id string) !none {
+	return try route(id)
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-noinline">
+        <h3><code>@noInline</code> <span class="api-tag api-planned">planned</span></h3>
+        <p class="api-targets"><strong>Debugger</strong> · targets functions, methods</p>
+        <pre class="api-siglist"><code>@noInline()</code></pre>
+        <p class="api-doc">Prevents the annotated function from being inlined by the compiler.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">noinline.adm</span>
+          </div>
+          <pre><code>@services.noInline()
+def hotPath(n int) int {
+	return n * 2
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-nooptimize">
+        <h3><code>@noOptimize</code> <span class="api-tag api-planned">planned</span></h3>
+        <p class="api-targets"><strong>Debugger</strong> · targets functions, methods</p>
+        <pre class="api-siglist"><code>@noOptimize()</code></pre>
+        <p class="api-doc">Disables compiler optimizations for the annotated function.</p>
+        <p class="api-doc">The function is also prevented from being inlined to preserve its source-level execution structure for debugging.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">nooptimize.adm</span>
+          </div>
+          <pre><code>@services.noOptimize()
+def underInvestigation(n int) int {
+	return n * 2
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-trackcaller">
+        <h3><code>@trackCaller</code></h3>
+        <p class="api-targets"><strong>Debugger</strong> · targets functions, methods</p>
+        <pre class="api-siglist"><code>@trackCaller()</code></pre>
+        <p class="api-doc">Preserves the source location of the caller when invoking the annotated function.</p>
+        <p class="api-doc">Diagnostics originating from the function may report the caller's location instead of the function's internal implementation location.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">trackcaller.adm</span>
+          </div>
+          <pre><code>@services.trackCaller()
+def logHere(message string) {
+	println("{__file_name__}:{__line__} {message}")
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-watch">
+        <h3><code>@watch</code> <span class="api-tag api-planned">planned</span></h3>
+        <p class="api-targets"><strong>Debugger</strong> · targets fields, variables</p>
+        <pre class="api-siglist"><code>@watch(mode WatchMode = WatchMode.Write)</code></pre>
+        <p class="api-doc">Watches accesses to the annotated field.</p>
+        <p class="api-doc">Emits debugger watch events whenever the field is read, written, or both, according to the selected mode.</p>
+        <p class="api-doc">Watch instrumentation may significantly affect performance and is intended for debugging and development use.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">watch.adm</span>
+          </div>
+          <pre><code>type Session {
+	@services.watch(WatchMode.Write)
+	token string
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-metric">
+        <h3><code>@metric</code></h3>
+        <p class="api-targets"><strong>Diagnostics</strong> · targets fields</p>
+        <pre class="api-siglist"><code>@metric(name string)</code></pre>
+        <p class="api-doc">Registers a metric using the annotated field's metric type and assigns the resulting metric handle to the field.</p>
+        <p class="api-doc">If a metric with the same name and type already exists, the existing metric is used. Registration fails if the name is already registered with a different metric type.</p>
+        <p class="api-note">The field’s own type selects the metric kind — no type argument is written.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">metric.adm</span>
+          </div>
+          <pre><code>use std.services::(metric)
+use std.metrics::(Counter, Gauge)
+
+type Uploads {
+	@metric("uploads.total")
+	total Counter
+
+	@metric("uploads.inflight")
+	inflight Gauge
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-measurecount">
+        <h3><code>@measureCount</code></h3>
+        <p class="api-targets"><strong>Diagnostics</strong> · targets methods</p>
+        <pre class="api-siglist"><code>@measureCount(name string)</code></pre>
+        <p class="api-doc">Tracks how many times the annotated method is invoked.</p>
+        <p class="api-doc">Registers a Counter under the specified metric name and increments it once for every method invocation.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">measurecount.adm</span>
+          </div>
+          <pre><code>@measureCount("uploads.calls")
+def upload(data byte[]) !none {
+	return try store(data)
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-measuretime">
+        <h3><code>@measureTime</code></h3>
+        <p class="api-targets"><strong>Diagnostics</strong> · targets methods</p>
+        <pre class="api-siglist"><code>@measureTime(name string)</code></pre>
+        <p class="api-doc">Tracks the execution duration of the annotated method.</p>
+        <p class="api-doc">Registers a Histogram under the specified metric name and records the duration of every completed method invocation.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">measuretime.adm</span>
+          </div>
+          <pre><code>@measureTime("uploads.latency")
+def upload(data byte[]) !none {
+	return try store(data)
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-measureerrors">
+        <h3><code>@measureErrors</code></h3>
+        <p class="api-targets"><strong>Diagnostics</strong> · targets methods</p>
+        <pre class="api-siglist"><code>@measureErrors(name string)</code></pre>
+        <p class="api-doc">Tracks failed executions of the annotated method.</p>
+        <p class="api-doc">Registers a Counter under the specified metric name and increments it when the method returns an error. The original error is propagated unchanged.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">measureerrors.adm</span>
+          </div>
+          <pre><code>@measureErrors("uploads.failures")
+def upload(data byte[]) !none {
+	return try store(data)
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-measureconcurrency">
+        <h3><code>@measureConcurrency</code></h3>
+        <p class="api-targets"><strong>Diagnostics</strong> · targets methods</p>
+        <pre class="api-siglist"><code>@measureConcurrency(name string)</code></pre>
+        <p class="api-doc">Tracks the number of concurrently executing invocations of the annotated method.</p>
+        <p class="api-doc">Registers a Gauge under the specified metric name. The gauge is incremented when the method begins execution and decremented when the method completes, including when the method returns an error.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">measureconcurrency.adm</span>
+          </div>
+          <pre><code>@measureConcurrency("uploads.active")
+def upload(data byte[]) !none {
+	return try store(data)
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-log">
+        <h3><code>@log</code> <span class="api-tag api-planned">planned</span></h3>
+        <p class="api-targets"><strong>Logging</strong> · targets functions, methods</p>
+        <pre class="api-siglist"><code>@log(level LogLevel = LogLevel.Debug)</code></pre>
+        <p class="api-doc">Logs executions of the annotated function.</p>
+        <p class="api-doc">A log entry is written when the function is invoked. Function arguments are included as structured fields.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">log.adm</span>
+          </div>
+          <pre><code>use std.services
+use std.services::(LogLevel)
+
+@services.log(LogLevel.Info)
+def createOrder(id string) !none {
+	return try persist(id)
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-logcontext">
+        <h3><code>@logContext</code> <span class="api-tag api-planned">planned</span></h3>
+        <p class="api-targets"><strong>Logging</strong> · targets types, functions, methods</p>
+        <pre class="api-siglist"><code>@logContext(fields map&lt;string, any&gt;)</code></pre>
+        <p class="api-doc">Adds structured logging context to log calls made from the annotated type.</p>
+        <p class="api-doc">The fields are automatically included in log entries produced by methods defined on the type. More specific logging context and fields supplied directly to the log call override fields with the same key.</p>
+      </div>
+      <div class="docs-sub" id="meta-sensitive">
+        <h3><code>@sensitive</code> <span class="api-tag api-planned">planned</span></h3>
+        <p class="api-targets"><strong>Logging</strong> · targets parameters, fields, properties</p>
+        <pre class="api-siglist"><code>@sensitive()</code></pre>
+        <p class="api-doc">Marks the annotated value as sensitive.</p>
+        <p class="api-doc">Diagnostic and introspection systems should redact the value rather than exposing its contents in logs, traces, debugger watches, crash reports, inspectors, and similar developer-facing output.</p>
+        <p class="api-doc">struct Credentials { username string @sensitive() password string }</p>
+        <p class="api-doc">@log() def login(username string, @sensitive password string) {}</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">sensitive.adm</span>
+          </div>
+          <pre><code>def login(email string, @services.sensitive() password string) !Session {
+	return try authenticate(email, password)
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-policy">
+        <h3><code>@policy</code> <span class="api-tag api-planned">planned</span></h3>
+        <p class="api-targets"><strong>Policy</strong> · targets methods</p>
+        <pre class="api-siglist"><code>@policy(action string, fields map&lt;string, PolicyValidator&gt;)</code></pre>
+        <p class="api-doc">Declares a policy-controlled operation and the validators used to evaluate its policy fields.</p>
+        <p class="api-doc">Validators are runtime code and are not persisted as part of policy rules.</p>
+      </div>
+      <div class="docs-sub" id="meta-requires">
+        <h3><code>@requires</code> <span class="api-tag api-planned">planned</span></h3>
+        <p class="api-targets"><strong>Policy</strong> · targets functions, methods</p>
+        <pre class="api-siglist"><code>@requires(permissions string[])</code></pre>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">requires.adm</span>
+          </div>
+          <pre><code>@services.requires(["net.connect"])
+def fetch(url string) !Response {
+	return try http.get(url)
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-cron">
+        <h3><code>@cron</code> <span class="api-tag api-planned">planned</span></h3>
+        <p class="api-targets"><strong>Scheduler</strong> · targets functions</p>
+        <pre class="api-siglist"><code>@cron(cronExpression string, name string = "")</code></pre>
+        <p class="api-doc">Schedules the annotated function using a cron expression.</p>
+        <p class="api-doc">The function is invoked whenever the cron schedule becomes due.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">cron.adm</span>
+          </div>
+          <pre><code>use std.services::(cron)
+
+@cron("0 3 * * *")
+def nightlyCleanup() {
+	purgeTempFiles()
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-at">
+        <h3><code>@at</code> <span class="api-tag api-planned">planned</span></h3>
+        <p class="api-targets"><strong>Scheduler</strong> · targets functions</p>
+        <pre class="api-siglist"><code>@at(timestamp time.Time, name string = "")</code></pre>
+        <p class="api-doc">Schedules the annotated function to run once at the specified time.</p>
+      </div>
+      <div class="docs-sub" id="meta-after">
+        <h3><code>@after</code> <span class="api-tag api-planned">planned</span></h3>
+        <p class="api-targets"><strong>Scheduler</strong> · targets functions</p>
+        <pre class="api-siglist"><code>@after(interval duration, name string = "")</code></pre>
+        <p class="api-doc">Schedules the annotated function to run once after the specified duration.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">after.adm</span>
+          </div>
+          <pre><code>@after(30s)
+def warmUp() {
+	primeCaches()
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-runevery">
+        <h3><code>@runEvery</code> <span class="api-tag api-planned">planned</span></h3>
+        <p class="api-targets"><strong>Scheduler</strong> · targets functions</p>
+        <pre class="api-siglist"><code>@runEvery(interval duration, name string = "")</code></pre>
+        <p class="api-doc">Schedules the annotated function to run repeatedly at the specified interval.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">runevery.adm</span>
+          </div>
+          <pre><code>@runEvery(5m)
+def heartbeat() {
+	Logging.info("alive")
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+</div>
+
+<script src="docs.js"></script>
+<script src="highlight.js"></script>
+</body>
+</html>
