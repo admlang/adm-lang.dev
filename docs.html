@@ -2592,9 +2592,15 @@ request.tags().set("")               // clear</code></pre>
         </div>
         <p>
           Strings, arrays, maps, channels, errors, <code>any</code>, closures and instances of declared
-          types can be tagged. Numbers, <code>bool</code>, <code>char</code>, <code>struct</code> values
-          and enums have no identity to hang a tag set on and offer no <code>.tags()</code>; neither do
-          literals or temporaries, so tag a variable, not <code>"hello".tags()</code>.
+          types carry their tags on the object itself — <code>struct</code> instances included, since
+          they are heap-backed. Numbers, <code>bool</code>, <code>char</code> and enums have no
+          identity, so their tags belong to the
+          <em>variable</em> holding them: <code>let x = 5; x.tags().add("trusted")</code> tags
+          <code>x</code>'s storage, and the compiler moves the tags with the value through bindings,
+          arguments and returns. A copy shares the set until its first mutation, then gets its own —
+          tagging a copy never changes the original. Only named storage can be tagged:
+          <code>5.tags()</code> and <code>(a + b).tags()</code> are compile errors. Tags do not cross
+          indirect calls, and scalar array elements or struct fields do not carry tags yet.
         </p>
       </div>
 
