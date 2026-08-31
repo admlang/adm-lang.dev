@@ -59,6 +59,7 @@
       <div class="docs-nav-group"><a class="docs-nav-top" href="#lambdas">Lambdas</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#parallel">Parallel Loops</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#async">Async &amp; Channels</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#value-tags">Value Tags</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#service">Services</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#annotations">Custom Annotations</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#simd">SIMD</a></div>
@@ -621,6 +622,65 @@ application Concurrency {
 			println(v)
 		} empty {
 			println("channel was empty")
+		}
+		return 0
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="value-tags">
+      <h2>Value Tags</h2>
+      <p>
+        Tags travel with a value's identity — through calls, array slots and channels — while copies
+        start clean. A gate function refuses anything that was not marked as signed.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">main.adm</span>
+        </div>
+        <pre><code>module demo.tags {
+	type Request {
+		id int
+		def new(v int) {
+			id = v
+		}
+	}
+
+	def deliver(message string) !none {
+		fail "unsigned message" unless message.tags().has("signed")
+		println("delivered: {message}")
+		return none
+	}
+}
+
+application TagsDemo {
+	use demo.tags::(*)
+
+	def new(args string[]) int {
+		let message = "hello"
+		message.tags().set("+signed")
+		deliver(message) onerror (err error) {
+			println("rejected: {err.message}")
+			recover none
+		}
+
+		let copy = message + "!"          // a new value: no tags
+		deliver(copy) onerror (err error) {
+			println("rejected: {err.message}")
+			recover none
+		}
+
+		let request = new Request(7)
+		request.tags().add("Network/primary").add("pii")
+		let queue channel&lt;Request&gt; = new(size=1)
+		queue &lt;- request
+		let got = &lt;-queue
+		if got is Request {
+			for let tag in got.tags().list() {
+				println(tag)                 // Network/primary, then pii
+			}
 		}
 		return 0
 	}

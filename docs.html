@@ -146,6 +146,14 @@
       </div>
 
       <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#value-tags">Value Tags</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#tagging-values">Tagging Values</a></li>
+          <li><a class="docs-nav-sub" href="#tag-propagation">Propagation Rules</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
         <a class="docs-nav-top" href="#services">Services</a>
       </div>
 
@@ -2542,6 +2550,84 @@ select {
         <p>
           There's no fall-through, so <code>continue</code> isn't allowed inside a <code>select</code>
           case — every case either handles its event or control leaves the <code>select</code> entirely.
+        </p>
+      </div>
+    </section>
+
+    <section class="docs-section" id="value-tags">
+      <h2>Value Tags</h2>
+      <p>
+        Every reference value carries an optional set of string tags, reached through
+        <code>.tags()</code>. Tags are metadata for tracing, ownership tracking and policy checks: a
+        request marked as coming from the primary network, a string that has been signed, a record
+        holding personal data. They are not part of the value's type.
+      </p>
+
+      <div class="docs-sub" id="tagging-values">
+        <h3>Tagging Values</h3>
+        <p>
+          <code>value.tags()</code> returns the value's <code>TagSet</code>, creating an empty one on
+          first use. The set offers <code>add</code>, <code>remove</code>, <code>toggle</code>,
+          <code>has</code>, <code>list</code>, <code>len</code>, <code>clear</code> and
+          <code>set(spec)</code>, where the spec is whitespace-separated: <code>+tag</code> adds,
+          <code>-tag</code> removes, a bare <code>tag</code> adds, and the empty string clears
+          everything. Mutators return the set, so calls chain.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">tags.adm</span>
+          </div>
+          <pre><code>let request = new Request(7)
+request.tags().add("Network/primary").add("pii")
+
+let message = "hello"
+message.tags().set("+signed")
+
+if request.tags().has("pii") {
+	redact(request)
+}
+request.tags().set("-pii +audited")   // remove one, add another
+request.tags().set("")               // clear</code></pre>
+        </div>
+        <p>
+          Strings, arrays, maps, channels, errors, <code>any</code>, closures and instances of declared
+          types can be tagged. Numbers, <code>bool</code>, <code>char</code>, <code>struct</code> values
+          and enums have no identity to hang a tag set on and offer no <code>.tags()</code>; neither do
+          literals or temporaries, so tag a variable, not <code>"hello".tags()</code>.
+        </p>
+      </div>
+
+      <div class="docs-sub" id="tag-propagation">
+        <h3>Propagation Rules</h3>
+        <p>
+          A tag set belongs to the value's identity. It follows the value wherever the value itself
+          goes: assignments, function arguments and returns, container slots, channel sends, futures
+          and errors. A callee can therefore check what it was handed:
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">propagation.adm</span>
+          </div>
+          <pre><code>def send(message string) !none {
+	fail "refusing an unsigned message" unless message.tags().has("signed")
+	// ...
+	return none
+}
+
+let items Request[]
+items.push(request)
+items[-1].tags().has("pii")   // true: the same object sits in the slot
+
+let ch channel&lt;Request&gt; = new(size=1)
+ch &lt;- request
+let got = &lt;-ch                  // got.tags() is request.tags()</code></pre>
+        </div>
+        <p>
+          A <em>copy</em> is a new value and starts with an empty set: <code>a + b</code> on strings,
+          <code>clone()</code>, slicing, <code>map.values()</code> and a freshly created error inherit
+          nothing from their inputs. The set lives exactly as long as the value and is released with it.
         </p>
       </div>
     </section>
