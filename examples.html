@@ -64,6 +64,10 @@
       <div class="docs-nav-group"><a class="docs-nav-top" href="#annotations">Custom Annotations</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#simd">SIMD</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#ffi">C Interop</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#gpu">GPU Kernels</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#data-collections">Collections</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#semver">Semantic Versions</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#plugins">Plugins</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#testing">Tests</a></div>
     </nav>
   </aside>
@@ -864,6 +868,119 @@ module libm {
 	def cos(x float64) float64;
 }</code></pre>
       </div>
+    </section>
+
+    <section class="docs-section" id="gpu">
+      <h2>GPU Kernels</h2>
+      <p>A <code>cuda def</code> is a CUDA kernel with ADM parameters; arrays are copied to the device and back around the launch, and the same program runs on the CPU when there is no GPU.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">blur.adm</span>
+        </div>
+        <pre><code>application Brighten {
+	use std.gpu
+
+	cuda def brighten(pixels byte[], amount int) !none {
+		int i = blockIdx.x * blockDim.x + threadIdx.x;
+		if (i &lt; pixels_len) {
+			int v = pixels[i] + amount;
+			pixels[i] = v &gt; 255 ? 255 : v;
+		}
+	}
+
+	def new(args string[]) int {
+		let image = byte[10, 120, 250]
+		brighten(image, 40) onerror recover none
+		println(image[0], image[1], image[2])   // 50 160 255
+		println(&quot;ran on {gpu.deviceName()}&quot;) when gpu.available()
+		return 0
+	}
+}</code></pre>
+      </div>
+      <p>Data reused across launches goes into a <code>DeviceBuffer</code> with <code>gpu.upload</code>; see <a href="docs.html#functions">GPU kernels</a> in the reference.</p>
+    </section>
+
+    <section class="docs-section" id="data-collections">
+      <h2>Collections</h2>
+      <p><code>std.data.collections</code> has the usual structures as generic types; every one iterates with <code>for</code>.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">words.adm</span>
+        </div>
+        <pre><code>application Words {
+	use std.data.collections::*
+
+	def new(args string[]) int {
+		let counts = new HashMap&lt;string, int&gt;()
+		for let word in &quot;the cat and the hat&quot;.split(&quot; &quot;) {
+			counts.set(word, counts.get(word, 0) + 1)
+		}
+
+		let repeated = new Deque&lt;string&gt;()
+		for let entry in counts {
+			repeated.pushBack(entry.key) when entry.value &gt; 1
+		}
+		println(repeated.popFront())        // the
+
+		let seen = new BloomFilter(1024)
+		seen.add(&quot;cat&quot;)
+		println(seen.mightContain(&quot;cat&quot;))   // true
+		return 0
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="semver">
+      <h2>Semantic Versions</h2>
+      <p><code>std.data.semver</code> parses versions, compares them by precedence and checks ranges in the usual <code>^</code>, <code>~</code> and <code>||</code> notation.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">semver.adm</span>
+        </div>
+        <pre><code>application Versions {
+	use std.data.semver::*
+
+	def new(args string[]) int {
+		let v = parse(&quot;1.4.0-rc.1&quot;)
+		return 1 when v is error
+
+		println(v.major)                          // 1
+		println(v &lt; &quot;1.4.0&quot;)                      // true: a prerelease precedes the release
+		println(v.satisfies(&quot;^1.2.0&quot;))            // false: prereleases need an opt-in
+		println(v.satisfies(&quot;&gt;=1.4.0-alpha&quot;))     // true
+		println(v.canonical())                    // 1.4.0-rc.1
+		return 0
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="plugins">
+      <h2>Plugins</h2>
+      <p>A plugin exports part of what it uses and builds into a single <code>.admplugin</code> package; <code>adm doc --plugin</code> shows what is inside.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">imagetools.adm</span>
+        </div>
+        <pre><code>@manifest(version = &quot;1.2.0&quot;)
+plugin ImageTools {
+	use (
+		acme.imaging
+		acme.imaging.filters
+	)
+
+	export (
+		acme.imaging.filters
+		acme.imaging::(Image, decode)
+	)
+}</code></pre>
+      </div>
+      <p><code>adm build</code> writes <code>ImageTools.admplugin</code>; the <a href="plugins.html">Plugins</a> page covers the package layout and the shared runtime.</p>
     </section>
 
     <section class="docs-section" id="testing">

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memory model — adm</title>
+<meta name="description" content="How memory works in ADM: automatic reference counting, values versus references, dispose, cycles, tasks and cost.">
+<link rel="icon" type="image/svg+xml" href="assets/adm.svg">
+<link rel="canonical" href="https://adm-lang.dev/memory.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="adm">
+<meta property="og:title" content="adm — Memory model">
+<meta property="og:description" content="How memory works in ADM: automatic reference counting, values versus references, dispose, cycles, tasks and cost.">
+<meta property="og:url" content="https://adm-lang.dev/memory.html">
+<meta property="og:image" content="https://adm-lang.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="adm — Memory model">
+<meta name="twitter:description" content="How memory works in ADM: automatic reference counting, values versus references, dispose, cycles, tasks and cost.">
+<meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/adm.svg" alt="ADM" class="brand-mark">
+      <span class="brand-name"><span class="brand-sub">programming language</span></span>
+    </a>
+    <nav class="nav">
+      <a href="docs.html" class="nav-active">Docs</a>
+      <a href="examples.html">Examples</a>
+      <a href="services.html">Services</a>
+      <a href="modules.html">Modules</a>
+      <a class="nav-icon" href="https://github.com/admlang" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs-layout">
+
+  <aside class="docs-sidebar">
+    <nav class="docs-nav" id="docs-nav">
+
+      <div class="docs-pages">
+        <span class="docs-pages-label">Docs</span>
+        <a class="docs-page-link" href="docs.html">Language reference</a>
+        <a class="docs-page-link current" href="memory.html">Memory model</a>
+        <a class="docs-page-link" href="annotations.html">Annotations</a>
+        <a class="docs-page-link" href="app-home.html">Application home &amp; migrations</a>
+        <a class="docs-page-link" href="plugins.html">Plugins</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#overview">Overview</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#values-and-references">Values and references</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#lifetime">Lifetime</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#dispose"><code>dispose()</code></a></li>
+          <li><a class="docs-nav-sub" href="#the-dispose-statement">The <code>dispose</code> statement</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#reference-cycles">Reference cycles</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#threads-and-tasks">Threads and tasks</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#what-it-costs">What it costs</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#looking-at-memory">Looking at memory</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#what-adm-is-not">What ADM is not</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#summary">Summary</a>
+      </div>
+
+    </nav>
+  </aside>
+
+  <main class="docs-content">
+
+    <p class="docs-eyebrow">Docs</p>
+    <h1 class="docs-page-title">Memory model</h1>
+    <p class="docs-lede">Not garbage collected, not a borrow checker: how ADM manages memory for you, what is a value and what is a reference, when objects die, and the one case you design around.</p>
+
+    <!-- Generated from docs/ADM Memory Model.md by tools/website_docs_pages.py; edit the markdown, not this file. -->
+
+    <section class="docs-section" id="overview">
+      <h2>Overview</h2>
+      <p><strong>Short version:</strong> ADM manages memory for you, automatically and deterministically. It is not garbage collected, it has no borrow checker, and you never call <code>free</code>. Every object is reference counted by the compiler: it lives exactly as long as something refers to it, and it is destroyed the moment the last reference goes away. If it declares <code>dispose()</code>, that runs right then.</p>
+      <p>If you know Swift or Objective-C with ARC, you already know the model. If you come from Go, Java or C#, the difference is that there is no collector thread and no pause: objects die at a predictable point. If you come from Rust, the difference is that the compiler does not ask you to prove lifetimes; references may alias freely, and the runtime keeps a count.</p>
+    </section>
+
+    <section class="docs-section" id="values-and-references">
+      <h2>Values and references</h2>
+      <p>ADM has two kinds of data: values and references.</p>
+      <p><strong>Values are copied.</strong> Assigning, passing or returning one gives the other side its own copy. Nothing is shared and nothing has to be freed.</p>
+      <ul>
+  <li>numbers: <code>int</code>, <code>uint</code>, <code>float</code>, <code>byte</code>, the sized variants, <code>complex</code></li>
+  <li>SIMD vectors and masks: <code>vec4&lt;T&gt;</code> through <code>vec128&lt;T&gt;</code>, <code>mask4&lt;T&gt;</code> and up; a vector is one machine value, copied whole</li>
+  <li><code>bool</code>, <code>char</code>, <code>duration</code></li>
+  <li>enum members</li>
+  <li>tuples such as <code>(int, string)</code></li>
+  <li>optional <code>?T</code> and errorable <code>!T</code> wrappers, which are values around whatever they wrap</li>
+  <li>union values such as <code>int | string | Point</code>: the union itself is a value; when the member it holds is a reference type, copying the union copies that reference</li>
+</ul>
+      <p><strong>References are shared.</strong> Assigning, passing or returning one hands over another reference to the same object. Changing the object through any reference is visible through all of them.</p>
+      <ul>
+  <li>instances of <code>type</code> and <code>struct</code></li>
+  <li>arrays <code>T[]</code> and maps <code>map&lt;K, V&gt;</code></li>
+  <li>strings and <code>bigint</code> (both immutable: every operation yields a new value, so sharing is never observable)</li>
+  <li><code>regex</code> (a compiled pattern; immutable)</li>
+  <li><code>error</code> values</li>
+  <li>channels, futures, closures</li>
+  <li>interface values and <code>any</code></li>
+  <li>services, components and views</li>
+</ul>
+      <p>The immutable ones on the reference list, <code>string</code>, <code>bigint</code> and <code>regex</code>, behave like values from the outside: you can pass them around freely and nothing you do through one name is visible through another. They are on this list only so you know they live on the heap and are counted, which is why building a big string or bigint in a loop does not copy it every time.</p>
+      <div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">memory_1.adm</span>
+  </div>
+  <pre><code>let a = new Point(1, 2)
+let b = a          // b refers to the same Point
+b.x = 10
+println(a.x)       // 10
+
+let xs = int[1, 2, 3]
+let ys = xs        // same array
+ys.push(4)
+println(xs.len())  // 4</code></pre>
+</div>
+      <p>There is no implicit copy of a reference type. When you want an independent copy, ask for one: <code>xs.clone()</code>, <code>m.clone()</code>, or implement <code>Cloneable</code> on your own type and call <code>clone()</code>.</p>
+    </section>
+
+    <section class="docs-section" id="lifetime">
+      <h2>Lifetime</h2>
+      <p>An object stays alive while at least one reference to it exists: a local variable, a field, an element of an array or map, a captured variable in a closure, a value inside an <code>any</code>, a pending message in a channel. When the last of those disappears, the object is destroyed immediately, on the thread that dropped the reference.</p>
+      <p>References disappear when:</p>
+      <ul>
+  <li>a local goes out of scope, or its function returns;</li>
+  <li>a variable or field is reassigned, releasing what it held before;</li>
+  <li>an element is removed from a container, or the container itself dies;</li>
+  <li>you write <code>dispose x</code> (see below).</li>
+</ul>
+      <p>Because destruction happens at a known point, ADM code can hold real resources in ordinary objects: files, sockets, GPU buffers, window handles. Freeing an object does not free what it wraps on its own; the operating system does not care that a number went out of scope. The type does it, in <code>dispose()</code>: <code>std.os.File</code> closes its descriptor there, so a file closes when its last reference is dropped, not "eventually".</p>
+      <div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">memory_2.adm</span>
+  </div>
+  <pre><code>def copyHeader(path string) !byte[] {
+	let f = try os.open(path)      // f owns the descriptor
+	let buf byte[]
+	buf.len(64)
+	try f.read(buf)
+	return buf
+}                                  // f is released here; File.dispose() closes the descriptor</code></pre>
+</div>
+      <p>When the moment matters, close it yourself: <code>try f.close()</code> (safe to call more than once) or <code>dispose f</code>. A resource type you write gets the same guarantee by closing its handle in <code>dispose()</code>.</p>
+      <p>Passing an object to a function does not transfer ownership; the callee borrows it for the duration of the call and may keep it alive longer by storing it somewhere. Returning an object hands the caller its own reference. You do not have to think about which side "owns" a value; the counts do that for you.</p>
+      <div class="docs-sub" id="dispose">
+        <h3><code>dispose()</code></h3>
+        <p>A <code>type</code> may declare <code>def dispose()</code>. It runs exactly once, when the last reference to the instance is released, before the memory is reclaimed. Use it to release things the runtime does not know about: native handles, temporary files, GPU memory.</p>
+        <div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">memory_3.adm</span>
+  </div>
+  <pre><code>type Texture {
+	internal id uint32
+
+	def new(w int, h int) {
+		id = gl.createTexture(w, h)
+	}
+
+	def dispose() {
+		gl.deleteTexture(id)
+	}
+}</code></pre>
+</div>
+        <p>The runtime calls <code>dispose()</code> when the object is really gone, so a shared texture is freed once, after its last user lets go.</p>
+        <p>You can also call it yourself, like any method: <code>tex.dispose()</code> runs the body right away and the object stays alive, references and all. The runtime still calls <code>dispose()</code> again when the object finally dies, so a body that must not run twice should note that it already ran:</p>
+        <div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">memory_4.adm</span>
+  </div>
+  <pre><code>def dispose() {
+	return when id == 0
+	gl.deleteTexture(id)
+	id = 0
+}</code></pre>
+</div>
+        <p>When what you want is "I am done with this object", prefer the <code>dispose</code> statement below: it drops your reference, and the body runs exactly once, when nobody else holds one.</p>
+        <p>Services have their own lifecycle: the service manager starts them before your application runs and disposes them at shutdown.</p>
+      </div>
+      <div class="docs-sub" id="the-dispose-statement">
+        <h3>The <code>dispose</code> statement</h3>
+        <p><code>dispose x</code> releases the reference held by <code>x</code> right now and leaves <code>x</code> empty. It is a way to end a lifetime early, for example to close a large buffer before a long computation, or to break a reference cycle. It does not force the object to die: if something else still refers to it, the object lives on until that reference is gone too.</p>
+      </div>
+    </section>
+
+    <section class="docs-section" id="reference-cycles">
+      <h2>Reference cycles</h2>
+      <p>Reference counting has one blind spot: a cycle. If <code>a</code> refers to <code>b</code> and <code>b</code> refers back to <code>a</code>, neither count ever reaches zero, the objects are never freed and their <code>dispose()</code> never runs. This is the one memory situation in ADM that you have to design around.</p>
+      <p>Cycles arise from back pointers: a child that refers to its parent, a node that refers to its owner, an observer that refers to the object it observes, a closure stored in an object that captures that object.</p>
+      <p>How to handle them:</p>
+      <ul>
+  <li><strong>Do not store the back reference.</strong> Pass the parent as a parameter when it is needed instead of keeping it in a field.</li>
+  <li><strong>Break the cycle explicitly.</strong> Clear the field that closes the loop when the structure is torn down, with <code>dispose node.parent</code> or by assigning <code>none</code>.</li>
+  <li><strong>Keep one direction strong.</strong> A tree owns its children; children do not own the tree. Use an index, an id or a lookup through the owner instead of a pointer back.</li>
+</ul>
+      <p>A <code>weak</code> field modifier for back references is planned; until it exists, the guidance above is the whole story. Nothing in the language detects a cycle for you.</p>
+    </section>
+
+    <section class="docs-section" id="threads-and-tasks">
+      <h2>Threads and tasks</h2>
+      <p>Reference counts are atomic. An object can be handed from one task to another, stored in a shared map, sent over a channel or captured by a <code>forall</code> body, and its lifetime stays correct. What the counts do not do is synchronise the object's <em>contents</em>: two tasks mutating the same array still race. Use <code>atomic</code> fields, channels, or the service model for shared mutable state.</p>
+      <p>Every task (an <code>async</code> call, a <code>forall</code> iteration, a service handler) runs on its own stack. A task stack is a reservation of address space, 32 MB by default, of which only the pages actually touched cost memory; a guard page turns a stack overflow into a clean error instead of corruption. <code>ADM_TASK_STACK</code> changes the reservation for programs that need deeper recursion or many more tasks.</p>
+    </section>
+
+    <section class="docs-section" id="what-it-costs">
+      <h2>What it costs</h2>
+      <p>Creating an object is an allocation with a small header; releasing it is a decrement, and freeing it when the count hits zero. The compiler removes counting where it can prove nothing observes it: a value that never leaves a function, a reference handed straight from a constructor into a field, a temporary consumed by the call that built it. Short-lived objects that never escape their scope may be placed on the stack or in a per-scope arena rather than the heap.</p>
+      <p>Arrays are contiguous. Appending grows the backing store geometrically, so pushing in a loop is amortised constant time. A slice <code>xs[a:b]</code> shares the backing store of <code>xs</code> rather than copying it; the two are detached on the first operation that would make them diverge in size.</p>
+      <p>Strings are immutable and reference counted; literals cost nothing to copy around. Concatenation in a loop reuses the left operand's buffer when nothing else refers to it, so building a string by repeated <code>+=</code> is linear.</p>
+      <p>Numbers, vectors, booleans, enums, tuples and optionals of values never touch the heap. <code>bigint</code>, like <code>string</code>, does: each result is a new counted object, and the old one is freed when nothing refers to it.</p>
+    </section>
+
+    <section class="docs-section" id="looking-at-memory">
+      <h2>Looking at memory</h2>
+      <ul>
+  <li><code>Runtime.sizeOf(value)</code> reports the deep size of a value graph at runtime, counting shared objects once.</li>
+  <li>Run any compiled program with <code>ADM_MEM_STATS=1</code> to print live bytes and allocation and free counts every 200k allocations. A leak shows as live bytes that grow while the program is steady.</li>
+  <li><code>ADM_MEM_TRACE=&lt;file&gt;</code> records every allocation with a backtrace and every free; <code>tools/memtrace.py &lt;file&gt; &lt;binary&gt;</code> lists what was never freed, by call site. It slows the program down, so use it on a reproduction rather than in production.</li>
+</ul>
+    </section>
+
+    <section class="docs-section" id="what-adm-is-not">
+      <h2>What ADM is not</h2>
+      <ul>
+  <li><strong>Not garbage collected.</strong> There is no collector, no heap scanning, no pauses, and no finaliser that "may run later". Memory is reclaimed as soon as it is unreachable, except for cycles.</li>
+  <li><strong>Not manually managed.</strong> There is no <code>malloc</code>, <code>free</code>, <code>delete</code> or ownership annotation. The compiler inserts every retain and release.</li>
+  <li><strong>Not a borrow checker.</strong> References alias freely; the compiler never rejects a program for sharing an object or holding a reference too long.</li>
+  <li><strong>Not unsafe.</strong> Ordinary ADM code cannot form a dangling reference, read freed memory or overflow a buffer; indexing is bounds checked and optionals must be tested before use. The only way to touch raw memory is a foreign call declared with <code>@c</code>, and there the foreign side's rules apply.</li>
+</ul>
+    </section>
+
+    <section class="docs-section" id="summary">
+      <h2>Summary</h2>
+      <table class="docs-table">
+  <tr><th>Question</th><th>Answer</th></tr>
+  <tr><td>Who frees memory?</td><td>The compiler-inserted reference counting, automatically</td></tr>
+  <tr><td>When?</td><td>The instant the last reference is dropped; <code>dispose()</code> runs then</td></tr>
+  <tr><td>Copy or share?</td><td>Numbers, tuples, optionals copy; types, arrays, maps, strings, closures share</td></tr>
+  <tr><td>Cycles?</td><td>Not collected; avoid back pointers or break them with <code>dispose</code></td></tr>
+  <tr><td>Threads?</td><td>Counts are atomic; contents are yours to synchronise</td></tr>
+  <tr><td>Pauses?</td><td>None</td></tr>
+  <tr><td>Manual control?</td><td><code>dispose x</code> to release early, <code>x.dispose()</code> to run the cleanup now, <code>clone()</code> to copy explicitly</td></tr>
+</table>
+    </section>
+  </main>
+
+</div>
+
+<script src="docs.js"></script>
+<script src="highlight.js"></script>
+</body>
+</html>

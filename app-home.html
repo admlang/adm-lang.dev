@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Application home &amp; migrations — adm</title>
+<meta name="description" content="Where an ADM application keeps its data, how the folder is laid out, and how version migrations and rollback work.">
+<link rel="icon" type="image/svg+xml" href="assets/adm.svg">
+<link rel="canonical" href="https://adm-lang.dev/app-home.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="adm">
+<meta property="og:title" content="adm — Application home &amp; migrations">
+<meta property="og:description" content="Where an ADM application keeps its data, how the folder is laid out, and how version migrations and rollback work.">
+<meta property="og:url" content="https://adm-lang.dev/app-home.html">
+<meta property="og:image" content="https://adm-lang.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="adm — Application home &amp; migrations">
+<meta name="twitter:description" content="Where an ADM application keeps its data, how the folder is laid out, and how version migrations and rollback work.">
+<meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/adm.svg" alt="ADM" class="brand-mark">
+      <span class="brand-name"><span class="brand-sub">programming language</span></span>
+    </a>
+    <nav class="nav">
+      <a href="docs.html" class="nav-active">Docs</a>
+      <a href="examples.html">Examples</a>
+      <a href="services.html">Services</a>
+      <a href="modules.html">Modules</a>
+      <a class="nav-icon" href="https://github.com/admlang" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs-layout">
+
+  <aside class="docs-sidebar">
+    <nav class="docs-nav" id="docs-nav">
+
+      <div class="docs-pages">
+        <span class="docs-pages-label">Docs</span>
+        <a class="docs-page-link" href="docs.html">Language reference</a>
+        <a class="docs-page-link" href="memory.html">Memory model</a>
+        <a class="docs-page-link" href="annotations.html">Annotations</a>
+        <a class="docs-page-link current" href="app-home.html">Application home &amp; migrations</a>
+        <a class="docs-page-link" href="plugins.html">Plugins</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#identity">Identity</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#location">Where the folder lives</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#layout">Layout</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#protocol">What the first call does</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#migrations">Writing migrations</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#rollback">Rollback</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#testing">Testing an upgrade</a>
+      </div>
+
+    </nav>
+  </aside>
+
+  <main class="docs-content">
+
+    <p class="docs-eyebrow">Docs</p>
+    <h1 class="docs-page-title">Application home &amp; migrations</h1>
+    <p class="docs-lede">Where an application keeps its files, what the folder looks like, and how it is carried from one version to the next.</p>
+
+    <section class="docs-section" id="identity">
+      <h2>Identity</h2>
+      <p>Every application has a name, an id and a version. They come, in order of precedence, from the <code>.admapp</code> manifest in the build, from <code>@manifest</code> on the <code>application</code> block, or from defaults: the declared application name (the source file name for an anonymous <code>application { }</code>) and version <code>0.1</code>.</p>
+      <div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">main.adm</span>
+  </div>
+  <pre><code>@manifest(name = &quot;myapp&quot;, version = &quot;1.2.0&quot;)
+application MyApp {
+	def new(args string[]) int {
+		let home = try Application.home()
+		...
+	}
+}</code></pre>
+</div>
+      <p>Inside the program they are the constants <code>__app_name__</code>, <code>__app_id__</code> and <code>__app_version__</code>, and <code>Application.name()</code> and <code>version()</code> return the same. Two builds that must coexist on one machine get different names (<code>myapp</code>, <code>myapp-beta</code>); versions never get their own folders.</p>
+    </section>
+
+    <section class="docs-section" id="location">
+      <h2>Where the folder lives</h2>
+      <p><code>Application.home()</code> (also <code>std.os.appHome()</code>) returns the application's folder and creates it on first use. It sits where the platform keeps per-user application data, named after the app, never as a dotfolder in the home directory:</p>
+      <table class="docs-table">
+  <tr><th>OS</th><th>Folder</th></tr>
+  <tr><td>Linux</td><td><code>$XDG_DATA_HOME/&lt;name&gt;</code>, default <code>~/.local/share/&lt;name&gt;</code></td></tr>
+  <tr><td>macOS</td><td><code>~/Library/Application Support/&lt;name&gt;</code></td></tr>
+  <tr><td>Windows</td><td><code>%APPDATA%\&lt;name&gt;</code></td></tr>
+</table>
+      <p>The environment variable <code>ADM_APP_HOME</code> names the folder directly, for portable installs and tests; <code>adm test</code> sets it to a scratch directory so a <code>check</code> suite never touches the real folder.</p>
+      <p>A folder that already exists at that path with contents but no <code>version</code> marker belongs to some other program. <code>home()</code> refuses it with a message naming the path and <code>ADM_APP_HOME</code>; it never adopts, overwrites or deletes anything there. An empty folder is adopted.</p>
+    </section>
+
+    <section class="docs-section" id="layout">
+      <h2>Layout</h2>
+      <p>One folder shared by every version of the app:</p>
+      <div class="docs-tree"><div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">~/.local/share/myapp</span>
+  </div>
+  <pre><code>version          the last version that ran this folder, e.g. &quot;3.54&quot;
+vault/           std.services.Vault, secrets and logins; shared across versions
+plugins/         extracted plugin objects, keyed by content hash
+data/            the app&#x27;s own files: configuration, caches, documents it owns
+backup/&lt;ver&gt;/    snapshot of data/ taken right before migrating from &lt;ver&gt;</code></pre>
+</div></div>
+      <p>Secrets, plugins, configuration and caches all live under it, so an application never writes anywhere else; in particular never under <code>~/.adm</code>, which belongs to the toolchain. Sharing one folder rather than one per version keeps logins across patch releases and avoids copying large local data; rollback comes from the snapshot instead.</p>
+    </section>
+
+    <section class="docs-section" id="protocol">
+      <h2>What the first call does</h2>
+      <p>The folder is brought up to date on the first <code>home()</code> call of a run, not at start-up, so a program that never asks for its folder never gets one. The call reads the <code>version</code> marker and compares it with <code>__app_version__</code>:</p>
+      <ul>
+  <li><strong>Missing:</strong> first run. The marker is written and that is all.</li>
+  <li><strong>Equal:</strong> nothing to do.</li>
+  <li><strong>Older:</strong> an upgrade. <code>data/</code> is copied to <code>backup/&lt;old&gt;/</code>, the migration steps run, and the marker is set to the new version.</li>
+  <li><strong>Newer:</strong> a downgrade. The call fails naming both versions, unless the application block carries <code>@allowDowngrade()</code>. Data written by a newer schema is how apps corrupt themselves, so opting in is deliberate.</li>
+</ul>
+      <p>Versions compare as semantic versions (<code>1.0.0-rc.1</code> is older than <code>1.0.0</code>); a version that is not a valid semver falls back to a numeric part-by-part comparison.</p>
+    </section>
+
+    <section class="docs-section" id="migrations">
+      <h2>Writing migrations</h2>
+      <p>A migration is an ordered list of steps, each knowing both ends, the way database migrations work. Annotate functions in the application block with <code>@migration</code>; each takes the home folder path and returns <code>!none</code>:</p>
+      <div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">main.adm</span>
+  </div>
+  <pre><code>application MyApp {
+	@migration(from = &quot;3.54&quot;, to = &quot;4.0&quot;)
+	def settingsToJson(home string) !none {
+		let ini = try os.readText(&quot;{home}/data/settings.ini&quot;)
+		try os.writeText(&quot;{home}/data/settings.json&quot;, toJson(ini))
+		try os.remove(&quot;{home}/data/settings.ini&quot;)
+	}
+
+	@migration(from = &quot;4.0&quot;, to = &quot;5.63&quot;)
+	def splitCache(home string) !none { ... }
+}</code></pre>
+</div>
+      <ul>
+  <li>Only the steps newer than the version that last ran the folder fire, in ascending order. Upgrading 3.54 to 5.64 runs both steps above; 5.63 to 5.64 runs none.</li>
+  <li><code>to</code> may be omitted: it then means the next declared step's <code>from</code>, so gaps between steps are fine.</li>
+  <li>A step only ever sees the folder as the previous step left it. Code never has to guess where the data came from.</li>
+</ul>
+    </section>
+
+    <section class="docs-section" id="rollback">
+      <h2>Rollback</h2>
+      <p>Before the first step runs, <code>data/</code> has been snapshotted to <code>backup/&lt;old&gt;/</code>. If a step fails, <code>data/</code> is restored from that snapshot, the <code>version</code> marker keeps the old value, and <code>home()</code> returns the step's error; the user can go back to the previous build and everything is as it was.</p>
+      <p>Backups are kept until the application deletes them, so a manual rollback is always one folder away. <code>vault/</code> and <code>plugins/</code> are not part of the snapshot: they are version-agnostic by design.</p>
+    </section>
+
+    <section class="docs-section" id="testing">
+      <h2>Testing an upgrade</h2>
+      <p>Point <code>ADM_APP_HOME</code> at a scratch folder holding a copy of an older layout and its <code>version</code> marker, then run the new build: the first <code>home()</code> call performs the upgrade against that copy. <code>adm test</code> does the same automatically with a fresh scratch folder per app, so a <code>check</code> suite can exercise the whole chain with fixture data.</p>
+    </section>
+  </main>
+
+</div>
+
+<script src="docs.js"></script>
+<script src="highlight.js"></script>
+</body>
+</html>

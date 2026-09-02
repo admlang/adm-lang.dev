@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plugins — adm</title>
+<meta name="description" content="How an ADM plugin declares its exports, what the .admplugin package contains, and how the shared runtime works.">
+<link rel="icon" type="image/svg+xml" href="assets/adm.svg">
+<link rel="canonical" href="https://adm-lang.dev/plugins.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="adm">
+<meta property="og:title" content="adm — Plugins">
+<meta property="og:description" content="How an ADM plugin declares its exports, what the .admplugin package contains, and how the shared runtime works.">
+<meta property="og:url" content="https://adm-lang.dev/plugins.html">
+<meta property="og:image" content="https://adm-lang.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="adm — Plugins">
+<meta name="twitter:description" content="How an ADM plugin declares its exports, what the .admplugin package contains, and how the shared runtime works.">
+<meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/adm.svg" alt="ADM" class="brand-mark">
+      <span class="brand-name"><span class="brand-sub">programming language</span></span>
+    </a>
+    <nav class="nav">
+      <a href="docs.html" class="nav-active">Docs</a>
+      <a href="examples.html">Examples</a>
+      <a href="services.html">Services</a>
+      <a href="modules.html">Modules</a>
+      <a class="nav-icon" href="https://github.com/admlang" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs-layout">
+
+  <aside class="docs-sidebar">
+    <nav class="docs-nav" id="docs-nav">
+
+      <div class="docs-pages">
+        <span class="docs-pages-label">Docs</span>
+        <a class="docs-page-link" href="docs.html">Language reference</a>
+        <a class="docs-page-link" href="memory.html">Memory model</a>
+        <a class="docs-page-link" href="annotations.html">Annotations</a>
+        <a class="docs-page-link" href="app-home.html">Application home &amp; migrations</a>
+        <a class="docs-page-link current" href="plugins.html">Plugins</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#declaring">Declaring a plugin</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#building">Building</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#inspecting">Inspecting a package</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#runtime">The shared runtime</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#loading">Loading</a>
+      </div>
+
+    </nav>
+  </aside>
+
+  <main class="docs-content">
+
+    <p class="docs-eyebrow">Docs</p>
+    <h1 class="docs-page-title">Plugins</h1>
+    <p class="docs-lede">Declaring what a plugin exports, what <code>adm build</code> packs into an <code>.admplugin</code>, and how it shares the runtime with its host.</p>
+
+    <section class="docs-section" id="declaring">
+      <h2>Declaring a plugin</h2>
+      <p>A plugin is a compilation unit like an application, without an entry point: <code>plugin Name { }</code> at file scope, <code>partial</code> allowed, its own <code>use</code> list. What makes it a plugin is the <code>export</code> list: the modules and symbols a host may reach, written with the same selectors as <code>use</code>. Everything else in the plugin stays private.</p>
+            <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">imagetools.adm</span>
+        </div>
+        <pre><code>@manifest(version = &quot;1.2.0&quot;)
+plugin ImageTools {
+	use (
+		std.io
+		acme.imaging
+		acme.imaging.filters
+	)
+
+	export (
+		acme.imaging.filters              // every non-internal symbol of the module
+		acme.imaging::(Image, decode)     // a subset
+	)
+
+	def new() !none { ... }              // optional lifecycle
+	def dispose() { ... }
+}</code></pre>
+      </div>
+      <p>The compiler checks the list: every module named is one the plugin uses, every symbol exists and is not <code>internal</code>, and the signatures of exported symbols only mention types that are exported too, so a host never sees a type it cannot name. <code>@manifest(version = ...)</code> sets the plugin's version; without it the version is <code>0.1</code>.</p>
+    </section>
+
+    <section class="docs-section" id="building">
+      <h2>Building</h2>
+      <p><code>adm build</code> on a plugin unit produces one file, <code>&lt;Name&gt;.admplugin</code>, a zip archive that holds everything a host or an IDE needs:</p>
+            <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">ImageTools.admplugin</span>
+        </div>
+        <pre><code>manifest.json                  name, version, exports, entry symbol,
+                               compiler and runtime it was built with
+meta/exports.json              every exported symbol: kind, signature, doc
+linux-amd64/libImageTools.so   the native object, uncompressed, mappable
+linux-arm64/libImageTools.so   one directory per platform requested</code></pre>
+      </div>
+      <p>The shared object exports a single symbol, the plugin's entry, and is linked position-independent with its own symbols bound, so two plugins never clash with each other or with the host. <code>adm build --platforms linux-amd64,linux-arm64,darwin-arm64,windows-amd64</code> runs the build once per platform and merges the results into one package; a cross target needs the platform's sysroot, named by <code>ADM_SYSROOT_&lt;OS&gt;_&lt;ARCH&gt;</code>, and without one only the host platform is built. Applications built the same way land in <code>&lt;out&gt;/&lt;os&gt;-&lt;arch&gt;/</code>.</p>
+    </section>
+
+    <section class="docs-section" id="inspecting">
+      <h2>Inspecting a package</h2>
+      <p><code>adm doc --plugin ImageTools.admplugin</code> prints the manifest and the export index without loading any code: the modules, the symbols with their signatures and doc comments, the platforms inside, and the compiler and runtime versions it was built against. Tooling reads the same entries, so what the IDE shows for a plugin is exactly what it exports.</p>
+    </section>
+
+    <section class="docs-section" id="runtime">
+      <h2>The shared runtime</h2>
+      <p>Native code needs the ADM runtime: memory management, tasks, strings, the service registry. An application normally carries it inside its binary. A plugin cannot, because two copies of the runtime in one process would each count references and each run a scheduler, so plugins are always linked against <code>libadm_runtime.so</code>, placed beside the output and found through a relative rpath, and the package records which runtime version it needs.</p>
+      <p>A host that loads plugins is built with <code>adm build --runtime shared</code>, which gives it the same library beside its binary; the plugin then shares the host's objects, tasks and services. Static linking stays the default for everything else because a shared runtime turns every retain and release into a call through the dynamic linker, a cost only a plugin host should pay. Linux and macOS today.</p>
+    </section>
+
+    <section class="docs-section" id="loading">
+      <h2>Loading</h2>
+      <p>The host side is the part still being built: a <code>std.plugins</code> module that opens a package, checks its runtime version and type layouts against the host, loads the platform's object and hands back the exported symbols, plus the plugin's <code>new(host)</code> receiving the host services. Until it lands, packages can be built, inspected and shipped, and a host written against the exported API can be linked to a plugin's object directly.</p>
+    </section>
+  </main>
+
+</div>
+
+<script src="docs.js"></script>
+<script src="highlight.js"></script>
+</body>
+</html>

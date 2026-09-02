@@ -636,3 +636,82 @@ code, pre, .code-window {
   }
   .docs-content { max-width: none; }
 }
+
+/* Docs sub-pages: the page list at the top of the shared sidebar */
+.docs-pages {
+  margin: 0 0 18px;
+  padding: 0 0 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.docs-pages-label {
+  display: block;
+  padding: 0 10px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.docs-page-link {
+  display: block;
+  padding: 6px 10px;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.docs-page-link:hover {
+  color: var(--text);
+  background: var(--bg-alt);
+}
+
+.docs-page-link.current {
+  color: var(--accent-dark);
+  background: var(--bg-alt);
+}
+
+.docs-eyebrow {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+}
+
+.docs-page-title {
+  margin: 0 0 10px;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.docs-content .docs-lede {
+  margin: 0 0 36px;
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.docs-content h4 {
+  margin: 22px 0 6px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.docs-content h4 code {
+  font-size: 0.95em;
+}
+
+.docs-tree {
+  margin: 0 0 18px;
+}
+
+.docs-tree pre {
+  margin: 0;
+}

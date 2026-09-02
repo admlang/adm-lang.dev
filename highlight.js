@@ -16,7 +16,7 @@
     "partial", "internal", "atomic", "asm", "async", "cuda", "sql", "infix",
     "meta",
     // bindings
-    "let", "const", "def", "use",
+    "let", "const", "def", "use", "export",
     // control flow
     "if", "else", "when", "unless", "for", "forall", "every", "empty", "break",
     "finish", "switch", "match", "select", "where", "case", "continue",

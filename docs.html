@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Docs — adm</title>
-<meta name="description" content="ADM language documentation.">
+<title>Language reference — adm</title>
+<meta name="description" content="ADM language reference: syntax, types, control flow, error handling, concurrency, services, and UI.">
 <link rel="icon" type="image/svg+xml" href="assets/adm.svg">
 <link rel="canonical" href="https://adm-lang.dev/docs.html">
 <meta property="og:type" content="website">
@@ -45,6 +45,15 @@
 
   <aside class="docs-sidebar">
     <nav class="docs-nav" id="docs-nav">
+
+      <div class="docs-pages">
+        <span class="docs-pages-label">Docs</span>
+        <a class="docs-page-link current" href="docs.html">Language reference</a>
+        <a class="docs-page-link" href="memory.html">Memory model</a>
+        <a class="docs-page-link" href="annotations.html">Annotations</a>
+        <a class="docs-page-link" href="app-home.html">Application home &amp; migrations</a>
+        <a class="docs-page-link" href="plugins.html">Plugins</a>
+      </div>
 
       <div class="docs-nav-group">
         <a class="docs-nav-top" href="#intro">Introduction</a>
@@ -193,6 +202,16 @@
   </aside>
 
   <main class="docs-content">
+
+    <p class="docs-eyebrow">Docs</p>
+    <h1 class="docs-page-title">Language reference</h1>
+    <p class="docs-lede">
+      The language itself, section by section. The other docs pages cover the
+      <a href="memory.html">memory model</a>, the <a href="annotations.html">annotations</a>
+      shipped with the compiler and the standard library, the
+      <a href="app-home.html">application home folder and migrations</a>, and
+      <a href="plugins.html">plugins</a>.
+    </p>
 
     <section class="docs-section" id="intro">
       <h2>Introduction</h2>
@@ -476,8 +495,12 @@ application MainApp {
           choose with <code>--private-key-out</code>). The private key should never be committed.
         </p>
         <p>
-          None of it is required — an application with no <code>.admapp</code> just resolves its
-          identity/update constants to empty strings and builds normally. When present, it sets:
+          None of it is required. Without a manifest the application still has an identity:
+          <code>__app_name__</code> and <code>__app_id__</code> are the declared application name (the
+          file name for an anonymous <code>application { }</code>) and <code>__app_version__</code> is
+          <code>0.1</code>; <code>@manifest(name = "myapp", version = "1.2.0")</code> on the
+          <code>application</code> block sets both without a file. The update constants resolve to
+          empty strings. A <code>.admapp</code> wins over all of that; when present, it sets:
         </p>
         <ul>
           <li><strong>Identity</strong> — the publisher's public key and a repo salt, combined with each
@@ -500,8 +523,9 @@ application MainApp {
             archive from the packaging rules and install it locally.</li>
         </ul>
         <p>
-          Every value the manifest can set has a matching compiler constant: <code>__app_id__</code>,
-          <code>__app_version__</code>, <code>__publisher_id__</code>, <code>__publisher_pubkey__</code>,
+          Every value the manifest can set has a matching compiler constant: <code>__app_name__</code>,
+          <code>__app_id__</code>, <code>__app_version__</code>, <code>__publisher_id__</code>,
+          <code>__publisher_pubkey__</code>,
           plus the three update fields above. There's also an <code>__build_id__</code> constant that's
           always set and changes on every build — don't use it as a stable identity.
         </p>
@@ -511,39 +535,62 @@ application MainApp {
         <h3>Libraries &amp; Plugins</h3>
         <p>
           Libraries and plugins share code without an entry point of their own — no <code>def new</code>,
-          nothing runs them directly. The difference is how they get linked in:
+          nothing runs them directly. The difference is how they reach a program:
         </p>
         <ul>
           <li><code>library</code> compiles into a statically linked archive (<code>.a</code>, <code>.lib</code>)
             that's linked into an application at build time.</li>
-          <li><code>plugin</code> compiles into a dynamically linked library (<code>.so</code>, <code>.dll</code>,
-            <code>.dylib</code>) that gets loaded at runtime instead, through a plugin/service manager.</li>
+          <li><code>plugin</code> is packaged: <code>adm build</code> produces one <code>.admplugin</code>
+            file holding the plugin's metadata, its export index and a native shared object per
+            platform, which a host loads at runtime through the plugin manager.</li>
         </ul>
         <p>
           Both live at file scope, both can be <code>partial</code>, and neither can be marked
-          <code>internal</code> — like applications, an unnamed one just inherits its filename:
+          <code>internal</code> — like applications, an unnamed one inherits its filename.
         </p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-            <span class="code-filename">lib_plugin.adm</span>
+            <span class="code-filename">geometry.adm</span>
           </div>
-          <pre><code>library MyLib {
-}
+          <pre><code>library Geometry {
+	use std.math
 
-partial library SharedLib {
-}
-
-plugin RenderPlugin {
-}
-
-partial plugin MyPlugin {
-}
-
-// unnamed — inherits the filename, same as an unnamed application
-library {
+	def area(radius float) float {
+		return math.pi * radius * radius
+	}
 }</code></pre>
         </div>
+        <p>
+          A plugin states its public surface with an <code>export</code> list, using the same selectors
+          as <code>use</code>; everything else in it stays private. The compiler checks that every
+          exported symbol exists, is not <code>internal</code>, and that its signature only mentions
+          exported types. <code>@manifest(version = ...)</code> sets the plugin's version:
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">imagetools.adm</span>
+          </div>
+          <pre><code>@manifest(version = &quot;1.2.0&quot;)
+plugin ImageTools {
+	use (
+		acme.imaging
+		acme.imaging.filters
+	)
+
+	export (
+		acme.imaging.filters              // every non-internal symbol of the module
+		acme.imaging::(Image, decode)     // a subset
+	)
+}</code></pre>
+        </div>
+        <p>
+          <code>adm build --platforms linux-amd64,linux-arm64,darwin-arm64,windows-amd64</code> builds
+          the plugin for each platform listed and bundles them all into the one package; without the
+          flag only the host platform is built. The <a href="plugins.html">Plugins</a> page covers the
+          package layout, <code>adm doc --plugin</code> and the shared runtime.
+        </p>
         <p>
           <code>adm build --libs</code> or <code>--plugins</code> narrows a build to just those targets,
           the same way naming an application does; <code>adm lib</code> manages libraries and
@@ -672,6 +719,23 @@ let c = """
 This is a
    multi-line string
 """</code></pre>
+        </div>
+        <p>
+          Inside a string, <code>{expr}</code> interpolates any expression: a variable, a call, an
+          index. A lone <code>{</code> followed by an expression start (a letter, a digit, a quote, a
+          bracket) opens interpolation, so a literal brace is written <code>\{</code> and
+          <code>\}</code>:
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">interpolation.adm</span>
+          </div>
+          <pre><code>let name = &quot;Ada&quot;
+let n = 3
+println(&quot;{name} has {n} items ({n * 2} halves)&quot;)   // Ada has 3 items (6 halves)
+println(&quot;template: \{name}&quot;)                        // template: {name}
+println(&quot;json: \{\&quot;ok\&quot;: true\}&quot;)                   // json: {&quot;ok&quot;: true}</code></pre>
         </div>
 
         <p><strong>Chars</strong> (<code>char</code>) are single-quoted and hold one Unicode code point:</p>
@@ -813,6 +877,23 @@ s[-2:]    // "cd"</code></pre>
           Arrays are <code>T[]</code>, dynamically sized, with a literal form — <code>[1, 2, 3]</code>,
           or <code>Type[1, 2, 3]</code> with an explicit element type.
         </p>
+        <p>
+          An untyped literal takes its element type from the items, or from where it is used: a
+          declared <code>any[]</code>, an assignment target or an <code>any[]</code> parameter push
+          their element type into the literal, and items of unrelated types make it an
+          <code>any[]</code> on their own, each item boxed:
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">array_literals.adm</span>
+          </div>
+          <pre><code>let ints = [1, 2, 3]                 // int[]
+let mixed = [4, &quot;z&quot;, 5.5]            // any[]
+let row any[] = [1, &quot;two&quot;]           // any[] by declaration
+def log(fields any[]) { ... }
+log([now(), &quot;started&quot;, 200])         // the parameter type reaches the literal</code></pre>
+        </div>
 
         <p><strong>Indexing</strong> supports negative indexes, which count from the end:</p>
         <div class="code-window">
@@ -1751,6 +1832,44 @@ for let j = 0; j &lt; 3; j++ {
           The suffix blocks still work under <code>forall</code>: <code>every</code> still runs, just
           out of order, and <code>finish</code> only runs once every worker has finished.
         </p>
+        <p>
+          Any type can be iterated with <code>for let v in value</code> by implementing the builtin
+          <code>Iterator&lt;T&gt;</code> interface, a single method <code>def iterate() ?T</code>. The
+          loop calls it until it returns <code>none</code>; the type keeps its own cursor and resets it
+          after exhaustion so the value can be walked again. An <code>Iterator&lt;T&gt;</code> is a
+          real interface value, so it can be stored and passed around:
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">iterator.adm</span>
+          </div>
+          <pre><code>type Countdown {
+	from int
+	next int
+
+	def new(from int) {
+		self.from = from
+		next = from
+	}
+
+	def iterate() ?int {
+		if next == 0 {
+			next = from
+			return none
+		}
+		next -= 1
+		return next + 1
+	}
+}
+
+for let n in new Countdown(3) {
+	println(n)              // 3, 2, 1
+}
+
+let it Iterator&lt;int&gt; = new Countdown(2)
+for let n in it { ... }</code></pre>
+        </div>
       </div>
       <div class="docs-sub" id="match">
         <h3>Switch / Match</h3>
@@ -2116,6 +2235,73 @@ sql def getUser(email string) !User {
           the compiler doesn't try to understand it, just records the identifiers it needs to
           substitute before handing the body to the target toolchain.
         </p>
+        <p>
+          A <code>cuda def</code> body is one CUDA kernel. Its ADM parameters are the kernel's
+          parameters: a numeric scalar arrives as the matching C type, and an array <code>T[]</code>
+          arrives as <code>T* name</code> plus <code>int64_t name_len</code>, copied to the device
+          before the launch and back after it. The result is always <code>!none</code>: a launch can
+          fail (no driver, rejected kernel), and values come back through the arrays. The grid is one
+          thread per element of the first array parameter, in blocks of <code>@launch(block = N)</code>
+          threads (default 256), so a body guards with <code>i &lt; name_len</code>;
+          <code>@launch(x = "w", y = "h")</code> names integer parameters holding the thread count per
+          axis instead.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">kernel.adm</span>
+          </div>
+          <pre><code>use std.gpu
+
+cuda def scale(values float32[], factor float32) !none {
+	int i = blockIdx.x * blockDim.x + threadIdx.x;
+	if (i &lt; values_len) values[i] *= factor;
+}
+
+def new(args string[]) int {
+	let samples = float32[1, 2, 3, 4]
+	try scale(samples, 2.5)
+	println(samples)                        // [2.5, 5, 7.5, 10]
+	println(gpu.available())                // true when a driver loaded
+	return 0
+}</code></pre>
+        </div>
+        <p>
+          The kernel is compiled to PTX at build time and also as plain C, so the same program runs
+          without a GPU: the CPU path runs the blocks in parallel. <code>ADM_CUDA=gpu</code> or
+          <code>=cpu</code> forces either, <code>ADM_CUDA_DEVICE</code> picks the device, and
+          <code>gpu.available()</code> / <code>gpu.deviceName()</code> report the path in use. A body
+          that needs device-only features (<code>__shared__</code>, <code>__syncthreads</code>, warp
+          intrinsics) declares <code>@launch(cpu = false)</code> and fails without a GPU.
+        </p>
+        <p>
+          Data that many launches share stays on the device in a <code>std.gpu.DeviceBuffer&lt;T&gt;</code>:
+          <code>gpu.upload(data)</code> copies once, the buffer goes wherever the kernel takes a
+          <code>T[]</code>, <code>download</code> and <code>write</code> move data explicitly, and
+          <code>dispose</code> frees it. <code>async cuda def</code> returns a future, so the scheduler
+          keeps other tasks running while the driver works:
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">device_buffer.adm</span>
+          </div>
+          <pre><code>use std.gpu
+
+async cuda def step(cells byte[], width int, height int) !none { ... }
+
+def simulate(initial byte[], width int, height int, generations int) !byte[] {
+	let cells = try gpu.upload(initial)
+	for let g in 0..generations {
+		try await step(cells, width, height)     // no copies between launches
+	}
+	let out = byte[]
+	out.len(cells.len())
+	try cells.download(out)
+	cells.dispose()
+	return out
+}</code></pre>
+        </div>
       </div>
       <div class="docs-sub" id="closures">
         <h3>Closures</h3>
@@ -2884,6 +3070,8 @@ component myComponent {
         Attributes (<code>@name(...)</code>) attach metadata to a declaration. Modifiers
         (<code>internal</code>, <code>partial</code>, ...) change how a declaration behaves. Both have
         shown up throughout these docs already — this section is the reference for each.
+        Every attribute the compiler and the standard library ship is catalogued on the
+        <a href="annotations.html">Annotations</a> page.
       </p>
 
       <div class="docs-sub" id="attributes">
@@ -3178,6 +3366,9 @@ module Math {
         <tr><td><code>__os__</code></td><td>OS of the active compilation target (<code>"linux"</code>, <code>"windows"</code>, <code>"macos"</code>, <code>"android"</code>, <code>"wasm"</code>).</td></tr>
         <tr><td><code>__arch__</code></td><td>Architecture of the active target (<code>"x86_64"</code>, <code>"arm64"</code>, <code>"wasm32"</code>).</td></tr>
         <tr><td><code>__build_timestamp__</code></td><td>ISO-8601 timestamp of when the build ran.</td></tr>
+        <tr><td><code>__app_name__</code></td><td>The application's name: from <code>.admapp</code>, else <code>@manifest</code>, else the declared <code>application</code> name.</td></tr>
+        <tr><td><code>__app_id__</code></td><td>Stable identity derived from the manifest's publisher key and slug; the application name when there is no manifest.</td></tr>
+        <tr><td><code>__app_version__</code></td><td>The application's version: from <code>.admapp</code>, else <code>@manifest</code>, else <code>"0.1"</code>. Drives the <a href="app-home.html">home folder migrations</a>.</td></tr>
         <tr><td><code>__endianness__</code></td><td><code>"little"</code> or <code>"big"</code>, per the target architecture.</td></tr>
         <tr><td><code>__ptr_width__</code></td><td>Pointer width in bytes for the target.</td></tr>
         <tr><td><code>__int_width__</code></td><td>Size of the default integer type, in bytes.</td></tr>

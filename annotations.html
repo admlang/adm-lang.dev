@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Annotations — adm</title>
+<meta name="description" content="Every annotation shipped with the ADM compiler and standard library: what it does, where it applies, and how to write your own.">
+<link rel="icon" type="image/svg+xml" href="assets/adm.svg">
+<link rel="canonical" href="https://adm-lang.dev/annotations.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="adm">
+<meta property="og:title" content="adm — Annotations">
+<meta property="og:description" content="Every annotation shipped with the ADM compiler and standard library: what it does, where it applies, and how to write your own.">
+<meta property="og:url" content="https://adm-lang.dev/annotations.html">
+<meta property="og:image" content="https://adm-lang.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="adm — Annotations">
+<meta name="twitter:description" content="Every annotation shipped with the ADM compiler and standard library: what it does, where it applies, and how to write your own.">
+<meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/adm.svg" alt="ADM" class="brand-mark">
+      <span class="brand-name"><span class="brand-sub">programming language</span></span>
+    </a>
+    <nav class="nav">
+      <a href="docs.html" class="nav-active">Docs</a>
+      <a href="examples.html">Examples</a>
+      <a href="services.html">Services</a>
+      <a href="modules.html">Modules</a>
+      <a class="nav-icon" href="https://github.com/admlang" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs-layout">
+
+  <aside class="docs-sidebar">
+    <nav class="docs-nav" id="docs-nav">
+
+      <div class="docs-pages">
+        <span class="docs-pages-label">Docs</span>
+        <a class="docs-page-link" href="docs.html">Language reference</a>
+        <a class="docs-page-link" href="memory.html">Memory model</a>
+        <a class="docs-page-link current" href="annotations.html">Annotations</a>
+        <a class="docs-page-link" href="app-home.html">Application home &amp; migrations</a>
+        <a class="docs-page-link" href="plugins.html">Plugins</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#using">Using annotations</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#compiler">Compiler</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#runtime">Runtime helpers</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#application">Application</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#services">Services and components</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#service-helpers">Service helpers</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#testing">Testing</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#encoding">Encoding</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#parameters">Parameter transforms</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#validations">Validations</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#discovery">Discovery</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#writing">Writing your own</a>
+      </div>
+
+    </nav>
+  </aside>
+
+  <main class="docs-content">
+
+    <p class="docs-eyebrow">Docs</p>
+    <h1 class="docs-page-title">Annotations</h1>
+    <p class="docs-lede">What each <code>@annotation</code> shipped with the compiler and the standard library does, grouped by area, and how to write one.</p>
+
+    <section class="docs-section" id="using">
+      <h2>Using annotations</h2>
+      <p>An annotation is a call placed before a declaration: <code>@name(args)</code>, with positional or named arguments like any other call, and empty parentheses when there are none. What it applies to is fixed by the annotation: a function, a method, a field, a parameter, a constant, a module or the <code>application</code> block. Using one on the wrong kind of declaration is a compile error.</p>
+      <p>The ones from the prelude need no import. The ones from a standard library module come in with that module (<code>use std.services::(cache)</code>, or the qualified <code>@services.cache(...)</code> form). Each entry below names the module.</p>
+    </section>
+
+    <section class="docs-section" id="compiler">
+      <h2>Compiler</h2>
+      <p>Prelude annotations read at build time. They shape what gets compiled rather than what happens at run time.</p>
+      <h4><code>@cfg(os = &quot;&quot;, arch = &quot;&quot;, build = &quot;&quot;, features = [], version = &quot;&quot;)</code></h4>
+<p>Compiles the declaration only when every given key matches the build. Several <code>@cfg</code> on one declaration are alternatives: any one matching keeps it.</p>
+      <h4><code>@os(value)  @arch(value)  @build(value)  @feature(values)  @version(value)</code></h4>
+<p>Sugar for a single-key <code>@cfg</code>.</p>
+      <h4><code>@embed(path, gzip = false)</code></h4>
+<p>On a <code>byte[]</code> constant with no initializer: bakes the file at <code>path</code> (relative to the source file) into it, gzip-compressed when asked; inflate with <code>std.data.compress.gzip.Reader</code>. <code>string(data)</code> turns a text asset back into text.</p>
+      <h4><code>@env(name, defaultValue = &quot;&quot;)</code></h4>
+<p>On a variable or constant: fills it from the environment variable <code>name</code>, or the default when unset.</p>
+      <h4><code>@flag(name, description, defaultValue = &quot;&quot;)</code></h4>
+<p>On a variable: wires it to a command-line flag of the application, with its help text.</p>
+      <h4><code>@deprecated(message, since = &quot;&quot;)</code></h4>
+<p>Warns at every use of the declaration with the given message.</p>
+      <h4><code>@inline()  @noinline()</code></h4>
+<p>Asks the backend to inline the function, or forbids it.</p>
+      <h4><code>@launch(block = 256, x = &quot;&quot;, y = &quot;&quot;, z = &quot;&quot;, cpu = true)</code></h4>
+<p>Launch shape of a <code>cuda def</code>: threads per block, the integer parameters that give the thread count per axis, and whether a CPU fallback is built. See the language reference on CUDA kernels.</p>
+      <h4><code>@c(header)  @c(header = &quot;&quot;, symbol = &quot;&quot;, name = &quot;&quot;, ret = &quot;&quot;, params = [])</code></h4>
+<p>From <code>std.interop</code>. On a module, the header its signature-only declarations need; on a function, binds it to a C symbol. Also available from the prelude as <code>@c(lib)</code> on a module.</p>
+      <h4><code>@link(lib)  @native(lib)</code></h4>
+<p>On a module: a linker dependency, or a native-ABI library the module binds to; <code>@native(lib, symbol, name)</code> on a function binds one symbol.</p>
+      <h4><code>@emits(chan = &quot;&quot;)</code></h4>
+<p>Declares the channel a function emits on.</p>
+      <h4><code>@python(entry)  @node(entry)</code></h4>
+<p>Bindings into an embedded interpreter.</p>
+    </section>
+
+    <section class="docs-section" id="runtime">
+      <h2>Runtime helpers</h2>
+      <p>Prelude annotations that wrap the call at run time.</p>
+      <h4><code>@once()</code></h4>
+<p>The function or method body runs on the first call only; later calls return immediately with the zero value.</p>
+      <h4><code>@delay(timeout)</code></h4>
+<p>The call returns at once with the zero value and the body runs <code>timeout</code> later on its own task, with the arguments it was given. For functions that return nothing.</p>
+      <h4><code>@debounce(window)</code></h4>
+<p>Calls closer together than <code>window</code> collapse into one: each call restarts the window, and only the last call's arguments reach the body once the calls stop. Callers get the zero value at once.</p>
+      <h4><code>@range(start, end)</code></h4>
+<p>On a numeric field or parameter: clamps the value into <code>[start, end]</code> before it is stored or before the body runs.</p>
+      <div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">debounce.adm</span>
+  </div>
+  <pre><code>type Search {
+	results string[]
+
+	@debounce(250ms)
+	def query(text string) {
+		results = index.lookup(text)
+	}
+}</code></pre>
+</div>
+    </section>
+
+    <section class="docs-section" id="application">
+      <h2>Application</h2>
+      <p>Prelude annotation on the <code>application</code> block.</p>
+      <h4><code>@manifest(name = &quot;&quot;, version = &quot;&quot;)</code></h4>
+<p>Supplies the application identity when there is no <code>.admapp</code> manifest; <code>name</code> fills <code>__app_name__</code> and <code>__app_id__</code>, <code>version</code> fills <code>__app_version__</code>. A <code>.admapp</code> in the build wins over it. See <a href="app-home.html#identity">Application home</a>.</p>
+      <p><code>@migration</code> and <code>@allowDowngrade</code>, which drive the home folder's version upgrades, belong to the <code>Application</code> service and are described with the other <a href="services.html#annotations">service annotations</a>.</p>
+    </section>
+
+    <section class="docs-section" id="services">
+      <h2>Services and components</h2>
+      <p>Prelude annotations that give a service its event model; only valid inside a <code>service</code>. The <a href="services.html">Services</a> page shows them on the built-in services.</p>
+      <h4><code>@commit()</code></h4>
+<p>A primary event: the method changes state and every commit is implicitly atomic.</p>
+      <h4><code>@emit()</code></h4>
+<p>A named event that only the declaring service can emit. Synchronous and side-effect free.</p>
+      <h4><code>@query()</code></h4>
+<p>A read-only method that returns a snapshot of state without producing an event. Synchronous and side-effect free.</p>
+      <h4><code>@on(serviceMethod, filter = none)</code></h4>
+<p>Declares an observer of another service's event, optionally filtered by a <code>def(Event) bool</code>.</p>
+      <h4><code>@controller()</code></h4>
+<p>Marks a type as the controller of a UI component.</p>
+    </section>
+
+    <section class="docs-section" id="service-helpers">
+      <h2>Service helpers</h2>
+      <p>The standard services ship their own annotations: caching (<code>@cache</code>, <code>@cacheInvalidate</code>), scheduling (<code>@cron</code>, <code>@at</code>, <code>@after</code>, <code>@runEvery</code>), metrics (<code>@metric</code>, <code>@measureCount</code>, <code>@measureTime</code>, <code>@measureErrors</code>, <code>@measureConcurrency</code>), logging, debugging, configuration, policy, and the application home folder (<code>@migration</code>, <code>@allowDowngrade</code>). They are helpers for talking to a service from ordinary code, and each is documented next to its service on the <a href="services.html#annotations">Services page</a>.</p>
+    </section>
+
+    <section class="docs-section" id="testing">
+      <h2>Testing</h2>
+      <p>From <code>std.testing</code>, inside a <code>check</code> suite.</p>
+      <h4><code>@test()</code></h4>
+<p>A test case; <code>assert</code> failures and returned errors fail it.</p>
+      <h4><code>@benchmark()</code></h4>
+<p>A benchmark, run by <code>adm test --bench</code>.</p>
+      <h4><code>@fuzz()</code></h4>
+<p>A fuzz target fed generated inputs.</p>
+      <h4><code>@timeout(limit)</code></h4>
+<p>Fails the test when it runs longer than <code>limit</code>.</p>
+      <h4><code>@parallel()</code></h4>
+<p>Lets the test run alongside other parallel tests.</p>
+      <h4><code>@skip(reason = &quot;&quot;)</code></h4>
+<p>Skips the test, reporting the reason.</p>
+      <h4><code>@only()</code></h4>
+<p>Runs just the tests carrying it while it is present.</p>
+      <h4><code>@golden(file)</code></h4>
+<p>Compares the test's output with the named golden file.</p>
+    </section>
+
+    <section class="docs-section" id="encoding">
+      <h2>Encoding</h2>
+      <p>From <code>std.data.encoding</code>, on struct fields and properties. All three take the same core options.</p>
+      <h4><code>@json(name = &quot;&quot;, omitempty = false, ignore = false, asString = false, nullable = false)</code></h4>
+<p><code>name</code> replaces the key, <code>omitempty</code> drops the field at its zero value, <code>ignore</code> skips it both ways, <code>asString</code> quotes the value (large integers stay exact), <code>nullable</code> writes <code>null</code> instead of omitting.</p>
+      <h4><code>@yaml(...)</code></h4>
+<p>Same options as <code>@json</code>, for YAML.</p>
+      <h4><code>@xml(name = &quot;&quot;, omitempty = false, attribute = false, ignore = false)</code></h4>
+<p>On fields and properties; <code>attribute</code> writes the value as an attribute of the parent element. On a type or struct, <code>@xml(name, ignore)</code> renames or hides the element.</p>
+      <div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">user.adm</span>
+  </div>
+  <pre><code>struct User {
+	@json(&quot;user_id&quot;) id int
+	@json(omitempty = true) nickname string
+	@xml(attribute = true) role string
+}</code></pre>
+</div>
+    </section>
+
+    <section class="docs-section" id="parameters">
+      <h2>Parameter transforms</h2>
+      <p>From <code>std.strings</code>, on string parameters; the value is rewritten before the body runs.</p>
+      <h4><code>@trim()  @lower()</code></h4>
+<p>Trims surrounding whitespace, or lowercases the argument.</p>
+    </section>
+
+    <section class="docs-section" id="validations">
+      <h2>Validations</h2>
+      <p>From <code>std.validations</code>, on fields and parameters: <code>@len(min, max)</code>, <code>@url()</code>, <code>@email()</code>, <code>@phone()</code>, <code>@creditcard()</code>, <code>@date()</code>, <code>@time()</code>, <code>@datetime()</code>, <code>@file()</code>, <code>@base64image()</code>, <code>@numeric()</code>, <code>@expression(pattern)</code>, <code>@list()</code>, <code>@truthy()</code>.</p>
+      <p>The same checks are available as functions (<code>validations.isEmail(...)</code>) and as the <code>string.isEmail()</code> family in the prelude.</p>
+    </section>
+
+    <section class="docs-section" id="discovery">
+      <h2>Discovery</h2>
+      <p>Annotations a service uses to find implementations at start-up, through reflection.</p>
+      <h4><code>@codec(name)</code></h4>
+<p>From <code>std.formats.*</code>: registers a type as the image, audio, font or archive codec for <code>name</code>, so the loaders pick it by extension or content.</p>
+      <h4><code>@UIRenderer(name)</code></h4>
+<p>From <code>std.ui.renderer</code>: registers a renderer implementation the UI service can select.</p>
+      <h4><code>@ide(kind = IdeKind.Value, label = &quot;&quot;, refresh = 1s, unit = &quot;&quot;)</code></h4>
+<p>From <code>std.ide</code>: publishes a zero-argument service method to the IDE service panel, polled at most every <code>refresh</code>.</p>
+    </section>
+
+    <section class="docs-section" id="writing">
+      <h2>Writing your own</h2>
+      <p>An annotation is a <code>meta def</code> whose first parameter is the context it applies to: <code>FunctionMetaContext</code>, <code>MethodMetaContext</code>, <code>FieldMetaContext</code>, <code>ParameterMetaContext</code>, <code>ConstMetaContext</code>, <code>VariableMetaContext</code>, <code>TypeMetaContext</code>, <code>ModuleMetaContext</code>, or the broad <code>DeclarationMetaContext</code>. A function or method meta runs on every call and decides what happens to the body:</p>
+      <ul><li><code>target.invoke()</code> runs it; <code>target.skip()</code> does not, and the caller gets the zero value;</li><li><code>target.resolve(value)</code> supplies the result without running it;</li><li><code>target.result()</code> and <code>target.failed()</code> read what the body produced;</li><li><code>target.detach()</code> copies the call so it can be invoked later, from a task or a timer (this is what <code>@delay</code> and <code>@debounce</code> do);</li><li><code>target.ctx.storage</code> is a small string store scoped to the annotated function, kept across calls.</li></ul>
+      <div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">retry.adm</span>
+  </div>
+  <pre><code>meta def retry(target FunctionMetaContext, attempts int = 3) {
+	for let i in 0..attempts {
+		target.invoke()
+		return unless target.failed()
+	}
+}
+
+@retry(attempts = 5)
+def fetch(url string) !Response { ... }</code></pre>
+</div>
+      <p>The wrapped call's arguments and context live only for the duration of the call; anything that must outlive it goes through <code>detach()</code>. See <a href="docs.html#attributes">Attributes</a> in the language reference for the full rules on where an annotation may appear.</p>
+    </section>
+  </main>
+
+</div>
+
+<script src="docs.js"></script>
+<script src="highlight.js"></script>
+</body>
+</html>

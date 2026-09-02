@@ -73,6 +73,8 @@
       <div class="docs-nav-group">
         <a class="docs-nav-top" href="#annotations">Annotations</a>
         <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#meta-migration"><code>@migration</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-allowdowngrade"><code>@allowDowngrade</code></a></li>
           <li><a class="docs-nav-sub" href="#meta-cache"><code>@cache</code></a></li>
           <li><a class="docs-nav-sub" href="#meta-cacheinvalidate"><code>@cacheInvalidate</code></a></li>
           <li><a class="docs-nav-sub" href="#meta-config"><code>@config</code></a></li>
@@ -185,7 +187,11 @@ def onExpiry(evt Event&lt;string&gt;) {
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def name() string</code></div>
-            <p class="api-doc">Returns resolved application name.</p>
+            <p class="api-doc">Returns the name the application is known by: the <code>.admapp</code> slug when one is configured, else the declared application name.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def home() !string</code></div>
+            <p class="api-doc">Returns the application's home folder, creating it on first use and bringing it up to date with this version: the <code>version</code> marker, a snapshot of <code>data/</code> and the <code>@migration</code> chain. Fails on a downgrade without <code>@allowDowngrade</code>, on a foreign folder at the same path, or when no home directory is known. See <a href="app-home.html">Application home &amp; migrations</a>.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def version() string</code></div>
@@ -1072,6 +1078,40 @@ def onExpiry(evt Event&lt;string&gt;) {
         Each entry shows the annotation as it is written at a use site — the meta context
         parameter and any type parameter inferred from the target are not spelled out.
       </p>
+      <div class="docs-sub" id="meta-migration">
+        <h3><code>@migration</code></h3>
+        <p class="api-targets"><strong>Application</strong> · targets functions of the <code>application</code> block</p>
+        <pre class="api-siglist"><code>@migration(from string, to string = "")</code></pre>
+        <p class="api-doc">Marks a step that upgrades the application's home folder from one version to another; see <code>Application.home()</code> and <a href="app-home.html">Application home &amp; migrations</a>.</p>
+        <p class="api-doc"><code>from</code> is the version whose data the step understands; <code>to</code> is the version it produces, or the next declared step's <code>from</code> when omitted. Steps run in ascending order, and only those newer than the version that last ran the folder. The annotated function takes the home folder path and returns <code>!none</code>; a failing step restores the snapshot taken before the first step.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">migration.adm</span>
+          </div>
+          <pre><code>application MyApp {
+	@migration(from = "3.54", to = "4.0")
+	def settingsToJson(home string) !none { ... }
+
+	@migration(from = "4.0", to = "5.63")
+	def splitCache(home string) !none { ... }
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-allowdowngrade">
+        <h3><code>@allowDowngrade</code></h3>
+        <p class="api-targets"><strong>Application</strong> · targets the <code>application</code> block</p>
+        <pre class="api-siglist"><code>@allowDowngrade()</code></pre>
+        <p class="api-doc">Lets the application open a home folder last written by a newer version of itself. Without it, a downgrade fails in <code>Application.home()</code>.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">downgrade.adm</span>
+          </div>
+          <pre><code>@allowDowngrade()
+application MyApp { ... }</code></pre>
+        </div>
+      </div>
       <div class="docs-sub" id="meta-cache">
         <h3><code>@cache</code></h3>
         <p class="api-targets"><strong>Cache</strong> · targets methods</p>

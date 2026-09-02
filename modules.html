@@ -56,7 +56,9 @@
           <li><a class="docs-nav-sub" href="#std-math">std.math</a></li>
           <li><a class="docs-nav-sub" href="#std-time">std.time</a></li>
           <li><a class="docs-nav-sub" href="#std-errors">std.errors</a></li>
-          <li><a class="docs-nav-sub" href="#std-collections">std.collections</a></li>
+          <li><a class="docs-nav-sub" href="#std-collections">std.data.collections</a></li>
+          <li><a class="docs-nav-sub" href="#std-semver">std.data.semver</a></li>
+          <li><a class="docs-nav-sub" href="#std-i18n">std.i18n</a></li>
           <li><a class="docs-nav-sub" href="#std-validations">std.validations</a></li>
         </ul>
       </div>
@@ -95,6 +97,7 @@
           <li><a class="docs-nav-sub" href="#std-ui">std.ui</a></li>
           <li><a class="docs-nav-sub" href="#std-gfx">std.gfx</a></li>
           <li><a class="docs-nav-sub" href="#std-simd">std.simd</a></li>
+          <li><a class="docs-nav-sub" href="#std-gpu">std.gpu</a></li>
         </ul>
       </div>
 
@@ -103,6 +106,7 @@
         <ul class="docs-sub-list">
           <li><a class="docs-nav-sub" href="#std-testing">std.testing</a></li>
           <li><a class="docs-nav-sub" href="#std-reflection">std.reflection</a></li>
+          <li><a class="docs-nav-sub" href="#std-ide">std.ide</a></li>
           <li><a class="docs-nav-sub" href="#std-cli">std.cli</a></li>
           <li><a class="docs-nav-sub" href="#std-metrics">std.metrics</a></li>
           <li><a class="docs-nav-sub" href="#std-i18n">std.i18n</a></li>
@@ -158,8 +162,28 @@ use std.data.encoding::(json)</code></pre>
         <p class="docs-placeholder">Error construction, wrapping, and inspection. Reference coming soon.</p>
       </div>
       <div class="docs-sub" id="std-collections">
-        <h3><code>std.collections</code></h3>
-        <p class="docs-placeholder">Sorting and searching over collections. Reference coming soon.</p>
+        <h3><code>std.data.collections</code></h3>
+        <p class="docs-placeholder">
+          Sequences (<code>List</code>, <code>LinkedList</code>, <code>DoublyLinkedList</code>, <code>Deque</code>,
+          <code>Queue</code>, <code>Stack</code>, <code>RingBuffer</code>), bit sets, hash and ordered maps
+          (<code>HashMap</code>, <code>SortedMap</code>, <code>OrderedMap</code>, <code>MultiMap</code>), sets,
+          heaps and priority queues, trees (<code>BinaryTree</code>, <code>BST</code>, <code>AVLTree</code>,
+          <code>RedBlackTree</code>, <code>BTree</code>, <code>BPlusTree</code>, <code>Trie</code>,
+          <code>RadixTree</code>), graphs with Dijkstra, sparse arrays, a Bloom filter and an LRU cache.
+          Reference coming soon.
+        </p>
+      </div>
+      <div class="docs-sub" id="std-semver">
+        <h3><code>std.data.semver</code></h3>
+        <p class="docs-placeholder">
+          <code>Semver</code>: <code>parse</code>, the version parts, precedence comparison against a
+          version or a string, and <code>satisfies(range)</code> with <code>||</code>, operators,
+          <code>~</code>, <code>^</code>, wildcards and hyphen ranges. Reference coming soon.
+        </p>
+      </div>
+      <div class="docs-sub" id="std-i18n">
+        <h3><code>std.i18n</code></h3>
+        <p class="docs-placeholder">Locales, languages, regions, currencies, time zones, number and date formats, plural categories. Reference coming soon.</p>
       </div>
       <div class="docs-sub" id="std-validations">
         <h3><code>std.validations</code></h3>
@@ -247,6 +271,15 @@ use std.data.encoding::(json)</code></pre>
           and lane operations. Reference coming soon.
         </p>
       </div>
+      <div class="docs-sub" id="std-gpu">
+        <h3><code>std.gpu</code></h3>
+        <p class="docs-placeholder">
+          <code>DeviceBuffer&lt;T&gt;</code>, memory that stays on the GPU between <code>cuda def</code>
+          launches (<code>upload</code>, <code>download</code>, <code>write</code>, <code>dispose</code>),
+          plus <code>available()</code> and <code>deviceName()</code>. See
+          <a href="docs.html#functions">GPU kernels</a> in the reference. Reference coming soon.
+        </p>
+      </div>
     </section>
 
     <section class="docs-section" id="tooling">
@@ -262,6 +295,14 @@ use std.data.encoding::(json)</code></pre>
         <p class="docs-placeholder">
           Meta contexts, runtime type info, and discovery — the machinery behind
           <a href="docs.html#attributes">attributes</a>. Reference coming soon.
+        </p>
+      </div>
+      <div class="docs-sub" id="std-ide">
+        <h3><code>std.ide</code></h3>
+        <p class="docs-placeholder">
+          Live service information for a connected IDE: the <code>@ide</code> annotation publishes a
+          service method as a value, table, series, tree or text panel, refreshed on a schedule.
+          Dormant unless the launcher sets <code>ADM_IDE_PORT</code>. Reference coming soon.
         </p>
       </div>
       <div class="docs-sub" id="std-cli">
