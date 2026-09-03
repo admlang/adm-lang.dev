@@ -205,7 +205,7 @@
   }
 
   function run() {
-    var blocks = document.querySelectorAll("pre > code");
+    var blocks = document.querySelectorAll("pre > code:not(.nohighlight)");
     for (var i = 0; i < blocks.length; i++) {
       var el = blocks[i];
       if (el.dataset.hl === "off") continue;

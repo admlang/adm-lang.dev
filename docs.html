@@ -53,6 +53,7 @@
         <a class="docs-page-link" href="annotations.html">Annotations</a>
         <a class="docs-page-link" href="app-home.html">Application home &amp; migrations</a>
         <a class="docs-page-link" href="plugins.html">Plugins</a>
+        <a class="docs-page-link" href="libraries.html">Libraries</a>
       </div>
 
       <div class="docs-nav-group">
@@ -538,11 +539,13 @@ application MainApp {
           nothing runs them directly. The difference is how they reach a program:
         </p>
         <ul>
-          <li><code>library</code> compiles into a statically linked archive (<code>.a</code>, <code>.lib</code>)
-            that's linked into an application at build time.</li>
+          <li><code>library</code> is shared as source: <code>adm build</code> packs its exported
+            modules into a signed <code>.admlib</code>, published through the registry and compiled
+            together with the program that <code>use</code>s it. See <a href="libraries.html">Libraries</a>.</li>
           <li><code>plugin</code> is packaged: <code>adm build</code> produces one <code>.admplugin</code>
             file holding the plugin's metadata, its export index and a native shared object per
-            platform, which a host loads at runtime through the plugin manager.</li>
+            platform, which a host loads at runtime through the plugin manager. See
+            <a href="plugins.html">Plugins</a>.</li>
         </ul>
         <p>
           Both live at file scope, both can be <code>partial</code>, and neither can be marked

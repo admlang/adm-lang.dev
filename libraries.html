@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Libraries — adm</title>
+<meta name="description" content="How an ADM library is declared, what the .admlib package contains, and how libraries are published, found and installed through the registry.">
+<link rel="icon" type="image/svg+xml" href="assets/adm.svg">
+<link rel="canonical" href="https://adm-lang.dev/libraries.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="adm">
+<meta property="og:title" content="adm — Libraries">
+<meta property="og:description" content="How an ADM library is declared, what the .admlib package contains, and how libraries are published, found and installed through the registry.">
+<meta property="og:url" content="https://adm-lang.dev/libraries.html">
+<meta property="og:image" content="https://adm-lang.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="adm — Libraries">
+<meta name="twitter:description" content="How an ADM library is declared, what the .admlib package contains, and how libraries are published, found and installed through the registry.">
+<meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/adm.svg" alt="ADM" class="brand-mark">
+      <span class="brand-name"><span class="brand-sub">programming language</span></span>
+    </a>
+    <nav class="nav">
+      <a href="docs.html" class="nav-active">Docs</a>
+      <a href="examples.html">Examples</a>
+      <a href="services.html">Services</a>
+      <a href="modules.html">Modules</a>
+      <a class="nav-icon" href="https://github.com/admlang" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs-layout">
+
+  <aside class="docs-sidebar">
+    <nav class="docs-nav" id="docs-nav">
+
+      <div class="docs-pages">
+        <span class="docs-pages-label">Docs</span>
+        <a class="docs-page-link" href="docs.html">Language reference</a>
+        <a class="docs-page-link" href="memory.html">Memory model</a>
+        <a class="docs-page-link" href="annotations.html">Annotations</a>
+        <a class="docs-page-link" href="app-home.html">Application home &amp; migrations</a>
+        <a class="docs-page-link" href="plugins.html">Plugins</a>
+        <a class="docs-page-link current" href="libraries.html">Libraries</a>
+      </div>
+
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#declaring">Declaring a library</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#package">The .admlib package</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#signing">Signing</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#publishing">Publishing</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#using">Finding and using one</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#lock">adm.lock and vendoring</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#registries">Registries</a></div>
+
+    </nav>
+  </aside>
+
+  <main class="docs-content">
+
+    <p class="docs-eyebrow">Docs</p>
+    <h1 class="docs-page-title">Libraries</h1>
+    <p class="docs-lede">A library is source code shared as a signed package: how one is declared, what <code>adm build</code> packs into an <code>.admlib</code>, and how it travels through the registry to another program's <code>use</code> line.</p>
+
+    <section class="docs-section" id="declaring">
+      <h2>Declaring a library</h2>
+      <p>A library is a compilation unit without an entry point, like a plugin: <code>library name { }</code> at file scope with a <code>use</code> list and an <code>export</code> list. Its name is a module prefix it owns: a library called <code>humanize</code> may export <code>humanize</code> and <code>humanize.*</code>, nothing else, and a library called <code>acme.imaging</code> owns <code>acme.imaging.*</code>. Modules the exported ones use come along inside the package but stay invisible to consumers unless they are exported too.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">library.adm</span>
+        </div>
+        <pre><code>@manifest(version = "0.1.0")
+library humanize {
+	use (
+		humanize
+	)
+
+	export (
+		humanize
+	)
+}</code></pre>
+      </div>
+
+      <p>The modules themselves are ordinary files next to it; a test suite beside them rides along in the repository but is left out of the package:</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">humanize/humanize.adm</span>
+        </div>
+        <pre><code>// Numbers, byte counts, durations and instants formatted the way people read them.
+partial module humanize {
+	use std.time
+
+	// Formats a byte count: `512 B`, `1.5 MB`; `binary` switches to 1024 and `MiB`.
+	def bytes(count int64, binary bool = false) string { ... }
+
+	// Formats a duration with its two largest units: `2h 5m`, `350ms`.
+	def span(d duration) string { ... }
+
+	// `3 minutes ago`, `yesterday`, `in 2 hours`.
+	def ago(t time.Time, now time.Time = time.now()) string { ... }
+}</code></pre>
+      </div>
+
+      <p><code>@manifest(version = ...)</code> is the library's version, semver; without it the version is <code>0.1</code>. The compiler checks the export list the same way it does for plugins: every module named is one the library uses, it sits under the library's prefix, and no exported signature mentions a type that is not exported.</p>
+    </section>
+
+    <section class="docs-section" id="package">
+      <h2>The .admlib package</h2>
+      <p><code>adm build</code> in the library's directory (or <code>adm build --libs</code> in a tree that also holds applications) writes <code>&lt;name&gt;-&lt;version&gt;.admlib</code>, a zip archive of sources. Nothing is compiled ahead of time: a consumer compiles the library together with its own code, on its own platform, with its own compiler, so a library never has to be rebuilt for a new platform or a new compiler release.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">humanize-0.1.0.admlib</span>
+        </div>
+        <pre><code>manifest.json          name, version, the compiler it was checked with,
+                       the exported modules, dependencies (namespace:name -&gt; version),
+                       the publisher's key and the signature
+meta/checksums.json    SHA-256 of every file below; the signature covers this list
+meta/exports.json      every exported symbol: kind, signature, doc comment (for the IDE)
+src/humanize/humanize.adm   the exported modules and everything they import from the
+                            package, as written; tests and unrelated files stay out</code></pre>
+      </div>
+
+      <p><code>adm lib verify humanize-0.1.0.admlib</code> checks the checksums and the signature and prints what the package is: name, version, publisher, hash, modules, dependencies. <code>adm doc --plugin humanize-0.1.0.admlib</code> lists the exports.</p>
+    </section>
+
+    <section class="docs-section" id="signing">
+      <h2>Signing</h2>
+      <p>Packages are signed with an ed25519 key that belongs to the publisher. <code>adm app init</code> in the library's directory creates it: the public key goes into <code>adm.toml</code>, which is committed, and the private key is written outside the repository (the command prints where) and must never be committed. Every build signs the package with it; a consumer refuses a package whose checksums or signature do not verify, and the registry records which key published each version so a later version signed by a different key is refused unless the consumer opts in.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">adm.toml</span>
+        </div>
+        <pre><code>schema = 1
+
+[publisher]
+pubkey = "ed25519:base64:oW+JniOg9fdkW/Ccs9jsT2OQXNDGJj9dm6sytU/TlZs="
+repo_salt = "base64:LZU1Nt+IhCAlqAtmKigUEvkpoUP2Goc2VAgkBqFspCg="</code></pre>
+      </div>
+
+      <p>In CI, <code>ADM_SIGNING_KEY</code> holds the base64 private key instead of a file.</p>
+    </section>
+
+    <section class="docs-section" id="publishing">
+      <h2>Publishing</h2>
+      <p>The registry is a git repository of pointers, not a file host: every library lives in its author's own GitHub repository, and the registry's index says where. Publishing needs a clean working tree, an <code>origin</code> on GitHub, and the <code>gh</code> CLI logged in as the account that owns the repository:</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">$ adm publish --description "Human-readable bytes, durations, relative times, ordinals and thousands separators."
+✓ built dist/humanize-0.1.0.admlib
+✓ pushed dist/humanize-0.1.0.admlib and tag v0.1.0 to git@github.com:cthackers/humanize.git
+✓ pull request opened: https://github.com/admlang/registry/pull/1
+the registry's pipeline verifies the package and merges on green</code></pre>
+      </div>
+
+      <p>What happened: the package was built and signed into <code>dist/</code>, committed and tagged <code>v0.1.0</code>, the tag was pushed, and a pull request added one line to the registry's index for your account. The registry's pipeline then fetches the package from that tag, checks its hash, checksums, signature, name, version and publisher, checks that the pull request comes from the namespace it claims and that the version is newer than the last one listed, and merges on its own. No human review, no upload, no token: your SSH key and <code>gh</code> login are all that is involved. The namespace is your GitHub account (or organisation); it is not part of the library's name, so two accounts may both publish a <code>utils</code>.</p>
+      <p>A version is immutable once published. Bump <code>@manifest(version)</code> and publish again; <code>--dry-run</code> shows the index line without touching git.</p>
+    </section>
+
+    <section class="docs-section" id="using">
+      <h2>Finding and using one</h2>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">$ adm search humanize
+LIBRARY             VERSION  PUBLISHED   DESCRIPTION
+cthackers:humanize  0.1.0    2026-09-03  Human-readable bytes, durations, relative times, ...
+
+$ adm get cthackers:humanize
+fetching cthackers:humanize 0.1.0 from https://github.com/cthackers/humanize...
+✓ cthackers:humanize 0.1.0 (publisher admpub_zp7f...) -&gt; ~/.adm/pkg/cthackers/humanize/0.1.0
+lock: ./adm.lock</code></pre>
+      </div>
+
+      <p><code>adm get</code> resolves the highest version that is not yanked, downloads the package from the library's repository (a shallow git fetch of the tag, so a private repository works with the same SSH key that reads it), verifies it exactly as the registry did, installs it into the package cache and records it in <code>adm.lock</code>. Dependencies the library declares are fetched the same way. A bare name that several accounts publish is refused with the list; say which one. Ranges: <code>humanize@0.1.0</code>, <code>@^0.1</code>, <code>@~0.1.0</code>, <code>@&gt;=0.1</code>.</p>
+      <p>In code the namespace disappears; the module is just its name:</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">main.adm</span>
+        </div>
+        <pre><code>use humanize
+
+application Report {
+	def new(args string[]) int {
+		println(humanize.bytes(1536000), humanize.span(2h + 5m))
+		return 0
+	}
+}</code></pre>
+      </div>
+
+      <p><code>adm lib</code> lists what the project depends on, whether each package is installed, and the newer version the registry offers; <code>adm lib verify</code> inspects a package file. The IDE reads the same lock, so completion and navigation work into the package's sources.</p>
+    </section>
+
+    <section class="docs-section" id="lock">
+      <h2>adm.lock and vendoring</h2>
+      <p><code>adm.lock</code> pins every package to a version, a hash and a publisher, one line each. Commit it: a fresh checkout runs <code>adm install</code> with no arguments to fetch exactly what it names.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">adm.lock</span>
+        </div>
+        <pre><code># adm.lock — namespace:name:hash:version [source=... publisher=...]
+cthackers:humanize:59b7bb9a...b0efd3ac:0.1.0 source=registry:public publisher=admpub_zp7f...</code></pre>
+      </div>
+
+      <p>For a build that must not touch the network or the cache, <code>adm vendor</code> copies the locked packages into <code>vendor/</code> beside the lock; when that directory exists the compiler and the IDE read dependencies from it instead of <code>~/.adm/pkg</code>. A project can also list ranges under <code>[deps]</code> in <code>adm.toml</code>; <code>adm get</code> with no arguments fetches the ones the lock does not cover yet.</p>
+    </section>
+
+    <section class="docs-section" id="registries">
+      <h2>Registries</h2>
+      <p>The public registry is <a href="https://github.com/admlang/registry">github.com/admlang/registry</a>: per-letter index files, one JSON line per published version. The compiler keeps a shallow clone under <code>~/.adm/catalog</code> and pulls it before searching or resolving, so both are local operations. A private registry is a clone of the same repository shape kept anywhere git can reach, with the same pipeline; a project names its registries in <code>adm.toml</code>, first one wins on a conflict:</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">adm.toml</span>
+        </div>
+        <pre><code>[registries]
+order = ["corp", "public"]
+
+[registries.corp]
+url = "git@git.corp.example:adm/registry.git"
+
+[registries.public]
+url = "https://github.com/admlang/registry"</code></pre>
+      </div>
+
+      <p>Tokens never appear in that file: catalogs and packages travel over git, so the remote's own authentication applies, and the one HTTPS step, opening the publish pull request, goes through <code>gh</code>.</p>
+    </section>
+  </main>
+
+</div>
+
+<script src="docs.js"></script>
+<script src="highlight.js"></script>
+</body>
+</html>

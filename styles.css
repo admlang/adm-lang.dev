@@ -10,7 +10,7 @@
   --code-text: #E7E9EC;
   --code-border: #323A45;
   --radius: 10px;
-  --wrap: 1120px;
+  --wrap: 1280px;
 }
 
 * { box-sizing: border-box; }
@@ -108,8 +108,9 @@ code, pre, .code-window {
 
 .hero {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 56px;
+  /* the example on the right needs ~600px to show its longest line unscrolled */
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 48px;
   align-items: center;
   padding: 88px 24px 96px;
 }
@@ -296,9 +297,15 @@ code, pre, .code-window {
 }
 
 .get-started-inner {
-  max-width: 560px;
+  max-width: 920px;
   text-align: center;
   margin: 0 auto;
+}
+
+.get-started-inner .lede {
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Footer */
@@ -715,3 +722,25 @@ code, pre, .code-window {
 .docs-tree pre {
   margin: 0;
 }
+
+/* Download tabs (home page) */
+.dl { margin: 2rem auto 0; max-width: 920px; text-align: left; border: 1px solid var(--border); border-radius: 12px; background: #fff; overflow: hidden; }
+.dl-tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--bg-alt); }
+.dl-tab { flex: 1; display: flex; align-items: center; justify-content: center; gap: .5rem; padding: .85rem 1rem; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--fg-muted, #666); font: inherit; font-weight: 600; cursor: pointer; }
+.dl-tab:hover { color: var(--accent-dark); }
+.dl-tab.is-active { color: var(--accent-dark); border-bottom-color: var(--accent); background: #fff; }
+.dl-icon { width: 1.25rem; height: 1.25rem; }
+.dl-panel { padding: 1.5rem 2rem 2rem; }
+.dl-cmd-wrap { position: relative; }
+.dl-copy { position: absolute; top: .55rem; right: .55rem; width: 2rem; height: 2rem; display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,.18); border-radius: 6px; background: rgba(255,255,255,.08); color: #d0d7de; cursor: pointer; }
+.dl-copy:hover { background: rgba(255,255,255,.18); color: #fff; }
+.dl-copy svg { width: 1rem; height: 1rem; }
+.dl-copy .dl-copied-icon { display: none; }
+.dl-copy.is-copied .dl-copy-icon { display: none; }
+.dl-copy.is-copied .dl-copied-icon { display: block; color: #7ee787; }
+.dl-label, .dl-soon { margin: 0 0 .75rem; }
+.dl-soon { color: var(--fg-muted, #666); }
+.dl-cmd { margin: 0; padding: .9rem 3.25rem .9rem 1.1rem; border-radius: 8px; background: #1f2328; color: #f6f8fa; overflow-x: auto; font-size: .95rem; white-space: pre; }
+.dl-cmd code { background: transparent; color: inherit; padding: 0; }
+.dl-note { margin: .9rem 0 0; font-size: .95rem; color: var(--fg-muted, #666); }
+@media (max-width: 600px) { .dl-tab span { display: none; } .dl-icon { width: 1.5rem; height: 1.5rem; } }
