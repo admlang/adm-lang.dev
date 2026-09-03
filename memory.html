@@ -271,6 +271,7 @@ if p is none {
 }
 println(p.name)   // the parent lives at least as long as p</code></pre>
 </div>
+        <p>The standard library uses this where a structure needs a back pointer: <code>DoublyLinkedList</code> and <code>LRUCache</code> own their nodes through <code>next</code> and keep <code>prev</code> weak.</p>
         <p>Assigning <code>none</code> or <code>dispose child.parent</code> clears the field without touching the target. <code>weak</code> cannot be combined with <code>atomic</code>, and it applies to fields only: not to datatype fields (values are copied, not shared), properties or locals.</p>
         <p>A closure stored in an object that captures that object is still a cycle; capture a weak field's value instead, or clear the closure when the object is torn down.</p>
       </div>

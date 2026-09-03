@@ -155,7 +155,11 @@ use std.data.encoding::(json)</code></pre>
       </div>
       <div class="docs-sub" id="std-time">
         <h3><code>std.time</code></h3>
-        <p class="docs-placeholder">Clocks, durations, formatting, and cron expressions. Reference coming soon.</p>
+        <p class="docs-placeholder">
+          Clocks, durations, formatting, and cron expressions. <code>Time.equals</code> compares the wall
+          clock only; <code>since</code> measures on the monotonic clock when both times carry one (both
+          came from <code>now()</code>), otherwise on the wall clock. Reference coming soon.
+        </p>
       </div>
       <div class="docs-sub" id="std-errors">
         <h3><code>std.errors</code></h3>
@@ -170,6 +174,7 @@ use std.data.encoding::(json)</code></pre>
           heaps and priority queues, trees (<code>BinaryTree</code>, <code>BST</code>, <code>AVLTree</code>,
           <code>RedBlackTree</code>, <code>BTree</code>, <code>BPlusTree</code>, <code>Trie</code>,
           <code>RadixTree</code>), graphs with Dijkstra, sparse arrays, a Bloom filter and an LRU cache.
+          Doubly linked structures keep their back pointers <code>weak</code>, so dropping a list frees its nodes.
           Reference coming soon.
         </p>
       </div>
@@ -199,7 +204,14 @@ use std.data.encoding::(json)</code></pre>
       </div>
       <div class="docs-sub" id="std-io">
         <h3><code>std.io</code></h3>
-        <p class="docs-placeholder">Readers, writers, and streaming primitives. Reference coming soon.</p>
+        <p class="docs-placeholder">
+          <code>Reader</code>, <code>Writer</code>, <code>Closer</code> and their combinations — interfaces
+          only, implemented by the types that own the data (<code>std.bytes.Buffer</code>,
+          <code>std.os.File</code>). <code>read(buf)</code> may return fewer bytes than asked; at the end of
+          the stream it returns <code>0</code> for a non-empty buffer, without an error, on every call from
+          then on. <code>readFull</code> loops until the buffer is full and fails if the stream ends first.
+          Reference coming soon.
+        </p>
       </div>
       <div class="docs-sub" id="std-mem">
         <h3><code>std.mem</code></h3>
@@ -225,7 +237,11 @@ use std.data.encoding::(json)</code></pre>
       <h2>Data</h2>
       <div class="docs-sub" id="std-data">
         <h3><code>std.data</code></h3>
-        <p class="docs-placeholder">Encoding (JSON, XML, YAML), compression, databases, and data structures. Reference coming soon.</p>
+        <p class="docs-placeholder">
+          Encoding (JSON, XML, YAML, MsgPack, Base64, plus <code>urlEncode</code>/<code>urlDecode</code>
+          percent encoding and <code>htmlEncode</code>/<code>htmlDecode</code> character references in
+          <code>std.data.encoding</code>), compression, databases, and data structures. Reference coming soon.
+        </p>
       </div>
       <div class="docs-sub" id="std-crypto">
         <h3><code>std.crypto</code></h3>
@@ -312,10 +328,6 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-metrics">
         <h3><code>std.metrics</code></h3>
         <p class="docs-placeholder">Counters, gauges, and metric publishing. Reference coming soon.</p>
-      </div>
-      <div class="docs-sub" id="std-i18n">
-        <h3><code>std.i18n</code></h3>
-        <p class="docs-placeholder">Localization catalogs and message formatting. Reference coming soon.</p>
       </div>
       <div class="docs-sub" id="std-interop">
         <h3><code>std.interop</code></h3>

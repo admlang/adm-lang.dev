@@ -339,7 +339,7 @@
         <table class="docs-table">
           <tr><th>Operator</th><th>Purpose</th></tr>
           <tr><td><code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>%</code></td>
-            <td>Arithmetic. <code>+</code> also concatenates strings and arrays.</td></tr>
+            <td>Arithmetic. <code>+</code> also concatenates strings and arrays, and merges maps (always into a new value).</td></tr>
           <tr><td><code>**</code></td><td>Exponentiation — <code>a ** b</code> raises <code>a</code> to the power <code>b</code>.</td></tr>
           <tr><td><code>.*</code></td><td>Element-wise matrix multiply (see <a href="#arrays">Arrays &amp; Slicing</a>).</td></tr>
           <tr><td><code>+=</code> <code>-=</code> <code>*=</code> <code>/=</code> <code>%=</code></td>
@@ -980,7 +980,11 @@ let hadamard = m .* m  // element-wise</code></pre>
         <h3>Maps</h3>
         <p>
           Maps are <code>map&lt;K, V&gt;</code>, with a literal syntax that mirrors structs. Keys must
-          satisfy <code>Serializable</code> — primitives and enums qualify by default.
+          satisfy <code>Serializable</code> — primitives and enums qualify by default. (Today a key is
+          hashed and compared by its serialized bytes; a hashing/equality interface is planned to replace
+          that constraint.) <code>a + b</code> on two maps merges <code>b</code> into a copy of
+          <code>a</code> and returns the copy, like the array operators, neither operand changes;
+          <code>merge(other)</code> is the in-place form.
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -1435,6 +1439,13 @@ partial type User&lt;T&gt; {
         <p>
           <code>internal type Cache { ... }</code> hides the whole type outside its module — the usual
           way to keep a helper type from leaking into your public API.
+        </p>
+        <p>
+          A field marked <code>weak</code> (<code>weak parent ?Node</code>) refers to another object
+          without owning it: the field must be optional, its target a struct, type, service or component,
+          and it reads <code>none</code> once the target has been released. Use it for back references so
+          parent and child form no reference cycle — see
+          <a href="memory.html#weak-references">Memory model → Weak references</a>.
         </p>
         <p>
           A <code>where T is Constraint { ... }</code> block adds members that only exist when the
