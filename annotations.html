@@ -178,7 +178,7 @@
       <h2>Application</h2>
       <p>Prelude annotation on the <code>application</code> block.</p>
       <h4><code>@manifest(name = &quot;&quot;, version = &quot;&quot;)</code></h4>
-<p>Supplies the application identity when there is no <code>.admapp</code> manifest; <code>name</code> fills <code>__app_name__</code> and <code>__app_id__</code>, <code>version</code> fills <code>__app_version__</code>. A <code>.admapp</code> in the build wins over it. See <a href="app-home.html#identity">Application home</a>.</p>
+<p>Supplies the application identity when there is no <code>adm.toml</code> manifest; <code>name</code> fills <code>__app_name__</code> and <code>__app_id__</code>, <code>version</code> fills <code>__app_version__</code>. A <code>adm.toml</code> in the build wins over it. See <a href="app-home.html#identity">Application home</a>.</p>
       <p><code>@migration</code> and <code>@allowDowngrade</code>, which drive the home folder's version upgrades, belong to the <code>Application</code> service and are described with the other <a href="services.html#annotations">service annotations</a>.</p>
     </section>
 

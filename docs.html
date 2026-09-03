@@ -76,7 +76,7 @@
         <a class="docs-nav-top" href="#program-structure">Program Structure</a>
         <ul class="docs-sub-list">
           <li><a class="docs-nav-sub" href="#applications">Applications</a></li>
-          <li><a class="docs-nav-sub" href="#admapp-manifest"><code>.admapp</code> Manifest</a></li>
+          <li><a class="docs-nav-sub" href="#admapp-manifest"><code>adm.toml</code> Manifest</a></li>
           <li><a class="docs-nav-sub" href="#libraries-plugins">Libraries &amp; Plugins</a></li>
           <li><a class="docs-nav-sub" href="#modules-namespaces">Modules &amp; Namespaces</a></li>
           <li><a class="docs-nav-sub" href="#use-imports"><code>use</code> Imports</a></li>
@@ -486,9 +486,9 @@ application MainApp {
       </div>
 
       <div class="docs-sub" id="admapp-manifest">
-        <h3><code>.admapp</code> Manifest</h3>
+        <h3><code>adm.toml</code> Manifest</h3>
         <p>
-          An application can carry an optional <code>.admapp</code> file — a TOML manifest at the
+          An application can carry an optional <code>adm.toml</code> file — a TOML manifest at the
           project root, keyed by the ADM <code>application</code> name. Run <code>adm app init</code>
           to generate one: it writes the manifest and also creates an Ed25519 signing keypair, putting
           the public key in the manifest and the private key in your config directory (or a path you
@@ -500,7 +500,7 @@ application MainApp {
           file name for an anonymous <code>application { }</code>) and <code>__app_version__</code> is
           <code>0.1</code>; <code>@manifest(name = "myapp", version = "1.2.0")</code> on the
           <code>application</code> block sets both without a file. The update constants resolve to
-          empty strings. A <code>.admapp</code> wins over all of that; when present, it sets:
+          empty strings. A <code>adm.toml</code> wins over all of that; when present, it sets:
         </p>
         <ul>
           <li><strong>Identity</strong> — the publisher's public key and a repo salt, combined with each
@@ -3366,9 +3366,9 @@ module Math {
         <tr><td><code>__os__</code></td><td>OS of the active compilation target (<code>"linux"</code>, <code>"windows"</code>, <code>"macos"</code>, <code>"android"</code>, <code>"wasm"</code>).</td></tr>
         <tr><td><code>__arch__</code></td><td>Architecture of the active target (<code>"x86_64"</code>, <code>"arm64"</code>, <code>"wasm32"</code>).</td></tr>
         <tr><td><code>__build_timestamp__</code></td><td>ISO-8601 timestamp of when the build ran.</td></tr>
-        <tr><td><code>__app_name__</code></td><td>The application's name: from <code>.admapp</code>, else <code>@manifest</code>, else the declared <code>application</code> name.</td></tr>
+        <tr><td><code>__app_name__</code></td><td>The application's name: from <code>adm.toml</code>, else <code>@manifest</code>, else the declared <code>application</code> name.</td></tr>
         <tr><td><code>__app_id__</code></td><td>Stable identity derived from the manifest's publisher key and slug; the application name when there is no manifest.</td></tr>
-        <tr><td><code>__app_version__</code></td><td>The application's version: from <code>.admapp</code>, else <code>@manifest</code>, else <code>"0.1"</code>. Drives the <a href="app-home.html">home folder migrations</a>.</td></tr>
+        <tr><td><code>__app_version__</code></td><td>The application's version: from <code>adm.toml</code>, else <code>@manifest</code>, else <code>"0.1"</code>. Drives the <a href="app-home.html">home folder migrations</a>.</td></tr>
         <tr><td><code>__endianness__</code></td><td><code>"little"</code> or <code>"big"</code>, per the target architecture.</td></tr>
         <tr><td><code>__ptr_width__</code></td><td>Pointer width in bytes for the target.</td></tr>
         <tr><td><code>__int_width__</code></td><td>Size of the default integer type, in bytes.</td></tr>
@@ -3391,7 +3391,7 @@ module Math {
       </table>
       <p>
         <code>__build_id__</code> also exists and changes on every build — see
-        <a href="#admapp-manifest"><code>.admapp</code> Manifest</a>, which covers it alongside the
+        <a href="#admapp-manifest"><code>adm.toml</code> Manifest</a>, which covers it alongside the
         identity constants a manifest fills in.
       </p>
     </section>
