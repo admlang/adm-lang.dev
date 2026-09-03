@@ -13,7 +13,7 @@
     "component", "datatype", "service", "type", "union", "interface", "enum",
     "struct",
     // modifiers
-    "partial", "internal", "atomic", "asm", "async", "cuda", "sql", "infix",
+    "partial", "internal", "atomic", "weak", "asm", "async", "cuda", "sql", "infix",
     "meta",
     // bindings
     "let", "const", "def", "use", "export",

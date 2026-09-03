@@ -873,6 +873,13 @@ s[1:3]    // "bc"
 s[-2:]    // "cd"</code></pre>
         </div>
         <p>Slicing mechanics are covered in full under <a href="#arrays">Arrays &amp; Slicing</a>.</p>
+        <ul>
+          <li><strong>Unit.</strong> Every index and length is a Unicode code point: <code>s.len()</code> counts code points, <code>s[i]</code> is the code point at <code>i</code>, <code>s[a:b]</code> selects code points, <code>for let (i, ch) in s</code> yields code-point indexes. Bytes are reached through <code>s.bytes()</code>; grapheme clusters are not a unit the language knows.</li>
+          <li><strong>Bounds.</strong> Negative indexes count from the end. An out-of-range <code>s[i]</code> yields <code>'\0'</code> rather than panicking; slice bounds are clamped and <code>b &lt;= a</code> gives <code>""</code>. A string slice always copies.</li>
+          <li><strong>Comparison.</strong> <code>==</code> and ordering are byte-wise (code-point order for valid UTF-8). No normalization, no case folding; <code>upper</code>/<code>lower</code> map ASCII only.</li>
+          <li><strong>Ill-formed bytes.</strong> A string built from bytes decodes each ill-formed byte, overlong form, surrogate or out-of-range value as U+FFFD, counting one code point. A string cannot contain U+0000: bytes after an embedded zero are dropped.</li>
+          <li><strong>Cost.</strong> <code>len()</code> is O(1) after the first call; <code>s[i]</code> is O(1) on ASCII strings and walks with a cursor otherwise, so sequential access stays linear.</li>
+        </ul>
       </div>
       <div class="docs-sub" id="arrays">
         <h3>Arrays &amp; Slicing</h3>
@@ -3177,6 +3184,8 @@ const SEPARATOR = "\\"</code></pre>
             <td>Splits a declaration across multiple files in the same directory. See <a href="#program-structure">Program Structure</a>.</td></tr>
           <tr><td><code>atomic</code></td><td>fields, functions, properties</td>
             <td>Locks per-instance around the call. See <a href="#params-returns">Params &amp; Returns</a>.</td></tr>
+          <tr><td><code>weak</code></td><td>fields</td>
+            <td>A non-owning optional reference (<code>weak parent ?Node</code>): never keeps its target alive, reads <code>none</code> once the target is gone. For back references, so parent and child form no cycle. See <a href="memory.html#weak-references">Memory → Weak references</a>.</td></tr>
           <tr><td><code>async</code></td><td>functions, types</td>
             <td>Returns a future instead of running immediately. See <a href="#async-await-futures">Async / Await / Futures</a>.</td></tr>
           <tr><td><code>asm</code>, <code>cuda</code>, <code>sql</code>, <code>meta</code></td><td>functions</td>

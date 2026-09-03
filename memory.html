@@ -74,6 +74,9 @@
 
       <div class="docs-nav-group">
         <a class="docs-nav-top" href="#reference-cycles">Reference cycles</a>
+        <ul class="docs-nav-list">
+          <li><a class="docs-nav-sub" href="#weak-references">Weak references</a></li>
+        </ul>
       </div>
 
       <div class="docs-nav-group">
@@ -234,7 +237,43 @@ println(xs.len())  // 4</code></pre>
   <li><strong>Break the cycle explicitly.</strong> Clear the field that closes the loop when the structure is torn down, with <code>dispose node.parent</code> or by assigning <code>none</code>.</li>
   <li><strong>Keep one direction strong.</strong> A tree owns its children; children do not own the tree. Use an index, an id or a lookup through the owner instead of a pointer back.</li>
 </ul>
-      <p>A <code>weak</code> field modifier for back references is planned; until it exists, the guidance above is the whole story. Nothing in the language detects a cycle for you.</p>
+      <p>Nothing in the language detects a cycle for you. When the back reference has to be stored, make it <code>weak</code>.</p>
+
+      <div class="docs-subsection" id="weak-references">
+        <h3>Weak references</h3>
+        <p>A field marked <code>weak</code> refers to an object without owning it. The count is not touched when the field is set, so the field never keeps its target alive; and when the target dies the runtime empties the field, so it reads as <code>none</code> from then on. That is why a weak field must be optional (<code>?T</code>) and must point at a struct, type, service or component: those are the reference objects the runtime can watch.</p>
+        <div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">memory_6.adm</span>
+  </div>
+  <pre><code>type Node {
+	name     string
+	children Node[]
+	weak parent ?Node
+
+	def add(child Node) {
+		child.parent = self
+		children.push(child)
+	}
+}</code></pre>
+</div>
+        <p>The tree owns its children through <code>children</code>; each child points back through <code>parent</code> without owning it. Drop the root and the whole tree is freed, <code>dispose()</code> and all, because nothing in it holds a count on anything above it.</p>
+        <p>Reading a weak field gives you an ordinary optional. While you hold the value you read, the object stays alive: the read takes a reference of its own, released like any other local. Check for <code>none</code> before use, as with any optional; a child whose parent has already gone simply sees <code>none</code>.</p>
+        <div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">memory_7.adm</span>
+  </div>
+  <pre><code>let p = child.parent
+if p is none {
+	return
+}
+println(p.name)   // the parent lives at least as long as p</code></pre>
+</div>
+        <p>Assigning <code>none</code> or <code>dispose child.parent</code> clears the field without touching the target. <code>weak</code> cannot be combined with <code>atomic</code>, and it applies to fields only: not to datatype fields (values are copied, not shared), properties or locals.</p>
+        <p>A closure stored in an object that captures that object is still a cycle; capture a weak field's value instead, or clear the closure when the object is torn down.</p>
+      </div>
     </section>
 
     <section class="docs-section" id="threads-and-tasks">
