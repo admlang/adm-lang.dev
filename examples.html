@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Examples — adm</title>
+<title>Examples - adm</title>
 <meta name="description" content="Annotated ADM code examples.">
 <link rel="icon" type="image/svg+xml" href="assets/adm.svg">
 <link rel="canonical" href="https://adm-lang.dev/examples.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="adm">
 <meta property="og:title" content="adm examples">
-<meta property="og:description" content="Annotated ADM code examples — pattern matching, contracts, transactions, concurrency, SIMD, and custom annotations.">
+<meta property="og:description" content="Annotated ADM code examples - pattern matching, contracts, transactions, concurrency, SIMD, and custom annotations.">
 <meta property="og:url" content="https://adm-lang.dev/examples.html">
 <meta property="og:image" content="https://adm-lang.dev/assets/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="adm examples">
-<meta name="twitter:description" content="Annotated ADM code examples — pattern matching, contracts, transactions, concurrency, SIMD, and custom annotations.">
+<meta name="twitter:description" content="Annotated ADM code examples - pattern matching, contracts, transactions, concurrency, SIMD, and custom annotations.">
 <meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -76,7 +76,7 @@
 
     <section class="docs-section" id="hello">
       <h2>Hello, World</h2>
-      <p>Every application declares <code>def new(args string[]) int</code> — its return value is the process exit code.</p>
+      <p>Every application declares <code>def new(args string[]) int</code> - its return value is the process exit code.</p>
       <div class="code-window">
         <div class="code-titlebar">
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -95,7 +95,7 @@
       <h2>String Interpolation</h2>
       <p>
         Any expression goes inside <code>{}</code>. A value whose type implements <code>str()</code>
-        formats itself — no explicit conversion needed.
+        formats itself - no explicit conversion needed.
       </p>
       <div class="code-window">
         <div class="code-titlebar">
@@ -173,7 +173,7 @@ application Interpolation {
     <section class="docs-section" id="regex">
       <h2>Regex</h2>
       <p>
-        Regexes are a primitive with their own literal syntax, not a library type — flags go after the
+        Regexes are a primitive with their own literal syntax, not a library type - flags go after the
         closing slash, and captures are referenced as <code>$1</code>, <code>$2</code> in replacements.
       </p>
       <div class="code-window">
@@ -209,7 +209,7 @@ application Interpolation {
     <section class="docs-section" id="bignum">
       <h2>Big Numbers</h2>
       <p>
-        <code>bigint</code> is arbitrary-precision and uses the same operators as any other number —
+        <code>bigint</code> is arbitrary-precision and uses the same operators as any other number -
         no special call syntax for arithmetic that would overflow a machine integer.
       </p>
       <div class="code-window">
@@ -232,7 +232,7 @@ application Interpolation {
 	}
 }</code></pre>
       </div>
-      <p>A literal too large for <code>int</code> infers <code>bigint</code> on its own — no cast needed.</p>
+      <p>A literal too large for <code>int</code> infers <code>bigint</code> on its own - no cast needed.</p>
     </section>
 
     <section class="docs-section" id="pattern-matching">
@@ -334,7 +334,7 @@ application Warehouse {
     <section class="docs-section" id="contracts">
       <h2>Contracts</h2>
       <p>
-        <code>expects</code> runs before the body, <code>provides</code> runs after — on every return
+        <code>expects</code> runs before the body, <code>provides</code> runs after - on every return
         path. A failed assertion becomes an error, so the function returns <code>!T</code>.
       </p>
       <div class="code-window">
@@ -366,7 +366,7 @@ application Warehouse {
       <p>
         A function declares how to save and undo its own state with <code>begin</code> and
         <code>rollback</code>. Those blocks lie dormant until the function is called from inside a
-        <code>transaction</code> — then any <code>fail</code> unwinds every rollback automatically.
+        <code>transaction</code> - then any <code>fail</code> unwinds every rollback automatically.
       </p>
       <div class="code-window">
         <div class="code-titlebar">
@@ -395,7 +395,7 @@ application Warehouse {
 	def run() !none {
 		transaction {
 			apply(5)
-			let v = try boom()   // fails — every rollback runs
+			let v = try boom()   // fails - every rollback runs
 			println(v)
 		} onerror (err error) {
 			println("rolled back: {err.message}")
@@ -416,7 +416,7 @@ application Warehouse {
       <h2>Generics</h2>
       <p>
         A <code>where</code> block adds members that only exist when the type argument satisfies the
-        constraint — <code>User&lt;Admin&gt;</code> has <code>permissions</code>,
+        constraint - <code>User&lt;Admin&gt;</code> has <code>permissions</code>,
         <code>User&lt;string&gt;</code> doesn't.
       </p>
       <div class="code-window">
@@ -467,7 +467,7 @@ application Warehouse {
       <h2>Operator Overloading</h2>
       <p>
         An <code>infix</code> method binds a type to an operator symbol, so instances of it work with
-        ordinary operator syntax — including shifts and rotations.
+        ordinary operator syntax - including shifts and rotations.
       </p>
       <div class="code-window">
         <div class="code-titlebar">
@@ -502,7 +502,7 @@ application Bits {
 		let rw = read | write     // calls infix def |
 		let hi = rw &lt;&lt;&lt; 4          // calls infix def &lt;&lt;&lt;
 
-		// the standard library does this too — strings repeat with *
+		// the standard library does this too - strings repeat with *
 		println("ha" * 3)          // hahaha
 		return 0
 	}
@@ -636,7 +636,7 @@ application Concurrency {
     <section class="docs-section" id="value-tags">
       <h2>Value Tags</h2>
       <p>
-        Tags travel with a value's identity — through calls, array slots and channels — while copies
+        Tags travel with a value's identity - through calls, array slots and channels - while copies
         start clean. A gate function refuses anything that was not marked as signed.
       </p>
       <div class="code-window">
@@ -733,7 +733,7 @@ application TagsDemo {
       <h2>Custom Annotations</h2>
       <p>
         <code>meta def</code> defines a new annotation. The first parameter's context type decides
-        what it can decorate — and a parameter annotation can rewrite the argument before the body
+        what it can decorate - and a parameter annotation can rewrite the argument before the body
         ever runs:
       </p>
       <div class="code-window">
@@ -782,7 +782,7 @@ application TagsDemo {
 
 	def run() int {
 		let hits = reflection.attrs(mark)
-		return hits.len()   // 2 — the type and the function
+		return hits.len()   // 2 - the type and the function
 	}
 }</code></pre>
       </div>
@@ -814,7 +814,7 @@ application TagsDemo {
     <section class="docs-section" id="simd">
       <h2>SIMD</h2>
       <p>
-        <code>vec4&lt;T&gt;</code> and friends map to hardware SIMD where available — arithmetic runs
+        <code>vec4&lt;T&gt;</code> and friends map to hardware SIMD where available - arithmetic runs
         across all lanes at once, and comparisons return a mask for branchless selection.
       </p>
       <div class="code-window">
@@ -846,7 +846,7 @@ application TagsDemo {
     <section class="docs-section" id="ffi">
       <h2>C Interop</h2>
       <p>
-        Annotate a module and every body-less <code>def</code> inside binds to that library — this is
+        Annotate a module and every body-less <code>def</code> inside binds to that library - this is
         how the standard library's OpenGL bindings work.
       </p>
       <div class="code-window">

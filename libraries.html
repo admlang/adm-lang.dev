@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Libraries — adm</title>
+<title>Libraries - adm</title>
 <meta name="description" content="How an ADM library is declared, what the .admlib package contains, and how libraries are published, found and installed through the registry.">
 <link rel="icon" type="image/svg+xml" href="assets/adm.svg">
 <link rel="canonical" href="https://adm-lang.dev/libraries.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="adm">
-<meta property="og:title" content="adm — Libraries">
+<meta property="og:title" content="adm - Libraries">
 <meta property="og:description" content="How an ADM library is declared, what the .admlib package contains, and how libraries are published, found and installed through the registry.">
 <meta property="og:url" content="https://adm-lang.dev/libraries.html">
 <meta property="og:image" content="https://adm-lang.dev/assets/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="adm — Libraries">
+<meta name="twitter:title" content="adm - Libraries">
 <meta name="twitter:description" content="How an ADM library is declared, what the .admlib package contains, and how libraries are published, found and installed through the registry.">
 <meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
 <link rel="stylesheet" href="styles.css">
@@ -56,7 +56,12 @@
         <a class="docs-page-link current" href="libraries.html">Libraries</a>
       </div>
 
-      <div class="docs-nav-group"><a class="docs-nav-top" href="#declaring">Declaring a library</a></div>
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#declaring">Declaring a library</a>
+        <ul class="docs-nav-list">
+          <li><a class="docs-nav-sub" href="#what-ships">What ships, what a consumer sees</a></li>
+        </ul>
+      </div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#package">The .admlib package</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#signing">Signing</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#publishing">Publishing</a></div>
@@ -115,6 +120,14 @@ partial module humanize {
       </div>
 
       <p><code>@manifest(version = ...)</code> is the library's version, semver; without it the version is <code>0.1</code>. The compiler checks the export list the same way it does for plugins: every module named is one the library uses, it sits under the library's prefix, and no exported signature mentions a type that is not exported.</p>
+
+      <div class="docs-subsection" id="what-ships">
+        <h3>What ships, what a consumer sees</h3>
+        <p>The package holds the exported modules and every module they <code>use</code>, recursively, and nothing else from the repository. The walk stops at three boundaries: the prelude and <code>std.*</code> are never shipped; a module that belongs to an installed package is recorded as a dependency (by package name, fetched by <code>adm get</code>) instead of being copied; and any other module outside the library's prefix is an error: <code>module "x" is outside its prefix; make the package that owns it a dependency instead of shipping it</code>. So a library never ships a module it does not own, and no module is ever inside two packages - installed modules would collide in a program that uses both.</p>
+        <p>For a consumer there are three levels of visibility. Exported modules are the API. Modules that shipped because an exported one needs them are present but refused: <code>use acme.imaging.psd.layers</code> fails with <code>module "acme.imaging.psd.layers" is internal to library "acme.imaging"; it exports acme.imaging, ...</code>, which is what lets the author reorganise them between versions. <code>internal</code> declarations stay invisible even inside an exported module. Within the library's own sources every module is visible as usual.</p>
+        <p>Several libraries in one repository is fine; <code>adm publish --library &lt;name&gt;</code> picks one, and each has its own versions. Code they share has three homes: a third library that both depend on (a sibling prefix such as <code>acme.core</code>, not a parent - a library named <code>acme</code> would own <code>acme.imaging</code> too), <code>std</code> when it is general plumbing, or a copy under each prefix when it is small. Naming it <code>acme.imaging.common</code> and using it from <code>acme.audio</code> makes audio depend on the whole imaging library.</p>
+        <p>The block name is the library's only identity: the prefix it owns, the package file name, the entry in the registry and in <code>adm.lock</code>, and what people write after <code>use</code>. <code>@manifest(name = ...)</code> is application identity and is ignored on a library, and the key under <code>[deps]</code> in <code>adm.toml</code> is that same name (qualified as <code>publisher:name</code> when two publishers share one), not an alias you choose.</p>
+      </div>
     </section>
 
     <section class="docs-section" id="package">
@@ -219,7 +232,7 @@ application Report {
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="code-filename">adm.lock</span>
         </div>
-        <pre><code># adm.lock — namespace:name:hash:version [source=... publisher=...]
+        <pre><code># adm.lock - namespace:name:hash:version [source=... publisher=...]
 cthackers:humanize:59b7bb9a...b0efd3ac:0.1.0 source=registry:public publisher=admpub_zp7f...</code></pre>
       </div>
 

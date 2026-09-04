@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plugins — adm</title>
+<title>Plugins - adm</title>
 <meta name="description" content="How an ADM plugin declares its exports, what the .admplugin package contains, and how the shared runtime works.">
 <link rel="icon" type="image/svg+xml" href="assets/adm.svg">
 <link rel="canonical" href="https://adm-lang.dev/plugins.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="adm">
-<meta property="og:title" content="adm — Plugins">
+<meta property="og:title" content="adm - Plugins">
 <meta property="og:description" content="How an ADM plugin declares its exports, what the .admplugin package contains, and how the shared runtime works.">
 <meta property="og:url" content="https://adm-lang.dev/plugins.html">
 <meta property="og:image" content="https://adm-lang.dev/assets/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="adm — Plugins">
+<meta name="twitter:title" content="adm - Plugins">
 <meta name="twitter:description" content="How an ADM plugin declares its exports, what the .admplugin package contains, and how the shared runtime works.">
 <meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
 <link rel="stylesheet" href="styles.css">
@@ -110,7 +110,7 @@ plugin ImageTools {
 	def dispose() { ... }
 }</code></pre>
       </div>
-      <p>The compiler checks the list: every module named is one the plugin uses, every symbol exists and is not <code>internal</code>, and the signatures of exported symbols only mention types that are exported too, so a host never sees a type it cannot name. <code>@manifest(version = ...)</code> sets the plugin's version; without it the version is <code>0.1</code>.</p>
+      <p>The compiler checks the list: every module named is one the plugin uses, every symbol exists and is not <code>internal</code>, and the signatures of exported symbols only mention types that are exported too, so a host never sees a type it cannot name. <code>@manifest(version = ...)</code> sets the plugin's version; without it the version is <code>0.1</code>. Exported modules must sit under the plugin's own name prefix, the same ownership rule libraries follow; see <a href="libraries.html#what-ships">Libraries → What ships</a>.</p>
     </section>
 
     <section class="docs-section" id="building">

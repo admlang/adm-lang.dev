@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Language reference — adm</title>
+<title>Language reference - adm</title>
 <meta name="description" content="ADM language reference: syntax, types, control flow, error handling, concurrency, services, and UI.">
 <link rel="icon" type="image/svg+xml" href="assets/adm.svg">
 <link rel="canonical" href="https://adm-lang.dev/docs.html">
@@ -218,7 +218,7 @@
       <h2>Introduction</h2>
       <p>
         ADM is a statically-typed, multi-paradigm language for applications, services, and UI.
-        Every program is one of four things — an application, a library, a plugin, or a module —
+        Every program is one of four things - an application, a library, a plugin, or a module -
         and all four follow the same syntax and rules.
       </p>
       <p>Three ideas carry through the rest of the language:</p>
@@ -311,7 +311,7 @@
     <section class="docs-section" id="syntax-basics">
       <h2>Syntax Basics</h2>
       <p>
-        Whitespace is insignificant except inside literals — no semicolons at the end of statements,
+        Whitespace is insignificant except inside literals - no semicolons at the end of statements,
         no significant indentation.
       </p>
 
@@ -340,10 +340,10 @@
           <tr><th>Operator</th><th>Purpose</th></tr>
           <tr><td><code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>%</code></td>
             <td>Arithmetic. <code>+</code> also concatenates strings and arrays, and merges maps (always into a new value).</td></tr>
-          <tr><td><code>**</code></td><td>Exponentiation — <code>a ** b</code> raises <code>a</code> to the power <code>b</code>.</td></tr>
+          <tr><td><code>**</code></td><td>Exponentiation - <code>a ** b</code> raises <code>a</code> to the power <code>b</code>.</td></tr>
           <tr><td><code>.*</code></td><td>Element-wise matrix multiply (see <a href="#arrays">Arrays &amp; Slicing</a>).</td></tr>
           <tr><td><code>+=</code> <code>-=</code> <code>*=</code> <code>/=</code> <code>%=</code></td>
-            <td>Compound assignment — <code>lhs = lhs op rhs</code>.</td></tr>
+            <td>Compound assignment - <code>lhs = lhs op rhs</code>.</td></tr>
           <tr><td><code>&amp;</code> <code>|</code> <code>^</code> <code>~</code> <code>!</code></td>
             <td>Bitwise AND / OR / XOR / NOT. Arrays reuse these as set operations.</td></tr>
           <tr><td><code>&lt;&lt;</code> <code>&gt;&gt;</code></td><td>Logical shifts; signedness is respected.</td></tr>
@@ -351,21 +351,21 @@
             <td>Bit rotations, with compound forms <code>&lt;&lt;&lt;=</code> and <code>&gt;&gt;&gt;=</code>.</td></tr>
           <tr><td><code>&amp;&amp;</code> <code>||</code> <code>!</code></td><td>Short-circuiting logical operators.</td></tr>
           <tr><td><code>&lt;</code> <code>&lt;=</code> <code>&gt;</code> <code>&gt;=</code> <code>==</code> <code>!=</code></td>
-            <td>Comparisons — work across numeric primitives, strings, chars, and enums.</td></tr>
+            <td>Comparisons - work across numeric primitives, strings, chars, and enums.</td></tr>
           <tr><td><code>cond ?? (a, b)</code></td>
             <td>Conditional choice; only the taken branch is evaluated (see <a href="#conditionals">Conditionals</a>).</td></tr>
-          <tr><td><code>:=</code></td><td>Conditional junction — reuses the left operand across a chain (see <a href="#conditionals">Conditionals</a>).</td></tr>
+          <tr><td><code>:=</code></td><td>Conditional junction - reuses the left operand across a chain (see <a href="#conditionals">Conditionals</a>).</td></tr>
           <tr><td><code>is</code></td><td>Type test, used for narrowing (see <a href="#type-narrowing">Type Narrowing</a>).</td></tr>
         </table>
         <p>
-          A type can overload most of these for its own instances with an <code>infix</code> method —
+          A type can overload most of these for its own instances with an <code>infix</code> method -
           see <a href="#type-methods">Types → Methods</a>.
         </p>
       </div>
 
       <div class="docs-sub" id="assignment">
         <h3>Assignment</h3>
-        <p>Several names can be assigned at once, which makes swapping values a one-liner — the right side is fully evaluated before anything is written:</p>
+        <p>Several names can be assigned at once, which makes swapping values a one-liner - the right side is fully evaluated before anything is written:</p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -396,7 +396,7 @@ counter--</code></pre>
         </div>
 
         <p>
-          Assignment is an expression, so it yields the value that was just written — handy inside a
+          Assignment is an expression, so it yields the value that was just written - handy inside a
           call or a condition. Compound assignment and slice assignment behave the same way:
         </p>
         <div class="code-window">
@@ -419,7 +419,7 @@ println((a[:] += 1))   // every element incremented</code></pre>
       <h2>Program Structure</h2>
       <p>
         Every ADM source file uses the <code>.adm</code> extension. A single file can hold any number
-        of applications, libraries, plugins, and modules — there's no one-file-one-thing rule.
+        of applications, libraries, plugins, and modules - there's no one-file-one-thing rule.
       </p>
       <p>
         Any of those four can be split across multiple files with the <code>partial</code> modifier,
@@ -429,7 +429,7 @@ println((a[:] += 1))   // every element incremented</code></pre>
       </p>
       <p>
         The directory a file lives in has nothing to do with its namespace, though. A module's name
-        comes from its own declared identifier — <code>module std.net.http</code> is always
+        comes from its own declared identifier - <code>module std.net.http</code> is always
         <code>std.net.http</code>, regardless of which folder or filename it's written in. Folders are
         just how you organize files on disk.
       </p>
@@ -464,14 +464,14 @@ application MainApp {
           <li>The constructor <code>def new(args string[]) int</code> is the entry point; the integer
             return value becomes the process exit code.</li>
           <li><code>def dispose()</code> is optional and runs when the runtime shuts the application down.</li>
-          <li>Application bodies may declare properties and methods, like a regular <code>type</code> —
+          <li>Application bodies may declare properties and methods, like a regular <code>type</code> -
             but applications cannot have generics, <code>where</code> clauses, or <code>infix</code>
             methods, because they are never instantiated by the user.</li>
           <li>Members cannot be marked <code>internal</code>; applications are always public compilation units.</li>
           <li>Multiple <code>application</code> declarations in one workspace generate multiple binaries.
-            An unnamed application inherits the filename and must be compiled explicitly — it cannot be
+            An unnamed application inherits the filename and must be compiled explicitly - it cannot be
             spread via <code>partial</code>.</li>
-          <li>Application names must be unique across the workspace, and are a single identifier — no
+          <li>Application names must be unique across the workspace, and are a single identifier - no
             dots, unlike a module's name.</li>
         </ul>
         <p>
@@ -489,7 +489,7 @@ application MainApp {
       <div class="docs-sub" id="admapp-manifest">
         <h3><code>adm.toml</code> Manifest</h3>
         <p>
-          An application can carry an optional <code>adm.toml</code> file — a TOML manifest at the
+          An application can carry an optional <code>adm.toml</code> file - a TOML manifest at the
           project root, keyed by the ADM <code>application</code> name. Run <code>adm app init</code>
           to generate one: it writes the manifest and also creates an Ed25519 signing keypair, putting
           the public key in the manifest and the private key in your config directory (or a path you
@@ -504,23 +504,23 @@ application MainApp {
           empty strings. A <code>adm.toml</code> wins over all of that; when present, it sets:
         </p>
         <ul>
-          <li><strong>Identity</strong> — the publisher's public key and a repo salt, combined with each
+          <li><strong>Identity</strong> - the publisher's public key and a repo salt, combined with each
             app's slug (or its application name) to derive stable <code>publisher_id</code>/<code>app_id</code>
             values that survive renames.</li>
-          <li><strong>Update metadata</strong> — a feed URL, channel, and artifact name, set globally or
+          <li><strong>Update metadata</strong> - a feed URL, channel, and artifact name, set globally or
             per app. These only reach your program as compiler constants (<code>__update_feed__</code>,
-            <code>__update_channel__</code>, <code>__update_artifact__</code>) — nothing in the toolchain
+            <code>__update_channel__</code>, <code>__update_artifact__</code>) - nothing in the toolchain
             fetches or applies updates on its own.</li>
-          <li><strong>Packaging</strong> — a version plus a list of files to bundle, consumed by
+          <li><strong>Packaging</strong> - a version plus a list of files to bundle, consumed by
             <code>adm package build</code> to produce a release archive.</li>
         </ul>
         <p>A small family of commands works with the manifest once it exists:</p>
         <ul>
-          <li><code>adm app id</code> — print the resolved identity/update values for an app.</li>
-          <li><code>adm app bump major|minor|patch</code> — bump the app's version in the manifest.</li>
-          <li><code>adm app sign</code> / <code>adm app verify</code> — sign a built artifact with the
+          <li><code>adm app id</code> - print the resolved identity/update values for an app.</li>
+          <li><code>adm app bump major|minor|patch</code> - bump the app's version in the manifest.</li>
+          <li><code>adm app sign</code> / <code>adm app verify</code> - sign a built artifact with the
             publisher key, then verify it later.</li>
-          <li><code>adm package build</code> / <code>adm package install</code> — build a release
+          <li><code>adm package build</code> / <code>adm package install</code> - build a release
             archive from the packaging rules and install it locally.</li>
         </ul>
         <p>
@@ -528,14 +528,14 @@ application MainApp {
           <code>__app_id__</code>, <code>__app_version__</code>, <code>__publisher_id__</code>,
           <code>__publisher_pubkey__</code>,
           plus the three update fields above. There's also an <code>__build_id__</code> constant that's
-          always set and changes on every build — don't use it as a stable identity.
+          always set and changes on every build - don't use it as a stable identity.
         </p>
       </div>
 
       <div class="docs-sub" id="libraries-plugins">
         <h3>Libraries &amp; Plugins</h3>
         <p>
-          Libraries and plugins share code without an entry point of their own — no <code>def new</code>,
+          Libraries and plugins share code without an entry point of their own - no <code>def new</code>,
           nothing runs them directly. The difference is how they reach a program:
         </p>
         <ul>
@@ -549,7 +549,10 @@ application MainApp {
         </ul>
         <p>
           Both live at file scope, both can be <code>partial</code>, and neither can be marked
-          <code>internal</code> — like applications, an unnamed one inherits its filename.
+          <code>internal</code> - like applications, an unnamed one inherits its filename. The block
+          name is the unit's identity and the module prefix it owns; what a package ships, what a
+          consumer may <code>use</code>, and how shared code is split are covered under
+          <a href="libraries.html#what-ships">Libraries → What ships</a>.
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -604,7 +607,7 @@ plugin ImageTools {
         <h3>Modules &amp; Namespaces</h3>
         <p>
           Modules are source containers that group symbols under a qualified name. They never produce
-          a binary or library on their own — their contents are pulled into whichever application,
+          a binary or library on their own - their contents are pulled into whichever application,
           library, or plugin imports them.
         </p>
         <div class="code-window">
@@ -623,7 +626,7 @@ plugin ImageTools {
             lets you split it across files in the same directory.</li>
           <li>Module bodies may contain <code>use</code> statements, constants, functions, types, structs,
             enums, unions, interfaces, datatypes, services, components, views, and styles.</li>
-          <li>Modules cannot declare other top-level units — <code>application</code>, <code>library</code>,
+          <li>Modules cannot declare other top-level units - <code>application</code>, <code>library</code>,
             <code>plugin</code>, or nested <code>module</code> declarations are forbidden inside a module block.</li>
         </ul>
         <p>
@@ -645,7 +648,7 @@ module std.ui.renderer.opengl.gl {
 }</code></pre>
         </div>
         <p>
-          Everything in this module is a real GL symbol — <code>glClear</code> and <code>glViewport</code>
+          Everything in this module is a real GL symbol - <code>glClear</code> and <code>glViewport</code>
           come straight from the system OpenGL library, not from ADM code. More on this under
           <a href="#interop">Interoperability</a>.
         </p>
@@ -669,17 +672,17 @@ use (
         </div>
         <ul>
           <li>A plain <code>use std.net.http</code> imports the module itself; you reference its exports
-            through the module name — <code>http.Response</code>, not the full dotted path.</li>
+            through the module name - <code>http.Response</code>, not the full dotted path.</li>
           <li><code>use my.module as mod</code> aliases the whole module to a different name.</li>
           <li><code>::(foo, bar as Baz)</code> imports specific symbols by name, optionally renaming any
-            of them. A module imported this way can't itself be aliased — there's nothing to alias,
+            of them. A module imported this way can't itself be aliased - there's nothing to alias,
             only the symbols it exposes are in scope.</li>
           <li><code>::*</code> (or <code>::(*)</code>) imports every exported symbol from a module,
             including every overload of an imported function name.</li>
           <li>Several imports can share one <code>use ( ... )</code> block.</li>
         </ul>
         <p>
-          Module names aren't implicitly in scope — even after <code>use std.net.http</code>, you still
+          Module names aren't implicitly in scope - even after <code>use std.net.http</code>, you still
           write <code>http.Response</code>, never <code>std.net.http.Response</code>.
         </p>
         <p>
@@ -697,7 +700,7 @@ use (
         <h3>Primitives</h3>
         <p>
           Values are declared with <code>let</code>, or <code>const</code> for ones that can't be
-          reassigned. A type annotation is optional — leave it off and ADM infers it from the value:
+          reassigned. A type annotation is optional - leave it off and ADM infers it from the value:
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -753,8 +756,8 @@ println(&quot;json: \{\&quot;ok\&quot;: true\}&quot;)                   // json:
         <p><strong>Booleans</strong> (<code>bool</code>) are <code>true</code>/<code>false</code>; <code>none</code> represents the absence of a value.</p>
 
         <p>
-          <strong>Integers</strong> come in a signed/unsigned family — <code>int</code>,
-          <code>int8/16/32/64/128</code>, <code>uint</code>, <code>uint8/16/32/64/128</code> — and can be
+          <strong>Integers</strong> come in a signed/unsigned family - <code>int</code>,
+          <code>int8/16/32/64/128</code>, <code>uint</code>, <code>uint8/16/32/64/128</code> - and can be
           written in decimal, hex, octal, or binary. Spaces (or underscores) can split up long digit runs
           for readability; the compiler ignores them:
         </p>
@@ -772,7 +775,7 @@ let a = 0b1010 1010</code></pre>
         </div>
         <p>
           A number too large for <code>int</code>, like <code>6277101735386680762814942322444851025767571854389858533375</code>,
-          is simply written as a literal — ADM infers <code>bigint</code>.
+          is simply written as a literal - ADM infers <code>bigint</code>.
         </p>
 
         <p><strong>Floats</strong> (<code>float</code>, <code>float16/32/64/128</code>) accept the same
@@ -822,7 +825,7 @@ let a = /[a-z]{1,}+/mg</code></pre>
         </p>
 
         <p>
-          <strong>Converting</strong> between types uses the target type as a call — there are no
+          <strong>Converting</strong> between types uses the target type as a call - there are no
           implicit numeric conversions, so a narrowing or lossy conversion has to be written out:
         </p>
         <div class="code-window">
@@ -837,7 +840,7 @@ let letter = string('Z')    // char    -> string</code></pre>
         </div>
 
         <p>
-          Primitives aren't bare values either — they carry methods, so common operations read as
+          Primitives aren't bare values either - they carry methods, so common operations read as
           ordinary method calls:
         </p>
         <div class="code-window">
@@ -857,7 +860,7 @@ xs.len()          // 3</code></pre>
         </div>
 
         <p>
-          <strong>Strings index and slice</strong> like arrays do, including negative indexes —
+          <strong>Strings index and slice</strong> like arrays do, including negative indexes -
           and because strings are UTF-8, indexing works on characters, not bytes:
         </p>
         <div class="code-window">
@@ -884,7 +887,7 @@ s[-2:]    // "cd"</code></pre>
       <div class="docs-sub" id="arrays">
         <h3>Arrays &amp; Slicing</h3>
         <p>
-          Arrays are <code>T[]</code>, dynamically sized, with a literal form — <code>[1, 2, 3]</code>,
+          Arrays are <code>T[]</code>, dynamically sized, with a literal form - <code>[1, 2, 3]</code>,
           or <code>Type[1, 2, 3]</code> with an explicit element type.
         </p>
         <p>
@@ -917,7 +920,7 @@ let last  = a[-1]  // 4
 a[-2] = 10         // a is now [1, 2, 10, 4]</code></pre>
         </div>
 
-        <p><strong>Slicing</strong> produces a view into the same backing storage — no copying:</p>
+        <p><strong>Slicing</strong> produces a view into the same backing storage - no copying:</p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -932,7 +935,7 @@ let trimmed = a[:-1]  // drops the last element</code></pre>
           <li>Writes through a slice are visible through the original array (and any other slice) as
             long as they still share the same backing storage.</li>
           <li>A slice has its own <code>len</code>/<code>cap</code>, independent of the original array.</li>
-          <li>If growing an array or slice needs more capacity, it detaches — allocates a new backing
+          <li>If growing an array or slice needs more capacity, it detaches - allocates a new backing
             buffer and copies. Existing slices keep working but stop sharing storage with the grown one.</li>
           <li>Use <code>.clone()</code> to force a copy instead of a view: <code>let copy = a.clone()</code>.</li>
         </ul>
@@ -980,7 +983,7 @@ let hadamard = m .* m  // element-wise</code></pre>
         <h3>Maps</h3>
         <p>
           Maps are <code>map&lt;K, V&gt;</code>, with a literal syntax that mirrors structs. Keys must
-          satisfy <code>Serializable</code> — primitives and enums qualify by default. (Today a key is
+          satisfy <code>Serializable</code> - primitives and enums qualify by default. (Today a key is
           hashed and compared by its serialized bytes; a hashing/equality interface is planned to replace
           that constraint.) <code>a + b</code> on two maps merges <code>b</code> into a copy of
           <code>a</code> and returns the copy, like the array operators, neither operand changes;
@@ -1005,7 +1008,7 @@ let hadamard = m .* m  // element-wise</code></pre>
           </div>
           <pre><code>m["c"] = 3
 let a int = m["a"]
-let missing = m.get("missing")  // ?int — none if the key is absent</code></pre>
+let missing = m.get("missing")  // ?int - none if the key is absent</code></pre>
         </div>
 
         <p>Other lookups and mutations are plain methods:</p>
@@ -1052,7 +1055,7 @@ let vs = m.values()  // int[]</code></pre>
 let t (int, int) = (1, 2)</code></pre>
         </div>
         <p>
-          A single parenthesized expression stays just that expression — it takes at least one comma
+          A single parenthesized expression stays just that expression - it takes at least one comma
           to make a tuple.
         </p>
 
@@ -1075,7 +1078,7 @@ let t (int, int) = (1, 2)</code></pre>
         </div>
 
         <p>
-          The same <code>let ( ... )</code> syntax also destructures a struct — but there it matches by
+          The same <code>let ( ... )</code> syntax also destructures a struct - but there it matches by
           field name instead of position, and any field can be renamed with <code>as</code>:
         </p>
         <div class="code-window">
@@ -1087,7 +1090,7 @@ let t (int, int) = (1, 2)</code></pre>
         </div>
 
         <p>
-          Tuples can also be unpacked with a <code>match</code> pattern — <code>case (a, b): return a + b</code> —
+          Tuples can also be unpacked with a <code>match</code> pattern - <code>case (a, b): return a + b</code> -
           covered under <a href="#match">Match</a>.
         </p>
       </div>
@@ -1095,7 +1098,7 @@ let t (int, int) = (1, 2)</code></pre>
         <h3>Vectors (SIMD)</h3>
         <p>
           <code>vec4/8/16/32/64/128&lt;T&gt;</code> are fixed-width SIMD vectors over a numeric lane
-          type <code>T</code> — the number is the lane count, and operations run across all lanes at
+          type <code>T</code> - the number is the lane count, and operations run across all lanes at
           once when hardware SIMD is available. <code>mask4/8/16/32/64/128&lt;T&gt;</code> hold the
           per-lane result of a comparison.
         </p>
@@ -1179,7 +1182,7 @@ let c = struct {x: 2, y: 3}  // anonymous, one-off struct</code></pre>
         </div>
 
         <p>
-          <strong>Embedding</strong> a struct — writing its type name as a bare field — copies that
+          <strong>Embedding</strong> a struct - writing its type name as a bare field - copies that
           struct's fields onto the outer one:
         </p>
         <div class="code-window">
@@ -1212,7 +1215,7 @@ let c = struct {x: 2, y: 3}  // anonymous, one-off struct</code></pre>
         </div>
 
         <p>
-          Give members explicit values — including expressions that reference earlier members in the
+          Give members explicit values - including expressions that reference earlier members in the
           same enum:
         </p>
         <div class="code-window">
@@ -1257,7 +1260,7 @@ let same = f == Flags.ReadWrite  // true</code></pre>
         <h3>Unions</h3>
         <p>
           A <code>union</code> is a raw memory type: every member shares the same storage. Writing to
-          one member changes the bits for all of them — reading a different member reinterprets those
+          one member changes the bits for all of them - reading a different member reinterprets those
           same bytes as its type. Unions don't track which variant was last written.
         </p>
         <div class="code-window">
@@ -1279,10 +1282,10 @@ let same = f == Flags.ReadWrite  // true</code></pre>
             <span class="code-filename">use_union.adm</span>
           </div>
           <pre><code>let s Size = Size.A(10)
-let a = s.B  // 1.401298e-44 — the bits of 10 (int), reinterpreted as float</code></pre>
+let a = s.B  // 1.401298e-44 - the bits of 10 (int), reinterpreted as float</code></pre>
         </div>
         <p>
-          That reinterpretation is the whole point — and the whole risk. Since nothing tracks the
+          That reinterpretation is the whole point - and the whole risk. Since nothing tracks the
           active variant, reading the "wrong" member is legal and just hands you back whatever bytes
           happen to be there.
         </p>
@@ -1292,8 +1295,8 @@ let a = s.B  // 1.401298e-44 — the bits of 10 (int), reinterpreted as float</c
       <div class="docs-sub" id="interfaces-datatypes">
         <h3>Interfaces &amp; Datatypes</h3>
         <p>
-          An <code>interface</code> declares behavior — a set of method signatures. Any type that has
-          all of them automatically satisfies the interface, no <code>implements</code> clause needed —
+          An <code>interface</code> declares behavior - a set of method signatures. Any type that has
+          all of them automatically satisfies the interface, no <code>implements</code> clause needed -
           the same implicit satisfaction Go uses for its interfaces.
         </p>
         <div class="code-window">
@@ -1314,14 +1317,14 @@ internal interface Dog {
 }</code></pre>
         </div>
         <p>
-          Interfaces support embedding — <code>Dog</code> pulls in every method <code>Animal</code>
-          requires, plus its own <code>Bark()</code> — and generics in method signatures
+          Interfaces support embedding - <code>Dog</code> pulls in every method <code>Animal</code>
+          requires, plus its own <code>Bark()</code> - and generics in method signatures
           (<code>Eat&lt;W&gt;</code>).
         </p>
 
         <p>
           A <code>datatype</code> is the same idea applied to data instead of behavior: it describes a
-          required shape — which fields must exist, and their types — rather than which methods must
+          required shape - which fields must exist, and their types - rather than which methods must
           exist. Any struct or type exposing those fields satisfies it, implicitly, the same way:
         </p>
         <div class="code-window">
@@ -1344,7 +1347,7 @@ internal datatype Account {
 
         <p>
           Datatypes embed the same way interfaces do, and can be used anywhere a type constraint is
-          expected — including generic bounds. <code>&amp;</code> combines constraints (a type must
+          expected - including generic bounds. <code>&amp;</code> combines constraints (a type must
           satisfy all of them); <code>|</code> accepts any one of them:
         </p>
         <div class="code-window">
@@ -1363,7 +1366,7 @@ internal datatype Account {
         <h3><code>any</code></h3>
         <p>
           <code>any</code> holds a value of any type at all. It's the escape hatch for cases where the
-          type genuinely isn't known ahead of time — and like a union, ADM won't let you use it as a
+          type genuinely isn't known ahead of time - and like a union, ADM won't let you use it as a
           concrete type until you narrow it with <code>is</code> or <code>match</code>:
         </p>
         <div class="code-window">
@@ -1376,12 +1379,12 @@ x is int        // true
 
 let p = Person{first: "Ada"}
 let a any = p
-a is Named     // true — interfaces work too</code></pre>
+a is Named     // true - interfaces work too</code></pre>
         </div>
         <p>
           The value keeps its real type underneath, so <code>std.reflection.typeName(x)</code> reports
           what it actually is. Reach for a <a href="#union-intersection-types">union type</a> instead
-          whenever the set of possibilities is known — it's checked at compile time, where
+          whenever the set of possibilities is known - it's checked at compile time, where
           <code>any</code> pushes the check to a narrowing site.
         </p>
       </div>
@@ -1390,7 +1393,7 @@ a is Named     // true — interfaces work too</code></pre>
     <section class="docs-section" id="type">
       <h2>Types</h2>
       <p>
-        A <code>type</code> is ADM's stateful, instantiable building block — the closest thing to a
+        A <code>type</code> is ADM's stateful, instantiable building block - the closest thing to a
         class. Unlike a <a href="#structs">struct</a>, it can have methods, properties, generics, and a
         constructor/destructor pair:
       </p>
@@ -1430,22 +1433,31 @@ partial type User&lt;T&gt; {
         </div>
         <p>
           Fields work like struct fields, but can take a default value (<code>name string = "unknown"</code>),
-          and the type itself can carry annotations and modifiers the same way a function can — this one
+          and the type itself can carry annotations and modifiers the same way a function can - this one
           is <code>partial</code>, so the rest of it can live in another file, as long as every fragment
           repeats the <code>&lt;T&gt;</code> generic parameter list. <code>use</code> inside a type is
           scoped to that type only, and a type body can also nest its own <code>struct</code>,
           <code>enum</code>, or <code>union</code> declarations.
         </p>
         <p>
-          <code>internal type Cache { ... }</code> hides the whole type outside its module — the usual
+          <code>internal type Cache { ... }</code> hides the whole type outside its module - the usual
           way to keep a helper type from leaking into your public API.
         </p>
         <p>
           A field marked <code>weak</code> (<code>weak parent ?Node</code>) refers to another object
           without owning it: the field must be optional, its target a struct, type, service or component,
           and it reads <code>none</code> once the target has been released. Use it for back references so
-          parent and child form no reference cycle — see
+          parent and child form no reference cycle - see
           <a href="memory.html#weak-references">Memory model → Weak references</a>.
+        </p>
+        <p>
+          A constructor with one parameter marked <code>@implicit</code> makes the type accept that
+          parameter's type directly: <code>def send(to Secret&lt;string&gt;)</code> is called as
+          <code>send("hunter2")</code> and the compiler inserts the constructor, the way a value
+          becomes a <code>?T</code>. Inward only, one hop, never through an interface, and the
+          constructor cannot fail; wrappers that validate use a factory returning <code>!T</code>
+          instead. The language server shows such a parameter as
+          <code>Secret&lt;string&gt;/string</code>.
         </p>
         <p>
           A <code>where T is Constraint { ... }</code> block adds members that only exist when the
@@ -1471,10 +1483,10 @@ type User&lt;T&gt; {
 }
 
 let u1 User&lt;Admin&gt; = new(name="bob")
-u1.tag()               // fine — T is Admin, satisfies the where clause
+u1.tag()               // fine - T is Admin, satisfies the where clause
 
 let u2 User&lt;string&gt; = new(name="alice")
-// u2.tag() would not compile — string doesn't satisfy Admin | Account</code></pre>
+// u2.tag() would not compile - string doesn't satisfy Admin | Account</code></pre>
         </div>
       </div>
 
@@ -1555,7 +1567,7 @@ print(b.count)  // 3</code></pre>
           Both accessors are optional: drop <code>get</code> for a write-only property, drop
           <code>set</code> and it becomes computed (read-only) instead. Accessors are ordinary
           <code>def</code>s and can be <code>internal</code>, <code>atomic</code>, <code>asm</code>,
-          <code>cuda</code>, or <code>sql</code> — but never <code>async</code> or <code>infix</code>. A
+          <code>cuda</code>, or <code>sql</code> - but never <code>async</code> or <code>infix</code>. A
           property itself can't be <code>partial</code> and can't declare its own <code>where</code>
           block; specialize the surrounding type instead.
         </p>
@@ -1582,7 +1594,7 @@ h.mid(1)             // T inferred as int
 h.mid&lt;string&gt;("ok")   // T pinned explicitly</code></pre>
         </div>
         <p>
-          <code>infix</code> turns a method into an operator overload — <code>infix def +</code> is what
+          <code>infix</code> turns a method into an operator overload - <code>infix def +</code> is what
           makes <code>a + b</code> work for a type's own instances. Only type methods can be
           <code>infix</code>; it can't be combined with <code>async</code> or <code>internal</code>:
         </p>
@@ -1609,8 +1621,8 @@ a &lt;&lt;&lt; 1
 a &amp; b</code></pre>
         </div>
         <p>
-          Everything from <a href="#params-returns">Params &amp; Returns</a> applies to methods too —
-          modifiers, overloading, generics, annotations — plus <code>infix</code>, which only makes
+          Everything from <a href="#params-returns">Params &amp; Returns</a> applies to methods too -
+          modifiers, overloading, generics, annotations - plus <code>infix</code>, which only makes
           sense here.
         </p>
       </div>
@@ -1619,7 +1631,7 @@ a &amp; b</code></pre>
     <section class="docs-section" id="control-flow">
       <h2>Control Flow</h2>
       <p>
-        Branching, looping, and pattern matching — the same three tools apply consistently across
+        Branching, looping, and pattern matching - the same three tools apply consistently across
         primitives, structs, tuples, and everything else already covered.
       </p>
 
@@ -1627,7 +1639,7 @@ a &amp; b</code></pre>
         <h3>Conditionals</h3>
         <p>
           <code>if</code>/<code>else</code> work as usual, and can carry an
-          initializer before the condition, separated by <code>;</code> — scoped to the whole chain:
+          initializer before the condition, separated by <code>;</code> - scoped to the whole chain:
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -1643,7 +1655,7 @@ a &amp; b</code></pre>
 
         <p>
           <code>when</code> and <code>unless</code> turn a single statement into its own guarded
-          conditional — often more readable than a whole <code>if</code> block for a one-liner:
+          conditional - often more readable than a whole <code>if</code> block for a one-liner:
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -1684,7 +1696,7 @@ if color := "white" || "black" || "blue" {
 // same as: if color == "white" || color == "black" || color == "blue" {}</code></pre>
         </div>
         <p>
-          The same trick works with regexes and <code>&amp;&amp;</code> — each regex tests the same
+          The same trick works with regexes and <code>&amp;&amp;</code> - each regex tests the same
           subject, which reads nicely for validating a password against several patterns at once:
         </p>
         <div class="code-window">
@@ -1749,10 +1761,10 @@ if password := /:alpha/ &amp;&amp; /:digit/ &amp;&amp; /:punct/ {
 
         <p>Four suffix blocks attach extra behavior to any <code>for</code>, in any combination:</p>
         <ul>
-          <li><code>every expr { ... }</code> — runs after iterations matching <code>expr</code> (or after every iteration if <code>expr</code> is omitted).</li>
-          <li><code>break { ... }</code> — runs if the loop exits via <code>break</code>.</li>
-          <li><code>empty { ... }</code> — runs if the body never executes at all.</li>
-          <li><code>finish { ... }</code> — runs after the loop completes normally.</li>
+          <li><code>every expr { ... }</code> - runs after iterations matching <code>expr</code> (or after every iteration if <code>expr</code> is omitted).</li>
+          <li><code>break { ... }</code> - runs if the loop exits via <code>break</code>.</li>
+          <li><code>empty { ... }</code> - runs if the body never executes at all.</li>
+          <li><code>finish { ... }</code> - runs after the loop completes normally.</li>
         </ul>
         <div class="code-window">
           <div class="code-titlebar">
@@ -1784,7 +1796,7 @@ if password := /:alpha/ &amp;&amp; /:digit/ &amp;&amp; /:punct/ {
 }</code></pre>
         </div>
 
-        <p>The same <code>in</code> form iterates an array — with the index if you ask for it — and a map, exactly like <a href="#maps">Maps</a> showed earlier:</p>
+        <p>The same <code>in</code> form iterates an array - with the index if you ask for it - and a map, exactly like <a href="#maps">Maps</a> showed earlier:</p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -1837,7 +1849,7 @@ for let j = 0; j &lt; 3; j++ {
 
         <p>
           <code>forall</code> runs a range or array loop in parallel, spreading the work across as
-          many CPU cores as are available. Order isn't guaranteed — each worker just picks up the next
+          many CPU cores as are available. Order isn't guaranteed - each worker just picks up the next
           item as it finishes the last one:
         </p>
         <div class="code-window">
@@ -1992,7 +2004,7 @@ def userId(u User) int {
         </div>
 
         <p>
-          The same bare-type case works against an interface or datatype — including a generic
+          The same bare-type case works against an interface or datatype - including a generic
           parameter, which is how a function can behave differently depending on what constraint its
           type argument happens to satisfy:
         </p>
@@ -2028,7 +2040,7 @@ def useMatch&lt;T&gt;(x T) string {
       <p>
         Some values can legitimately be more than one shape: a union type is one of several types, an
         optional is either a value or <code>none</code>. ADM won't let you use either as a single
-        concrete type until you narrow it — with <code>is</code>, <code>match</code>, or a
+        concrete type until you narrow it - with <code>is</code>, <code>match</code>, or a
         <code>when</code>/<code>unless</code> guard, all of which you've already seen.
       </p>
 
@@ -2062,7 +2074,7 @@ match width {
 }</code></pre>
         </div>
         <p>
-          Nothing lets you read <code>width</code> as a plain value without picking a branch first —
+          Nothing lets you read <code>width</code> as a plain value without picking a branch first -
           unlike structurally typed languages such as TypeScript, there's no "anything goes" path
           around it.
         </p>
@@ -2083,14 +2095,14 @@ match width {
 
 let score Numeric = 9.5</code></pre>
         </div>
-        <p>Aliases are always a single expression — they can't be <code>partial</code>.</p>
+        <p>Aliases are always a single expression - they can't be <code>partial</code>.</p>
       </div>
 
       <div class="docs-sub" id="optional-types">
         <h3>Optional Types</h3>
         <p>
           <code>?T</code> marks a value that might be <code>none</code> instead of holding a
-          <code>T</code>. The same narrowing tools apply — <code>is</code>, <code>match</code>, and the
+          <code>T</code>. The same narrowing tools apply - <code>is</code>, <code>match</code>, and the
           <code>when</code>/<code>unless</code> guards from <a href="#conditionals">Conditionals</a>:
         </p>
         <div class="code-window">
@@ -2127,7 +2139,7 @@ match o {
       <h2>Functions</h2>
       <p>
         A function declaration can carry modifiers, generics, parameter defaults and annotations, and
-        — for a few special cases — a foreign-language body instead of an ADM one:
+        - for a few special cases - a foreign-language body instead of an ADM one:
       </p>
       <div class="code-window">
         <div class="code-titlebar">
@@ -2145,22 +2157,22 @@ internal atomic async def funcName&lt;A, B: Serializable&gt;(a int, b string = "
         <h3>Params &amp; Returns</h3>
         <p>A function can carry any of these modifiers:</p>
         <ul>
-          <li><code>internal</code> — visible only inside the declaring module, same as everywhere else.</li>
-          <li><code>atomic</code> — wraps the call in a per-instance lock, so only one caller runs it at
+          <li><code>internal</code> - visible only inside the declaring module, same as everywhere else.</li>
+          <li><code>atomic</code> - wraps the call in a per-instance lock, so only one caller runs it at
             a time; everyone else blocks until it's done. More under <a href="#concurrency">Concurrency</a>.</li>
-          <li><code>async</code> — the function returns a future instead of running immediately. Covered
+          <li><code>async</code> - the function returns a future instead of running immediately. Covered
             in depth under <a href="#async-await-futures">Async / Await / Futures</a>.</li>
-          <li><code>infix</code> — turns a method into an operator overload (<code>a + b</code>). Only
+          <li><code>infix</code> - turns a method into an operator overload (<code>a + b</code>). Only
             type methods can be <code>infix</code>, so it's covered under <a href="#type-methods">Types → Methods</a>.</li>
-          <li><code>meta</code> — turns the function itself into a reusable annotation, the way
+          <li><code>meta</code> - turns the function itself into a reusable annotation, the way
             <code>@trim</code> (below) is defined. Covered in depth under <a href="#attributes-modifiers">Attributes &amp; Modifiers</a>.</li>
-          <li><code>asm</code>, <code>cuda</code>, <code>sql</code> — the body is a foreign-language DSL
+          <li><code>asm</code>, <code>cuda</code>, <code>sql</code> - the body is a foreign-language DSL
             instead of ADM statements (below).</li>
         </ul>
 
         <p>
           Parameters can share a type across grouped names, take a default value, and a call can name
-          any argument regardless of position — arguments after a named one just can't go back to
+          any argument regardless of position - arguments after a named one just can't go back to
           being positional:
         </p>
         <div class="code-window">
@@ -2197,7 +2209,7 @@ let b = sum(0, ...xs)</code></pre>
 
         <p>
           Parameters take annotations too, and an annotation can rewrite the value before the body
-          ever sees it. <code>@trim()</code> does exactly that — it reads the argument, trims it, and
+          ever sees it. <code>@trim()</code> does exactly that - it reads the argument, trims it, and
           writes the trimmed value back:
         </p>
         <div class="code-window">
@@ -2211,15 +2223,15 @@ let b = sum(0, ...xs)</code></pre>
 }</code></pre>
         </div>
         <p>
-          Annotation arguments can be named too, the same way call arguments can —
+          Annotation arguments can be named too, the same way call arguments can -
           <code>@validate(min=-10, max=10)</code> is the general shape. Annotations aren't limited to
           compile time either: they're inspectable at runtime through reflection, the same mechanism
           behind <code>@flag</code>, <code>@json</code>, and <code>@controller</code>.
         </p>
 
         <p>
-          Functions and methods can share a name as long as their full signatures — parameter types
-          and count, plus the receiver type for methods — differ. Overload resolution happens entirely
+          Functions and methods can share a name as long as their full signatures - parameter types
+          and count, plus the receiver type for methods - differ. Overload resolution happens entirely
           at compile time; a call must match exactly one candidate or it's a compile error, never a
           runtime guess.
         </p>
@@ -2252,7 +2264,7 @@ sql def getUser(email string) !User {
 }</code></pre>
         </div>
         <p>
-          Everything outside a <code>{name}</code> placeholder is plain text in the target language —
+          Everything outside a <code>{name}</code> placeholder is plain text in the target language -
           the compiler doesn't try to understand it, just records the identifiers it needs to
           substitute before handing the body to the target toolchain.
         </p>
@@ -2327,8 +2339,8 @@ def simulate(initial byte[], width int, height int, generations int) !byte[] {
       <div class="docs-sub" id="closures">
         <h3>Closures</h3>
         <p>
-          A <code>def</code> block can be declared inline as a value — with the same parameter and
-          return syntax as a top-level function — and called immediately, or stored and called later:
+          A <code>def</code> block can be declared inline as a value - with the same parameter and
+          return syntax as a top-level function - and called immediately, or stored and called later:
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -2342,7 +2354,7 @@ def simulate(initial byte[], width int, height int, generations int) !byte[] {
 }()</code></pre>
         </div>
         <p>
-          It closes over surrounding variables by reference, the same way a deferred call does — give
+          It closes over surrounding variables by reference, the same way a deferred call does - give
           it a name and it can even call itself, which is otherwise the only reason to name one:
         </p>
         <div class="code-window">
@@ -2357,7 +2369,7 @@ def simulate(initial byte[], width int, height int, generations int) !byte[] {
         </div>
         <p>
           An anonymous function can still have an <code>asm</code>, <code>sql</code>, or <code>cuda</code>
-          body — but it can't be <code>meta</code> or <code>infix</code>, and doesn't accept
+          body - but it can't be <code>meta</code> or <code>infix</code>, and doesn't accept
           <code>internal</code> or <code>atomic</code>; those only make sense on a named declaration.
         </p>
 
@@ -2379,7 +2391,7 @@ let c = a.mapElem((v int) =&gt; v + 1)</code></pre>
       <div class="docs-sub" id="defer">
         <h3>Defer</h3>
         <p>
-          <code>defer</code> schedules a call to run at the end of the current function's scope —
+          <code>defer</code> schedules a call to run at the end of the current function's scope -
           typically cleanup, like closing a resource opened earlier in the same function:
         </p>
         <div class="code-window">
@@ -2395,7 +2407,7 @@ let c = a.mapElem((v int) =&gt; v + 1)</code></pre>
 }</code></pre>
         </div>
         <p>
-          Multiple deferred calls run in reverse order — last deferred, first run — so the code above
+          Multiple deferred calls run in reverse order - last deferred, first run - so the code above
           prints <code>body</code>, then <code>second</code>, then finally closes <code>f</code>.
         </p>
       </div>
@@ -2406,14 +2418,14 @@ let c = a.mapElem((v int) =&gt; v + 1)</code></pre>
       <p>
         Errors are values, not exceptions. A function that can fail says so in its return type, and a
         failure propagates up the call stack on its own until something tests for it, recovers it, or
-        the program crashes — there's no hidden control-flow jump to catch.
+        the program crashes - there's no hidden control-flow jump to catch.
       </p>
 
       <div class="docs-sub" id="errorable-types">
         <h3>Errorable Types</h3>
         <p>
           <code>!T</code> marks a value that might be a <code>T</code> or might be an error. If a
-          function's body contains <code>fail</code>, its return type has to be errorable — the
+          function's body contains <code>fail</code>, its return type has to be errorable - the
           compiler checks this, not just a convention:
         </p>
         <div class="code-window">
@@ -2438,7 +2450,7 @@ def name(a int) !int {
 }</code></pre>
         </div>
         <p>
-          An errorable value has to be dealt with before you can use it as a plain value — either test
+          An errorable value has to be dealt with before you can use it as a plain value - either test
           it, or use <code>try</code> to propagate the error to whoever called you instead of handling
           it here:
         </p>
@@ -2447,7 +2459,7 @@ def name(a int) !int {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">try.adm</span>
           </div>
-          <pre><code>// open returns !File — f might be a File, or an error
+          <pre><code>// open returns !File - f might be a File, or an error
 let f !File = open("file")
 
 // try unwraps it to a plain File, or bails out of this function
@@ -2478,7 +2490,7 @@ fail MyCustomStruct{message: "reason", traceid: id}</code></pre>
         </div>
         <p>
           <code>onerror</code> attaches a handler to a call. <code>recover</code> stops the error there
-          and supplies a fallback — a value, another call, or a whole block if you need more logic —
+          and supplies a fallback - a value, another call, or a whole block if you need more logic -
           instead of letting the error keep propagating:
         </p>
         <div class="code-window">
@@ -2518,7 +2530,7 @@ let c = mightFail(false) onerror return 0</code></pre>
       <div class="docs-sub" id="contracts">
         <h3>Contracts</h3>
         <p>
-          <code>expects</code> and <code>provides</code> wrap a function with assertions — preconditions
+          <code>expects</code> and <code>provides</code> wrap a function with assertions - preconditions
           checked before the body runs, postconditions checked after, no matter which <code>return</code>
           path was taken. Because a failed assertion is itself a failure, a function using either block
           has to return an errorable type:
@@ -2573,7 +2585,7 @@ let c = mightFail(false) onerror return 0</code></pre>
         <p>
           <code>begin</code> and <code>rollback</code> blocks declare how a function saves and restores
           state, but they only actually run when that function is called from inside a
-          <code>transaction { ... }</code> region — outside one, they're skipped entirely:
+          <code>transaction { ... }</code> region - outside one, they're skipped entirely:
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -2629,7 +2641,7 @@ def someFunction(x int) {
       <div class="docs-sub" id="async-await-futures">
         <h3>Async / Await / Futures</h3>
         <p>
-          An <code>async</code> function returns a future — <code>async T</code> — instead of a
+          An <code>async</code> function returns a future - <code>async T</code> - instead of a
           <code>T</code> directly. <code>await</code> unwraps it; using an <code>async T</code> without
           awaiting it (or propagating it onward as <code>async</code>) is a type error:
         </p>
@@ -2647,7 +2659,7 @@ def new(args string[]) int {
 	return 0
 }</code></pre>
         </div>
-        <p>Any call — async function or not — can run in the background just by prefixing it with <code>async</code>:</p>
+        <p>Any call - async function or not - can run in the background just by prefixing it with <code>async</code>:</p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -2701,7 +2713,7 @@ print("int") when v is int</code></pre>
 homepage.timeout(3s)</code></pre>
         </div>
         <p>
-          <code>try</code> and <code>await</code> compose in either order on an errorable future —
+          <code>try</code> and <code>await</code> compose in either order on an errorable future -
           <code>try await f()</code> and <code>await try f()</code> both work.
         </p>
       </div>
@@ -2709,7 +2721,7 @@ homepage.timeout(3s)</code></pre>
       <div class="docs-sub" id="channels">
         <h3>Channels</h3>
         <p>
-          A channel is a typed pipe between workers — <code>chan &lt;- value</code> sends,
+          A channel is a typed pipe between workers - <code>chan &lt;- value</code> sends,
           <code>&lt;-chan</code> receives. An unbuffered channel (the default) blocks the sender until
           a receiver is ready; a buffered one has room for values to queue up:
         </p>
@@ -2725,7 +2737,7 @@ let v = &lt;-ch
 println(v)</code></pre>
         </div>
         <p>
-          <code>new channel&lt;T&gt;(size=?, mode=?)</code> is the full constructor — <code>size</code>
+          <code>new channel&lt;T&gt;(size=?, mode=?)</code> is the full constructor - <code>size</code>
           defaults to <code>0</code> (unbuffered), and <code>mode</code> (FIFO/LIFO/priority) defaults
           to FIFO. A channel exposes a <code>closed</code> property, and the range form of
           <code>for</code> drains it until the producer closes it: <code>for let value in channel { ... }</code>.
@@ -2756,7 +2768,7 @@ select {
         </div>
         <p>
           There's no fall-through, so <code>continue</code> isn't allowed inside a <code>select</code>
-          case — every case either handles its event or control leaves the <code>select</code> entirely.
+          case - every case either handles its event or control leaves the <code>select</code> entirely.
         </p>
       </div>
     </section>
@@ -2799,12 +2811,12 @@ request.tags().set("")               // clear</code></pre>
         </div>
         <p>
           Strings, arrays, maps, channels, errors, <code>any</code>, closures and instances of declared
-          types carry their tags on the object itself — <code>struct</code> instances included, since
+          types carry their tags on the object itself - <code>struct</code> instances included, since
           they are heap-backed. Numbers, <code>bool</code>, <code>char</code> and enums have no
           identity, so their tags belong to the
           <em>variable</em> holding them: <code>let x = 5; x.tags().add("trusted")</code> tags
           <code>x</code>'s storage, and the compiler moves the tags with the value through bindings,
-          arguments and returns. A copy shares the set until its first mutation, then gets its own —
+          arguments and returns. A copy shares the set until its first mutation, then gets its own -
           tagging a copy never changes the original. Only named storage can be tagged:
           <code>5.tags()</code> and <code>(a + b).tags()</code> are compile errors. Tags do not cross
           indirect calls, and scalar array elements or struct fields do not carry tags yet.
@@ -2850,13 +2862,23 @@ let got = &lt;-ch                  // got.tags() is request.tags()</code></pre>
       <p>
         A <code>service</code> behaves like an OS service: the ADM service manager starts it before
         <code>application.new</code> runs and stops it on shutdown, and it owns exclusive access to
-        one slice of the platform — networking, storage, the UI surface, whatever it's responsible for.
+        one slice of the platform - networking, storage, the UI surface, whatever it's responsible for.
       </p>
       <p>
         A service method is one of three kinds: <code>@query()</code> reads a snapshot of its state,
         <code>@commit()</code> mutates it and emits a typed <code>Event&lt;T&gt;</code> that other code
-        can react to, and <code>@emit()</code> only exists to describe that event's shape — it can't be
+        can react to, and <code>@emit()</code> only exists to describe that event's shape - it can't be
         called directly.
+      </p>
+      <p>
+        Those annotated methods are the whole public surface. Fields are always private to the
+        service, and a <code>def</code> without an annotation is internal: callable from the service's
+        own methods, refused from anywhere else (<code>method "helper" is internal to service
+        Counter</code>). The manager's members are the exception: the <code>ServiceDescriptor</code>
+        fields (<code>description</code>, <code>dependencies</code>, <code>lifecycle</code>,
+        <code>permissions</code>, <code>status</code>) and the <code>ServiceHooks</code> methods (<code>config</code>,
+        <code>start</code>, <code>stop</code>, <code>restart</code>) stay reachable. <code>@commit()</code> may be <code>async</code>; <code>@query()</code> and
+        <code>@emit()</code> may not.
       </p>
       <div class="code-window">
         <div class="code-titlebar">
@@ -2892,13 +2914,15 @@ def log(evt Event&lt;string&gt;) {
       </div>
       <p>
         <code>Network.open("...")</code> calls straight into the service like any other function. The
-        handler subscribed with <code>@on(Service.method, ?filter)</code> takes exactly one argument —
-        <code>Event&lt;T&gt;</code>, where <code>T</code> is that method's return type — and an optional
-        <code>filter</code> to only react to some events.
+        handler subscribed with <code>@on(Service.method, ?filter)</code> takes exactly one argument -
+        <code>Event&lt;T&gt;</code>, where <code>T</code> is that method's return type - and an optional
+        <code>filter</code> to only react to some events. What the event carries, when handlers run,
+        and how the manager starts, restarts and reports services is covered under
+        <a href="services.html#events">Services → Events and observers</a>.
       </p>
       <p>
         Services can't be constructed with <code>new</code> and can't declare their own
-        <code>new</code>/<code>dispose</code> — the manager owns that lifecycle entirely.
+        <code>new</code>/<code>dispose</code> - the manager owns that lifecycle entirely.
         <code>@commit()</code> methods are implicitly <code>atomic</code>; <code>@query()</code> and
         <code>@emit()</code> can never be <code>async</code>; and <code>infix</code> is rejected outright,
         since nothing ever operates on a service like a value. A service can still be <code>internal</code>
@@ -2912,9 +2936,9 @@ def log(evt Event&lt;string&gt;) {
       <table class="docs-table">
         <tr><th>Service</th><th>Description</th></tr>
         <tr><td>Application</td><td>Application details (PID, executable path, start time, uptime) and lifecycle methods (exit/restart).</td></tr>
-        <tr><td>Runtime</td><td>The ADM runtime itself — memory/CPU/OS/GC/heap info, environment variable reads.</td></tr>
-        <tr><td>Storage</td><td>Permanent storage (disk) — open files, disk usage, read/write metrics.</td></tr>
-        <tr><td>Network</td><td>All networking — connections, metrics, firewalling.</td></tr>
+        <tr><td>Runtime</td><td>The ADM runtime itself - memory/CPU/OS/GC/heap info, environment variable reads.</td></tr>
+        <tr><td>Storage</td><td>Permanent storage (disk) - open files, disk usage, read/write metrics.</td></tr>
+        <tr><td>Network</td><td>All networking - connections, metrics, firewalling.</td></tr>
         <tr><td>Cache</td><td>Fast in-memory cache, Redis-like.</td></tr>
         <tr><td>Scheduler</td><td>Cron-style scheduling of methods at configurable intervals or times.</td></tr>
         <tr><td>Logging</td><td>Leveled logging, log rotation, log shipping.</td></tr>
@@ -2933,7 +2957,7 @@ def log(evt Event&lt;string&gt;) {
       <h2>UI</h2>
       <p>
         ADM's UI is built from three pieces bound together into a <a href="#components">component</a>:
-        a view (structure), a style (appearance), and a controller (behavior) — all written in plain
+        a view (structure), a style (appearance), and a controller (behavior) - all written in plain
         ADM, not a separate template language.
       </p>
 
@@ -2942,8 +2966,8 @@ def log(evt Event&lt;string&gt;) {
         <p>
           A view body is a regular ADM block. Components are instantiated like function calls
           (<code>Button("Logout", onClick=doLogout())</code>), children go in a trailing
-          <code>{ ... }</code> block, and ordinary control flow — <code>if</code>/<code>else</code>,
-          <code>for</code>, <code>match</code>, the <code>when</code> guard — works right inside it:
+          <code>{ ... }</code> block, and ordinary control flow - <code>if</code>/<code>else</code>,
+          <code>for</code>, <code>match</code>, the <code>when</code> guard - works right inside it:
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -2975,7 +2999,7 @@ def log(evt Event&lt;string&gt;) {
         </div>
         <p>
           A style body is the same idea applied to appearance: a regular block, run in a scope that
-          predeclares context variables — <code>centered</code>, <code>box</code>, <code>on</code>,
+          predeclares context variables - <code>centered</code>, <code>box</code>, <code>on</code>,
           <code>children</code>, plus layout references like <code>root</code>/<code>parent</code>/<code>prev</code>/<code>next</code>.
           Assigning a struct literal to one overrides the base style; <code>let</code> introduces a
           reusable snippet:
@@ -3017,7 +3041,7 @@ def log(evt Event&lt;string&gt;) {
 }</code></pre>
         </div>
         <p>
-          Views and styles can't be <code>partial</code> or annotated — they're pure templates. Declare
+          Views and styles can't be <code>partial</code> or annotated - they're pure templates. Declare
           one standalone with a name, like <code>MyView</code> above, and a component can reference it
           by that name; or write it anonymously, inline inside the component itself.
         </p>
@@ -3027,10 +3051,10 @@ def log(evt Event&lt;string&gt;) {
         <h3>Components</h3>
         <p>
           A <code>component</code> binds a view, a style, and a controller <code>type</code> together.
-          The UI service asks for a window or surface and renders the component tree — the same
+          The UI service asks for a window or surface and renders the component tree - the same
           component source targets a desktop window or a WASM/web canvas; the backend decides which.
         </p>
-        <p>Reference named view/style/type declarations, or write every piece anonymously inline — both are the same construct:</p>
+        <p>Reference named view/style/type declarations, or write every piece anonymously inline - both are the same construct:</p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -3054,7 +3078,7 @@ component myComponent {
 }</code></pre>
         </div>
         <p>
-          The controller <code>type</code> is where state and event handling live — a regular
+          The controller <code>type</code> is where state and event handling live - a regular
           <code>type</code>, following every rule from <a href="#type">Types</a> (imports, annotations,
           <code>internal</code> members, infix methods, all of it):
         </p>
@@ -3077,7 +3101,7 @@ component myComponent {
 }</code></pre>
         </div>
         <p>
-          A component can be <code>partial</code>, but its embedded view and style can't be — only the
+          A component can be <code>partial</code>, but its embedded view and style can't be - only the
           component wrapper splits across files. UI events are delivered through the
           <a href="#services">UI service</a>; a controller method opts in by annotating itself, the way
           <code>onClick</code> does above.
@@ -3088,9 +3112,10 @@ component myComponent {
     <section class="docs-section" id="attributes-modifiers">
       <h2>Attributes &amp; Modifiers</h2>
       <p>
-        Attributes (<code>@name(...)</code>) attach metadata to a declaration. Modifiers
+        Attributes (<code>@name(...)</code>, or just <code>@name</code> when no arguments are
+        passed) attach metadata to a declaration. Modifiers
         (<code>internal</code>, <code>partial</code>, ...) change how a declaration behaves. Both have
-        shown up throughout these docs already — this section is the reference for each.
+        shown up throughout these docs already - this section is the reference for each.
         Every attribute the compiler and the standard library ship is catalogued on the
         <a href="annotations.html">Annotations</a> page.
       </p>
@@ -3099,7 +3124,7 @@ component myComponent {
         <h3>Attributes</h3>
         <p>
           An attribute's arguments can be positional or named, same as a regular call, and every
-          attribute is preserved in compiled metadata — tooling and runtime reflection can inspect it,
+          attribute is preserved in compiled metadata - tooling and runtime reflection can inspect it,
           it's not just a compile-time note to the compiler:
         </p>
         <div class="code-window">
@@ -3111,7 +3136,7 @@ component myComponent {
 internal const version string</code></pre>
         </div>
         <p>
-          <code>meta def</code> is how an attribute like this gets defined in the first place — it's
+          <code>meta def</code> is how an attribute like this gets defined in the first place - it's
           what <code>@trim</code> from <a href="#params-returns">Params &amp; Returns</a> actually is:
         </p>
         <div class="code-window">
@@ -3125,7 +3150,7 @@ internal const version string</code></pre>
 }</code></pre>
         </div>
         <p>
-          The context parameter's type is what limits where an attribute can be used — one that takes
+          The context parameter's type is what limits where an attribute can be used - one that takes
           a <code>ParameterMetaContext</code> only makes sense on a parameter, one built around a
           service-specific context only makes sense on a <code>service</code>. Overload the same
           <code>meta def</code> with a different context type to let it target more than one kind of
@@ -3134,7 +3159,7 @@ internal const version string</code></pre>
 
         <p>
           A handful of attributes are built into the compiler itself. <code>@cfg(...)</code>
-          conditionally compiles a declaration — the excluded copy isn't just skipped, it's never even
+          conditionally compiles a declaration - the excluded copy isn't just skipped, it's never even
           required to parse:
         </p>
         <div class="code-window">
@@ -3159,7 +3184,7 @@ const SEPARATOR = "\\"</code></pre>
         </p>
         <p>
           <code>@embed(path)</code> is the other built-in: it stages a file's bytes (or a whole
-          directory) into a <code>const</code> at compile time — <code>byte[]</code> for a file,
+          directory) into a <code>const</code> at compile time - <code>byte[]</code> for a file,
           <code>std.os.FileSystem</code> for a directory. The standard library also reserves names for
           annotations like <code>@derive</code>, <code>@mock</code>, and <code>@sqlschema</code>, built
           on the same compile-time mechanism.
@@ -3202,7 +3227,7 @@ const SEPARATOR = "\\"</code></pre>
           <tr><td><code>asm</code>, <code>cuda</code>, <code>sql</code>, <code>meta</code></td><td>functions</td>
             <td>Body is a foreign DSL, or (for <code>meta</code>) defines a new attribute. See <a href="#params-returns">Params &amp; Returns</a>.</td></tr>
           <tr><td><code>infix</code></td><td>methods</td>
-            <td>Operator-style invocation (<code>a + b</code>). Only on type methods — see <a href="#type-methods">Types → Methods</a>.</td></tr>
+            <td>Operator-style invocation (<code>a + b</code>). Only on type methods - see <a href="#type-methods">Types → Methods</a>.</td></tr>
         </table>
       </div>
     </section>
@@ -3212,7 +3237,7 @@ const SEPARATOR = "\\"</code></pre>
       <p>
         ADM can call into any language that exposes a C-compatible ABI directly, and reach a few more
         through embedded VMs or bridging layers. Only a <a href="#modules-namespaces">module</a> body
-        can host a foreign declaration — a function signature with no block body, ending in
+        can host a foreign declaration - a function signature with no block body, ending in
         <code>;</code>:
       </p>
       <div class="code-window">
@@ -3243,15 +3268,15 @@ const SEPARATOR = "\\"</code></pre>
       </div>
       <p>
         A few rules keep these declarations honest: only module bodies can have a body-less
-        <code>def</code> — applications, types, and services always need a real one. They can't be
+        <code>def</code> - applications, types, and services always need a real one. They can't be
         <code>asm</code>, <code>sql</code>, <code>cuda</code>, <code>meta</code>, or <code>infix</code>,
-        and every parameter/return type has to be representable in the target language — no channels,
+        and every parameter/return type has to be representable in the target language - no channels,
         optionals, errorables, or ADM-only composites. <code>atomic</code>/<code>async</code> still work
         as wrappers around the call even though the body itself is foreign.
       </p>
       <p>
         For binding a whole library at once instead of one function at a time, annotate the module
-        itself — this is the same <code>@link("GL")</code> mechanism <a href="#modules-namespaces">Modules &amp; Namespaces</a>
+        itself - this is the same <code>@link("GL")</code> mechanism <a href="#modules-namespaces">Modules &amp; Namespaces</a>
         already showed for the OpenGL bindings:
       </p>
       <div class="code-window">
@@ -3280,8 +3305,8 @@ module Math {
       <h2>Testing</h2>
       <p>
         <code>check</code> blocks keep tests next to the code they verify, instead of a separate
-        framework bolted on top. They're parsed and type-checked right alongside production code —
-        so a broken test surfaces immediately — but the compiler drops them from the final binary
+        framework bolted on top. They're parsed and type-checked right alongside production code -
+        so a broken test surfaces immediately - but the compiler drops them from the final binary
         unless <code>adm test</code> is what's asking for them.
       </p>
 
@@ -3289,7 +3314,7 @@ module Math {
         <h3>Unit Tests</h3>
         <p>
           A <code>check "name" { ... }</code> block is legal at file scope and inside modules, types,
-          services, components, and applications — just not inside a function body. If it has no
+          services, components, and applications - just not inside a function body. If it has no
           explicit <code>@test()</code> function, its top-level statements run as one synthetic test:
         </p>
         <div class="code-window">
@@ -3308,7 +3333,7 @@ module Math {
 	}
 }</code></pre>
         </div>
-        <p>Name individual cases with <code>@test()</code> instead, and each one runs — and reports — separately:</p>
+        <p>Name individual cases with <code>@test()</code> instead, and each one runs - and reports - separately:</p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -3328,8 +3353,8 @@ module Math {
 }</code></pre>
         </div>
         <p>
-          A suite can also declare <code>use</code> imports, constants, structs, and helper functions —
-          all scoped to that suite, never exported — plus lifecycle hooks from <code>std.testing</code>
+          A suite can also declare <code>use</code> imports, constants, structs, and helper functions -
+          all scoped to that suite, never exported - plus lifecycle hooks from <code>std.testing</code>
           (<code>beforeAll</code>, <code>beforeEach</code>, <code>afterAll</code>, <code>afterEach</code>),
           and can nest other <code>check</code> blocks to group related tests. Files named
           <code>_test.adm</code> or <code>.test.adm</code> are discovered automatically; run everything
@@ -3340,7 +3365,7 @@ module Math {
       <div class="docs-sub" id="benchmarks">
         <h3>Benchmarks</h3>
         <p>
-          <code>@benchmark()</code> marks a suite function as a benchmark instead of a test — same
+          <code>@benchmark()</code> marks a suite function as a benchmark instead of a test - same
           <code>check</code> block, same scoping rules:
         </p>
         <div class="code-window">
@@ -3410,10 +3435,10 @@ module Math {
         <tr><td><code>__file_hash__</code></td><td>Compiler-generated hash of the file contents (used for caching).</td></tr>
         <tr><td><code>__line__</code></td><td>Current line number, 1-based.</td></tr>
         <tr><td><code>__module__</code></td><td>Fully-qualified module of the current file.</td></tr>
-        <tr><td><code>__name__</code></td><td>Current symbol name — function, type, method, and so on.</td></tr>
+        <tr><td><code>__name__</code></td><td>Current symbol name - function, type, method, and so on.</td></tr>
       </table>
       <p>
-        <code>__build_id__</code> also exists and changes on every build — see
+        <code>__build_id__</code> also exists and changes on every build - see
         <a href="#admapp-manifest"><code>adm.toml</code> Manifest</a>, which covers it alongside the
         identity constants a manifest fills in.
       </p>

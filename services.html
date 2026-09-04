@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Services — adm</title>
+<title>Services - adm</title>
 <meta name="description" content="Reference for the builtin ADM services and their annotations.">
 <link rel="icon" type="image/svg+xml" href="assets/adm.svg">
 <link rel="canonical" href="https://adm-lang.dev/services.html">
@@ -46,7 +46,12 @@
   <aside class="docs-sidebar">
     <nav class="docs-nav" id="docs-nav">
 
-      <div class="docs-nav-group"><a class="docs-nav-top" href="#overview">Overview</a></div>
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#overview">Overview</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#events">Events and observers</a></li>
+        </ul>
+      </div>
       <div class="docs-nav-group">
         <a class="docs-nav-top" href="#builtin">Builtin services</a>
         <ul class="docs-sub-list">
@@ -108,12 +113,22 @@
     <section class="docs-section" id="overview">
       <h2>Services</h2>
       <p>
-        The builtin services are always available — no import of an instance, no construction. The
+        The builtin services are always available - no import of an instance, no construction. The
         ADM service manager starts them before <code>application.new</code> runs and stops them on
         shutdown, so calling one is just <code>Cache.get("k")</code>. For the language rules behind
         <code>service</code> declarations, see <a href="docs.html#services">Services</a> in the docs.
       </p>
-      <p>Every public method is one of three kinds:</p>
+      <p>
+        A service's public surface is exactly its annotated methods. Fields are always private, and a
+        <code>def</code> with no annotation is internal to the service: it can be called by the
+        service's own methods (<code>method "helper" is internal to service
+        Counter</code>, <code>field "count" is internal to service Counter</code>). Only the members
+        the manager relies on are exempt: the <code>ServiceDescriptor</code> fields
+        (<code>description</code>, <code>dependencies</code>, <code>lifecycle</code>,
+        <code>permissions</code>, <code>status</code>) and the <code>ServiceHooks</code> methods (<code>config</code>,
+        <code>start</code>, <code>stop</code>, <code>restart</code>). Every public method is one of
+        three kinds:
+      </p>
       <table class="docs-table">
         <tr>
           <td><span class="api-tag api-query">query</span></td>
@@ -121,12 +136,12 @@
         </tr>
         <tr>
           <td><span class="api-tag api-commit">commit</span></td>
-          <td>Mutates state and emits a typed event. Implicitly <code>atomic</code>.</td>
+          <td>Mutates state and emits a typed event. Implicitly <code>atomic</code>; may be <code>async</code>.</td>
         </tr>
         <tr>
           <td><span class="api-tag api-emit">emit</span></td>
           <td>
-            Describes an event's shape only — you subscribe to it with
+            Describes an event's shape only - you subscribe to it with
             <code>@on(Service.method)</code> and never call it.
           </td>
         </tr>
@@ -152,9 +167,71 @@ def onExpiry(evt Event&lt;string&gt;) {
 	println("expired {evt.result}")
 }</code></pre>
       </div>
+
+      <div class="docs-subsection" id="events">
+        <h3>Events and observers</h3>
+        <p>
+          Every <code>@commit()</code> call emits an event; there is no way to run a commit silently.
+          The event is named after the method, carries the arguments it was called with, and carries
+          what it returned. It is an ordinary value, <code>Event&lt;T&gt;</code> from the prelude:
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">builtin</span>
+          </div>
+          <pre><code>struct Event&lt;T&gt; {
+	source service           // the service that emitted it
+	name   string            // the method name: "open"
+	params map&lt;string, any&gt;  // the call's named arguments: {"path": "data.txt"}
+	result T                 // the method's return value, exactly its declared type (T, ?T or !T)
+	time   time.Time         // reserved; not populated yet
+}</code></pre>
+        </div>
+        <p>
+          So <code>Storage.open("data.txt")</code> hands the caller the file and hands every observer
+          an <code>Event&lt;os.File&gt;</code> with <code>name = "open"</code>,
+          <code>params["path"] = "data.txt"</code> and <code>result</code> set to that same file. An
+          <code>@emit()</code> method is the secondary form: the service calls it from inside a commit
+          (<code>opened(file)</code>) to publish a named event whose <code>result</code> is the
+          value it was given and whose <code>params</code> are empty. <code>@query()</code> methods
+          never emit. Emitting an event that no method declares is a compile error.
+        </p>
+        <p>
+          <code>@on(Service.method)</code> subscribes a handler: a free function or a method, taking
+          exactly one argument, the <code>Event&lt;T&gt;</code> for that method's return type. Handlers
+          run synchronously inside the commit, after the method body returns and before the caller
+          gets the result, so by the time <code>Storage.open</code> returns every observer has seen the
+          event. A handler cannot change the commit's result. A second argument filters:
+          <code>@on(Storage.open, audit)</code> with <code>def audit(ev Event&lt;os.File&gt;) bool</code>
+          runs the handler only for events the filter accepts; the filter sees the same event record.
+          A method handler on a service runs on that service's singleton; a method handler on any other
+          type runs on one lazily created instance of it.
+        </p>
+        <p>
+          The <code>Event</code> is read straight through its fields: <code>ev.result</code>,
+          <code>ev.params["path"]</code>, <code>ev.name</code>. Commits are serialized per service
+          (implicitly <code>atomic</code>), so observers only ever see completed state, and events are
+          not stored: a handler registered after a commit does not see it.
+        </p>
+        <p>
+          The service manager owns lifecycle. Services whose <code>lifecycle.start</code> is
+          <code>StartMode.Automatic</code> are started before <code>application.new</code> runs, in
+          the order their <code>dependencies</code> require; <code>StartMode.Manual</code> services
+          wait for code to call <code>start()</code>. <code>lifecycle.restart</code> decides what a
+          failed <code>start</code> gets: <code>Never</code>, <code>OnFailure</code> (retried) or
+          <code>Always</code> (retried more), and the outcome lands in the service's
+          <code>status</code> field as a <code>ServiceStatus</code>
+          (<code>Starting</code>, <code>Started</code>, <code>Stopping</code>, <code>Stopped</code>,
+          <code>Restarting</code>, <code>Failed</code>). Calling <code>start</code>/<code>stop</code>/
+          <code>restart</code> yourself goes through the manager too, so <code>status</code> stays
+          truthful. Services are singletons that never expire and cannot be constructed with
+          <code>new</code>; all of them stop at shutdown.
+        </p>
+      </div>
       <p>
-        Services also ship <a href="#annotations">annotations</a> — <code>@cache</code>,
-        <code>@metric</code>, <code>@measureTime</code> and friends — that wrap a declaration instead
+        Services also ship <a href="#annotations">annotations</a> - <code>@cache</code>,
+        <code>@metric</code>, <code>@measureTime</code> and friends - that wrap a declaration instead
         of being called. Import them by name (<code>use std.services::(cache)</code>). An annotation
         that accepts more than one kind of target must be written qualified
         (<code>use std.services</code> then <code>@services.trace()</code>), because a by-name import
@@ -492,11 +569,11 @@ def onExpiry(evt Event&lt;string&gt;) {
       <div class="docs-sub" id="svc-devices">
         <h3><code>Devices</code></h3>
         <p>Cameras, microphones, USB, and other attached hardware.</p>
-        <p class="docs-placeholder">Planned — no public methods yet.</p>
+        <p class="docs-placeholder">Planned - no public methods yet.</p>
       </div>
       <div class="docs-sub" id="svc-diagnostics">
         <h3><code>Diagnostics</code></h3>
-        <p>Named metric registry — counters, gauges, histograms, and toggles.</p>
+        <p>Named metric registry - counters, gauges, histograms, and toggles.</p>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def register&lt;T: Metric&gt;(name string) !T</code></div>
@@ -525,12 +602,12 @@ def onExpiry(evt Event&lt;string&gt;) {
       <div class="docs-sub" id="svc-i18n">
         <h3><code>I18n</code></h3>
         <p>Locale selection and message catalogs.</p>
-        <p class="docs-placeholder">Planned — no public methods yet.</p>
+        <p class="docs-placeholder">Planned - no public methods yet.</p>
       </div>
       <div class="docs-sub" id="svc-ipc">
         <h3><code>IPC</code></h3>
         <p>Inter-process communication between ADM applications.</p>
-        <p class="docs-placeholder">Planned — no public methods yet.</p>
+        <p class="docs-placeholder">Planned - no public methods yet.</p>
       </div>
       <div class="docs-sub" id="svc-logging">
         <h3><code>Logging</code></h3>
@@ -574,7 +651,7 @@ def onExpiry(evt Event&lt;string&gt;) {
       <div class="docs-sub" id="svc-messaging">
         <h3><code>Messaging</code></h3>
         <p>In-memory queues and topics.</p>
-        <p class="docs-placeholder">Planned — no public methods yet.</p>
+        <p class="docs-placeholder">Planned - no public methods yet.</p>
       </div>
       <div class="docs-sub" id="svc-network">
         <h3><code>Network</code></h3>
@@ -761,7 +838,7 @@ def onExpiry(evt Event&lt;string&gt;) {
       </div>
       <div class="docs-sub" id="svc-runtime">
         <h3><code>Runtime</code></h3>
-        <p>The ADM runtime itself — host info, memory, environment, service registry.</p>
+        <p>The ADM runtime itself - host info, memory, environment, service registry.</p>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def systemInfo() SystemInfo</code></div>
@@ -973,7 +1050,7 @@ def onExpiry(evt Event&lt;string&gt;) {
       <div class="docs-sub" id="svc-telemetry">
         <h3><code>Telemetry</code></h3>
         <p>Telemetry export.</p>
-        <p class="docs-placeholder">Planned — no public methods yet.</p>
+        <p class="docs-placeholder">Planned - no public methods yet.</p>
       </div>
       <div class="docs-sub" id="svc-ui">
         <h3><code>UI</code></h3>
@@ -1068,14 +1145,14 @@ def onExpiry(evt Event&lt;string&gt;) {
       <div class="docs-sub" id="svc-vault">
         <h3><code>Vault</code></h3>
         <p>Encrypted storage for secrets.</p>
-        <p class="docs-placeholder">Planned — no public methods yet.</p>
+        <p class="docs-placeholder">Planned - no public methods yet.</p>
       </div>
     </section>
 
     <section class="docs-section" id="annotations">
       <h2>Annotations</h2>
       <p>
-        Each entry shows the annotation as it is written at a use site — the meta context
+        Each entry shows the annotation as it is written at a use site - the meta context
         parameter and any type parameter inferred from the target are not spelled out.
       </p>
       <div class="docs-sub" id="meta-migration">
@@ -1261,7 +1338,7 @@ def logHere(message string) {
         <pre class="api-siglist"><code>@metric(name string)</code></pre>
         <p class="api-doc">Registers a metric using the annotated field's metric type and assigns the resulting metric handle to the field.</p>
         <p class="api-doc">If a metric with the same name and type already exists, the existing metric is used. Registration fails if the name is already registered with a different metric type.</p>
-        <p class="api-note">The field’s own type selects the metric kind — no type argument is written.</p>
+        <p class="api-note">The field’s own type selects the metric kind - no type argument is written.</p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>

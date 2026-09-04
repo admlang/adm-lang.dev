@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Annotations — adm</title>
+<title>Annotations - adm</title>
 <meta name="description" content="Every annotation shipped with the ADM compiler and standard library: what it does, where it applies, and how to write your own.">
 <link rel="icon" type="image/svg+xml" href="assets/adm.svg">
 <link rel="canonical" href="https://adm-lang.dev/annotations.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="adm">
-<meta property="og:title" content="adm — Annotations">
+<meta property="og:title" content="adm - Annotations">
 <meta property="og:description" content="Every annotation shipped with the ADM compiler and standard library: what it does, where it applies, and how to write your own.">
 <meta property="og:url" content="https://adm-lang.dev/annotations.html">
 <meta property="og:image" content="https://adm-lang.dev/assets/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="adm — Annotations">
+<meta name="twitter:title" content="adm - Annotations">
 <meta name="twitter:description" content="Every annotation shipped with the ADM compiler and standard library: what it does, where it applies, and how to write your own.">
 <meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
 <link rel="stylesheet" href="styles.css">
@@ -132,7 +132,9 @@
 <p>On a variable or constant: fills it from the environment variable <code>name</code>, or the default when unset.</p>
       <h4><code>@flag(name, description, defaultValue = &quot;&quot;)</code></h4>
 <p>On a variable: wires it to a command-line flag of the application, with its help text.</p>
-      <h4><code>@deprecated(message, since = &quot;&quot;)</code></h4>
+      <h4><code>@implicit</code></h4>
+<p>On a constructor with exactly one parameter: a value of that parameter's type converts to the type wherever the type is expected (arguments, assignments, returns), the way a <code>T</code> becomes a <code>?T</code>. The constructor cannot fail; the conversion is inward only and one hop. </p>
+      <h4><code>@deprecated(message = &quot;&quot;, since = &quot;&quot;)</code></h4>
 <p>Warns at every use of the declaration with the given message.</p>
       <h4><code>@inline()  @noinline()</code></h4>
 <p>Asks the backend to inline the function, or forbids it.</p>
