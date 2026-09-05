@@ -14,6 +14,8 @@ list sits at the top of it and each page's own sections follow:
 | `annotations.html` — Annotations | hand-written; keep in step with the `meta def`s in `internal/prelude` and `std` |
 | `app-home.html` — Application home & migrations | hand-written; source design in `docs/requirements/app-home.md` |
 | `plugins.html` — Plugins | hand-written; source design in `docs/requirements/plugins.md` |
+| `libraries.html` — Libraries | hand-written; source design in `docs/requirements/libraries.md` |
+| `cli.html` — Command line | hand-written from `adm <command> --help`; keep in step with `internal/commands` |
 
 To add a page: copy the header, the `.docs-pages` block and the footer from one of
 them, add the page to the list in every sibling (and to `PAGES` in the generator),

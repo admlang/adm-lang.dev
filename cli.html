@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Command line - adm</title>
+<meta name="description" content="ADM command line reference: every adm command and subcommand, what it does and its flags.">
+<link rel="icon" type="image/svg+xml" href="assets/adm.svg">
+<link rel="canonical" href="https://adm-lang.dev/cli.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="adm">
+<meta property="og:title" content="adm command line">
+<meta property="og:description" content="Every adm command and subcommand, what it does and its flags.">
+<meta property="og:url" content="https://adm-lang.dev/cli.html">
+<meta property="og:image" content="https://adm-lang.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="adm command line">
+<meta name="twitter:description" content="Every adm command and subcommand, what it does and its flags.">
+<meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/adm.svg" alt="ADM" class="brand-mark">
+      <span class="brand-name"><span class="brand-sub">programming language</span></span>
+    </a>
+    <nav class="nav">
+      <a href="docs.html" class="nav-active">Docs</a>
+      <a href="examples.html">Examples</a>
+      <a href="services.html">Services</a>
+      <a href="modules.html">Modules</a>
+      <a class="nav-icon" href="https://github.com/admlang" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs-layout">
+
+  <aside class="docs-sidebar">
+    <nav class="docs-nav" id="docs-nav">
+
+      <div class="docs-pages">
+        <span class="docs-pages-label">Docs</span>
+        <a class="docs-page-link" href="docs.html">Language reference</a>
+        <a class="docs-page-link" href="memory.html">Memory model</a>
+        <a class="docs-page-link" href="annotations.html">Annotations</a>
+        <a class="docs-page-link" href="app-home.html">Application home &amp; migrations</a>
+        <a class="docs-page-link" href="plugins.html">Plugins</a>
+        <a class="docs-page-link" href="libraries.html">Libraries</a>
+        <a class="docs-page-link current" href="cli.html">Command line</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#source">Source code</a>
+        <ul class="docs-nav-list">
+          <li><a class="docs-nav-sub" href="#build">adm build</a></li>
+          <li><a class="docs-nav-sub" href="#check">adm check</a></li>
+          <li><a class="docs-nav-sub" href="#doc">adm doc</a></li>
+          <li><a class="docs-nav-sub" href="#fmt">adm fmt</a></li>
+          <li><a class="docs-nav-sub" href="#run">adm run</a></li>
+          <li><a class="docs-nav-sub" href="#test">adm test</a></li>
+          <li><a class="docs-nav-sub" href="#package-build">adm package build</a></li>
+          <li><a class="docs-nav-sub" href="#package-install">adm package install</a></li>
+        </ul>
+      </div>
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#project">Project and application</a>
+        <ul class="docs-nav-list">
+          <li><a class="docs-nav-sub" href="#list">adm list</a></li>
+          <li><a class="docs-nav-sub" href="#list-packages">adm list packages</a></li>
+          <li><a class="docs-nav-sub" href="#audit">adm audit</a></li>
+          <li><a class="docs-nav-sub" href="#app-init">adm app init</a></li>
+          <li><a class="docs-nav-sub" href="#app-info">adm app info</a></li>
+          <li><a class="docs-nav-sub" href="#app-set">adm app set</a></li>
+          <li><a class="docs-nav-sub" href="#app-unset">adm app unset</a></li>
+          <li><a class="docs-nav-sub" href="#app-bump">adm app bump</a></li>
+          <li><a class="docs-nav-sub" href="#app-id">adm app id</a></li>
+          <li><a class="docs-nav-sub" href="#app-rekey">adm app rekey</a></li>
+          <li><a class="docs-nav-sub" href="#app-sign">adm app sign</a></li>
+          <li><a class="docs-nav-sub" href="#app-verify">adm app verify</a></li>
+          <li><a class="docs-nav-sub" href="#app-policy-init">adm app policy init</a></li>
+          <li><a class="docs-nav-sub" href="#app-policy-set">adm app policy set</a></li>
+          <li><a class="docs-nav-sub" href="#app-policy-unset">adm app policy unset</a></li>
+          <li><a class="docs-nav-sub" href="#app-policy-get">adm app policy get</a></li>
+          <li><a class="docs-nav-sub" href="#app-policy-log">adm app policy log</a></li>
+          <li><a class="docs-nav-sub" href="#lib">adm lib</a></li>
+          <li><a class="docs-nav-sub" href="#lib-remove">adm lib remove</a></li>
+          <li><a class="docs-nav-sub" href="#lib-verify">adm lib verify</a></li>
+          <li><a class="docs-nav-sub" href="#new">adm new</a></li>
+        </ul>
+      </div>
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#packages">Package manager</a>
+        <ul class="docs-nav-list">
+          <li><a class="docs-nav-sub" href="#get">adm get</a></li>
+          <li><a class="docs-nav-sub" href="#install">adm install</a></li>
+          <li><a class="docs-nav-sub" href="#publish">adm publish</a></li>
+          <li><a class="docs-nav-sub" href="#search">adm search</a></li>
+          <li><a class="docs-nav-sub" href="#vendor">adm vendor</a></li>
+        </ul>
+      </div>
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#tools">Developer tools</a>
+        <ul class="docs-nav-list">
+          <li><a class="docs-nav-sub" href="#dump">adm dump</a></li>
+          <li><a class="docs-nav-sub" href="#lsp">adm lsp</a></li>
+          <li><a class="docs-nav-sub" href="#mcp">adm mcp</a></li>
+          <li><a class="docs-nav-sub" href="#env">adm env</a></li>
+          <li><a class="docs-nav-sub" href="#fix">adm fix</a></li>
+          <li><a class="docs-nav-sub" href="#graph">adm graph</a></li>
+          <li><a class="docs-nav-sub" href="#lint">adm lint</a></li>
+          <li><a class="docs-nav-sub" href="#ide">adm ide</a></li>
+        </ul>
+      </div>
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#system">Toolchain</a>
+        <ul class="docs-nav-list">
+          <li><a class="docs-nav-sub" href="#doctor">adm doctor</a></li>
+          <li><a class="docs-nav-sub" href="#targets">adm targets</a></li>
+          <li><a class="docs-nav-sub" href="#update">adm update</a></li>
+          <li><a class="docs-nav-sub" href="#version">adm version</a></li>
+          <li><a class="docs-nav-sub" href="#clean">adm clean</a></li>
+          <li><a class="docs-nav-sub" href="#config">adm config</a></li>
+          <li><a class="docs-nav-sub" href="#completion">adm completion</a></li>
+        </ul>
+      </div>
+
+    </nav>
+  </aside>
+
+  <main class="docs-content">
+
+    <p class="docs-eyebrow">Docs</p>
+    <h1 class="docs-page-title">Command line</h1>
+    <p class="docs-lede">Every <code>adm</code> command and subcommand with its flags. <code>adm &lt;command&gt; --help</code> prints the same for the installed version; commands that tools read have a <code>--json</code> form.</p>
+
+    <section class="docs-section" id="source">
+      <h2>Source code</h2>
+      <p>Compile, check, format, run and test what is in the tree. Every command takes the current directory as its tree unless a path or names say otherwise.</p>
+      <h3 id="build"><code>adm build</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm build [targets...] [flags]</code></pre>
+      </div>
+      <p>Builds the applications, libraries and plugins found in a source tree. Without names every unit is built; names select units of any kind, a directory or <code>.adm</code> file argument is the source path. An application becomes an executable, a library an <code>.admlib</code> source package (its permissions audited into the manifest), a plugin an <code>.admplugin</code>.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--apps / --libs / --plugins</code></td><td>Build only that kind of unit.</td></tr>
+        <tr><td><code>--path DIR</code></td><td>Build only targets under the directory (default <code>.</code>).</td></tr>
+        <tr><td><code>--out DIR</code></td><td>Output directory for built binaries (default: the current directory).</td></tr>
+        <tr><td><code>--release</code></td><td>Fully optimized (<code>-O3 -DNDEBUG</code>, drops debug-only runtime diagnostics); the default is <code>-O2</code>.</td></tr>
+        <tr><td><code>--debug</code></td><td>Unoptimized with debug info (<code>-O0 -g</code>).</td></tr>
+        <tr><td><code>--backend llvm|c</code></td><td>Compiler backend (default <code>llvm</code>).</td></tr>
+        <tr><td><code>--os, --arch</code></td><td>Target platform (defaults to the host).</td></tr>
+        <tr><td><code>--platforms a,b</code></td><td>Build several <code>&lt;os&gt;-&lt;arch&gt;</code> at once; plugins merge into one <code>.admplugin</code>. A cross target needs <code>ADM_SYSROOT_&lt;OS&gt;_&lt;ARCH&gt;</code>.</td></tr>
+        <tr><td><code>--runtime static|shared</code></td><td>Runtime linkage; <code>shared</code> is required to load plugins.</td></tr>
+        <tr><td><code>--features a,b</code></td><td>Comma-separated feature list.</td></tr>
+        <tr><td><code>--deps-only / --no-deps</code></td><td>Build only dependencies of the selected targets, or none of them.</td></tr>
+        <tr><td><code>--no-cache</code></td><td>Disable IR caching.</td></tr>
+        <tr><td><code>--perf</code></td><td>Show performance metrics.</td></tr>
+      </table>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">shell</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm build App1 acme.imaging
+adm build --libs samples/imaging
+adm build App1 --release --os linux --arch arm64</code></pre>
+      </div>
+      <h3 id="check"><code>adm check</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm check [paths...] [flags]</code></pre>
+      </div>
+      <p>Semantic analysis without building: parses, resolves and type-checks, then prints diagnostics. <code>adm check --all std</code> validates the standard library.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--all</code></td><td>Show every error (same as <code>--limit=0</code>).</td></tr>
+        <tr><td><code>--limit N</code></td><td>Maximum number of errors shown (default 10).</td></tr>
+        <tr><td><code>--context N</code></td><td>Lines of context around each error (default 2).</td></tr>
+        <tr><td><code>--exclude GLOB</code></td><td>Skip paths matching the globs.</td></tr>
+        <tr><td><code>--json</code></td><td>Diagnostics as JSON.</td></tr>
+        <tr><td><code>--perf</code></td><td>Show performance metrics.</td></tr>
+      </table>
+      <h3 id="doc"><code>adm doc</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm doc [module-or-symbol] [flags]</code></pre>
+      </div>
+      <p>Documentation from the compiler's own resolver: a module's exports with signatures and doc comments, a workspace overview, or a symbol search across modules. Methods, fields and properties are not module exports and do not appear in a search; the language server and the MCP server's <code>adm_symbol</code> find those.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--module, -m NAME</code></td><td>One module's exports (<code>std.io</code>, <code>builtin</code> for the prelude).</td></tr>
+        <tr><td><code>--search, -s NAME</code></td><td>Find a symbol by name across modules.</td></tr>
+        <tr><td><code>--workspace</code></td><td>Workspace-wide module overview.</td></tr>
+        <tr><td><code>--json</code></td><td>Documentation as JSON, with <code>kindName</code> and per-type <code>members</code>.</td></tr>
+        <tr><td><code>--full-doc</code></td><td>Include doc comments in the workspace listing.</td></tr>
+        <tr><td><code>--root PATH</code></td><td>Workspace roots or files to load (default <code>.</code>).</td></tr>
+        <tr><td><code>--no-std</code></td><td>Skip the standard library.</td></tr>
+        <tr><td><code>--plugin FILE</code></td><td>What an <code>.admplugin</code> exports, from its metadata alone.</td></tr>
+        <tr><td><code>--exclude GLOB</code></td><td>Skip paths matching the globs.</td></tr>
+      </table>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">shell</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm doc --module std.io
+adm doc --search readFile
+adm doc --workspace --root std --no-std</code></pre>
+      </div>
+      <h3 id="fmt"><code>adm fmt</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm fmt [paths...] [flags]</code></pre>
+      </div>
+      <p>Formats <code>.adm</code> files in place; the authoritative formatting, so never hand-align.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--check</code></td><td>Report files that would change without writing.</td></tr>
+        <tr><td><code>--diff</code></td><td>Print a diff instead of rewriting.</td></tr>
+        <tr><td><code>--stdin</code></td><td>Read source from stdin and write the result to stdout.</td></tr>
+        <tr><td><code>--include / --exclude GLOB</code></td><td>Limit to files whose base name matches.</td></tr>
+        <tr><td><code>--write</code></td><td>Write the result back (default on).</td></tr>
+      </table>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">shell</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm fmt
+adm fmt --check src/</code></pre>
+      </div>
+      <h3 id="run"><code>adm run</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm run [appName] [-- appArgs...] [flags]</code></pre>
+      </div>
+      <p>Builds an application, runs it and removes the executable afterwards. Arguments after <code>--</code> go to the program.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--keep</code></td><td>Keep the executable.</td></tr>
+        <tr><td><code>--watch</code></td><td>Rebuild and restart whenever a source file changes.</td></tr>
+        <tr><td><code>--path DIR</code></td><td>Build targets under the directory.</td></tr>
+        <tr><td><code>--release / --debug</code></td><td>Optimization level, as for <code>build</code>.</td></tr>
+        <tr><td><code>--backend, --os, --arch, --features, --no-cache</code></td><td>As for <code>build</code>.</td></tr>
+      </table>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">shell</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm run
+adm run MyApp -- --help</code></pre>
+      </div>
+      <h3 id="test"><code>adm test</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm test [paths...] [flags]</code></pre>
+      </div>
+      <p>Builds and runs the <code>check</code> suites under the paths (<code>adm test std</code> runs the whole standard library's). Each program gets its own scratch application folder through <code>ADM_APP_HOME</code>, so suites never touch real user folders.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--run TEXT</code></td><td>Only tests whose name contains the text (repeatable; <code>=</code> prefix for an exact match).</td></tr>
+        <tr><td><code>--file TEXT</code></td><td>Only tests whose source file contains the text.</td></tr>
+        <tr><td><code>--list / --list-bench</code></td><td>List discovered tests or benchmarks without running.</td></tr>
+        <tr><td><code>--bench TEXT</code></td><td>Run benchmarks matching the text (<code>.</code> for all); <code>--bench-count</code>, <code>--bench-time</code> shape the run.</td></tr>
+        <tr><td><code>--coverage</code></td><td>Emit a clang coverage profile; <code>--coverage-report</code> prints a summary, <code>--coverage-per-test</code> re-runs each test (slow), <code>--coverage-out</code> names the file.</td></tr>
+        <tr><td><code>--build-only</code></td><td>Build the runner and print <code>ADM_TEST_BIN=&lt;path&gt;</code>.</td></tr>
+        <tr><td><code>--out DIR</code></td><td>Keep the compiled runner there.</td></tr>
+        <tr><td><code>--backend, --release, --debug, --no-cache</code></td><td>As for <code>build</code>.</td></tr>
+      </table>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">shell</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm test std/services
+adm test --run TestRule std/services</code></pre>
+      </div>
+      <h3 id="package-build"><code>adm package build</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm package build --app NAME [flags]</code></pre>
+      </div>
+      <p>Builds a <code>tar.gz</code> release artifact from the <code>[package]</code> rules of <code>adm.toml</code>, versioned from <code>[apps.&lt;Name&gt;]</code> (<code>0.1</code> when unset), optionally signed.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--app NAME</code></td><td>Application to package (required).</td></tr>
+        <tr><td><code>--dir DIR</code></td><td>Where to look for <code>adm.toml</code> (walks up).</td></tr>
+        <tr><td><code>--out PATH</code></td><td>Artifact path (default <code>./dist/&lt;app&gt;-&lt;version&gt;.tar.gz</code>).</td></tr>
+        <tr><td><code>--sign</code></td><td>Sign the artifact; <code>--key</code> names the private key, <code>--sig-out</code> the signature file (default <code>&lt;artifact&gt;.zsig</code>).</td></tr>
+      </table>
+      <h3 id="package-install"><code>adm package install</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm package install &lt;artifact.tar.gz&gt; [flags]</code></pre>
+      </div>
+      <p>Installs a release artifact into the user's application directory, versioned, and updates the <code>current</code> symlink.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--sig PATH</code></td><td>Signature file (default <code>&lt;artifact&gt;.zsig</code>).</td></tr>
+        <tr><td><code>--no-verify</code></td><td>Skip signature verification.</td></tr>
+        <tr><td><code>--bin NAME</code></td><td>Symlink name under <code>~/.local/bin</code> (default: the signed app name).</td></tr>
+      </table>
+    </section>
+
+    <section class="docs-section" id="project">
+      <h2>Project and application</h2>
+      <p>The manifest, the application's identity and policy, the units and dependencies of a tree.</p>
+      <h3 id="list"><code>adm list</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm list [DIR] [flags]</code></pre>
+      </div>
+      <p>Lists every application, library and plugin declared under a directory: kind, name, file and line, folder, the nearest <code>adm.toml</code> above it and its version. A monorepo lists many units, some with a manifest and some without.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--json</code></td><td>One object per unit: <code>kind</code>, <code>name</code>, <code>file</code>, <code>line</code>, <code>dir</code>, <code>manifest</code> (or null), <code>version</code>.</td></tr>
+      </table>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">shell</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm list testdata/apps --json</code></pre>
+      </div>
+      <h3 id="list-packages"><code>adm list packages</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm list packages [--dir DIR] [flags]</code></pre>
+      </div>
+      <p>The project's dependencies from <code>adm.lock</code>: version, whether each is installed, the newest version the registry offers, the permissions accepted at install, the description, and the package's own requirements (the permissions its code reaches, with the chains).</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--dir DIR</code></td><td>Project directory (walks up to the nearest <code>adm.lock</code>).</td></tr>
+        <tr><td><code>--no-pull</code></td><td>Use the local registry clone without pulling.</td></tr>
+        <tr><td><code>--json</code></td><td>One object per package; the same shape as <code>adm lib --json</code>.</td></tr>
+      </table>
+      <h3 id="audit"><code>adm audit</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm audit [DIR] [flags]</code></pre>
+      </div>
+      <p>Lists the permissions a package's code reaches: every function is walked and each call followed, through the standard library and dependencies, to the gated functions it can reach (a service method with <code>@commit(policy = ...)</code> or <code>@query(policy = ...)</code>, a function with <code>@requires</code>). Each permission comes with the chain that reaches it; an <code>@on</code> observer of a gated commit is listed as <code>observe</code>, and files binding foreign code (<code>@c</code>, <code>@native</code>) are named, since no policy can verify them. In a library tree the package is each library's exported modules and their closure; elsewhere it is the application's own modules. A library build writes the same set into the package manifest and fails when <code>adm.toml</code> narrows it with <code>[requires] permissions = [...]</code> to less than the code reaches.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--library NAME</code></td><td>Audit one library of the tree.</td></tr>
+        <tr><td><code>--json</code></td><td><code>{package, requirements: [{permission, observe, via, description, spec, fields}], foreign}</code> per package.</td></tr>
+      </table>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">shell</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm audit
+adm audit testdata/desktop_apps/opengl_window</code></pre>
+      </div>
+      <h3 id="app-init"><code>adm app init</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm app init [flags]</code></pre>
+      </div>
+      <p>Generates <code>adm.toml</code> with a fresh Ed25519 publisher key and repo salt, and writes the private key outside the repository (<code>~/.config/adm/keys/&lt;publisher id&gt;.ed25519</code>).</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--dir DIR</code></td><td>Where to write the manifest.</td></tr>
+        <tr><td><code>--private-key-out PATH</code></td><td>Where to write the private key.</td></tr>
+        <tr><td><code>--git</code></td><td>Initialize a git repository and a <code>.gitignore</code>.</td></tr>
+        <tr><td><code>--force</code></td><td>Overwrite an existing manifest.</td></tr>
+      </table>
+      <h3 id="app-info"><code>adm app info</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm app info [--dir DIR] [--app NAME] [flags]</code></pre>
+      </div>
+      <p>The application's identity and everything <code>adm.toml</code> configures: publisher (id, public key, salt presence, private key path and whether it exists, creation date), the resolved app id, name, version and update feed, the <code>[apps]</code> tables, packaging rules, dependencies, registries, the <code>[requires]</code> narrowing and the policy flag. Without a manifest the identity comes from the application declaration.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--json</code></td><td>The whole tree as one object; <code>manifest</code> is null without an <code>adm.toml</code>.</td></tr>
+      </table>
+      <h3 id="app-set"><code>adm app set</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm app set &lt;table.key&gt; &lt;value&gt; [--dir DIR] [--app NAME]</code></pre>
+      </div>
+      <p>Writes one <code>adm.toml</code> value, keeping every other line and comment: the key's line is replaced, appended to its table, or the table is appended. With <code>--app</code>, <code>version</code>, <code>slug</code>, <code>update.*</code> and <code>package.*</code> address that application's tables. Values are written by the key's type: <code>policy.sandbox</code> as a bool, <code>requires.permissions</code> and <code>registries.order</code> as arrays from a comma list, everything else as a string. <code>package.files</code> replaces the whole file-rule list from <code>from=&gt;to[:mode], ...</code>. Quote a segment holding a dot or a colon: <code>apps."My App".version</code>, <code>deps."acme:utils"</code>.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">shell</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm app set --app Main version 1.2.0
+adm app set update.feed https://example.com/feed.json
+adm app set registries.order &quot;corp, public&quot;
+adm app set --app Main package.files &quot;dist/app=&gt;bin/app:0755, README.md=&gt;share/doc/README.md&quot;</code></pre>
+      </div>
+      <h3 id="app-unset"><code>adm app unset</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm app unset &lt;table.key | table&gt; [--dir DIR] [--app NAME]</code></pre>
+      </div>
+      <p>Removes one key, or a whole table when the name is one: <code>registries.acme</code> drops <code>[registries.acme]</code> and takes it out of the order list; with <code>--app</code>, <code>package.files</code> drops every file rule.</p>
+      <h3 id="app-bump"><code>adm app bump</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm app bump &lt;major|minor|patch&gt; --app NAME [--dir DIR]</code></pre>
+      </div>
+      <p>Increments the application's version in <code>adm.toml</code>.</p>
+      <h3 id="app-id"><code>adm app id</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm app id [AppName] [--dir DIR]</code></pre>
+      </div>
+      <p>Prints the resolved identity and update configuration the build bakes in as <code>__app_id__</code>, <code>__app_name__</code>, <code>__app_version__</code> and the update constants.</p>
+      <h3 id="app-rekey"><code>adm app rekey</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm app rekey [--dir DIR] [--private-key-out PATH]</code></pre>
+      </div>
+      <p>Gives an existing manifest a new key pair and repo salt, rewriting <code>[publisher]</code> in place and writing the new private key where <code>init</code> would. The publisher id and every app id change with it; signing looks only at the default key path or <code>ADM_SIGNING_KEY</code>, so a custom key path needs the variable.</p>
+      <h3 id="app-sign"><code>adm app sign</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm app sign &lt;artifact&gt; [flags]</code></pre>
+      </div>
+      <p>Signs an artifact with the manifest's publisher key.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--app NAME</code></td><td>Which application, when the tree builds several.</td></tr>
+        <tr><td><code>--key PATH</code></td><td>Private key (default: the publisher's file under the XDG config directory).</td></tr>
+        <tr><td><code>--out PATH</code></td><td>Signature file (default <code>&lt;artifact&gt;.zsig</code>).</td></tr>
+        <tr><td><code>--force</code></td><td>Overwrite an existing signature.</td></tr>
+      </table>
+      <h3 id="app-verify"><code>adm app verify</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm app verify &lt;artifact&gt; [--sig PATH]</code></pre>
+      </div>
+      <p>Verifies an artifact's signature.</p>
+      <h3 id="app-policy-init"><code>adm app policy init</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm app policy init [--dir DIR] [--app NAME] [--force]</code></pre>
+      </div>
+      <p>Writes a commented <code>policy.toml</code> template into the application's folder (<code>ADM_APP_HOME</code>, else <code>~/.local/share/&lt;app name&gt;</code>): the grants compiled into the program per package, then one table per held permission with the fields it can narrow. The Policy service reads the file at startup; it can only narrow what the build granted.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--force</code></td><td>Overwrite an existing file.</td></tr>
+      </table>
+      <h3 id="app-policy-set"><code>adm app policy set</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm app policy set [--package ns:name] &lt;permission&gt; &lt;field.kind|setting&gt; &lt;values&gt;</code></pre>
+      </div>
+      <p>Writes one rule into <code>policy.toml</code>, for the whole program or for one dependency: <code>field.allow</code>, <code>field.deny</code> or <code>field.ask</code> with a comma-separated list (globs, IPv4 networks, <code>${app.home}</code>), or a scalar setting. The file is created when missing.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">shell</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm app policy set adm.network.connect host.deny &quot;*.example.net, 10.0.0.0/8&quot;
+adm app policy set --package acme:imaging adm.storage.read path.allow &quot;${app.home}/**&quot;</code></pre>
+      </div>
+      <h3 id="app-policy-unset"><code>adm app policy unset</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm app policy unset [--package ns:name] &lt;permission&gt; &lt;field.kind|setting&gt;</code></pre>
+      </div>
+      <p>Removes one rule.</p>
+      <h3 id="app-policy-get"><code>adm app policy get</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm app policy get [--json]</code></pre>
+      </div>
+      <p>Prints every rule of the file: subject (<code>*</code> or the package), permission, field, kind and values.</p>
+      <h3 id="app-policy-log"><code>adm app policy log</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm app policy log [--dir DIR] [--app NAME]</code></pre>
+      </div>
+      <p>Prints the decision log the Policy service keeps beside the file: denials, asks, live answers, file loads, the sandbox report.</p>
+      <h3 id="lib"><code>adm lib</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm lib [--dir DIR] [flags]</code></pre>
+      </div>
+      <p>Lists the libraries the project depends on: version, publisher, where each came from, whether it is in the cache or in <code>vendor/</code>, and a newer registry version when one exists.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--json</code></td><td>One object per package, the shape of <code>adm list packages --json</code>.</td></tr>
+        <tr><td><code>--no-pull</code></td><td>Use the local registry clone without pulling.</td></tr>
+      </table>
+      <h3 id="lib-remove"><code>adm lib remove</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm lib remove [namespace:]name [--dir DIR]</code></pre>
+      </div>
+      <p>Drops a dependency from <code>adm.lock</code> and its line from <code>[deps]</code> in <code>adm.toml</code>; the cached package stays for other projects.</p>
+      <h3 id="lib-verify"><code>adm lib verify</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm lib verify &lt;package.admlib | plugin.admplugin&gt; [flags]</code></pre>
+      </div>
+      <p>Reads a container the way the compiler does before using one: every file must match the checksums and the publisher signature must verify. Prints name, version, publisher id, SHA-256 and dependencies; exits non-zero on a corrupt, tampered or unsigned container.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--allow-unsigned</code></td><td>Accept a container with no publisher.</td></tr>
+        <tr><td><code>--json</code></td><td>One object, what the registry's gatekeeper reads.</td></tr>
+      </table>
+      <h3 id="new"><code>adm new</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm new</code></pre>
+      </div>
+      <p>Generates boilerplate: modules, services, views.</p>
+      <p><em>Not implemented yet; prints a placeholder and exits.</em></p>
+    </section>
+
+    <section class="docs-section" id="packages">
+      <h2>Package manager</h2>
+      <p>Fetching, installing, publishing and vendoring libraries; see the <a href="libraries.html">Libraries</a> page for the model behind them.</p>
+      <h3 id="get"><code>adm get</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get [namespace:]name[@range] ... [flags]</code></pre>
+      </div>
+      <p>Resolves each library in the configured registries, picks the highest version in range that is not yanked, downloads the container from the library's own repository, verifies it (index hash, checksums, signature, publisher, module ownership) and installs it into the package cache, recording it in <code>adm.lock</code>; dependencies the library declares follow. Then the permissions the package asks for are shown as a checklist, grouped by package; the accepted set goes into the lock and a later version asking for more is refused until accepted again. With no arguments every <code>[deps]</code> entry the lock does not cover yet is fetched.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--accept all|none|LIST</code></td><td>Grant without asking: everything, nothing, or a comma-separated list of names and globs (<code>adm.storage.*</code>). Required without a terminal.</td></tr>
+        <tr><td><code>--dir DIR</code></td><td>Project whose lock to update.</td></tr>
+        <tr><td><code>--dry-run</code></td><td>Resolve and report, install nothing; with <code>--json</code> the container is fetched and described (permissions, foreign files, dependencies) without installing.</td></tr>
+        <tr><td><code>--json</code></td><td>The installed packages as JSON, progress on stderr.</td></tr>
+        <tr><td><code>--no-pull</code></td><td>Use the local registry clone without pulling.</td></tr>
+        <tr><td><code>--trust</code></td><td>Accept a publisher other than the one the lock pinned.</td></tr>
+      </table>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">shell</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get acme:imaging
+adm get acme:imaging@^1.4 --accept adm.storage.*</code></pre>
+      </div>
+      <h3 id="install"><code>adm install</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm install [package.admlib | URL ...] [flags]</code></pre>
+      </div>
+      <p>Installs <code>.admlib</code> packages from files or URLs into the cache and records them in <code>adm.lock</code>, with the same verification and the same permission checklist as <code>get</code>. With no arguments every package the lock names but the cache lacks is fetched again from its recorded source.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--accept, --dir, --json, --trust</code></td><td>As for <code>get</code>.</td></tr>
+        <tr><td><code>--namespace NAME</code></td><td>Namespace to file a package under (a file install defaults to <code>local</code>).</td></tr>
+      </table>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">shell</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm install ../lib/acme.files-0.1.admlib --accept all</code></pre>
+      </div>
+      <h3 id="publish"><code>adm publish</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm publish [flags]</code></pre>
+      </div>
+      <p>In a library's source tree with a clean git working tree and a GitHub origin: builds and signs the <code>.admlib</code>, commits it as <code>dist/&lt;name&gt;-&lt;version&gt;.admlib</code>, tags <code>v&lt;version&gt;</code>, pushes, and opens a pull request on the registry adding the index line. Refuses when the version is not newer than the registry's, when nothing signs the package, or when the tree is dirty.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--description TEXT</code></td><td>One line saying what the library is (required, shown by <code>search</code>).</td></tr>
+        <tr><td><code>--library NAME</code></td><td>Which library, when the tree declares several.</td></tr>
+        <tr><td><code>--registry NAME</code></td><td>Registry from <code>adm.toml</code> (default: the first).</td></tr>
+        <tr><td><code>--dry-run</code></td><td>Build and print the index line, touch nothing.</td></tr>
+        <tr><td><code>--no-pr</code></td><td>Push the release but print the index line instead of opening the pull request.</td></tr>
+        <tr><td><code>--dir DIR</code></td><td>Library source directory.</td></tr>
+      </table>
+      <h3 id="search"><code>adm search</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm search [text] [flags]</code></pre>
+      </div>
+      <p>Pulls the configured registries and lists every library whose name, namespace or description contains the text (all of them without text).</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--json</code></td><td>Hits as JSON: namespace, name, latest, description, repo, publisher, date, registry, every version newest first.</td></tr>
+        <tr><td><code>--indexes</code></td><td>List the registry indexes the project uses (<code>--json</code>: name, url, official, local catalog) instead of searching.</td></tr>
+        <tr><td><code>--refresh</code></td><td>Pull every registry clone first; alone, just refresh.</td></tr>
+        <tr><td><code>--no-pull</code></td><td>Use the local clones without pulling.</td></tr>
+        <tr><td><code>--dir DIR</code></td><td>Project whose <code>adm.toml</code> names the registries.</td></tr>
+      </table>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">shell</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm search humanize</code></pre>
+      </div>
+      <h3 id="vendor"><code>adm vendor</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm vendor [--dir DIR]</code></pre>
+      </div>
+      <p>Copies every locked package from the cache into <code>vendor/</code> beside the lock, the same layout; when that directory exists the compiler and the language server read dependencies from it instead of <code>~/.adm/pkg</code>, so a checkout builds without <code>get</code> or network access.</p>
+    </section>
+
+    <section class="docs-section" id="tools">
+      <h2>Developer tools</h2>
+      <p>Compiler internals and editor integration.</p>
+      <h3 id="dump"><code>adm dump</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm dump &lt;file&gt; [flags]</code></pre>
+      </div>
+      <p>Dumps a compilation stage for one file: tokens, the AST, the IR, LLVM IR or the generated C.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--stage tokens|ast|ir|llvm|c</code></td><td>Which stage (default <code>ast</code>).</td></tr>
+        <tr><td><code>--ir-verbose</code></td><td>Full IR/MIR/LIR blocks and instructions.</td></tr>
+        <tr><td><code>--comments</code></td><td>Include comments in token and AST output (default on).</td></tr>
+      </table>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">shell</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm dump main.adm --stage c</code></pre>
+      </div>
+      <h3 id="lsp"><code>adm lsp</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm lsp [--log-protocol]</code></pre>
+      </div>
+      <p>Starts the language server on stdio (go to definition, references, hover, workspace symbols, diagnostics); <code>--log-protocol</code> traces every request to stderr.</p>
+      <h3 id="mcp"><code>adm mcp</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm mcp [--root DIR] [--log-protocol]</code></pre>
+      </div>
+      <p>Starts a Model Context Protocol server on stdio exposing the compiler's resolver and type checker as agent tools: <code>adm_doc</code>, <code>adm_symbol</code>, <code>adm_explore</code>, <code>adm_check</code>, <code>adm_test</code>.</p>
+      <h3 id="env"><code>adm env</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm env</code></pre>
+      </div>
+      <p>Prints environment information.</p>
+      <h3 id="fix"><code>adm fix</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm fix</code></pre>
+      </div>
+      <p>Applies automatic safe rewrites.</p>
+      <p><em>Not implemented yet.</em></p>
+      <h3 id="graph"><code>adm graph</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm graph</code></pre>
+      </div>
+      <p>Shows the dependency graph.</p>
+      <p><em>Not implemented yet.</em></p>
+      <h3 id="lint"><code>adm lint</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm lint</code></pre>
+      </div>
+      <p>Runs static analysis.</p>
+      <p><em>Not implemented yet.</em></p>
+      <h3 id="ide"><code>adm ide</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm ide</code></pre>
+      </div>
+      <p>Starts the IDE.</p>
+      <p><em>Not implemented yet.</em></p>
+    </section>
+
+    <section class="docs-section" id="system">
+      <h2>Toolchain</h2>
+      <p>The installation itself.</p>
+      <h3 id="doctor"><code>adm doctor</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm doctor [--json] [--verbose]</code></pre>
+      </div>
+      <p>Diagnoses the installation: compiler, C toolchain, library paths, caches. <code>--json</code> prints one result per check with <code>title</code>, <code>status</code>, <code>message</code> and a fix hint.</p>
+      <h3 id="targets"><code>adm targets</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm targets</code></pre>
+      </div>
+      <p>Prints every <code>&lt;os&gt;-&lt;arch&gt;</code> the build accepts, the clang triple it maps to and whether it can be linked here: the host always, another platform only when <code>ADM_SYSROOT_&lt;OS&gt;_&lt;ARCH&gt;</code> points at a sysroot.</p>
+      <h3 id="update"><code>adm update</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm update [flags]</code></pre>
+      </div>
+      <p>Looks up the latest language package on the distribution repository and installs it over this installation (<code>bin/</code>, <code>lib/</code>, <code>tools/</code>; caches, packages and catalogs are kept). A development checkout is refused.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--check</code></td><td>Only report whether a newer release exists.</td></tr>
+        <tr><td><code>--version V</code></td><td>Install that release.</td></tr>
+        <tr><td><code>--force</code></td><td>Reinstall even when nothing newer exists.</td></tr>
+      </table>
+      <h3 id="version"><code>adm version</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm version [flags]</code></pre>
+      </div>
+      <p>Shows the version, checking for a newer release unless told not to.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--json</code></td><td>As JSON.</td></tr>
+        <tr><td><code>--plain</code></td><td>Just the number, no check.</td></tr>
+        <tr><td><code>--skip-versioncheck</code></td><td>No release check.</td></tr>
+        <tr><td><code>--verbose</code></td><td>Detailed version information.</td></tr>
+      </table>
+      <h3 id="clean"><code>adm clean</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm clean</code></pre>
+      </div>
+      <p>Removes build artifacts.</p>
+      <h3 id="config"><code>adm config</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm config</code></pre>
+      </div>
+      <p>Configures the toolchain.</p>
+      <p><em>Not implemented yet.</em></p>
+      <h3 id="completion"><code>adm completion</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm completion bash|zsh|fish|powershell</code></pre>
+      </div>
+      <p>Prints the shell completion script for the named shell.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">shell</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">source &lt;(adm completion zsh)</code></pre>
+      </div>
+    </section>
+
+  </main>
+
+</div>
+
+<script src="docs.js"></script>
+<script src="highlight.js"></script>
+</body>
+</html>

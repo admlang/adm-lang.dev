@@ -54,6 +54,7 @@
         <a class="docs-page-link" href="app-home.html">Application home &amp; migrations</a>
         <a class="docs-page-link" href="plugins.html">Plugins</a>
         <a class="docs-page-link" href="libraries.html">Libraries</a>
+        <a class="docs-page-link" href="cli.html">Command line</a>
       </div>
 
       <div class="docs-nav-group">
@@ -248,63 +249,15 @@
         these just picks the matching LLVM target triple.
       </p>
 
-      <p><strong>Source code</strong></p>
-      <table class="docs-table">
-        <tr><th>Command</th><th>Description</th></tr>
-        <tr><td><code>build</code></td><td>Build ADM applications, libraries, or plugins.</td></tr>
-        <tr><td><code>check</code></td><td>Perform semantic analysis without building.</td></tr>
-        <tr><td><code>doc</code></td><td>Show documentation for modules, the workspace, or a symbol search.</td></tr>
-        <tr><td><code>fmt</code></td><td>Format ADM source files.</td></tr>
-        <tr><td><code>package</code></td><td>Package build outputs into distributable artifacts.</td></tr>
-        <tr><td><code>run</code></td><td>Build and run an application (then delete the executable).</td></tr>
-        <tr><td><code>test</code></td><td>Build and run <code>check</code> suites.</td></tr>
-      </table>
-
-      <p><strong>Project &amp; Module management</strong></p>
-      <table class="docs-table">
-        <tr><th>Command</th><th>Description</th></tr>
-        <tr><td><code>app</code></td><td>Application identity, packaging, and updates.</td></tr>
-        <tr><td><code>lib</code></td><td>Manage libraries and dependencies.</td></tr>
-        <tr><td><code>list</code></td><td>List symbols, modules, or packages.</td></tr>
-        <tr><td><code>new</code></td><td>Generate boilerplate code (modules, services, views).</td></tr>
-      </table>
-
-      <p><strong>Developer tools</strong></p>
-      <table class="docs-table">
-        <tr><th>Command</th><th>Description</th></tr>
-        <tr><td><code>dump</code></td><td>Dump lexer tokens or parsed AST for a source file.</td></tr>
-        <tr><td><code>env</code></td><td>Prints environment information.</td></tr>
-        <tr><td><code>fix</code></td><td>Apply automatic safe rewrites.</td></tr>
-        <tr><td><code>graph</code></td><td>Show dependency graph.</td></tr>
-        <tr><td><code>ide</code></td><td>Start the IDE.</td></tr>
-        <tr><td><code>lint</code></td><td>Run static analysis.</td></tr>
-        <tr><td><code>lsp</code></td><td>Start the language server.</td></tr>
-        <tr><td><code>mcp</code></td><td>Start the MCP server (code intelligence for agents).</td></tr>
-      </table>
-
-      <p><strong>Package manager</strong></p>
-      <table class="docs-table">
-        <tr><th>Command</th><th>Description</th></tr>
-        <tr><td><code>get</code></td><td>Download external libraries.</td></tr>
-        <tr><td><code>publish</code></td><td>Publish a library to the registry.</td></tr>
-        <tr><td><code>search</code></td><td>Search for libraries.</td></tr>
-        <tr><td><code>vendor</code></td><td>Vendor external packages.</td></tr>
-      </table>
-
-      <p><strong>System &amp; Environment</strong></p>
-      <table class="docs-table">
-        <tr><th>Command</th><th>Description</th></tr>
-        <tr><td><code>clean</code></td><td>Remove build artifacts.</td></tr>
-        <tr><td><code>config</code></td><td>Configure the toolchain.</td></tr>
-        <tr><td><code>doctor</code></td><td>Diagnose issues in your installation.</td></tr>
-        <tr><td><code>targets</code></td><td>List supported compilation targets.</td></tr>
-        <tr><td><code>update</code></td><td>Update the toolchain to the latest version.</td></tr>
-        <tr><td><code>version</code></td><td>Show version information.</td></tr>
-      </table>
-
       <p>
-        Every command has its own <code>--help</code>, e.g. <code>adm build --help</code>, for the
-        flags it accepts.
+        Every command and subcommand, with its flags, is on the <a href="cli.html">Command line</a>
+        page; <code>adm &lt;command&gt; --help</code> prints the same for the installed version. In
+        short: <code>build</code>, <code>check</code>, <code>run</code>, <code>test</code>,
+        <code>fmt</code> and <code>doc</code> work on the source tree; <code>app</code>,
+        <code>audit</code>, <code>lib</code> and <code>list</code> on the project and its manifest;
+        <code>get</code>, <code>install</code>, <code>publish</code>, <code>search</code> and
+        <code>vendor</code> on packages; <code>doctor</code>, <code>targets</code>,
+        <code>update</code> and <code>version</code> on the installation itself.
       </p>
     </section>
 
@@ -514,12 +467,18 @@ application MainApp {
           <li><strong>Packaging</strong> - a version plus a list of files to bundle, consumed by
             <code>adm package build</code> to produce a release archive.</li>
         </ul>
-        <p>A small family of commands works with the manifest once it exists:</p>
+        <p>A family of commands works with the manifest once it exists, all on the
+          <a href="cli.html#project">Command line</a> page:</p>
         <ul>
-          <li><code>adm app id</code> - print the resolved identity/update values for an app.</li>
-          <li><code>adm app bump major|minor|patch</code> - bump the app's version in the manifest.</li>
+          <li><code>adm app info</code> / <code>adm app id</code> - print what the manifest configures
+            and the identity it resolves to.</li>
+          <li><code>adm app set</code> / <code>adm app unset</code> - write or remove one value, keeping
+            the rest of the file; <code>adm app bump major|minor|patch</code> bumps a version.</li>
+          <li><code>adm app rekey</code> - a new key pair and salt in place.</li>
           <li><code>adm app sign</code> / <code>adm app verify</code> - sign a built artifact with the
             publisher key, then verify it later.</li>
+          <li><code>adm app policy init|set|unset|get|log</code> - the application's policy file and
+            decision log.</li>
           <li><code>adm package build</code> / <code>adm package install</code> - build a release
             archive from the packaging rules and install it locally.</li>
         </ul>
