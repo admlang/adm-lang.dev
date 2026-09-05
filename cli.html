@@ -284,14 +284,15 @@ adm run MyApp -- --help</code></pre>
         </div>
         <pre><code data-hl="off" class="nohighlight">adm test [paths...] [flags]</code></pre>
       </div>
-      <p>Builds and runs the <code>check</code> suites under the paths (<code>adm test std</code> runs the whole standard library's). Each program gets its own scratch application folder through <code>ADM_APP_HOME</code>, so suites never touch real user folders.</p>
+      <p>Builds and runs the <code>check</code> suites under the paths (<code>adm test std</code> runs the whole standard library's). Only tests whose files lie under the paths run; the standard library and the dependencies the runner links are left out unless named. Each program gets its own scratch application folder through <code>ADM_APP_HOME</code>, so suites never touch real user folders.</p>
       <table class="docs-table">
         <tr><th>Flag</th><th>Meaning</th></tr>
         <tr><td><code>--run TEXT</code></td><td>Only tests whose name contains the text (repeatable; <code>=</code> prefix for an exact match).</td></tr>
         <tr><td><code>--file TEXT</code></td><td>Only tests whose source file contains the text.</td></tr>
         <tr><td><code>--list / --list-bench</code></td><td>List discovered tests or benchmarks without running.</td></tr>
         <tr><td><code>--bench TEXT</code></td><td>Run benchmarks matching the text (<code>.</code> for all); <code>--bench-count</code>, <code>--bench-time</code> shape the run.</td></tr>
-        <tr><td><code>--coverage</code></td><td>Emit a clang coverage profile; <code>--coverage-report</code> prints a summary, <code>--coverage-per-test</code> re-runs each test (slow), <code>--coverage-out</code> names the file.</td></tr>
+        <tr><td><code>--coverage</code></td><td>Emit a clang coverage profile to <code>./adm_test.profraw</code> (<code>--coverage-out</code> names the file). <code>--coverage-report</code> prints the line coverage of the modules whose tests ran and keeps the profile in the build's temporary folder; with <code>--json</code> it also reports every module and every source line as covered, partly covered or not covered. <code>--coverage-per-test</code> re-runs each test on its own (slow). Only the C backend instruments module bodies, so pass <code>--backend c</code> for coverage.</td></tr>
+        <tr><td><code>--json</code></td><td>Machine-readable output. With <code>--list</code>: a JSON array of tests (<code>name</code>, <code>module</code>, <code>file</code>, <code>line</code>). Otherwise one JSON event per line (<code>status</code>, <code>diagnostic</code>, <code>run</code>, <code>pass</code>, <code>fail</code>, <code>skip</code>, <code>output</code>, <code>summary</code>, <code>coverage</code>, <code>file_coverage</code>, <code>error</code>, <code>done</code>); the IDE test panel reads this.</td></tr>
         <tr><td><code>--build-only</code></td><td>Build the runner and print <code>ADM_TEST_BIN=&lt;path&gt;</code>.</td></tr>
         <tr><td><code>--out DIR</code></td><td>Keep the compiled runner there.</td></tr>
         <tr><td><code>--backend, --release, --debug, --no-cache</code></td><td>As for <code>build</code>.</td></tr>
@@ -302,7 +303,9 @@ adm run MyApp -- --help</code></pre>
           <span class="code-filename">shell</span>
         </div>
         <pre><code data-hl="off" class="nohighlight">adm test std/services
-adm test --run TestRule std/services</code></pre>
+adm test --run TestRule std/services
+adm test --list --json std/io
+adm test --json --coverage-report --backend c .</code></pre>
       </div>
       <h3 id="package-build"><code>adm package build</code></h3>
       <div class="code-window">
@@ -387,7 +390,7 @@ adm test --run TestRule std/services</code></pre>
       <table class="docs-table">
         <tr><th>Flag</th><th>Meaning</th></tr>
         <tr><td><code>--library NAME</code></td><td>Audit one library of the tree.</td></tr>
-        <tr><td><code>--json</code></td><td><code>{package, requirements: [{permission, observe, via, description, spec, fields}], foreign}</code> per package.</td></tr>
+        <tr><td><code>--json</code></td><td><code>{package, requirements: [{permission, observe, via, sites, description, spec, fields}], foreign}</code> per package. <code>sites</code> runs parallel to <code>via</code>: the file and line where each hop of the chain is declared, relative to the audited directory.</td></tr>
       </table>
       <div class="code-window">
         <div class="code-titlebar">
@@ -793,10 +796,29 @@ adm get acme:imaging@^1.4 --accept adm.storage.*</code></pre>
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="code-filename">usage</span>
         </div>
-        <pre><code data-hl="off" class="nohighlight">adm lint</code></pre>
+        <pre><code data-hl="off" class="nohighlight">adm lint [paths...] [--json] [--skip CODE,...] [--exclude GLOB] [--list]</code></pre>
       </div>
-      <p>Runs static analysis.</p>
-      <p><em>Not implemented yet.</em></p>
+      <p>Static checks over a program that type-checks, reported for the files under the given paths (default <code>.</code>); the standard library is loaded but never reported on. The text report groups findings by file and ends with a count per check. <code>--json</code> prints an array of <code>{file, line, column, code, severity, message, fix}</code>, which the IDE's Lint tab reads.</p>
+      <table class="docs-table">
+        <tr><th>Check</th><th>Reports</th></tr>
+        <tr><td><code>ref-cycle</code></td><td>Two types holding strong references to each other, or a type holding itself through two fields (a tree's <code>parent</code> and <code>children</code>), so neither instance is ever freed. The fix names the field to mark <code>weak</code>.</td></tr>
+        <tr><td><code>unused-import</code></td><td>A <code>use</code> whose alias, module name and exports appear nowhere in the file.</td></tr>
+        <tr><td><code>unused-internal</code></td><td>An <code>internal</code> function, type, const or let nothing refers to.</td></tr>
+        <tr><td><code>error-doc</code></td><td>An exported function returning <code>!T</code> whose doc comment never says when it fails.</td></tr>
+        <tr><td><code>missing-doc</code></td><td>An exported declaration without a doc comment.</td></tr>
+        <tr><td><code>naming</code></td><td>Types not <code>PascalCase</code>; functions, methods and fields not <code>camelCase</code>. Test files and test functions are exempt.</td></tr>
+        <tr><td><code>todo</code></td><td><code>TODO</code>, <code>FIXME</code>, <code>HACK</code> and <code>XXX</code> comments.</td></tr>
+      </table>
+      <p><code>ref-cycle</code>, <code>unused-import</code> and <code>unused-internal</code> are warnings; the rest are informational. Test files skip the naming and documentation checks, and constructors and destructors need no doc comment. <code>--skip</code> leaves checks out; the exit code is 0 either way.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">shell</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm lint
+adm lint std/io --skip missing-doc,todo
+adm lint --list</code></pre>
+      </div>
       <h3 id="ide"><code>adm ide</code></h3>
       <div class="code-window">
         <div class="code-titlebar">

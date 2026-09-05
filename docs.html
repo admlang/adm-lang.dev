@@ -285,6 +285,27 @@
 
 /* outer /* inner */ still commented */</code></pre>
         </div>
+        <p>A run of <code>//</code> lines directly above a declaration is its doc comment. Start it with the name and say what the thing does, what it takes, what it returns and when it fails. <code>adm doc</code>, the hover card and the IDE's Documentation tab show it, and the IDE renders it in place with the gutter pencil to switch back to the raw lines.</p>
+        <p>A fenced block, three backticks on their own comment line before and after, is a code block shown in a grey box with highlighting. Tags at the end of the comment, one per line, are shown as rows: every <code>@author</code> joined under Author, each <code>@see</code> a link to that symbol under See Also, <code>@since</code>, <code>@deprecated</code>, and any other <code>@word</code> under its own name. A tag's text runs on until the next tag; tags come after the description, never inside it.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">doc-comments.adm</span>
+          </div>
+          <pre><code>// Groups the digits in threes: `1,234,567`; `-1,000`; `999` unchanged.
+// `separator` replaces the comma.
+//
+// Example usage:
+// ```
+// comma(1234567) == "1,234,567"
+// comma(-1234567, " ") == "-1 234 567"
+// ```
+// @author Ada Lovelace
+// @see words
+// @since 1.0
+def comma(n int64, separator string = ",") string {</code></pre>
+        </div>
+        <p>A block whose language is <code>example</code> is lifted out of the description instead, titled by the line above it, and listed under Examples by <code>adm doc</code> and the Documentation tab. A plain block is the better default.</p>
       </div>
 
       <div class="docs-sub" id="operators">
