@@ -963,7 +963,7 @@ a += [7]     // append; type-checked at compile time</code></pre>
         </div>
         <p>
           <code>a = a + ["oops"]</code> on an <code>int[]</code> is a
-          compile-time error, not a runtime surprise.
+          compile-time error.
         </p>
 
         <p><strong>Matrices</strong> are arrays with row separators (<code>;</code>) and support matrix multiplication:</p>
@@ -1285,9 +1285,9 @@ let same = f == Flags.ReadWrite  // true</code></pre>
 let a = s.B  // 1.401298e-44 - the bits of 10 (int), reinterpreted as float</code></pre>
         </div>
         <p>
-          That reinterpretation is the whole point - and the whole risk. Since nothing tracks the
-          active variant, reading the "wrong" member is legal and just hands you back whatever bytes
-          happen to be there.
+          That reinterpretation is what a union is for. Since nothing tracks the active variant,
+          reading the "wrong" member is legal and hands you back whatever bytes happen to be
+          there.
         </p>
 
         <p>Unions can be marked <code>internal</code> to be scope it to the declaring module. Unions can't be <code>partial</code>:</p>
@@ -1631,8 +1631,8 @@ a &amp; b</code></pre>
     <section class="docs-section" id="control-flow">
       <h2>Control Flow</h2>
       <p>
-        Branching, looping, and pattern matching - the same three tools apply consistently across
-        primitives, structs, tuples, and everything else already covered.
+        Branching, looping, and pattern matching, and the same three work on primitives, structs,
+        tuples and every other type.
       </p>
 
       <div class="docs-sub" id="conditionals">
@@ -2041,7 +2041,7 @@ def useMatch&lt;T&gt;(x T) string {
         Some values can legitimately be more than one shape: a union type is one of several types, an
         optional is either a value or <code>none</code>. ADM won't let you use either as a single
         concrete type until you narrow it - with <code>is</code>, <code>match</code>, or a
-        <code>when</code>/<code>unless</code> guard, all of which you've already seen.
+        <code>when</code>/<code>unless</code> guard.
       </p>
 
       <div class="docs-sub" id="union-intersection-types">
@@ -2418,7 +2418,7 @@ let c = a.mapElem((v int) =&gt; v + 1)</code></pre>
       <p>
         Errors are values, not exceptions. A function that can fail says so in its return type, and a
         failure propagates up the call stack on its own until something tests for it, recovers it, or
-        the program crashes - there's no hidden control-flow jump to catch.
+        the program crashes.
       </p>
 
       <div class="docs-sub" id="errorable-types">
@@ -2633,7 +2633,7 @@ def someFunction(x int) {
     <section class="docs-section" id="concurrency">
       <h2>Concurrency</h2>
       <p>
-        Three primitives cover concurrency, and they compose with everything already covered: futures
+        Three primitives cover concurrency: futures
         for a single background result, channels for a pipe between workers, and <code>select</code>
         for waiting on several channels at once.
       </p>
@@ -3115,7 +3115,7 @@ component myComponent {
         Attributes (<code>@name(...)</code>, or just <code>@name</code> when no arguments are
         passed) attach metadata to a declaration. Modifiers
         (<code>internal</code>, <code>partial</code>, ...) change how a declaration behaves. Both have
-        shown up throughout these docs already - this section is the reference for each.
+        appeared in earlier sections; this one is the reference for each.
         Every attribute the compiler and the standard library ship is catalogued on the
         <a href="annotations.html">Annotations</a> page.
       </p>
@@ -3124,8 +3124,8 @@ component myComponent {
         <h3>Attributes</h3>
         <p>
           An attribute's arguments can be positional or named, same as a regular call, and every
-          attribute is preserved in compiled metadata - tooling and runtime reflection can inspect it,
-          it's not just a compile-time note to the compiler:
+          attribute is preserved in compiled metadata, where tooling and runtime reflection can read
+          it:
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -3159,8 +3159,7 @@ internal const version string</code></pre>
 
         <p>
           A handful of attributes are built into the compiler itself. <code>@cfg(...)</code>
-          conditionally compiles a declaration - the excluded copy isn't just skipped, it's never even
-          required to parse:
+          conditionally compiles a declaration; an excluded copy is not even required to parse:
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -3211,7 +3210,7 @@ const SEPARATOR = "\\"</code></pre>
 
       <div class="docs-sub" id="modifiers">
         <h3>Modifiers</h3>
-        <p>Every modifier in the language, and where it's already been covered in depth:</p>
+        <p>Every modifier in the language, and the section that covers it:</p>
         <table class="docs-table">
           <tr><th>Modifier</th><th>Applies to</th><th>Meaning</th></tr>
           <tr><td><code>internal</code></td><td>modules, members, services, unions, enums</td>
@@ -3292,7 +3291,7 @@ module Math {
         </div>
       <p>Every <code>def</code> inside becomes an implicit FFI declaration, without repeating <code>@external</code> on each one.</p>
 
-      <p>Native ABI covers most systems languages directly; a couple more layers reach further:</p>
+      <p>The native ABI reaches systems languages directly; two more layers reach interpreted and VM languages:</p>
       <table class="docs-table">
         <tr><th>Layer</th><th>Languages</th></tr>
         <tr><td>Native ABI</td><td>C, C++, Rust, Zig, Go, Swift, Fortran, Nim, D, Pascal, Assembly</td></tr>
@@ -3304,9 +3303,9 @@ module Math {
     <section class="docs-section" id="testing">
       <h2>Testing</h2>
       <p>
-        <code>check</code> blocks keep tests next to the code they verify, instead of a separate
-        framework bolted on top. They're parsed and type-checked right alongside production code -
-        so a broken test surfaces immediately - but the compiler drops them from the final binary
+        <code>check</code> blocks keep tests next to the code they verify, with no separate test
+        framework. They're parsed and type-checked with the production code, so a broken test
+        surfaces immediately, but the compiler drops them from the final binary
         unless <code>adm test</code> is what's asking for them.
       </p>
 
