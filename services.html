@@ -460,7 +460,7 @@ def onExpiry(evt Event&lt;string&gt;) {
       </div>
       <div class="docs-sub" id="svc-clipboard">
         <h3><code>Clipboard</code></h3>
-        <p>Text copy and paste through the system clipboard. The service drives the desktop's clipboard program: wl-copy and wl-paste on Wayland, xclip or xsel on X11, pbcopy and pbpaste on macOS. A machine without one reports nothing available and the calls fail. Reading needs <code>adm.clipboard.read</code>, writing <code>adm.clipboard.write</code>. <code>copy</code>, <code>paste</code> and <code>clear</code> are commits, so <code>@on(Clipboard.copy)</code>, <code>@on(Clipboard.paste)</code> and <code>@on(Clipboard.clear)</code> observe them. The programs run through the shell, which the OS sandbox refuses.</p>
+        <p>Text copy and paste through the system clipboard. The service drives the desktop's clipboard program: wl-copy and wl-paste on Wayland, xclip or xsel on X11, pbcopy and pbpaste on macOS. A machine without one reports nothing available and the calls fail. Reading needs <code>adm.clipboard.read</code>, writing <code>adm.clipboard.write</code>, and both run the program through <code>Runtime.run</code>, so <code>adm.runtime.spawn</code> as well. <code>copy</code>, <code>paste</code> and <code>clear</code> are commits, so <code>@on(Clipboard.copy)</code>, <code>@on(Clipboard.paste)</code> and <code>@on(Clipboard.clear)</code> observe them. The programs run through the shell, which the OS sandbox refuses.</p>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def copy(text string) !none</code></div>
@@ -1020,7 +1020,7 @@ def onExpiry(evt Event&lt;string&gt;) {
       </div>
       <div class="docs-sub" id="svc-runtime">
         <h3><code>Runtime</code></h3>
-        <p>The ADM runtime itself - host info, memory, environment, service registry.</p>
+        <p>The ADM runtime itself - host info, memory, environment, service registry, and the one door to other programs: <code>run</code> starts a command through the system shell behind the <code>adm.runtime.spawn</code> permission, whose description says what granting it means: trusting the package completely. Foreign code (<code>@c</code>, <code>@link</code>, <code>@native</code>, <code>@extern</code>) is not a permission: a dependency binding it is accepted by the developer at install and refused by the build otherwise, see <a href="policy.html#foreign">Policy</a>.</p>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def systemInfo() SystemInfo</code></div>
@@ -1060,6 +1060,11 @@ def onExpiry(evt Event&lt;string&gt;) {
 
             <p class="api-doc">Returns none if the service is not registered with the runtime.</p>
 
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def run(command string, input string = "") !ProcessResult</code></div>
+            <p class="api-doc">Runs a command through the system shell with <code>input</code> as its standard input and returns what it printed and its exit code (128 + signal when killed, 127 when the shell could not start it). Needs <code>adm.runtime.spawn</code>. <code>std.os.run</code> and <code>std.os.output</code> wrap it.</p>
+            <p class="api-doc">Fails when the policy denies it or the process could not be started, which the OS sandbox causes; a command that exited with an error is reported through the code.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setEnv(key string, value string) !none</code></div>

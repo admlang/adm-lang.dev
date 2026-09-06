@@ -52,6 +52,7 @@
         <a class="docs-page-link" href="memory.html">Memory model</a>
         <a class="docs-page-link" href="annotations.html">Annotations</a>
         <a class="docs-page-link" href="app-home.html">Application home &amp; migrations</a>
+        <a class="docs-page-link" href="policy.html">Policy &amp; permissions</a>
         <a class="docs-page-link" href="plugins.html">Plugins</a>
         <a class="docs-page-link" href="libraries.html">Libraries</a>
         <a class="docs-page-link current" href="cli.html">Command line</a>
@@ -391,6 +392,7 @@ adm test --json --coverage-report --backend c .</code></pre>
         <tr><th>Flag</th><th>Meaning</th></tr>
         <tr><td><code>--library NAME</code></td><td>Audit one library of the tree.</td></tr>
         <tr><td><code>--json</code></td><td><code>{package, requirements: [{permission, observe, via, sites, description, spec, fields}], foreign}</code> per package. <code>sites</code> runs parallel to <code>via</code>: the file and line where each hop of the chain is declared, relative to the audited directory.</td></tr>
+        <tr><td><code>--catalog</code></td><td>Instead of what the code reaches, every permission the program's services declare, with its description and rule fields; <code>--json</code> gives <code>[{permission, description, fields}]</code>. The IDE's permission picker for <code>[requires]</code> reads it.</td></tr>
       </table>
       <div class="code-window">
         <div class="code-titlebar">
@@ -528,16 +530,18 @@ adm app set --app Main package.files &quot;dist/app=&gt;bin/app:0755, README.md=
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="code-filename">usage</span>
         </div>
-        <pre><code data-hl="off" class="nohighlight">adm app policy set [--package ns:name] &lt;permission&gt; &lt;field.kind|setting&gt; &lt;values&gt;</code></pre>
+        <pre><code data-hl="off" class="nohighlight">adm app policy set [--package ns:name] &lt;permission&gt; &lt;field.kind|setting&gt; &lt;values&gt;
+adm app policy set [--package ns:name] &lt;permission&gt; allow|deny|ask</code></pre>
       </div>
-      <p>Writes one rule into <code>policy.toml</code>, for the whole program or for one dependency: <code>field.allow</code>, <code>field.deny</code> or <code>field.ask</code> with a comma-separated list (globs, IPv4 networks, <code>${app.home}</code>), or a scalar setting. The file is created when missing.</p>
+      <p>Writes one rule into <code>policy.toml</code>, for the whole program or for one dependency: <code>field.allow</code>, <code>field.deny</code> or <code>field.ask</code> with a comma-separated list (globs, IPv4 networks, <code>${app.home}</code>), or a scalar setting. A kind alone rules on the permission as a whole, the field <code>*</code>, which is the only rule a permission without fields (<code>adm.clipboard.read</code>, <code>adm.runtime.spawn</code>, <code>adm.notifications.show</code>) can have: it writes <code>"*".deny = ["*"]</code>. The file is created when missing.</p>
       <div class="code-window">
         <div class="code-titlebar">
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="code-filename">shell</span>
         </div>
         <pre><code data-hl="off" class="nohighlight">adm app policy set adm.network.connect host.deny &quot;*.example.net, 10.0.0.0/8&quot;
-adm app policy set --package acme:imaging adm.storage.read path.allow &quot;${app.home}/**&quot;</code></pre>
+adm app policy set --package acme:imaging adm.storage.read path.allow &quot;${app.home}/**&quot;
+adm app policy set adm.clipboard.read deny</code></pre>
       </div>
       <h3 id="app-policy-unset"><code>adm app policy unset</code></h3>
       <div class="code-window">
@@ -556,7 +560,7 @@ adm app policy set --package acme:imaging adm.storage.read path.allow &quot;${ap
         </div>
         <pre><code data-hl="off" class="nohighlight">adm app policy get [--json]</code></pre>
       </div>
-      <p>Prints every rule of the file: subject (<code>*</code> or the package), permission, field, kind and values.</p>
+      <p>Prints every rule of the file: subject (<code>*</code> or the package), permission, field (<code>*</code> for a rule on the whole permission), kind and values.</p>
       <h3 id="app-policy-log"><code>adm app policy log</code></h3>
       <div class="code-window">
         <div class="code-titlebar">
@@ -626,10 +630,10 @@ adm app policy set --package acme:imaging adm.storage.read path.allow &quot;${ap
         </div>
         <pre><code data-hl="off" class="nohighlight">adm get [namespace:]name[@range] ... [flags]</code></pre>
       </div>
-      <p>Resolves each library in the configured registries, picks the highest version in range that is not yanked, downloads the container from the library's own repository, verifies it (index hash, checksums, signature, publisher, module ownership) and installs it into the package cache, recording it in <code>adm.lock</code>; dependencies the library declares follow. Then the permissions the package asks for are shown as a checklist, grouped by package; the accepted set goes into the lock and a later version asking for more is refused until accepted again. With no arguments every <code>[deps]</code> entry the lock does not cover yet is fetched.</p>
+      <p>Resolves each library in the configured registries, picks the highest version in range that is not yanked, downloads the container from the library's own repository, verifies it (index hash, checksums, signature, publisher, module ownership) and installs it into the package cache, recording it in <code>adm.lock</code>; dependencies the library declares follow. Then the permissions the package asks for are shown as a checklist, grouped by package, with one more row when the package binds foreign code (<code>@c</code>, <code>@link</code>, <code>@native</code>, <code>@extern</code>); the accepted set goes into the lock (<code>permissions=</code>, and <code>foreign=yes</code> for the bindings) and a later version asking for more, or starting to bind foreign code, is refused until accepted again. With no arguments every <code>[deps]</code> entry the lock does not cover yet is fetched.</p>
       <table class="docs-table">
         <tr><th>Flag</th><th>Meaning</th></tr>
-        <tr><td><code>--accept all|none|LIST</code></td><td>Grant without asking: everything, nothing, or a comma-separated list of names and globs (<code>adm.storage.*</code>). Required without a terminal.</td></tr>
+        <tr><td><code>--accept all|none|LIST</code></td><td>Grant without asking: everything, nothing, or a comma-separated list of names and globs (<code>adm.storage.*</code>); the token <code>foreign</code> in a list accepts the package's foreign code (<code>all</code> includes it). Required without a terminal.</td></tr>
         <tr><td><code>--dir DIR</code></td><td>Project whose lock to update.</td></tr>
         <tr><td><code>--dry-run</code></td><td>Resolve and report, install nothing; with <code>--json</code> the container is fetched and described (permissions, foreign files, dependencies) without installing.</td></tr>
         <tr><td><code>--json</code></td><td>The installed packages as JSON, progress on stderr.</td></tr>

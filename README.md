@@ -13,6 +13,7 @@ list sits at the top of it and each page's own sections follow:
 | `memory.html` — Memory model | generated from `docs/ADM Memory Model.md` by `tools/website_docs_pages.py` |
 | `annotations.html` — Annotations | hand-written; keep in step with the `meta def`s in `internal/prelude` and `std` |
 | `app-home.html` — Application home & migrations | hand-written; source design in `docs/requirements/app-home.md` |
+| `policy.html` — Policy & permissions | hand-written; source design in `docs/requirements/policy.md` |
 | `plugins.html` — Plugins | hand-written; source design in `docs/requirements/plugins.md` |
 | `libraries.html` — Libraries | hand-written; source design in `docs/requirements/libraries.md` |
 | `cli.html` — Command line | hand-written from `adm <command> --help`; keep in step with `internal/commands` |

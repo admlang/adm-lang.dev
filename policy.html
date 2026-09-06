@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Policy and permissions - adm</title>
+<meta name="description" content="How ADM programs are protected from the libraries they use: permissions, gated services, install consent, the policy file, the audit, foreign code and the OS sandbox.">
+<link rel="icon" type="image/svg+xml" href="assets/adm.svg">
+<link rel="canonical" href="https://adm-lang.dev/policy.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="adm">
+<meta property="og:title" content="adm policy and permissions">
+<meta property="og:description" content="Permissions, gates, consent at install, policy.toml, the audit, foreign code and the sandbox.">
+<meta property="og:url" content="https://adm-lang.dev/policy.html">
+<meta property="og:image" content="https://adm-lang.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="adm policy and permissions">
+<meta name="twitter:description" content="Permissions, gates, consent at install, policy.toml, the audit, foreign code and the sandbox.">
+<meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/adm.svg" alt="ADM" class="brand-mark">
+      <span class="brand-name"><span class="brand-sub">programming language</span></span>
+    </a>
+    <nav class="nav">
+      <a href="docs.html" class="nav-active">Docs</a>
+      <a href="examples.html">Examples</a>
+      <a href="services.html">Services</a>
+      <a href="modules.html">Modules</a>
+      <a class="nav-icon" href="https://github.com/admlang" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs-layout">
+
+  <aside class="docs-sidebar">
+    <nav class="docs-nav" id="docs-nav">
+
+      <div class="docs-pages">
+        <span class="docs-pages-label">Docs</span>
+        <a class="docs-page-link" href="docs.html">Language reference</a>
+        <a class="docs-page-link" href="memory.html">Memory model</a>
+        <a class="docs-page-link" href="annotations.html">Annotations</a>
+        <a class="docs-page-link" href="app-home.html">Application home &amp; migrations</a>
+        <a class="docs-page-link current" href="policy.html">Policy &amp; permissions</a>
+        <a class="docs-page-link" href="plugins.html">Plugins</a>
+        <a class="docs-page-link" href="libraries.html">Libraries</a>
+        <a class="docs-page-link" href="cli.html">Command line</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#people">Two people, two moments</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#developer">For the developer</a>
+        <a class="docs-nav-sub" href="#permissions">Permissions and gates</a>
+        <a class="docs-nav-sub" href="#chains">The whole call chain</a>
+        <a class="docs-nav-sub" href="#audit">The audit</a>
+        <a class="docs-nav-sub" href="#consent">The checklist and the lock</a>
+        <a class="docs-nav-sub" href="#foreign">Foreign code: an acceptance, not a permission</a>
+        <a class="docs-nav-sub" href="#refusals">What the build refuses</a>
+        <a class="docs-nav-sub" href="#which-library">Which library did that</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#user">For the user</a>
+        <a class="docs-nav-sub" href="#prompt">The question</a>
+        <a class="docs-nav-sub" href="#policy-file">The policy file</a>
+        <a class="docs-nav-sub" href="#log">The decision log</a>
+        <a class="docs-nav-sub" href="#sandbox">The sandbox</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#meet">Where the two meet</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#limits">What it does not do</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#reference">Quick reference</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="docs-content">
+    <p class="docs-eyebrow">Docs</p>
+    <h1 class="docs-page-title">Policy and permissions</h1>
+    <p class="docs-lede">
+      Permissions in ADM are decided by two people at two different times. The developer decides, when the program is built, which libraries get in and what they may do. The user decides, when the program runs, what it may do on their machine. This page describes each side and how they fit together.
+    </p>
+
+    <section class="docs-section" id="people">
+      <h2>Two people, two moments</h2>
+
+<p>Most of a program is code written by other people. A library pulled from the internet runs inside the process with the user's rights, and in most languages nothing stops an image decoder from reading <code>~/.ssh</code> or an analytics helper from sending data to a server abroad. ADM routes every way out of the process through the <a href="services.html">services</a>, and each of those doors is a named permission.</p>
+<p><strong>The developer, at build time</strong>, wants to know that the libraries they pulled in do not do more than they claim. They can read a call chain, a file name and a symbol, so their tools work in those terms: <code>adm audit</code>, the checklist <code>adm get</code> shows, <code>adm.lock</code>, the build's refusals and the IDE's Security tab. What the developer accepts is the ceiling. The finished program can do that much and no more.</p>
+<p><strong>The user, at run time</strong>, has downloaded a program that plays music. They do not know what ADM, a library or a C binding is, and the program should not show them those words. What they care about is what the program does on their computer: read files, talk to a server, read the clipboard, start another program, show notifications. Their tools are the question the program asks, <code>policy.toml</code>, <code>policy.log</code>, and the operating-system sandbox for the case where a library lies. The user can narrow the developer's ceiling but cannot raise it.</p>
+<p>This split decides where each feature lives. Something that is true about the code, for example that a library binds C, is the developer's business and is settled at build time. It is not a permission, it does not appear in the policy file and the program does not ask about it. Something the program does in the world is the user's business: it is checked at the call, described in plain words, and the user can be asked, can refuse, and can read about it in the log.</p>
+    </section>
+
+    <section class="docs-section" id="developer">
+      <h2>For the developer</h2>
+
+<h3 id="permissions">Permissions and gates</h3>
+<p>A permission is declared by the service that owns the capability: a name, a one-sentence description in the user's words, and optionally a <em>spec</em>, the type whose fields a rule can narrow.</p>
+<div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">std/services/storage.adm</span>
+  </div>
+  <pre><code>service Storage {
+	permissions = [
+		Permission{name: &quot;read&quot;,  description: &quot;Read files and list directories&quot;, spec: PathSpec},
+		Permission{name: &quot;write&quot;, description: &quot;Create, change and delete files&quot;, spec: PathSpec},
+	]
+	...
+}</code></pre>
+</div>
+
+<p>The full name is <code>&lt;owner&gt;.&lt;service&gt;.&lt;name&gt;</code>: <code>adm.storage.read</code> for the builtin services, <code>acme.imaging.cache.write</code> for a service <code>Cache</code> in the library <code>acme.imaging</code>. A service can only declare names under its own prefix, so the tree is owned and cannot collide. Names form a tree: holding <code>adm.storage</code> covers <code>adm.storage.read</code>, and <code>adm.storage.*</code> means the same in a narrowing list.</p>
+<p>The standard library declares these permissions today. Each one describes something a user can picture the program doing:</p>
+<table class="docs-table">
+  <tr><th>Permission</th><th>What the program would do</th><th>Rule fields</th></tr>
+  <tr><td><code>adm.storage.read</code></td><td>Read files and folders on this computer</td><td><code>path</code></td></tr>
+  <tr><td><code>adm.storage.write</code></td><td>Create, change and delete files on this computer</td><td><code>path</code></td></tr>
+  <tr><td><code>adm.network.connect</code></td><td>Connect to other computers over the network</td><td><code>host</code>, <code>protocol</code>, ...</td></tr>
+  <tr><td><code>adm.network.listen</code></td><td>Accept connections from other computers</td><td><code>host</code>, ...</td></tr>
+  <tr><td><code>adm.notifications.show</code></td><td>Show desktop notifications</td><td>none: ruled on as a whole</td></tr>
+  <tr><td><code>adm.clipboard.read</code>, <code>adm.clipboard.write</code></td><td>Read what was copied to the clipboard; put text on it</td><td>none</td></tr>
+  <tr><td><code>adm.runtime.spawn</code></td><td>Run other programs on this computer</td><td>none</td></tr>
+</table>
+<p>A permission protects functions. A service commit or query names the permission it needs in its annotation; a plain function or method in a module uses <code>@requires</code>. Both go through the same check. A gated function must return an errorable, because the call can be refused.</p>
+<div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">gates.adm</span>
+  </div>
+  <pre><code>service Storage {
+	// Every call to open() needs adm.storage.read on the whole call chain.
+	@commit(policy = &quot;read&quot;)
+	def open(path Path, mode string) !int { ... }
+}
+
+module acme.imaging {
+	// A module function can be gated too.
+	@requires(&quot;adm.network.connect&quot;)
+	def fetch(url string) !Image { ... }
+}</code></pre>
+</div>
+
+<p>A parameter typed with the permission's spec, such as <code>Path</code> for <code>adm.storage.read</code> or <code>Endpoint</code> for <code>adm.network.connect</code>, is <em>constrained</em>: before the body runs, the argument is checked against the user's rules for that field. A plain <code>string</code> parameter cannot be constrained, which is deliberate pressure on library authors to take a <code>Path</code>.</p>
+<p>When a gate refuses, the call fails with <code>PolicyDenied</code>, an ordinary error the library handles like any other: the feature that needed the network fails, the rest of the program keeps working. A library is expected to be written that way, since the person installing it may not tick every box, and the person running it may say no.</p>
+
+<h3 id="chains">The whole call chain</h3>
+<p>The subject of every decision is a <em>package</em>: the application, or one installed library or plugin. Every package on the call stack must hold the permission, not only the one that made the gated call.</p>
+<p>The reason is the confused deputy. Your application uses library B, which connects to the network; both are granted. Library C, which was never granted network access, calls B's function that connects. With only the direct caller checked, B would connect on C's behalf. With the whole chain checked, C is on the stack and the call is refused. The runtime keeps a per-task stack of packages; a push and a pop at each package boundary, nothing per ordinary call.</p>
+<p>The standard library is never a subject of its own: a chain that passes through <code>std.os.open</code> is attributed to the package that called it. Observers are gated with the commit they watch: <code>@on(Storage.open)</code> in a package without <code>adm.storage.read</code> is refused at build, because the event would otherwise hand that package every call's arguments.</p>
+
+<h3 id="audit">The audit</h3>
+<p>Nobody writes the permission list by hand, and a hand-written list would be wrong. <code>adm audit</code> walks the code a package can reach, lists every gated function it can call with the chain that gets there, and then names the files that bind C. Calls through interfaces and function values count every implementation they could reach.</p>
+<div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">$ adm audit</span>
+  </div>
+  <pre><code>acme.imaging requires
+  adm.storage.read        via imaging.load → os.open → Storage.open
+  adm.network.connect     via imaging.fetch → http.get → Network.connect
+contains foreign code: imaging/native/webp.adm</code></pre>
+</div>
+
+<p><code>adm publish</code> runs the same computation and writes the result into the package manifest: the permissions under <code>requires</code>, the binding files under <code>foreign</code>. That manifest is what the install checklist, <code>adm lib requires</code> and the registry show, so what a library asks for is exactly what its code reaches, no more and no less. <code>--json</code> prints the same report for tools, and <code>--library NAME</code> audits one library of a workspace.</p>
+<p>A package may <em>narrow</em> what it wants to be granted in its <code>adm.toml</code>:</p>
+<div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">adm.toml</span>
+  </div>
+  <pre><code>[requires]
+permissions = [&quot;adm.storage.read&quot;, &quot;adm.network.*&quot;]</code></pre>
+</div>
+
+<p>The published set is the intersection, and publish fails if the code reaches something the narrowing excludes, since the package could not run.</p>
+
+<h3 id="consent">The checklist and the lock</h3>
+<p><code>adm get</code> and <code>adm install</code> show one checklist across everything being installed: one row per permission with its description, and one more row when the package binds C. The ticked subset goes into <code>adm.lock</code>:</p>
+<div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">$ adm get acme:imaging</span>
+  </div>
+  <pre><code>Permissions to grant (tick what each package may do):
+acme:imaging 1.4.0
+  [x] adm.storage.read                          Read files and folders on this computer
+  [ ] adm.network.connect                       Connect to other computers over the network
+  [x] observe Storage.open
+  [ ] foreign code: native/webp.adm, native/png.adm   This library binds C code the compiler cannot check. Accepting it means trusting the library completely.
+acme:core 2.1.0
+  [x] adm.runtime.info                          Read system information</code></pre>
+</div>
+
+<p>Scripts pass <code>--accept all</code>, <code>--accept none</code>, or a list such as <code>--accept adm.storage.read,adm.network.*,foreign</code>, where the token <code>foreign</code> is the foreign-code row. An unticked permission is not an error: the library's calls under it fail at run time with <code>PolicyDenied</code>. A newer version that asks for more than the lock records, or that starts binding C when the locked one did not, is refused until it is accepted again, so an update cannot quietly grow a library's reach.</p>
+<div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">adm.lock</span>
+  </div>
+  <pre><code>acme:imaging:9f3c…:1.4.0 publisher=k7… permissions=adm.storage.read foreign=yes
+acme:core:41ab…:2.1.0 publisher=k7… permissions=adm.runtime.info</code></pre>
+</div>
+
+<p>The lock is the compiled layer: the grants baked into the binary, per package. The application itself holds everything its own code reaches, because its author wrote those calls. A package that was never asked holds nothing.</p>
+
+<h3 id="foreign">Foreign code: an acceptance, not a permission</h3>
+<p>Interop is a language feature. A module binds a C library with <code>@link</code>, <code>@c</code>, <code>@native</code> or <code>@extern</code>. An application's own bindings are the author's choice; there is no lint, warning or question about them.</p>
+<div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">glfw.adm</span>
+  </div>
+  <pre><code>@link(&quot;glfw&quot;)
+module std.ui.renderer.opengl.glfw {
+	@c(&quot;GLFW/glfw3.h&quot;, ret = &quot;int&quot;)
+	def glfwInit() int;
+	...
+}</code></pre>
+</div>
+
+<p>A <em>dependency</em> that binds C is a different matter. That code runs outside every gate with the process's rights, and the compiler cannot check what it does. Since this is a fact about the code, the developer settles it once, at install: the checklist lists the binding files as a row of their own, the lock records the answer as <code>foreign=yes</code>, and the build refuses to link a dependency whose C bindings were not accepted. It is not a permission under any name. It has no table in <code>policy.toml</code>, the user is not asked about it, and a rule for it could not do anything anyway, because the binary is already linked by the time the file is read. A library that binds <code>popen</code> to get around <code>adm.runtime.spawn</code> has to be accepted as "trust this library completely", and the audit names the file that does it.</p>
+<p>If the developer does not want a library's C code, they leave the row unticked and use another library. If they accept it and it turns out to be hostile, what protects the user is the <a href="#sandbox">sandbox</a>.</p>
+
+<h3 id="refusals">What the build refuses</h3>
+<ul>
+  <li>A dependency that binds C in a file the lock did not accept: <code>acme:imaging binds C code in native/webp.adm that was not accepted at install (adm install --accept foreign)</code>.</li>
+  <li>A dependency observing a gated commit under a permission it was not granted.</li>
+  <li>A library whose code reaches a permission its own <code>[requires]</code> narrowing excludes, at publish.</li>
+  <li>An install of a version that asks for more than the lock accepted, until <code>--accept</code> or the checklist says so again.</li>
+</ul>
+
+<h3 id="which-library">Which library did that</h3>
+<p>To the user, the application is the one asking: "MusicPlayer wants to connect to 203.0.113.5", not "acme:telemetry wants to connect". Which library inside the program made the call is written to <code>policy.log</code> as <code>subject=</code> on every line, and that is where the developer looks it up. Per-package tables in <code>policy.toml</code> are for the same reader, a developer or a power user who wants one library held below the rest of the program.</p>
+    </section>
+
+    <section class="docs-section" id="user">
+      <h2>For the user</h2>
+
+<h3 id="prompt">The question</h3>
+<p>An <code>ask</code> rule makes the program ask before it acts. With nothing else set up, the question appears as a desktop notification with Allow, Always allow and Deny buttons. Dismissing it or leaving it unanswered counts as Deny. The text is the application's name and the permission's description:</p>
+<div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">desktop notification</span>
+  </div>
+  <pre><code>MusicPlayer asks for permission
+Connect to other computers over the network
+adm.network.connect: 203.0.113.5</code></pre>
+</div>
+
+<p>An <em>Always</em> answer is written into the policy file under the package that asked, so the question does not come back. A program with its own interface can register a <code>PolicyResolver</code> and ask in its own window instead; the possible answers are <code>AllowOnce</code>, <code>DenyOnce</code>, <code>AllowAlways</code> and <code>DenyAlways</code>. <code>ADM_POLICY_PROMPT=0</code> turns the desktop notification off, and an <code>ask</code> then denies; <code>adm test</code> sets it so a suite never waits on a dialog.</p>
+
+<h3 id="policy-file">The policy file</h3>
+<p>The developer's grants are the most the program can do. The person running it can deny, ask or restrict within that through <code>policy.toml</code> in the application's <a href="app-home.html">home folder</a>. The file cannot grant anything that was not compiled in, and it is read once, at startup.</p>
+<p><code>adm app policy init</code> writes a commented template listing every permission the program can ask for, with its description, its fields and the grants each package holds, so a rule is a line to uncomment rather than a spec to read. <code>adm app policy set</code> edits one rule from the command line:</p>
+<div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">$ adm app policy set adm.network.connect host.deny &quot;*.example.net, 10.0.0.0/8&quot;</span>
+  </div>
+  <pre><code>[adm.network.connect]
+host.deny = [&quot;*.example.net&quot;, &quot;10.0.0.0/8&quot;]</code></pre>
+</div>
+
+<p>There is one table per permission, for the whole program or for one package. A rule names a field, a kind and a list: <code>field.allow</code>, <code>field.deny</code> or <code>field.ask</code>. The field <code>*</code> stands for the permission as a whole. It is the only rule a permission without fields can have, and the only value that means anything for it is <code>*</code>:</p>
+<div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">~/.local/share/MusicPlayer/policy.toml</span>
+  </div>
+  <pre><code># the whole permission: never, ask first, or always
+[adm.clipboard.read]
+&quot;*&quot;.deny = [&quot;*&quot;]
+
+[adm.runtime.spawn]
+&quot;*&quot;.ask = [&quot;*&quot;]
+
+# field rules narrow a permission the program keeps
+[adm.network.connect]
+protocol.allow = [&quot;http&quot;, &quot;https&quot;]
+host.deny      = [&quot;203.0.113.0/24&quot;, &quot;*.example.net&quot;]
+host.ask       = [&quot;*&quot;]
+maxConnections = 20
+
+[adm.storage.read]
+path.allow = [&quot;${app.home}/**&quot;, &quot;~/Music/**&quot;]
+path.deny  = [&quot;~/Music/private/**&quot;]
+
+# one library only, below the rest of the program
+[&quot;acme:imaging&quot;.adm.network.connect]
+host.allow = [&quot;https://cdn.acme.com&quot;]</code></pre>
+</div>
+
+<p><code>adm app policy set adm.clipboard.read deny</code> writes the first table above: a kind on its own means the whole permission. Values are globs (<code>*.example.com</code>, <code>${app.home}/**</code>) or IPv4 networks. Rules merge per field and kind across the program-wide and per-package tables: <code>allow</code> and <code>ask</code> lists replace each other, <code>deny</code> lists add up, so a denial can only grow. Within one decision the order is deny, then allow, then ask, and the <code>*</code> rule is decided before the field rules. A field with no rule passes; the package still had to hold the permission in the compiled layer to get this far.</p>
+<p>An unknown field or kind is a load error and the program does not start, because a misspelled rule that silently did nothing would be worse. A table for a permission this build does not know, left behind by an older version, is skipped with a line in the log. The policy state itself, the file and the log, is off-limits to every subject including the application's own code: only the Policy service writes there. A library with disk access cannot grant itself anything or undo what you denied.</p>
+
+<h3 id="log">The decision log</h3>
+<p>Every denial, every question and every live answer is recorded in <code>policy.log</code> beside the policy file, and emitted as the <code>Policy.decided</code> event for the program to observe. <code>adm app policy log</code> prints it, <code>--clear</code> deletes it.</p>
+<div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">$ adm app policy log</span>
+  </div>
+  <pre><code>2026-09-06T02:34:39.094Z deny adm.network.connect subject=acme:imaging field=host denied by rule *.example.net
+2026-09-06T02:34:39.101Z ask adm.storage.read subject=* field=path ~/Music/holiday.mp3
+2026-09-06T02:34:41.220Z allow adm.storage.read subject=* field=path allowed always: ~/Music/**
+2026-09-06T02:34:42.005Z deny adm.clipboard.read subject=* field=* denied by rule
+2026-09-06T02:34:39.094Z ignore adm.old.name subject=* unknown permission in policy.toml, table skipped
+2026-09-06T02:34:39.000Z sandbox * subject=* applied: landlock, seccomp</code></pre>
+</div>
+
+<p><code>Policy.explain(request)</code> answers "why" for one request: which rule, in which layer, made the decision; a whole-permission rule shows up as the <code>*</code> constraints.</p>
+
+<h3 id="sandbox">The sandbox</h3>
+<p>Everything above happens inside the process, and inside one process there is no complete safety: a runtime bug, or C code the developer accepted, has the process's rights. The compiled policy table is the union of everything the program may ever do, and the runtime can hand it to the operating system before the first thread starts, so every thread inherits the limits. The sandbox does not care which code made the system call, and that is what makes it the user's protection against a library that lies.</p>
+<p>Turn it on in the manifest, or per run with an environment variable:</p>
+<div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">adm.toml</span>
+  </div>
+  <pre><code>[policy]
+sandbox = true</code></pre>
+</div>
+
+<table class="docs-table">
+  <tr><th>Variable</th><th>Effect</th></tr>
+  <tr><td><code>ADM_SANDBOX=1</code></td><td>Apply the sandbox at startup from the compiled table</td></tr>
+  <tr><td><code>ADM_SANDBOX=0</code></td><td>Turn off a sandbox compiled in through <code>adm.toml</code></td></tr>
+  <tr><td><code>ADM_SCHED_DEBUG=1</code></td><td>Also print what was applied to stderr</td></tr>
+</table>
+<p>On Linux this is Landlock for files and TCP and seccomp for the rest. Without <code>adm.storage.read</code> only the system directories, the executable's directory, the application folder and <code>/tmp</code> stay readable; without <code>adm.storage.write</code> only the application folder, <code>/tmp</code> and <code>/dev</code> stay writable; without <code>adm.network.listen</code> a TCP bind is refused, without <code>adm.network.connect</code> a TCP connect is, and with no network permission at all no socket can be opened. Starting a program (<code>execve</code>) is always refused under the sandbox, whatever the table says, so a sandboxed program cannot use <code>Runtime.run</code> or the clipboard service, which drives a clipboard program. The report goes to <code>policy.log</code> as a <code>sandbox</code> line. macOS and Windows report that nothing was applied, for now.</p>
+    </section>
+
+    <section class="docs-section" id="meet">
+      <h2>Where the two meet</h2>
+
+<p>The developer's acceptances set the maximum and the user's rules cut it down. Nothing in the file can add what was not compiled in, and nothing done at build time can override what the user denies. The two sides do not share a vocabulary: the developer reads package names, chains and files, the user reads sentences about their computer. The log carries both, a permission in the user's words next to the package that asked for it.</p>
+<p>Today a program asks only where a rule says <code>ask</code>. A program with no policy file uses every permission the developer compiled in without saying so. A default that makes user-facing programs ask on the first use of each permission, switched on in <code>adm.toml</code>, is designed but not built. Until then, <code>adm app policy init</code> followed by one <code>&quot;*&quot;.ask = [&quot;*&quot;]</code> line per permission gives a user the same thing.</p>
+    </section>
+
+    <section class="docs-section" id="limits">
+      <h2>What it does not do</h2>
+
+<ul>
+  <li>It does not protect a program from its own author. The application holds everything its code reaches, by construction.</li>
+  <li>It does not undo an open door: a connection already open to a host you then deny is not cut. Change the file and restart.</li>
+  <li>Inside the process it trusts the compiler, the runtime and the operating system. Accepted C code and started programs are outside the gates; the sandbox is what limits them.</li>
+  <li>Without the sandbox, <code>policy.toml</code> governs ADM code going through services, which is all of a well-behaved library, and nothing else.</li>
+  <li>Nothing asks by default. A user who writes no rule and does not turn on the sandbox gets exactly what the developer compiled in.</li>
+</ul>
+    </section>
+
+    <section class="docs-section" id="reference">
+      <h2>Quick reference</h2>
+
+<table class="docs-table">
+  <tr><th>Command</th><th>Does</th></tr>
+  <tr><td><code>adm audit [DIR] [--library NAME] [--json]</code></td><td>Lists the permissions a package's code reaches, with chains, and the files binding C; <code>--catalog</code> lists every permission the program's services declare instead</td></tr>
+  <tr><td><code>adm get</code>, <code>adm install</code> <code>[--accept all|none|list]</code></td><td>Install and show the checklist: permission rows and a foreign-code row; record the answers in <code>adm.lock</code>. In a list, <code>foreign</code> accepts the C bindings</td></tr>
+  <tr><td><code>adm lib requires [--markdown]</code></td><td>Print what an installed library asks for and which files bind C, from its manifest</td></tr>
+  <tr><td><code>adm app policy init [--dir DIR] [--force]</code></td><td>Write the commented <code>policy.toml</code> template for an application</td></tr>
+  <tr><td><code>adm app policy set &lt;permission&gt; &lt;field.kind&gt; &lt;values&gt;</code></td><td>Add or replace one field rule</td></tr>
+  <tr><td><code>adm app policy set &lt;permission&gt; allow|deny|ask</code></td><td>Rule on the permission as a whole (<code>&quot;*&quot;.kind = [&quot;*&quot;]</code>)</td></tr>
+  <tr><td><code>adm app policy get [--json]</code></td><td>Print every rule of the file, with <code>*</code> as the field of a whole-permission rule</td></tr>
+  <tr><td><code>adm app policy log [--clear]</code></td><td>Print or delete the decision log</td></tr>
+</table>
+<table class="docs-table">
+  <tr><th>Environment</th><th>Meaning</th></tr>
+  <tr><td><code>ADM_SANDBOX</code></td><td><code>1</code> applies the OS sandbox from the compiled table; <code>0</code> turns a compiled-in sandbox off</td></tr>
+  <tr><td><code>ADM_POLICY_PROMPT</code></td><td><code>0</code> turns off the desktop prompt for <code>ask</code> rules; the ask then denies</td></tr>
+  <tr><td><code>ADM_APP_HOME</code></td><td>Where <code>policy.toml</code> and <code>policy.log</code> live, when not the default application folder</td></tr>
+  <tr><td><code>ADM_SCHED_DEBUG</code></td><td>Also reports the sandbox on stderr</td></tr>
+</table>
+<table class="docs-table">
+  <tr><th>Files</th><th></th></tr>
+  <tr><td><code>adm.toml [requires] permissions</code></td><td>A package narrowing what it wants to be granted</td></tr>
+  <tr><td><code>adm.toml [policy] sandbox</code></td><td>Compile the sandbox in</td></tr>
+  <tr><td><code>adm.lock</code></td><td>The grants accepted per installed package (<code>permissions=</code>) and whether its C bindings were accepted (<code>foreign=yes</code>)</td></tr>
+  <tr><td><code>&lt;app home&gt;/policy.toml</code></td><td>The user's rules, read at startup</td></tr>
+  <tr><td><code>&lt;app home&gt;/policy.log</code></td><td>Every decision, with the package that asked</td></tr>
+</table>
+    </section>
+  </main>
+
+</div>
+
+<script src="docs.js"></script>
+<script src="highlight.js"></script>
+</body>
+</html>
