@@ -146,7 +146,21 @@ partial module humanize {
 meta/checksums.json    SHA-256 of every file below; the signature covers this list
 meta/exports.json      every exported symbol: kind, signature, doc comment (for the IDE)
 src/humanize/humanize.adm   the exported modules and everything they import from the
-                            package, as written; tests and unrelated files stay out</code></pre>
+                            package, as written; tests and unrelated files stay out
+files/native/sqlite3.h      what the [package] files rules of adm.toml select:
+files/native/sqlite3.c      headers and C sources a binding needs, assets</code></pre>
+      </div>
+
+      <p>A library that binds C can ship what the binding needs, so a consumer does not have to have it installed. The <code>[package] files</code> rules of <code>adm.toml</code>, the same ones an application uses for its distribution archive, name the files; they land under <code>files/</code> in the package and beside <code>src/</code> when installed. A program that installs the library gets that folder on its include path and every <code>.c</code> under it compiled and linked, so <code>@c(&quot;native/sqlite3.h&quot;)</code> resolves the same way in the library's own tree and in a consumer's build when the rule keeps the path (<code>from = &quot;native&quot;</code>, <code>to = &quot;native/&quot;</code>). The manifest lists them as <code>files</code>, and <code>adm get --dry-run --json</code> shows the list before anything is installed.</p>
+      <p>Files a library needs while the program runs, an image or a data table, are named with a package path: <code>os.readFile(&quot;package://assets/logo.png&quot;)</code> from the library's own code reads its own copy, and <code>acme:imaging://assets/logo.png</code> names a file another library shipped. Every <code>std.os</code> call and every <code>Storage</code> method accepts the form, and <a href="services.html#svc-application"><code>Application.files()</code></a> gives the folder. During development the copy is the one in the package cache; <code>adm package build</code> copies every library's files into the application's archive under <code>share/&lt;namespace&gt;/&lt;name&gt;/</code>, and the same path finds them there once the program is installed. A bare <code>logo.png</code> resolves against the working directory and finds nothing.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">adm.toml</span>
+        </div>
+        <pre><code>[[package.files]]
+from = &quot;native&quot;
+to = &quot;native/&quot;</code></pre>
       </div>
 
       <p><code>adm lib verify humanize-0.1.0.admlib</code> checks the checksums and the signature and prints what the package is: name, version, publisher, hash, modules, dependencies. <code>adm doc --plugin humanize-0.1.0.admlib</code> lists the exports.</p>

@@ -127,7 +127,9 @@ plugin ImageTools {
                                compiler and runtime it was built with
 meta/exports.json              every exported symbol: kind, signature, doc
 linux-amd64/libImageTools.so   the native object, uncompressed, mappable
-linux-arm64/libImageTools.so   one directory per platform requested</code></pre>
+linux-arm64/libImageTools.so   one directory per platform requested
+files/...                      what the [package] files rules of adm.toml select
+                               (assets, headers), as for a library</code></pre>
       </div>
       <p>The shared object exports a single symbol, the plugin's entry, and is linked position-independent with its own symbols bound, so two plugins never clash with each other or with the host. <code>adm build --platforms linux-amd64,linux-arm64,darwin-arm64,windows-amd64</code> runs the build once per platform and merges the results into one package; a cross target needs the platform's sysroot, named by <code>ADM_SYSROOT_&lt;OS&gt;_&lt;ARCH&gt;</code>, and without one only the host platform is built. Applications built the same way land in <code>&lt;out&gt;/&lt;os&gt;-&lt;arch&gt;/</code>.</p>
     </section>

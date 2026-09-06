@@ -252,6 +252,14 @@ def onExpiry(evt Event&lt;string&gt;) {
         <p>Identity and lifecycle of the running application.</p>
         <ul class="api-list">
           <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def files(name string = &quot;&quot;) !string</code></div>
+            <p class="api-doc">The folder holding a package's shipped files, its <code>[package] files</code>: the calling package's when <code>name</code> is empty, else the library named <code>namespace:name</code> (<code>local:name</code> for one installed from a file). Once the program is installed that is <code>share/&lt;namespace&gt;/&lt;name&gt;</code> beside the executable, or the install root for the application itself; while it runs from its source tree it is the package cache for a library and the tree for the application. Fails when no folder exists in either layout.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def filePath(path string) !string</code></div>
+            <p class="api-doc">Resolves a package path: <code>package://assets/logo.png</code> is a file the calling package shipped, <code>acme:imaging://assets/logo.png</code> one a library shipped. Any other path comes back unchanged. Every <code>Storage</code> method, and so every <code>std.os</code> call, resolves its path this way, so <code>os.readFile(&quot;package://assets/logo.png&quot;)</code> works from <code>adm run</code>, from a build in the tree and from an installed program alike. Fails when the package has no shipped files.</p>
+          </li>
+          <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def pid() int</code></div>
             <p class="api-doc">Returns process id of the application</p>
 
