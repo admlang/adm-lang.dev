@@ -654,6 +654,9 @@ use (
           <li>A plain <code>use std.net.http</code> imports the module itself; you reference its exports
             through the module name - <code>http.Response</code>, not the full dotted path.</li>
           <li><code>use my.module as mod</code> aliases the whole module to a different name.</li>
+          <li><code>use my.module as _</code> links the module without a name. Nothing in the file can
+            refer to it; it is there for what it registers, such as a renderer that
+            <code>reflection.attrs</code> discovers by its annotation. The linter leaves these alone.</li>
           <li><code>::(foo, bar as Baz)</code> imports specific symbols by name, optionally renaming any
             of them. A module imported this way can't itself be aliased - there's nothing to alias,
             only the symbols it exposes are in scope.</li>

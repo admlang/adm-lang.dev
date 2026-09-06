@@ -57,6 +57,7 @@
         <ul class="docs-sub-list">
           <li><a class="docs-nav-sub" href="#svc-application"><code>Application</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-cache"><code>Cache</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-clipboard"><code>Clipboard</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-config"><code>Config</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-debugger"><code>Debugger</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-devices"><code>Devices</code></a></li>
@@ -66,6 +67,7 @@
           <li><a class="docs-nav-sub" href="#svc-logging"><code>Logging</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-messaging"><code>Messaging</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-network"><code>Network</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-notifications"><code>Notifications</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-policy"><code>Policy</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-runtime"><code>Runtime</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-scheduler"><code>Scheduler</code></a></li>
@@ -453,6 +455,51 @@ def onExpiry(evt Event&lt;string&gt;) {
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def created(key string) string</code></div>
             <p class="api-doc">Emitted when a key is stored for the first time.</p>
+          </li>
+        </ul>
+      </div>
+      <div class="docs-sub" id="svc-clipboard">
+        <h3><code>Clipboard</code></h3>
+        <p>Text copy and paste through the system clipboard. The service drives the desktop's clipboard program: wl-copy and wl-paste on Wayland, xclip or xsel on X11, pbcopy and pbpaste on macOS. A machine without one reports nothing available and the calls fail. Reading needs <code>adm.clipboard.read</code>, writing <code>adm.clipboard.write</code>. <code>copy</code>, <code>paste</code> and <code>clear</code> are commits, so <code>@on(Clipboard.copy)</code>, <code>@on(Clipboard.paste)</code> and <code>@on(Clipboard.clear)</code> observe them. The programs run through the shell, which the OS sandbox refuses.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def copy(text string) !none</code></div>
+            <p class="api-doc">Puts the text on the clipboard, replacing what was there.</p>
+            <p class="api-doc">Fails when the policy denies it, this machine has no clipboard program, or the program fails.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def paste() !string</code></div>
+            <p class="api-doc">Returns the text on the clipboard, "" when it holds none.</p>
+            <p class="api-doc">Fails when the policy denies it, this machine has no clipboard program, or the program fails.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def clear() !none</code></div>
+            <p class="api-doc">Empties the clipboard.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def has() !bool</code></div>
+            <p class="api-doc">Whether the clipboard holds any text. Needs the read permission.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def capabilities() ClipboardCapabilities</code></div>
+            <p class="api-doc">Reports whether this machine has a clipboard program and which one: <code>wl-clipboard</code>, <code>xclip</code>, <code>xsel</code> or <code>pbcopy</code>.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def watch(period duration = 500ms) !none</code></div>
+            <p class="api-doc">Starts watching the clipboard: a task reads it every <code>period</code> and emits <code>changed</code> when the text differs from what it saw last, whichever program changed it. Calling it while watching only changes the period.</p>
+            <p class="api-doc">Fails when the policy denies reading or this machine has no clipboard program.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def unwatch()</code></div>
+            <p class="api-doc">Stops the watcher task; nothing happens when none runs.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def watching() bool</code></div>
+            <p class="api-doc">Whether the watcher task runs.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def changed(change ClipboardChange) ClipboardChange</code></div>
+            <p class="api-doc">Emitted by the watcher when the clipboard text changed. <code>ClipboardChange</code> carries the text ("" when emptied), whether this program put it there through <code>copy</code>, and when the watcher noticed.</p>
           </li>
         </ul>
       </div>
@@ -853,6 +900,47 @@ def onExpiry(evt Event&lt;string&gt;) {
           </li>
         </ul>
       </div>
+      <div class="docs-sub" id="svc-notifications">
+        <h3><code>Notifications</code></h3>
+        <p>Desktop notifications through the platform's notification server. On Linux this is the freedesktop server on the D-Bus session bus; other platforms report nothing available yet. Showing one needs the <code>adm.notifications.show</code> permission.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def show(notification Notification) !NotificationId</code></div>
+            <p class="api-doc">Shows a notification and returns the id the server gave it. <code>Notification</code> carries the title, body, an icon name or absolute image path, the level (Info to Critical), action buttons, a timeout and an id to replace.</p>
+            <p class="api-doc">Fails when the policy denies it, there is no notification server, or the server refuses it.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def show(title string, body string = "") !NotificationId</code></div>
+            <p class="api-doc">Shows a notification with a title and an optional body and returns its id.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def close(id NotificationId) !none</code></div>
+            <p class="api-doc">Takes a shown notification off the screen.</p>
+            <p class="api-doc">Fails when there is no connection or the server does not know the id.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def ask(notification Notification, wait duration = 60s) !string</code></div>
+            <p class="api-doc">Shows a notification whose buttons are a question and waits for the answer: the pressed action's id, or "" when the user dismissed it or nobody answered within <code>wait</code> (the notification is then closed).</p>
+            <p class="api-doc">Fails when there is no notification server or it refuses the notification.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def capabilities() NotificationCapabilities</code></div>
+            <p class="api-doc">Reports what the notification server can do: actions, body text, markup, images, sound, persistence. Nothing is available when there is no server.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def shown() NotificationId[]</code></div>
+            <p class="api-doc">The ids of the notifications shown by this program that the server has not closed yet.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def action(event NotificationAction) NotificationAction</code></div>
+            <p class="api-doc">Emitted when the user presses one of a notification's buttons; the event names the notification and the action id.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def closed(id NotificationId) NotificationId</code></div>
+            <p class="api-doc">Emitted when a notification leaves the screen: dismissed, expired or closed.</p>
+          </li>
+        </ul>
+      </div>
       <div class="docs-sub" id="svc-policy">
         <h3><code>Policy</code></h3>
         <p>Permissions and policy decisions.</p>
@@ -864,7 +952,7 @@ def onExpiry(evt Event&lt;string&gt;) {
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def registerResolver(handler PolicyResolver) !none</code></div>
-            <p class="api-doc">Registers the resolver that answers `ask` rules. Without one an `ask` denies.</p>
+            <p class="api-doc">Registers the resolver that answers `ask` rules. Without one an `ask` prompts through a desktop notification (Allow, Always allow, Deny); with prompts off (`ADM_POLICY_PROMPT=0`) it denies.</p>
 
           </li>
           <li class="api-item">
@@ -910,8 +998,12 @@ def onExpiry(evt Event&lt;string&gt;) {
 
           </li>
           <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def text() string</code></div>
+            <p class="api-doc">The policy file as it would be written from the loaded rules and settings: one table per subject and permission, the comment preamble kept.</p>
+          </li>
+          <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def validate(permission string, spec string, value string) !none</code></div>
-            <p class="api-doc">Checks one constrained argument of a gated function against the merged rule for its permission: the file's rules for the program and for every package on the chain, then the registered spec's own check. An `ask` outcome goes to the resolver; without one it denies. The policy state itself is denied to every subject.</p>
+            <p class="api-doc">Checks one constrained argument of a gated function against the merged rule for its permission: the file's rules for the program and for every package on the chain, then the registered spec's own check. An `ask` outcome goes to the resolver, else to a desktop notification the user answers; unanswered denies. The policy state itself is denied to every subject.</p>
 
           </li>
           <li class="api-item">

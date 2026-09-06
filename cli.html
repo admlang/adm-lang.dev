@@ -375,7 +375,7 @@ adm test --json --coverage-report --backend c .</code></pre>
       <table class="docs-table">
         <tr><th>Flag</th><th>Meaning</th></tr>
         <tr><td><code>--dir DIR</code></td><td>Project directory (walks up to the nearest <code>adm.lock</code>).</td></tr>
-        <tr><td><code>--no-pull</code></td><td>Use the local registry clone without pulling.</td></tr>
+        <tr><td><code>--no-pull</code></td><td>Use the local registry clone without pulling, however old it is.</td></tr>
         <tr><td><code>--json</code></td><td>One object per package; the same shape as <code>adm lib --json</code>.</td></tr>
       </table>
       <h3 id="audit"><code>adm audit</code></h3>
@@ -563,9 +563,9 @@ adm app policy set --package acme:imaging adm.storage.read path.allow &quot;${ap
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="code-filename">usage</span>
         </div>
-        <pre><code data-hl="off" class="nohighlight">adm app policy log [--dir DIR] [--app NAME]</code></pre>
+        <pre><code data-hl="off" class="nohighlight">adm app policy log [--dir DIR] [--app NAME] [--clear]</code></pre>
       </div>
-      <p>Prints the decision log the Policy service keeps beside the file: denials, asks, live answers, file loads, the sandbox report.</p>
+      <p>Prints the decision log the Policy service keeps beside the file: denials, asks, live answers, file loads, the sandbox report. <code>--clear</code> deletes the log; the service starts a fresh one at its next decision.</p>
       <h3 id="lib"><code>adm lib</code></h3>
       <div class="code-window">
         <div class="code-titlebar">
@@ -578,7 +578,7 @@ adm app policy set --package acme:imaging adm.storage.read path.allow &quot;${ap
       <table class="docs-table">
         <tr><th>Flag</th><th>Meaning</th></tr>
         <tr><td><code>--json</code></td><td>One object per package, the shape of <code>adm list packages --json</code>.</td></tr>
-        <tr><td><code>--no-pull</code></td><td>Use the local registry clone without pulling.</td></tr>
+        <tr><td><code>--no-pull</code></td><td>Use the local registry clone without pulling, however old it is.</td></tr>
       </table>
       <h3 id="lib-remove"><code>adm lib remove</code></h3>
       <div class="code-window">
@@ -633,7 +633,7 @@ adm app policy set --package acme:imaging adm.storage.read path.allow &quot;${ap
         <tr><td><code>--dir DIR</code></td><td>Project whose lock to update.</td></tr>
         <tr><td><code>--dry-run</code></td><td>Resolve and report, install nothing; with <code>--json</code> the container is fetched and described (permissions, foreign files, dependencies) without installing.</td></tr>
         <tr><td><code>--json</code></td><td>The installed packages as JSON, progress on stderr.</td></tr>
-        <tr><td><code>--no-pull</code></td><td>Use the local registry clone without pulling.</td></tr>
+        <tr><td><code>--no-pull</code></td><td>Use the local registry clone without pulling, however old it is.</td></tr>
         <tr><td><code>--trust</code></td><td>Accept a publisher other than the one the lock pinned.</td></tr>
       </table>
       <div class="code-window">
@@ -691,13 +691,13 @@ adm get acme:imaging@^1.4 --accept adm.storage.*</code></pre>
         </div>
         <pre><code data-hl="off" class="nohighlight">adm search [text] [flags]</code></pre>
       </div>
-      <p>Pulls the configured registries and lists every library whose name, namespace or description contains the text (all of them without text).</p>
+      <p>Lists every library whose name, namespace or description contains the text (all of them without text). The registries are pulled when their local clones are more than an hour old (<code>ADM_CATALOG_MAX_AGE</code>, a Go duration, changes that).</p>
       <table class="docs-table">
         <tr><th>Flag</th><th>Meaning</th></tr>
         <tr><td><code>--json</code></td><td>Hits as JSON: namespace, name, latest, description, repo, publisher, date, registry, every version newest first.</td></tr>
         <tr><td><code>--indexes</code></td><td>List the registry indexes the project uses (<code>--json</code>: name, url, official, local catalog) instead of searching.</td></tr>
-        <tr><td><code>--refresh</code></td><td>Pull every registry clone first; alone, just refresh.</td></tr>
-        <tr><td><code>--no-pull</code></td><td>Use the local clones without pulling.</td></tr>
+        <tr><td><code>--refresh</code></td><td>Pull every registry clone now, however recent the last pull; alone, just refresh.</td></tr>
+        <tr><td><code>--no-pull</code></td><td>Use the local clones without pulling, however old they are.</td></tr>
         <tr><td><code>--dir DIR</code></td><td>Project whose <code>adm.toml</code> names the registries.</td></tr>
       </table>
       <div class="code-window">
@@ -796,20 +796,33 @@ adm get acme:imaging@^1.4 --accept adm.storage.*</code></pre>
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="code-filename">usage</span>
         </div>
-        <pre><code data-hl="off" class="nohighlight">adm lint [paths...] [--json] [--skip CODE,...] [--exclude GLOB] [--list]</code></pre>
+        <pre><code data-hl="off" class="nohighlight">adm lint [paths...] [--json] [--fix] [--skip CODE,...] [--exclude GLOB] [--list]</code></pre>
       </div>
-      <p>Static checks over a program that type-checks, reported for the files under the given paths (default <code>.</code>); the standard library is loaded but never reported on. The text report groups findings by file and ends with a count per check. <code>--json</code> prints an array of <code>{file, line, column, code, severity, message, fix}</code>, which the IDE's Lint tab reads.</p>
+      <p>Static checks over a program that type-checks, reported for the files under the given paths (default <code>.</code>); the standard library is loaded but never reported on. The text report groups findings by file and ends with a count per check. <code>--json</code> prints an array of <code>{file, line, column, code, severity, message, fix, edits}</code>, which the IDE's Lint tab reads. A finding with <code>edits</code> can be fixed mechanically: <code>--fix</code> applies every such edit on disk and names the files changed, and the Lint tab's Fix button does the same for one finding or a whole group. The language server runs the same checks on the open files, so editors show the findings inline (warnings and weak warnings, source <code>adm-lint</code>) with the fixes as code actions; <code>initializationOptions.lint</code> takes <code>enabled</code> and a <code>skip</code> list, and the <code>adm/lint</code> request returns every finding under a directory from the server's current analysis. On the command line an unchanged tree answers from a result cache under <code>~/.adm/cache/lint</code> (every file the last run loaded still hashes the same and the roots hold the same files); <code>ADM_NO_LINT_CACHE=1</code> bypasses it and <code>--fix</code> always runs.</p>
       <table class="docs-table">
         <tr><th>Check</th><th>Reports</th></tr>
-        <tr><td><code>ref-cycle</code></td><td>Two types holding strong references to each other, or a type holding itself through two fields (a tree's <code>parent</code> and <code>children</code>), so neither instance is ever freed. The fix names the field to mark <code>weak</code>.</td></tr>
-        <tr><td><code>unused-import</code></td><td>A <code>use</code> whose alias, module name and exports appear nowhere in the file.</td></tr>
+        <tr><td><code>unchecked-map-index</code></td><td>A read <code>m[k]</code> of a map where nothing before it established the key, which panics when the key is missing. An earlier <code>m[k] = v</code> or <code>m.set(k, v)</code> in the block, a <code>hasKey(k)</code>, <code>get(k)</code> or <code>k in m</code> check earlier or in an enclosing condition, a <code>for let (k, v) in m</code> loop around the read, or a map literal declaring the key all count as establishing it. <code>m[w] = m[w] + 1</code> still fires: it reads before it writes.</td></tr>
+        <tr><td><code>ref-cycle</code></td><td>Two types holding strong references to each other, or a type holding itself through two fields where one is named as a back reference (a tree's <code>parent</code> beside <code>children</code>, a list's <code>prev</code> beside <code>next</code>), so neither instance is ever freed. A node whose self links all point forward, such as <code>children</code> and <code>next</code>, is not reported, nor is one whose links all point up, and two types that hold arrays of each other are a tree of parts, not a cycle. The fix names the field to mark <code>weak</code>.</td></tr>
+        <tr><td><code>undeclared-dependency</code></td><td>A service calling or observing another service that its <code>dependencies</code> field lists under neither <code>hard</code> nor <code>soft</code>. The fix appends it to the <code>hard</code> list.</td></tr>
+        <tr><td><code>undeclared-permission</code></td><td>A library reaching a permission its <code>adm.toml</code> does not list under <code>[requires] permissions</code>, shown with the call chain. The library build fails on the same thing.</td></tr>
+        <tr><td><code>assertless-test</code></td><td>A <code>@test</code> with no <code>assert</code>, no <code>assert*</code> or <code>expect*</code> helper call and no <code>try</code>: it passes whatever the code does.</td></tr>
+        <tr><td><code>untested-export</code></td><td>An exported function or method no <code>_test.adm</code> under the roots names. Silent when there are no test files at all.</td></tr>
+        <tr><td><code>suite-file-without-suite</code></td><td>A <code>_test.adm</code> file with no <code>check</code> block, so <code>adm test</code> runs nothing in it.</td></tr>
+        <tr><td><code>prefer-lambda</code></td><td>An anonymous <code>def</code> passed as an argument whose body is one <code>return</code>. The fix rewrites it as <code>(a, b) =&gt; a + b</code>, or <code>v =&gt; v + 1</code> for one untyped parameter.</td></tr>
+        <tr><td><code>prefer-expects</code></td><td>An errorable function opening with <code>fail ... when</code>, <code>fail ... unless</code> or <code>if cond { fail }</code> guards on its parameters. The fix rewrites them as an <code>expects</code> block.</td></tr>
+        <tr><td><code>prefer-when</code></td><td>An <code>if</code> with no else around one call, return or assignment. The fix writes <code>one when cond</code>, or <code>one unless x</code> for <code>if !x</code>.</td></tr>
+        <tr><td><code>prefer-junction</code></td><td><code>x == a || x == b || x == c</code> with literals, or <code>x == /a/ &amp;&amp; x == /b/</code> with regexes. The fix writes the junction <code>x := a || b || c</code>.</td></tr>
+        <tr><td><code>prefer-empty-block</code></td><td>An emptiness check paired with a loop over the same collection, as an else branch or the statement before. The fix moves the check into the loop's <code>empty</code> block.</td></tr>
+        <tr><td><code>service-dependency-cycle</code></td><td>Services whose <code>dependencies</code> fields form a loop through a soft edge: it starts, but calls between the two can recurse. A loop over hard edges alone is a compile error already.</td></tr>
+        <tr><td><code>unused-import</code></td><td>A <code>use</code> whose alias, module name and exports appear nowhere in the file. A module kept for what it registers is written <code>use m as _</code>, which the check skips.</td></tr>
         <tr><td><code>unused-internal</code></td><td>An <code>internal</code> function, type, const or let nothing refers to.</td></tr>
         <tr><td><code>error-doc</code></td><td>An exported function returning <code>!T</code> whose doc comment never says when it fails.</td></tr>
         <tr><td><code>missing-doc</code></td><td>An exported declaration without a doc comment.</td></tr>
         <tr><td><code>naming</code></td><td>Types not <code>PascalCase</code>; functions, methods and fields not <code>camelCase</code>. Test files and test functions are exempt.</td></tr>
+        <tr><td><code>accessor-prefix</code></td><td><code>getX()</code> and <code>setX(v)</code> methods over a field, which ADM reads as a property. When both do nothing but read and write the field, the fix rewrites the field into a property block carrying the accessors' doc comments, deletes the methods and turns every caller into <code>o.x</code> or <code>o.x = v</code>. A getter with logic, or a setter used as an expression, is reported without a fix.</td></tr>
         <tr><td><code>todo</code></td><td><code>TODO</code>, <code>FIXME</code>, <code>HACK</code> and <code>XXX</code> comments.</td></tr>
       </table>
-      <p><code>ref-cycle</code>, <code>unused-import</code> and <code>unused-internal</code> are warnings; the rest are informational. Test files skip the naming and documentation checks, and constructors and destructors need no doc comment. <code>--skip</code> leaves checks out; the exit code is 0 either way.</p>
+      <p><code>ref-cycle</code>, <code>unchecked-map-index</code>, <code>unused-import</code> and <code>unused-internal</code> are warnings; the rest are informational. Test files skip the naming and documentation checks, and constructors and destructors need no doc comment. <code>--skip</code> leaves checks out; the exit code is 0 either way. Fixes exist for <code>ref-cycle</code> (inserts <code>weak</code> on the optional field), <code>unused-import</code> (removes the line or the name) and <code>accessor-prefix</code>.</p>
       <div class="code-window">
         <div class="code-titlebar">
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -817,6 +830,7 @@ adm get acme:imaging@^1.4 --accept adm.storage.*</code></pre>
         </div>
         <pre><code data-hl="off" class="nohighlight">adm lint
 adm lint std/io --skip missing-doc,todo
+adm lint --fix .
 adm lint --list</code></pre>
       </div>
       <h3 id="ide"><code>adm ide</code></h3>
