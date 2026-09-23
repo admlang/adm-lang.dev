@@ -2723,8 +2723,8 @@ println(v)</code></pre>
         </div>
         <p>
           <code>new channel&lt;T&gt;(size=?, mode=?)</code> is the full constructor - <code>size</code>
-          defaults to <code>0</code> (unbuffered), and <code>mode</code> (FIFO/LIFO/priority) defaults
-          to FIFO. A channel exposes a <code>closed</code> property, and the range form of
+          defaults to <code>0</code> (unbuffered), and <code>mode</code> (<code>ChanMode.FIFO</code> or
+          <code>ChanMode.LIFO</code>) defaults to FIFO. A channel exposes a <code>closed</code> property, and the range form of
           <code>for</code> drains it until the producer closes it: <code>for let value in channel { ... }</code>.
         </p>
       </div>
