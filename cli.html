@@ -50,6 +50,7 @@
         <span class="docs-pages-label">Docs</span>
         <a class="docs-page-link" href="docs.html">Language reference</a>
         <a class="docs-page-link" href="memory.html">Memory model</a>
+        <a class="docs-page-link" href="units.html">Units of measure</a>
         <a class="docs-page-link" href="annotations.html">Annotations</a>
         <a class="docs-page-link" href="app-home.html">Application home &amp; migrations</a>
         <a class="docs-page-link" href="policy.html">Policy &amp; permissions</a>
@@ -179,6 +180,14 @@
 adm build --libs samples/imaging
 adm build App1 --release --os linux --arch arm64</code></pre>
       </div>
+      <p>
+        Builds are incremental. The compiler caches each module's checked and lowered form and its
+        object code under <code>~/.adm/cache</code>, so after an edit only the modules whose sources or
+        imported interfaces changed are checked and compiled again. An unchanged binary is not linked
+        again. An application build also drops every function the program cannot reach before code
+        generation. <code>--no-cache</code>, <code>ADM_NO_INCREMENTAL=1</code> and
+        <code>ADM_NO_SHAKE=1</code> turn these off.
+      </p>
       <h3 id="check"><code>adm check</code></h3>
       <div class="code-window">
         <div class="code-titlebar">
@@ -909,7 +918,7 @@ adm lint --list</code></pre>
         </div>
         <pre><code data-hl="off" class="nohighlight">adm clean</code></pre>
       </div>
-      <p>Removes build artifacts.</p>
+      <p>Removes the build cache (<code>ADM_CACHE</code>, default <code>~/.adm/cache</code>). Every cache entry is keyed on the compiler that wrote it, so after an update the old entries can never be used again.</p>
       <h3 id="config"><code>adm config</code></h3>
       <div class="code-window">
         <div class="code-titlebar">

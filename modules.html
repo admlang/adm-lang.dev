@@ -54,6 +54,7 @@
           <li><a class="docs-nav-sub" href="#std-strings">std.strings</a></li>
           <li><a class="docs-nav-sub" href="#std-bytes">std.bytes</a></li>
           <li><a class="docs-nav-sub" href="#std-math">std.math</a></li>
+          <li><a class="docs-nav-sub" href="#std-units">std.units</a></li>
           <li><a class="docs-nav-sub" href="#std-time">std.time</a></li>
           <li><a class="docs-nav-sub" href="#std-errors">std.errors</a></li>
           <li><a class="docs-nav-sub" href="#std-collections">std.data.collections</a></li>
@@ -88,6 +89,16 @@
         <a class="docs-nav-top" href="#net-group">Networking</a>
         <ul class="docs-sub-list">
           <li><a class="docs-nav-sub" href="#std-net">std.net</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#media">Media &amp; Devices</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#std-media-player">std.media.player</a></li>
+          <li><a class="docs-nav-sub" href="#std-media-dsp">std.media.dsp</a></li>
+          <li><a class="docs-nav-sub" href="#std-media-synth">std.media.synth</a></li>
+          <li><a class="docs-nav-sub" href="#std-devices">std.devices</a></li>
         </ul>
       </div>
 
@@ -151,7 +162,11 @@ use std.data.encoding::(json)</code></pre>
       </div>
       <div class="docs-sub" id="std-math">
         <h3><code>std.math</code></h3>
-        <p class="docs-placeholder">Numeric functions plus <code>std.math.geom</code> for geometry types. Reference coming soon.</p>
+        <p class="docs-placeholder">Numeric functions plus <code>std.math.geom</code> for geometry types, <code>std.math.bezier</code> (Bézier curves and the CSS <code>cubic-bezier</code> solver) and <code>std.math.easing</code> (the easings.net curves, CSS <code>steps</code> and a damped <code>spring</code>). Reference coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-units">
+        <h3><code>std.units</code></h3>
+        <p>Dimension types and units for <a href="units.html">quantity literals</a>: the SI base dimensions plus angle and data size, around forty derived dimensions (<code>Speed</code>, <code>Force</code>, <code>Energy</code>, <code>Voltage</code>, <code>DataRate</code>, …), SI units with every prefix, the accepted non-SI units (<code>min</code>, <code>h</code>, <code>L</code>, <code>°C</code>, <code>kWh</code>, <code>bar</code>, …), data sizes with decimal and binary prefixes, and the levels <code>dB</code>, <code>dBFS</code>, <code>dBm</code> and <code>dBW</code>. <code>parseUnit</code> reads quantities from text and <code>quantity</code> builds one from a number. The <a href="units.html#catalogue">catalogue</a> lists them all.</p>
       </div>
       <div class="docs-sub" id="std-time">
         <h3><code>std.time</code></h3>
@@ -173,7 +188,7 @@ use std.data.encoding::(json)</code></pre>
           (<code>HashMap</code>, <code>SortedMap</code>, <code>OrderedMap</code>, <code>MultiMap</code>), sets,
           heaps and priority queues, trees (<code>BinaryTree</code>, <code>BST</code>, <code>AVLTree</code>,
           <code>RedBlackTree</code>, <code>BTree</code>, <code>BPlusTree</code>, <code>Trie</code>,
-          <code>RadixTree</code>), graphs with Dijkstra, sparse arrays, a Bloom filter and an LRU cache.
+          <code>RadixTree</code>), graphs with Dijkstra, sparse arrays, a Bloom filter and an LRU cache. <code>std.data.collections.sort</code> sorts any type that implements <code>Comparable&lt;T&gt;</code>, and <code>std.data.collections.search</code> finds a value in a list. Both let you pick the algorithm.
           Doubly linked structures keep their back pointers <code>weak</code>, so dropping a list frees its nodes.
           Reference coming soon.
         </p>
@@ -240,16 +255,25 @@ use std.data.encoding::(json)</code></pre>
         <p class="docs-placeholder">
           Encoding (JSON, XML, YAML, MsgPack, Base64, plus <code>urlEncode</code>/<code>urlDecode</code>
           percent encoding and <code>htmlEncode</code>/<code>htmlDecode</code> character references in
-          <code>std.data.encoding</code>), compression, databases, and data structures. Reference coming soon.
+          <code>std.data.encoding</code>), compression in <code>std.data.compress</code> (DEFLATE with
+          every level and window size, gzip, zlib and LZW), databases, and data structures. Reference coming soon.
         </p>
       </div>
       <div class="docs-sub" id="std-crypto">
         <h3><code>std.crypto</code></h3>
-        <p class="docs-placeholder">Hashes, ciphers, random, and UUIDs. Reference coming soon.</p>
+        <p>Random numbers, UUIDs, keys and signatures (RSA, ECDSA, Ed25519, X25519), and PEM, PKIX and PKCS#8 encoding. <code>std.crypto.hash</code> has MD5, the SHA-1, SHA-2 and SHA-3 families, Keccak, BLAKE2, RIPEMD-160, CRC and Adler-32, plus HMAC and HKDF. <code>std.crypto.cipher</code> has AES, GCM and ChaCha20-Poly1305. <code>std.crypto.x509</code> parses certificates and verifies chains for TLS. All of it is written in ADM.</p>
       </div>
       <div class="docs-sub" id="std-formats">
         <h3><code>std.formats</code></h3>
-        <p class="docs-placeholder">Image, audio, video, font, archive, and document formats. Reference coming soon.</p>
+        <p>Readers and writers for file formats, written in ADM. Each family (images, audio, documents) shares one model, and options specific to a format are on that codec's own type. <code>std.formats</code> itself handles MIME types and content detection.</p>
+        <ul>
+          <li><code>std.formats.image</code>: PNG, APNG, GIF, JPEG, WebP, BMP, PCX, TGA, XPM, TIFF, PSD, ICO/CUR and ANI, with animation frames and EXIF.</li>
+          <li><code>std.formats.audio</code>: WAV, AIFF, AU, FLAC, MP3, Ogg Vorbis, Opus, AAC and M4A/ALAC, plus MIDI and SoundFont files, a single tag model for all of them (with covers and ReplayGain), and rate and channel conversion. Decoded output matches ffmpeg.</li>
+          <li><code>std.formats.docs</code>: a format-neutral <code>Document</code> with Markdown (CommonMark plus GFM), plain-text and RTF codecs.</li>
+          <li><code>std.formats.playlist</code>: M3U/M3U8 and PLS.</li>
+          <li><code>std.formats.fonts</code>: TrueType outlines and metrics.</li>
+        </ul>
+        <p class="docs-placeholder">Archives, video, spreadsheets and slides are designed but not built yet.</p>
       </div>
       <div class="docs-sub" id="std-proto">
         <h3><code>std.proto</code></h3>
@@ -261,10 +285,36 @@ use std.data.encoding::(json)</code></pre>
       <h2>Networking</h2>
       <div class="docs-sub" id="std-net">
         <h3><code>std.net</code></h3>
-        <p class="docs-placeholder">
-          TCP, UDP, DNS, and higher-level protocol clients and servers - HTTP, SSH, SMTP, FTP, LDAP,
-          IRC. Reference coming soon.
-        </p>
+        <p>Sockets, addresses and listeners, with typed <code>NetError</code> failures. The protocols on top are written in ADM:</p>
+        <ul>
+          <li><code>std.net.tcp</code> and <code>std.net.udp</code>: clients and servers.</li>
+          <li><code>std.net.tls</code>: TLS 1.3 client and server.</li>
+          <li><code>std.net.http</code>: HTTP/1.1 client and server with handlers, middleware, cookies, keep-alive and limits; <code>.http2</code> (HTTP/2 with HPACK, served over TLS); <code>.websocket</code> (RFC 6455); <code>.httptest</code> (loopback test server and response recorder).</li>
+          <li><code>std.net.dns</code>: DNS client and server with EDNS; <code>.secure</code> (DNS over TLS and over HTTPS); <code>.dnssec</code> (validation and zone signing, NSEC and NSEC3); <code>.mdns</code> (multicast DNS and DNS-SD service discovery).</li>
+          <li><code>std.net.url</code>: URLs, query values, RFC 6570 templates and URL patterns.</li>
+          <li><code>std.net.multipart</code>: multipart form bodies.</li>
+        </ul>
+        <p class="docs-placeholder">SSH, SMTP, FTP, LDAP and IRC are planned.</p>
+      </div>
+    </section>
+
+    <section class="docs-section" id="media">
+      <h2>Media &amp; Devices</h2>
+      <div class="docs-sub" id="std-media-player">
+        <h3><code>std.media.player</code></h3>
+        <p>A <code>MediaPlayer</code> that plays a <code>Playlist</code> of files, folders and internet radio streams (ICY titles, reconnects) through the default speaker or any sink. It plays gapless or with crossfades, and has shuffle, repeat, a play-next queue, ReplayGain, an effect chain, and a display for cover art or a visualizer. Playback runs on its own task. See the <a href="examples.html#media-player">example</a>.</p>
+      </div>
+      <div class="docs-sub" id="std-media-dsp">
+        <h3><code>std.media.dsp</code></h3>
+        <p>Audio effects the player runs in a chain: biquad filters, parametric and graphic equalizers with presets, compressor, limiter, gain, balance, stereo width, reverb, delay and chorus, plus a spectrum analyzer and level meter.</p>
+      </div>
+      <div class="docs-sub" id="std-media-synth">
+        <h3><code>std.media.synth</code></h3>
+        <p>A software synthesizer: built-in waveforms per General MIDI group, or the samples of a SoundFont. Plays notes live or renders a MIDI file as an audio stream.</p>
+      </div>
+      <div class="docs-sub" id="std-devices">
+        <h3><code>std.devices</code></h3>
+        <p>Cameras over V4L2, and sound: <code>Speaker</code> and <code>Microphone</code> through PulseAudio or PipeWire, or raw ALSA when no sound server runs. Linux only for now.</p>
       </div>
     </section>
 
@@ -273,12 +323,15 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-ui">
         <h3><code>std.ui</code></h3>
         <p class="docs-placeholder">
-          Components and renderers backing the <a href="docs.html#ui">UI</a> constructs. Reference coming soon.
+          Components and renderers backing the <a href="docs.html#ui">UI</a> constructs: events, the
+          style model, the OpenGL renderer, and the layout dimensions <code>px</code>, <code>%</code>,
+          <code>vh</code>, <code>vw</code> and <code>em</code> with their union <code>Extent</code>
+          (see <a href="units.html#ui-extents">UI extents</a>). Reference coming soon.
         </p>
       </div>
       <div class="docs-sub" id="std-gfx">
         <h3><code>std.gfx</code></h3>
-        <p class="docs-placeholder">Canvas drawing, color, and rendering. Reference coming soon.</p>
+        <p><code>Raster</code>, the pixel surface shared by images and canvases, plus masks and a <code>Canvas</code>. <code>std.gfx.color</code> covers color models, CSS parsing, blending and WCAG contrast. <code>std.gfx.processing</code> chains filters (blur runs on the GPU when there is one), transforms (resizing, content-aware seam carving, cropping around the main subject) and analysis in a <code>Pipeline</code>.</p>
       </div>
       <div class="docs-sub" id="std-simd">
         <h3><code>std.simd</code></h3>

@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Units of measure - adm</title>
+<meta name="description" content="Units of measure in ADM: quantity literals, dimension types, conversions, and the std.units catalogue.">
+<link rel="icon" type="image/svg+xml" href="assets/adm.svg">
+<link rel="canonical" href="https://adm-lang.dev/units.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="adm">
+<meta property="og:title" content="adm - Units of measure">
+<meta property="og:description" content="Units of measure in ADM: quantity literals, dimension types, conversions, and the std.units catalogue.">
+<meta property="og:url" content="https://adm-lang.dev/units.html">
+<meta property="og:image" content="https://adm-lang.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="adm - Units of measure">
+<meta name="twitter:description" content="Units of measure in ADM: quantity literals, dimension types, conversions, and the std.units catalogue.">
+<meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/adm.svg" alt="ADM" class="brand-mark">
+      <span class="brand-name"><span class="brand-sub">programming language</span></span>
+    </a>
+    <nav class="nav">
+      <a href="docs.html" class="nav-active">Docs</a>
+      <a href="examples.html">Examples</a>
+      <a href="services.html">Services</a>
+      <a href="modules.html">Modules</a>
+      <a class="nav-icon" href="https://github.com/admlang" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs-layout">
+
+  <aside class="docs-sidebar">
+    <nav class="docs-nav" id="docs-nav">
+
+      <div class="docs-pages">
+        <span class="docs-pages-label">Docs</span>
+        <a class="docs-page-link" href="docs.html">Language reference</a>
+        <a class="docs-page-link" href="memory.html">Memory model</a>
+        <a class="docs-page-link current" href="units.html">Units of measure</a>
+        <a class="docs-page-link" href="annotations.html">Annotations</a>
+        <a class="docs-page-link" href="app-home.html">Application home &amp; migrations</a>
+        <a class="docs-page-link" href="policy.html">Policy &amp; permissions</a>
+        <a class="docs-page-link" href="plugins.html">Plugins</a>
+        <a class="docs-page-link" href="libraries.html">Libraries</a>
+        <a class="docs-page-link" href="cli.html">Command line</a>
+      </div>
+
+            <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#overview">Overview</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#literals">Quantity literals</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#dimensions">Dimensions</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#arithmetic">Arithmetic</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#conversions">Conversions and printing</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#parsing">Numbers from variables and text</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#durations">Durations</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#levels">Offsets and levels</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#own-units">Declaring units</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#ui-extents">UI extents</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#catalogue">Catalogue</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#catalogue-base">Base dimensions</a></li>
+          <li><a class="docs-nav-sub" href="#catalogue-derived">Derived dimensions</a></li>
+        </ul>
+      </div>
+
+    </nav>
+  </aside>
+
+  <main class="docs-content">
+
+    <section class="docs-section" id="overview">
+      <h2>Units of measure</h2>
+      <p>
+        In ADM a number can carry a unit, and the type of that value is its dimension
+        (<code>Length</code>, <code>Speed</code>, <code>Energy</code>). The compiler checks the
+        dimensions, so adding metres to seconds does not compile. You pick a unit when you write a
+        value and again when you convert or print it. In between you work with lengths, speeds and
+        forces.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">trip.adm</span>
+        </div>
+        <pre><code>application Trip {
+	use std.units::*
+
+	def eta(distance Length, speed Speed) Time {
+		return distance / speed
+	}
+
+	def new(args string[]) int {
+		let t = eta(420(km), 110(km/h))
+		println(t.str(h, digits = 1))        // 3.8 h
+
+		let force = 75(kg) * 9.81(m/s²)
+		println(force.str(N))                // 735.75 N
+
+		// let wrong = 420(km) + t           // error: cannot add std.units.Length and std.units.Time
+		return 0
+	}
+}</code></pre>
+      </div>
+      <p>
+        At run time a quantity is a plain <code>float</code> in SI base units: <code>1(km)</code>
+        is the constant <code>1000.0</code>, and the dimension exists only in the type. A quantity takes
+        the same memory as a float, and an array of them can be passed to C as an array of
+        <code>double</code>.
+      </p>
+    </section>
+
+    <section class="docs-section" id="literals">
+      <h2>Quantity literals</h2>
+      <p>
+        A unit is written in parentheses directly after a number literal: <code>100(km)</code>,
+        <code>9.81(m/s²)</code>, <code>-5(m)</code>, <code>36(km/h)</code>, <code>50(%)</code>.
+        Only number literals take a unit this way; a variable is converted by multiplying or with
+        <a href="#parsing"><code>quantity</code></a>.
+      </p>
+      <p>
+        The text in the parentheses is unit notation, not an expression:
+      </p>
+      <ul>
+        <li>names, including <code>µ</code>, <code>Ω</code>, <code>%</code>, <code>°</code>, <code>′</code>, <code>″</code> and subscript digits;</li>
+        <li><code>*</code> or <code>·</code> to multiply, <code>/</code> to divide everything after it: <code>kg·m/s²</code>, <code>J/(kg·K)</code>;</li>
+        <li>powers as <code>^2</code>, <code>^-1</code>, <code>²</code> or <code>⁻¹</code>, and parentheses;</li>
+        <li>a number directly before a name as a scale: <code>6.2(L/100km)</code>.</li>
+      </ul>
+      <p>
+        Spaces are ignored, and <code>in</code> inside the parentheses is the inch, not the keyword.
+        Unit symbols are not variables, so you can still name a local <code>m</code>, <code>s</code>
+        or <code>kg</code>. A literal sees the units of the modules imported where it is written,
+        so <code>use std.units</code> (whole, by member, or with <code>*</code>) is enough to write
+        <code>2(m)</code>. <code>adm fmt</code> writes units in canonical form:
+        <code>9.81 (m / s ^ 2)</code> becomes <code>9.81(m/s²)</code>.
+      </p>
+    </section>
+
+    <section class="docs-section" id="dimensions">
+      <h2>Dimensions</h2>
+      <p>
+        A dimension is a type. <code>std.units</code> declares the base dimensions with
+        <code>@dimension</code> and derives the rest from them with <code>*</code>, <code>/</code>
+        and integer powers:
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">std/units</span>
+        </div>
+        <pre><code>@dimension(unit = &quot;m&quot;)
+type Length
+
+@dimension(unit = &quot;s&quot;)
+type Time
+
+type Speed = Length / Time
+type Acceleration = Speed / Time
+type Area = Length ** 2
+type Force = Mass * Acceleration</code></pre>
+      </div>
+      <p>
+        Two dimensions made of the same base dimensions are the same type, so an
+        <code>Energy</code> can be assigned to a <code>Torque</code>. A result that no declared type
+        names still has a dimension, written in base dimensions (<code>Mass·Time</code>).
+        Parameters and fields use the dimension name like any type:
+        <code>def eta(d Length, v Speed) Time</code>.
+      </p>
+    </section>
+
+    <section class="docs-section" id="arithmetic">
+      <h2>Arithmetic</h2>
+      <ul>
+        <li><code>+</code>, <code>-</code> and comparisons need the same dimension.</li>
+        <li><code>*</code> and <code>/</code> combine dimensions; a number scales a quantity (<code>2 * 8(px)</code>, <code>x / 2</code>), and <code>1 / 2(s)</code> is a <code>Frequency</code>.</li>
+        <li><code>**</code> takes an integer constant: <code>2(cm) ** 2</code> is an <code>Area</code>.</li>
+        <li>A dimensionless result is a <code>float</code>: <code>1(km) / 1(m)</code> is <code>1000.0</code>.</li>
+        <li>The literal <code>0</code> stands for any quantity except a temperature, so <code>let total Length = 0</code> works.</li>
+        <li><code>float(q)</code> gives the number in base units; a quantity is never converted to a number implicitly.</li>
+      </ul>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">average.adm</span>
+        </div>
+        <pre><code>def average(parts Length[]) Length {
+	let total Length = 0
+	for let p in parts {
+		total += p
+	}
+	return total / parts.len()
+}
+
+println(average([1(m), 2(m), 6(m)]))   // 3 m
+println(float(36(km/h)))               // 10 (m/s)</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="conversions">
+      <h2>Conversions and printing</h2>
+      <p>
+        A quantity does not remember the unit it was written in: <code>10(m/s)</code> and
+        <code>36(km/h)</code> are the same value. You choose a unit again when you convert or print:
+      </p>
+      <ul>
+        <li><code>v.to(km/h)</code> is a <code>float</code>: the value expressed in that unit.</li>
+        <li><code>v.str()</code>, <code>println(v)</code> and interpolation print base units: <code>735.75 kg·m/s²</code>.</li>
+        <li><code>v.str(N)</code> prints in another unit, <code>v.str(km, digits = 2)</code> with a fixed number of decimals.</li>
+      </ul>
+      <p>The unit must measure the value's dimension; <code>distance.to(kg)</code> is a compile error.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">conversions.adm</span>
+        </div>
+        <pre><code>let fuel = 6.2(L/100km)
+let used Volume = 420(km) * fuel
+println(used.str(L))                  // 26.04 L
+
+let size = 1(GiB)
+println(size.str(MB, digits = 0))     // 1074 MB
+
+let warm = 20(°C) + 5(K)
+println(warm.str(°C))                 // 25 °C</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="parsing">
+      <h2>Numbers from variables and text</h2>
+      <p>
+        <code>quantity(value, unit)</code> turns a number held in a variable into a quantity. Multiplying by a one-unit literal does the same for linear
+        units. <code>parseUnit(text, unit)</code> reads user input such as <code>"80 km/h"</code>,
+        <code>"45 L"</code> or a bare <code>"45"</code>, which it reads in <code>unit</code>; it
+        fails when the text does not start with a number or names a unit it does not know.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">input.adm</span>
+        </div>
+        <pre><code>let x = 3.0
+println(quantity(x, km))              // 3000 m
+println((x * 1(km)).str(km))          // 3 km
+
+let limit = parseUnit(&quot;80 km/h&quot;, km/h) onerror (err error) {
+	return 1
+}
+println(limit)                        // 22.2222 m/s</code></pre>
+      </div>
+      <p>
+        <code>parseUnit</code> is declared as <code>def parseUnit&lt;D&gt;(text string, unit Unit&lt;D&gt;) !D</code>:
+        a parameter of type <code>Unit&lt;D&gt;</code> takes a unit as its argument, and the unit's
+        dimension becomes <code>D</code>. Your own functions can take units the same way.
+      </p>
+    </section>
+
+    <section class="docs-section" id="durations">
+      <h2>Durations</h2>
+      <p>
+        <code>duration</code> is unchanged: nanoseconds, written <code>2h</code> or
+        <code>150ms</code>, and <code>1m</code> is still one minute (duration literals also accept
+        <code>min</code>). Where a duration meets a quantity in an operator, it counts as a
+        <code>Time</code> in seconds, so <code>100(km) / 2h</code> is a <code>Speed</code> and
+        <code>2h == 2(h)</code> is true. To turn a quantity into a duration, convert it:
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">wait.adm</span>
+        </div>
+        <pre><code>let wait = 1.5(min)
+let d = wait.to(s) * 1s
+println(d)                            // 1m30s</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="levels">
+      <h2>Offsets and levels</h2>
+      <p>
+        <code>°C</code> is an offset unit: <code>21(°C)</code> is 294.15 K. Adding two offset
+        literals, as in <code>20(°C) + 5(°C)</code>, gives a warning because it adds two absolute
+        temperatures. <code>20(°C) + 5(K)</code> does not.
+      </p>
+      <p>
+        <code>dB</code>, <code>dBFS</code>, <code>dBm</code> and <code>dBW</code> are logarithmic
+        units. Values stay linear: <code>-6(dB)</code> is the gain 0.501, and
+        <code>10(dBm)</code> is a <code>Power</code> of 10 mW. <code>to</code> and <code>str</code>
+        convert back to the level.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">levels.adm</span>
+        </div>
+        <pre><code>let gain = quantity(-6, dB)
+println(gain)                         // 0.501187
+println(gain.str(dB))                 // -6 dB
+
+let rx = 10(dBm)
+println(rx.str(mW))                   // 10 mW</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="own-units">
+      <h2>Declaring units</h2>
+      <p>
+        <code>@dimension(unit = "…")</code> declares a base dimension and its base unit.
+        <code>@unit("…")</code> on a constant adds a unit to an existing dimension, with the
+        constant's value as its size. <code>prefixes = Prefixes.SI</code> generates every SI prefix
+        (<code>mg</code>, <code>kg</code>, <code>µg</code>), <code>prefixes = Prefixes.Data</code> the
+        decimal and binary data prefixes (<code>kB</code>, <code>KiB</code>), and
+        <code>offset</code> and <code>log</code> make offset and logarithmic units.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">brewery.adm</span>
+        </div>
+        <pre><code>module brewing {
+	use std.units::*
+
+	// a base dimension of its own
+	@dimension(unit = &quot;IBU&quot;)
+	type Bitterness
+
+	// a new unit for an existing dimension
+	@unit(&quot;bbl&quot;)
+	const barrel Volume = 117.35(L)
+}
+
+application Brewery {
+	use (
+		std.units::*
+		brewing::*
+	)
+
+	def new(args string[]) int {
+		let batch = 20(bbl)
+		println(batch.str(hL, digits = 1))   // 23.5 hL
+		let hops = 45(IBU) / batch
+		println(hops.str(IBU/L))             // 0.0191734 IBU/L
+		return 0
+	}
+}</code></pre>
+      </div>
+      <p>
+        Two modules may declare the same symbol. If a literal can see both, the compiler reports it
+        as ambiguous. If it can see neither, the error names the module to import.
+      </p>
+    </section>
+
+    <section class="docs-section" id="ui-extents">
+      <h2>UI extents</h2>
+      <p>
+        <code>std.ui</code> declares the layout dimensions <code>Pixels</code> (<code>px</code>),
+        <code>Percent</code> (<code>%</code>), <code>ViewportHeight</code> (<code>vh</code>),
+        <code>ViewportWidth</code> (<code>vw</code>) and <code>FontRelative</code>
+        (<code>em</code>), and <code>Extent</code>, a union of those and <code>Length</code>. Style
+        properties such as padding and margin take an <code>Extent</code>, and a <code>match</code>
+        can check whether a value is <code>8(px)</code> or <code>50(%)</code>.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">layout.adm</span>
+        </div>
+        <pre><code>let pad Extent = 8(px)
+let width Extent = 50(%)</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="catalogue">
+      <h2>Catalogue</h2>
+      <p>
+        Everything below comes from <code>use std.units</code>. It covers SI and the units accepted
+        alongside it, with no imperial units. "SI prefixes" means every prefix from quecto to
+        quetta; "data prefixes" means k, M, G, T, … and Ki, Mi, Gi, Ti, ….
+      </p>
+
+      <div class="docs-sub" id="catalogue-base">
+        <h3>Base dimensions</h3>
+        <table class="docs-table">
+          <thead><tr><th>Dimension</th><th>Base unit</th><th>Other units</th></tr></thead>
+          <tbody>
+            <tr><td><code>Length</code></td><td><code>m</code>, SI prefixes</td><td><code>au</code>, <code>nmi</code>, <code>pt</code></td></tr>
+            <tr><td><code>Mass</code></td><td><code>kg</code> (<code>g</code> with SI prefixes)</td><td><code>t</code>, <code>Da</code></td></tr>
+            <tr><td><code>Time</code></td><td><code>s</code>, SI prefixes</td><td><code>min</code>, <code>h</code>, <code>d</code></td></tr>
+            <tr><td><code>ElectricCurrent</code></td><td><code>A</code>, SI prefixes</td><td></td></tr>
+            <tr><td><code>Temperature</code></td><td><code>K</code>, SI prefixes</td><td><code>°C</code></td></tr>
+            <tr><td><code>Amount</code></td><td><code>mol</code>, SI prefixes</td><td></td></tr>
+            <tr><td><code>LuminousIntensity</code></td><td><code>cd</code>, SI prefixes</td><td></td></tr>
+            <tr><td><code>Angle</code></td><td><code>rad</code>, SI prefixes</td><td><code>°</code>, <code>′</code>, <code>″</code></td></tr>
+            <tr><td><code>SolidAngle</code></td><td><code>sr</code></td><td></td></tr>
+            <tr><td><code>DataSize</code></td><td><code>B</code>, data prefixes</td><td><code>bit</code>, data prefixes</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="docs-sub" id="catalogue-derived">
+        <h3>Derived dimensions</h3>
+        <table class="docs-table">
+          <thead><tr><th>Dimension</th><th>Is</th><th>Named units</th></tr></thead>
+          <tbody>
+            <tr><td><code>Area</code></td><td>Length²</td><td><code>ha</code></td></tr>
+            <tr><td><code>Volume</code></td><td>Length³</td><td><code>L</code>, SI prefixes</td></tr>
+            <tr><td><code>Speed</code></td><td>Length / Time</td><td><code>kn</code></td></tr>
+            <tr><td><code>Acceleration</code></td><td>Speed / Time</td><td><code>g₀</code></td></tr>
+            <tr><td><code>Jerk</code></td><td>Acceleration / Time</td><td></td></tr>
+            <tr><td><code>AngularVelocity</code></td><td>Angle / Time</td><td><code>rpm</code></td></tr>
+            <tr><td><code>AngularAcceleration</code></td><td>AngularVelocity / Time</td><td></td></tr>
+            <tr><td><code>Resolution</code></td><td>Length⁻¹</td><td><code>dpi</code></td></tr>
+            <tr><td><code>Force</code></td><td>Mass · Acceleration</td><td><code>N</code>, SI prefixes</td></tr>
+            <tr><td><code>Pressure</code></td><td>Force / Area</td><td><code>Pa</code>, <code>bar</code>, SI prefixes</td></tr>
+            <tr><td><code>Energy</code> = <code>Torque</code></td><td>Force · Length</td><td><code>J</code>, <code>eV</code>, SI prefixes; <code>kWh</code>, <code>kcal</code></td></tr>
+            <tr><td><code>Power</code></td><td>Energy / Time</td><td><code>W</code>, SI prefixes; <code>dBm</code>, <code>dBW</code></td></tr>
+            <tr><td><code>Momentum</code></td><td>Mass · Speed</td><td></td></tr>
+            <tr><td><code>Density</code></td><td>Mass / Volume</td><td></td></tr>
+            <tr><td><code>VolumeFlow</code>, <code>MassFlow</code></td><td>Volume / Time, Mass / Time</td><td></td></tr>
+            <tr><td><code>Viscosity</code></td><td>Pressure · Time</td><td></td></tr>
+            <tr><td><code>FuelConsumption</code></td><td>Volume / Length</td><td>written <code>L/100km</code></td></tr>
+            <tr><td><code>Frequency</code> = <code>Radioactivity</code></td><td>Time⁻¹</td><td><code>Hz</code>, <code>Bq</code>, SI prefixes; <code>bpm</code></td></tr>
+            <tr><td><code>Charge</code></td><td>ElectricCurrent · Time</td><td><code>C</code>, SI prefixes; <code>mAh</code></td></tr>
+            <tr><td><code>Voltage</code></td><td>Power / ElectricCurrent</td><td><code>V</code>, SI prefixes</td></tr>
+            <tr><td><code>Resistance</code>, <code>Conductance</code></td><td>Voltage / ElectricCurrent and its inverse</td><td><code>Ω</code>, <code>S</code>, SI prefixes</td></tr>
+            <tr><td><code>Capacitance</code></td><td>Charge / Voltage</td><td><code>F</code>, SI prefixes</td></tr>
+            <tr><td><code>MagneticFlux</code></td><td>Voltage · Time</td><td><code>Wb</code>, SI prefixes</td></tr>
+            <tr><td><code>Inductance</code></td><td>MagneticFlux / ElectricCurrent</td><td><code>H</code>, SI prefixes</td></tr>
+            <tr><td><code>FluxDensity</code></td><td>MagneticFlux / Area</td><td><code>T</code>, SI prefixes</td></tr>
+            <tr><td><code>LuminousFlux</code></td><td>LuminousIntensity · SolidAngle</td><td><code>lm</code></td></tr>
+            <tr><td><code>Illuminance</code></td><td>LuminousFlux / Area</td><td><code>lx</code></td></tr>
+            <tr><td><code>Luminance</code></td><td>LuminousIntensity / Area</td><td></td></tr>
+            <tr><td><code>SpecificHeat</code></td><td>Energy / (Mass · Temperature)</td><td></td></tr>
+            <tr><td><code>MolarMass</code></td><td>Mass / Amount</td><td></td></tr>
+            <tr><td><code>Concentration</code></td><td>Amount / Volume</td><td></td></tr>
+            <tr><td><code>AbsorbedDose</code> = <code>EquivalentDose</code></td><td>Energy / Mass</td><td><code>Gy</code>, <code>Sv</code>, SI prefixes</td></tr>
+            <tr><td><code>DataRate</code></td><td>DataSize / Time</td><td><code>bps</code>, data prefixes</td></tr>
+          </tbody>
+        </table>
+        <p>
+          Any compound of these works in a literal or a conversion without a name of its own:
+          <code>km/h</code>, <code>kg·m/s²</code>, <code>J/(kg·K)</code>, <code>Mbit/s</code>.
+          <code>dB</code> and <code>dBFS</code> are dimensionless levels (amplitude ratios).
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+</div>
+
+<script src="docs.js"></script>
+<script src="highlight.js"></script>
+</body>
+</html>

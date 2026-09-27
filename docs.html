@@ -50,6 +50,7 @@
         <span class="docs-pages-label">Docs</span>
         <a class="docs-page-link current" href="docs.html">Language reference</a>
         <a class="docs-page-link" href="memory.html">Memory model</a>
+        <a class="docs-page-link" href="units.html">Units of measure</a>
         <a class="docs-page-link" href="annotations.html">Annotations</a>
         <a class="docs-page-link" href="app-home.html">Application home &amp; migrations</a>
         <a class="docs-page-link" href="policy.html">Policy &amp; permissions</a>
@@ -99,6 +100,7 @@
           <li><a class="docs-nav-sub" href="#unions">Unions</a></li>
           <li><a class="docs-nav-sub" href="#interfaces-datatypes">Interfaces &amp; Datatypes</a></li>
           <li><a class="docs-nav-sub" href="#any-type"><code>any</code></a></li>
+          <li><a class="docs-nav-sub" href="#units">Units of measure</a></li>
         </ul>
       </div>
 
@@ -1371,6 +1373,40 @@ a is Named     // true - interfaces work too</code></pre>
           what it actually is. Reach for a <a href="#union-intersection-types">union type</a> instead
           whenever the set of possibilities is known - it's checked at compile time, where
           <code>any</code> pushes the check to a narrowing site.
+        </p>
+      </div>
+
+      <div class="docs-sub" id="units">
+        <h3>Units of measure</h3>
+        <p>
+          A number literal can carry a unit in parentheses: <code>100(km)</code>,
+          <code>9.81(m/s²)</code>, <code>36(km/h)</code>. The value's type is its dimension
+          (<code>Length</code>, <code>Speed</code>, <code>Force</code>), declared with
+          <code>@dimension</code> or derived with <code>*</code>, <code>/</code> and <code>**</code>.
+          <code>+</code>, <code>-</code> and comparisons need the same dimension, and <code>*</code>
+          and <code>/</code> combine dimensions, so adding a <code>Length</code> to a <code>Time</code>
+          is a compile error. At run time a quantity is a <code>float</code> in SI base units; the
+          dimension exists only in the type.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">units.adm</span>
+          </div>
+          <pre><code>use std.units::*
+
+let distance = 420(km)
+let t = distance / 110(km/h)          // Time
+println(t.str(h, digits = 1))         // 3.8 h
+println(t.to(min))                    // 229.090909, a float
+let wrong = distance + t              // error: cannot add Length and Time</code></pre>
+        </div>
+        <p>
+          <code>v.to(unit)</code> gives the number in another unit, <code>v.str(unit)</code> the text,
+          and <code>quantity(x, unit)</code> turns a variable into a quantity. When a <code>duration</code>
+          is used with a quantity, it counts as a <code>Time</code>. <a href="units.html">Units of measure</a>
+          covers the unit notation, conversions, offset and logarithmic units, declaring your own
+          units, and the full <code>std.units</code> catalogue.
         </p>
       </div>
     </section>

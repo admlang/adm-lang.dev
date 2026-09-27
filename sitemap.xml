@@ -41,6 +41,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://adm-lang.dev/units.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://adm-lang.dev/annotations.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
