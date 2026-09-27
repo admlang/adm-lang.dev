@@ -63,39 +63,91 @@
       <div class="code-window">
         <div class="code-titlebar">
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-          <span class="code-filename">warehouse.adm</span>
+          <span class="code-filename">launch.adm</span>
         </div>
-        <pre><code>module inventory {
-	struct Item {
-		@trim()
-		name  string
-		stock int
+        <pre><code>module rocket {
+	use std.units::*
+
+	// Contracts: checked when the function starts and when it returns.
+	def burnTime(fuel Mass, rate MassFlow) !Time {
+		expects {
+			assert rate &gt; 0 onerror fail &quot;engine off&quot;
+		}
+		let t = fuel / rate
+		return t
+		provides {
+			assert t &lt; 10(min) onerror fail &quot;burn too long: {t.str(min)}&quot;
+		}
 	}
 
-	def restock(item Item, qty int) !Item {
-		expects {
-			assert qty =&gt; 0 onerror fail "quantity must be positive"
-			assert item.name != ""
-		}
-		return Item{name: item.name, stock: item.stock + qty}
+	// Compiled for the GPU; runs on the CPU when there is none.
+	cuda def cool(temps float64[], by float64) !none {
+		int i = blockIdx.x * blockDim.x + threadIdx.x;
+		if (i &lt; temps_len) temps[i] -= by;
+	}
+
+	async def weather() string {
+		use std.net.http
+		let reply = http.get(&quot;https://wttr.in/Cape+Canaveral?format=3&quot;) onerror return &quot;no go&quot;
+		return reply.text() onerror recover &quot;no go&quot;
+	}
+
+	async def range() string {
+		return &quot;go&quot;
 	}
 }
 
-application Warehouse {
+application Launch {
+	use (
+		std.units::*
+		rocket
+	)
+
+	let fuel Mass = 0
+
+	def load(m Mass) {
+		begin { fuel += m }
+		rollback { fuel -= m }
+	}
+
+	// When anything inside fails, every rollback runs.
+	def fuelUp(m Mass) !none {
+		transaction {
+			load(m)
+			let t = try rocket.burnTime(fuel, 2.5(t/s))
+			println(&quot;burn for {t.str(s)}&quot;)
+		} onerror (err error) {
+			println(&quot;scrubbed: {err.message}, fuel back to {fuel.str(t)}&quot;)
+			recover none
+		}
+		return none
+	}
 
 	def new(args string[]) int {
-		use inventory
+		fuelUp(2000(t)) onerror return 1
+		fuelUp(400(t)) onerror return 1
 
-		let item = inventory.Item{name: "widget", stock: 12}
-		let updated = inventory.restock(item, 8) onerror recover item
+		// Both checks run at once; the first answer wins.
+		let status = await (rocket.weather() || rocket.range())
+		println(&quot;status: {status}&quot;)
 
-		match updated.stock {
-			case (n); n &gt; 15:
-				println("well stocked: {updated.stock}")
-			default:
-				println("low stock: {updated.stock}")
+		// All four engines compared in one SIMD instruction.
+		let temps = float64[910.0, 870.0, 1020.0, 880.0]
+		let v vec4&lt;float64&gt;
+		let hot = v.load(temps, 0).gt(v.splat(1000.0))
+		if hot.any() {
+			rocket.cool(temps, 50.0) onerror recover none
 		}
 
+		// One task per engine, spread across cores, reporting on a channel.
+		let telemetry channel&lt;string&gt; = new(size = 4)
+		forall let (i, t) in temps {
+			telemetry &lt;- &quot;engine {i}: {int(t)} K&quot;
+		}
+		telemetry.close()
+		for let line in telemetry {
+			println(line)
+		}
 		return 0
 	}
 }

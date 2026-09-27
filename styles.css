@@ -220,6 +220,18 @@ code, pre, .code-window {
 
 .code-window code { color: inherit; }
 
+/* The home page example is longer than the hero; it scrolls inside its window. */
+.hero-code .code-window pre {
+  max-height: 560px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #454E5A transparent;
+}
+
+.hero-code .code-window pre::-webkit-scrollbar { width: 8px; height: 8px; }
+.hero-code .code-window pre::-webkit-scrollbar-thumb { background: #454E5A; border-radius: 4px; }
+.hero-code .code-window pre::-webkit-scrollbar-track { background: transparent; }
+
 .kw { color: #E39A56; }
 .ty { color: #7FB0DE; }
 .str { color: #9AC98C; }
