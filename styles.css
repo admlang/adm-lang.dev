@@ -756,3 +756,19 @@ code, pre, .code-window {
 .dl-cmd code { background: transparent; color: inherit; padding: 0; }
 .dl-note { margin: .9rem 0 0; font-size: .95rem; color: var(--fg-muted, #666); }
 @media (max-width: 600px) { .dl-tab span { display: none; } .dl-icon { width: 1.5rem; height: 1.5rem; } }
+
+/* Module export tables (modules.html) */
+
+.exports-table {
+  table-layout: fixed;
+}
+
+.exports-table td:first-child {
+  width: 58%;
+}
+
+.docs-content .exports-note {
+  margin: -8px 0 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
