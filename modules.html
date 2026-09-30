@@ -52,12 +52,16 @@
         <a class="docs-nav-top" href="#core">Core</a>
         <ul class="docs-sub-list">
           <li><a class="docs-nav-sub" href="#std-strings">std.strings</a></li>
+          <li><a class="docs-nav-sub" href="#std-text-unicode">std.text.unicode</a></li>
+          <li><a class="docs-nav-sub" href="#std-text-jinja">std.text.templates.jinja</a></li>
+          <li><a class="docs-nav-sub" href="#std-glob">std.glob</a></li>
           <li><a class="docs-nav-sub" href="#std-bytes">std.bytes</a></li>
           <li><a class="docs-nav-sub" href="#std-math">std.math</a></li>
           <li><a class="docs-nav-sub" href="#std-math-geom">std.math.geom</a></li>
           <li><a class="docs-nav-sub" href="#std-math-bezier">std.math.bezier</a></li>
           <li><a class="docs-nav-sub" href="#std-math-easing">std.math.easing</a></li>
           <li><a class="docs-nav-sub" href="#std-math-processing">std.math.processing</a></li>
+          <li><a class="docs-nav-sub" href="#std-math-ecc">std.math.ecc</a></li>
           <li><a class="docs-nav-sub" href="#std-units">std.units</a></li>
           <li><a class="docs-nav-sub" href="#std-time">std.time</a></li>
           <li><a class="docs-nav-sub" href="#std-errors">std.errors</a></li>
@@ -86,6 +90,7 @@
         <ul class="docs-sub-list">
           <li><a class="docs-nav-sub" href="#std-encoding">std.data.encoding</a></li>
           <li><a class="docs-nav-sub" href="#std-codepages">std.data.encoding.codepages</a></li>
+          <li><a class="docs-nav-sub" href="#std-shiftjis">std.data.encoding.shiftjis</a></li>
           <li><a class="docs-nav-sub" href="#std-compress">std.data.compress</a></li>
           <li><a class="docs-nav-sub" href="#std-crypto">std.crypto</a></li>
           <li><a class="docs-nav-sub" href="#std-hash">std.crypto.hash</a></li>
@@ -109,6 +114,12 @@
           <li><a class="docs-nav-sub" href="#std-calendar">std.formats.calendar</a></li>
           <li><a class="docs-nav-sub" href="#std-contacts">std.formats.contacts</a></li>
           <li><a class="docs-nav-sub" href="#std-formats-ai">std.formats.ai</a></li>
+          <li><a class="docs-nav-sub" href="#std-barcodes">std.barcodes</a></li>
+          <li><a class="docs-nav-sub" href="#std-barcodes-qr">std.barcodes.qr</a></li>
+          <li><a class="docs-nav-sub" href="#std-barcodes-datamatrix">std.barcodes.datamatrix</a></li>
+          <li><a class="docs-nav-sub" href="#std-barcodes-aztec">std.barcodes.aztec</a></li>
+          <li><a class="docs-nav-sub" href="#std-barcodes-pdf417">std.barcodes.pdf417</a></li>
+          <li><a class="docs-nav-sub" href="#std-barcodes-linear">std.barcodes.linear</a></li>
           <li><a class="docs-nav-sub" href="#formats-planned">Planned</a></li>
         </ul>
       </div>
@@ -224,6 +235,27 @@ use std.data.encoding::(json)</code></pre>
         </table>
         <p class="exports-note">Most string operations are methods on <code>string</code> in the prelude.</p>
       </div>
+      <div class="docs-sub" id="std-text-unicode">
+        <h3><code>std.text.unicode</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>category</code>, <code>Category</code>, <code>combiningClass</code>, <code>script</code></td><td>Unicode 18 character properties</td></tr>
+          <tr><td><code>normalize</code>, <code>NormalForm</code>, <code>decompose</code>, <code>compose</code></td><td>normalization (NFC, NFD, NFKC, NFKD)</td></tr>
+          <tr><td><code>mirror</code>, <code>isDefaultIgnorable</code>, <code>isExtendedPictographic</code></td><td>bidi mirroring, ignorables, emoji</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-text-jinja">
+        <h3><code>std.text.templates.jinja</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>parse</code>, <code>Template</code>, <code>Options</code></td><td>Jinja2 templates</td></tr>
+          <tr><td><code>Safe</code></td><td>text marked safe from autoescape</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-glob">
+        <h3><code>std.glob</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>glob</code>, <code>Glob</code></td><td>shell-style patterns (<code>*</code>, <code>?</code>)</td></tr>
+        </table>
+      </div>
       <div class="docs-sub" id="std-bytes">
         <h3><code>std.bytes</code></h3>
         <table class="docs-table exports-table">
@@ -273,6 +305,13 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>fft</code>, <code>ifft</code>, <code>rfft</code>, <code>irfft</code></td><td>Fourier transforms</td></tr>
           <tr><td><code>dct</code>, <code>idct</code></td><td>cosine transforms (DCT-II/III)</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-math-ecc">
+        <h3><code>std.math.ecc</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Field</code>, <code>BinaryField</code>, <code>PrimeField</code></td><td>finite fields: GF(2^m), GF(p)</td></tr>
+          <tr><td><code>ReedSolomon</code></td><td>Reed-Solomon: <code>encode</code>, <code>correct</code> with errors and erasures</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-units">
@@ -423,6 +462,12 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>decode</code>, <code>encode</code>, <code>forCharset</code></td><td>conversion, lookup by charset name</td></tr>
         </table>
       </div>
+      <div class="docs-sub" id="std-shiftjis">
+        <h3><code>std.data.encoding.shiftjis</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>encode</code>, <code>decode</code></td><td>Shift JIS (JIS X 0208)</td></tr>
+        </table>
+      </div>
       <div class="docs-sub" id="std-compress">
         <h3><code>std.data.compress</code></h3>
         <table class="docs-table exports-table">
@@ -497,29 +542,36 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>Image</code>, <code>load</code>, <code>info</code></td><td>image, implements <code>gfx.Raster</code></td></tr>
           <tr><td><code>PNG</code>, <code>APNG</code>, <code>GIF</code>, <code>JPEG</code>, <code>WEBP</code>, <code>BMP</code>, <code>TIFF</code>, <code>PSD</code>, <code>TGA</code>, <code>PCX</code>, <code>XPM</code>, <code>ICO</code>, <code>CUR</code>, <code>ANI</code></td><td>codecs</td></tr>
+          <tr><td><code>SVG.parsePath</code>, <code>SVG.pathData</code></td><td>SVG path data</td></tr>
+          <tr><td><code>exif.Tag</code>, <code>exif.IFD</code>, <code>exif.ImageTag</code>, <code>exif.PhotoTag</code>, <code>exif.GPSInfoTag</code></td><td>EXIF tags</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-audio">
         <h3><code>std.formats.audio</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>AudioStream</code>, <code>open</code>, <code>load</code>, <code>save</code>, <code>info</code></td><td>decoded audio, seekable</td></tr>
+          <tr><td><code>AudioStream</code>, <code>open</code>, <code>load</code>, <code>save</code>, <code>write</code>, <code>info</code>, <code>AudioInfo</code></td><td>decoded audio, seekable</td></tr>
           <tr><td><code>WAV</code>, <code>AIFF</code>, <code>AU</code>, <code>FLAC</code>, <code>MP3</code>, <code>Vorbis</code>, <code>Opus</code>, <code>AAC</code>, <code>M4A</code>, <code>WMA</code></td><td>codecs, read and write</td></tr>
           <tr><td><code>AC3</code>, <code>EAC3</code>, <code>AMR</code>, <code>AMRWB</code></td><td>codecs, read only</td></tr>
+          <tr><td><code>AudioFormat</code>, <code>AudioDecoder</code>, <code>AudioEncoder</code>, <code>AudioCodec</code>, <code>@codec</code></td><td>codec interfaces, registering a format</td></tr>
           <tr><td><code>AudioTags</code>, <code>tags</code></td><td>tags and covers for every format</td></tr>
+          <tr><td><code>ID3Tags</code>, <code>OpusTags</code>, <code>M4aMetadata</code>, <code>FlacMetadata</code>, <code>FlacPicture</code>, <code>WAVCue</code>, <code>AIFFMarker</code>, <code>AIFFComment</code></td><td>format-specific metadata</td></tr>
           <tr><td><code>Converter</code></td><td>sample rate and channel conversion</td></tr>
           <tr><td><code>Midi</code>, <code>MidiTrack</code></td><td>MIDI files</td></tr>
           <tr><td><code>SoundFont</code></td><td>SoundFont banks</td></tr>
           <tr><td><code>PCM</code></td><td>raw samples</td></tr>
         </table>
+        <p class="exports-note">AAC decodes AAC-LC and HE-AAC (SBR, parametric stereo) up to 7.1; the encoder writes AAC-LC.</p>
       </div>
       <div class="docs-sub" id="std-video">
         <h3><code>std.formats.video</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Video</code>, <code>open</code></td><td>video file: tracks, frames, sound</td></tr>
-          <tr><td><code>VideoFrame</code>, <code>toImage</code>, <code>draw</code></td><td>decoded picture</td></tr>
-          <tr><td><code>MP4</code>, <code>MKV</code>, <code>AVI</code>, <code>FLV</code>, <code>OGV</code>, <code>MPEG</code>, <code>TS</code>, <code>ASF</code>, <code>ElementaryStream</code></td><td>containers</td></tr>
+          <tr><td><code>VideoFrame</code>, <code>toImage</code>, <code>draw</code>, <code>fittedSize</code></td><td>decoded picture</td></tr>
+          <tr><td><code>VideoInfo</code>, <code>Track</code>, <code>Packet</code>, <code>FrameRate</code>, <code>VideoStream</code></td><td>tracks and packets</td></tr>
+          <tr><td><code>Container</code>, <code>ContainerFormat</code>, <code>VideoDecoder</code>, <code>ContainerCodec</code>, <code>@codec</code>, <code>@decoder</code></td><td>container and decoder interfaces, registering a format</td></tr>
+          <tr><td><code>MP4</code>, <code>MKV</code>, <code>AVI</code>, <code>FLV</code>, <code>OGV</code>, <code>MPEG</code>, <code>TS</code>, <code>ASF</code>, <code>MXF</code>, <code>ElementaryStream</code></td><td>containers</td></tr>
           <tr><td><code>H264</code>, <code>HEVC</code>, <code>AV1</code>, <code>Mpeg2</code>, <code>Mpeg4Part2</code>, <code>Msmpeg4v2</code>, <code>VP8</code>, <code>Theora</code>, <code>MJPEG</code></td><td>decoders</td></tr>
-          <tr><td><code>VideoHardware</code>, <code>GpuPicture</code></td><td>GPU decoding (NVDEC, VA-API), frames kept on the GPU</td></tr>
+          <tr><td><code>VideoHardware</code>, <code>HardwareDecoder</code>, <code>GpuPicture</code>, <code>download</code></td><td>GPU decoding (NVDEC, VA-API), frames kept on the GPU</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-archive">
@@ -554,6 +606,9 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Font</code>, <code>Face</code>, <code>load</code>, <code>info</code></td><td>fonts and faces</td></tr>
           <tr><td><code>TTF</code>, <code>OTF</code>, <code>WOFF</code>, <code>WOFF2</code>, <code>EOT</code>, <code>FON</code></td><td>codecs</td></tr>
           <tr><td><code>Outline</code>, <code>FontMetrics</code>, <code>Bitmap</code></td><td>glyphs and metrics</td></tr>
+          <tr><td><code>shape</code>, <code>features</code>, <code>ShapedRun</code>, <code>ShapedGlyph</code>, <code>ShapeOptions</code>, <code>TextDirection</code></td><td>OpenType shaping</td></tr>
+          <tr><td><code>Hinting</code>, <code>Baselines</code>, <code>Axis</code></td><td>hinted outlines (TrueType, CFF), baselines</td></tr>
+          <tr><td><code>VariableFace</code>, <code>VariationAxis</code>, <code>OpenTypeFace</code></td><td>variable fonts, OpenType tables</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-playlist">
@@ -590,9 +645,49 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>dequantize</code>, <code>blockSize</code>, <code>blockBytes</code></td><td>quantized blocks to floats</td></tr>
         </table>
       </div>
+      <div class="docs-sub" id="std-barcodes">
+        <h3><code>std.barcodes</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Symbology</code>, <code>Symbol</code>, <code>Barcode</code></td><td>symbol grid or bars, decoded result</td></tr>
+          <tr><td><code>encode</code>, <code>decode</code></td><td>any symbology; every barcode in an image</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-barcodes-qr">
+        <h3><code>std.barcodes.qr</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>encode</code>, <code>decode</code>, <code>Level</code></td><td>QR Code and Micro QR</td></tr>
+          <tr><td><code>sequence</code></td><td>structured append</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-barcodes-datamatrix">
+        <h3><code>std.barcodes.datamatrix</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>encode</code>, <code>decode</code>, <code>Shape</code></td><td>Data Matrix ECC 200, square and rectangular</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-barcodes-aztec">
+        <h3><code>std.barcodes.aztec</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>encode</code>, <code>decode</code>, <code>Format</code></td><td>Aztec compact and full-range</td></tr>
+          <tr><td><code>rune</code></td><td>Aztec runes</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-barcodes-pdf417">
+        <h3><code>std.barcodes.pdf417</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>encode</code>, <code>decode</code></td><td>PDF417, compact PDF417, MicroPDF417</td></tr>
+          <tr><td><code>sequence</code></td><td>Macro PDF417</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-barcodes-linear">
+        <h3><code>std.barcodes.linear</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>encode</code>, <code>decode</code></td><td>EAN-13/8, UPC-A/E with add-ons, Code 128, Code 39, Code 93, ITF, Codabar</td></tr>
+        </table>
+      </div>
       <div class="docs-sub" id="formats-planned">
         <h3>Planned</h3>
-        <p class="docs-placeholder"><code>std.formats.sheets</code> and <code>.slides</code>.</p>
+        <p class="docs-placeholder"><code>std.formats.sheets</code>, <code>.slides</code> and <code>.data</code>.</p>
       </div>
     </section>
 
@@ -655,6 +750,8 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.net.http.webdav</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Client</code>, <code>Server</code></td><td>WebDAV, over any <code>std.fs</code> store</td></tr>
+          <tr><td><code>caldav.Client</code>, <code>caldav.Calendars</code>, <code>caldav.CalendarObject</code></td><td>CalDAV client and server</td></tr>
+          <tr><td><code>carddav.Client</code>, <code>carddav.AddressBooks</code>, <code>carddav.AddressObject</code></td><td>CardDAV client and server</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-dns">
@@ -791,7 +888,7 @@ use std.data.encoding::(json)</code></pre>
       </div>
       <div class="docs-sub" id="net-planned">
         <h3>Planned</h3>
-        <p class="docs-placeholder"><code>std.net.jmap</code>, <code>std.net.http.webdav.caldav</code> and <code>.carddav</code>.</p>
+        <p class="docs-placeholder"><code>std.net.jmap</code>.</p>
       </div>
     </section>
 
@@ -809,11 +906,11 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-media-dsp">
         <h3><code>std.media.dsp</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>Biquad</code>, <code>Equalizer</code>, <code>EqPreset</code></td><td>filters, equalizers</td></tr>
+          <tr><td><code>Biquad</code>, <code>Equalizer</code>, <code>EqBand</code>, <code>EqPreset</code></td><td>filters, equalizers</td></tr>
           <tr><td><code>Compressor</code>, <code>Limiter</code>, <code>Gain</code>, <code>Balance</code>, <code>StereoWidth</code></td><td>dynamics, levels</td></tr>
           <tr><td><code>Reverb</code>, <code>Delay</code>, <code>Chorus</code></td><td>effects</td></tr>
           <tr><td><code>Spectrum</code>, <code>LevelMeter</code></td><td>analysis</td></tr>
-          <tr><td><code>AudioEffect</code></td><td>effect interface</td></tr>
+          <tr><td><code>AudioEffect</code>, <code>AudioProcessor</code>, <code>EffectSwitch</code></td><td>effect interfaces, bypass switch</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-media-synth">
@@ -887,6 +984,7 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>Raster</code></td><td>pixel surface shared by images and canvases</td></tr>
           <tr><td><code>Mask</code>, <code>RectangleMask</code>, <code>CircleMask</code>, <code>PathMask</code></td><td>masks</td></tr>
+          <tr><td><code>RowMask</code>, <code>coverageRow</code>, <code>coverageBounds</code>, <code>luminanceCoverage</code></td><td>masks a row at a time, and where they cover</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-gfx-color">
@@ -900,7 +998,14 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-gfx-canvas">
         <h3><code>std.gfx.canvas</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>Canvas</code>, <code>DrawContext</code></td><td>drawing surface</td></tr>
+          <tr><td><code>Canvas</code></td><td>CPU drawing surface, implements <code>gfx.Raster</code></td></tr>
+          <tr><td><code>Painter</code>, <code>DrawContext</code>, <code>Picture</code>, <code>record</code></td><td>drawing interface, recording and replay</td></tr>
+          <tr><td><code>Paint</code>, <code>LinearGradient</code>, <code>RadialGradient</code>, <code>ConicGradient</code>, <code>Pattern</code>, <code>linear</code>, <code>radial</code></td><td>colors, gradients (OKLab, linear light, sRGB), patterns</td></tr>
+          <tr><td><code>ColorStop</code>, <code>Spread</code>, <code>ColorSpace</code></td><td>gradient stops, spread and interpolation space</td></tr>
+          <tr><td><code>DrawState</code>, <code>Composite</code>, <code>Sampling</code>, <code>ClipRegion</code></td><td>transform, clip, alpha, Porter-Duff operators, blend, sampling</td></tr>
+          <tr><td><code>Effect</code>, <code>DropShadow</code>, <code>InnerShadow</code>, <code>OuterGlow</code>, <code>InnerGlow</code>, <code>Blur</code>, <code>Outline</code>, <code>ColorAdjust</code>, <code>ColorMatrix</code></td><td>group effects</td></tr>
+          <tr><td><code>Layers</code>, <code>Layer</code>, <code>LayerGroup</code>, <code>LayerItem</code></td><td>layer stacks with masks, clipping layers and folders</td></tr>
+          <tr><td><code>TextStyle</code>, <code>TextAlign</code>, <code>TextBaseline</code>, <code>TextMetrics</code>, <code>GlyphBox</code></td><td>shaped, hinted text</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-gfx-processing">
