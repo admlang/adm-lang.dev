@@ -106,6 +106,9 @@
           <li><a class="docs-nav-sub" href="#std-mail-format">std.formats.mail</a></li>
           <li><a class="docs-nav-sub" href="#std-fonts">std.formats.fonts</a></li>
           <li><a class="docs-nav-sub" href="#std-playlist">std.formats.playlist</a></li>
+          <li><a class="docs-nav-sub" href="#std-calendar">std.formats.calendar</a></li>
+          <li><a class="docs-nav-sub" href="#std-contacts">std.formats.contacts</a></li>
+          <li><a class="docs-nav-sub" href="#std-formats-ai">std.formats.ai</a></li>
           <li><a class="docs-nav-sub" href="#formats-planned">Planned</a></li>
         </ul>
       </div>
@@ -150,6 +153,14 @@
           <li><a class="docs-nav-sub" href="#std-media-dsp">std.media.dsp</a></li>
           <li><a class="docs-nav-sub" href="#std-media-synth">std.media.synth</a></li>
           <li><a class="docs-nav-sub" href="#std-devices">std.devices</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#ai-group">AI</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#std-ai-llm">std.ai.llm</a></li>
+          <li><a class="docs-nav-sub" href="#std-ai-tensor">std.ai.tensor</a></li>
         </ul>
       </div>
 
@@ -507,7 +518,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Video</code>, <code>open</code></td><td>video file: tracks, frames, sound</td></tr>
           <tr><td><code>VideoFrame</code>, <code>toImage</code>, <code>draw</code></td><td>decoded picture</td></tr>
           <tr><td><code>MP4</code>, <code>MKV</code>, <code>AVI</code>, <code>FLV</code>, <code>OGV</code>, <code>MPEG</code>, <code>TS</code>, <code>ASF</code>, <code>ElementaryStream</code></td><td>containers</td></tr>
-          <tr><td><code>H264</code>, <code>Mpeg2</code>, <code>Mpeg4Part2</code>, <code>Msmpeg4v2</code>, <code>VP8</code>, <code>Theora</code>, <code>MJPEG</code></td><td>decoders</td></tr>
+          <tr><td><code>H264</code>, <code>HEVC</code>, <code>AV1</code>, <code>Mpeg2</code>, <code>Mpeg4Part2</code>, <code>Msmpeg4v2</code>, <code>VP8</code>, <code>Theora</code>, <code>MJPEG</code></td><td>decoders</td></tr>
           <tr><td><code>VideoHardware</code>, <code>GpuPicture</code></td><td>GPU decoding (NVDEC, VA-API), frames kept on the GPU</td></tr>
         </table>
       </div>
@@ -552,9 +563,36 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>M3U</code>, <code>PLS</code></td><td>codecs</td></tr>
         </table>
       </div>
+      <div class="docs-sub" id="std-calendar">
+        <h3><code>std.formats.calendar</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Calendar</code>, <code>load</code>, <code>save</code></td><td>calendars, occurrences with overrides</td></tr>
+          <tr><td><code>CalendarEntry</code>, <code>EntryKind</code>, <code>Alarm</code>, <code>Attachment</code></td><td>events, to-dos, journal entries</td></tr>
+          <tr><td><code>RecurrenceRule</code>, <code>Occurrence</code></td><td>repeating entries</td></tr>
+          <tr><td><code>TimeZone</code>, <code>Observance</code>, <code>FreeBusy</code></td><td>time zones, free/busy</td></tr>
+          <tr><td><code>ICalendar</code>, <code>VCalendar</code>, <code>XCal</code></td><td>codecs</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-contacts">
+        <h3><code>std.formats.contacts</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Contact</code>, <code>load</code>, <code>save</code></td><td>contacts</td></tr>
+          <tr><td><code>PersonName</code>, <code>Address</code>, <code>Organization</code>, <code>ContactDate</code></td><td>contact fields</td></tr>
+          <tr><td><code>VCard</code>, <code>XCard</code>, <code>LDIF</code>, <code>ContactsCSV</code></td><td>codecs</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-formats-ai">
+        <h3><code>std.formats.ai</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>ModelFile</code>, <code>load</code>, <code>info</code></td><td>model file: metadata and tensors</td></tr>
+          <tr><td><code>Gguf</code>, <code>Safetensors</code></td><td>codecs, read and write</td></tr>
+          <tr><td><code>TensorType</code>, <code>TensorInfo</code></td><td>tensor types (every ggml quantized type)</td></tr>
+          <tr><td><code>dequantize</code>, <code>blockSize</code>, <code>blockBytes</code></td><td>quantized blocks to floats</td></tr>
+        </table>
+      </div>
       <div class="docs-sub" id="formats-planned">
         <h3>Planned</h3>
-        <p class="docs-placeholder"><code>std.formats.sheets</code>, <code>.slides</code>, <code>.calendar</code> and <code>.contacts</code>.</p>
+        <p class="docs-placeholder"><code>std.formats.sheets</code> and <code>.slides</code>.</p>
       </div>
     </section>
 
@@ -792,6 +830,28 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Microphone</code>, <code>microphones</code>, <code>defaultMicrophone</code>, <code>openMicrophone</code></td><td>sound input</td></tr>
         </table>
         <p class="exports-note">Linux only for now.</p>
+      </div>
+    </section>
+
+    <section class="docs-section" id="ai-group">
+      <h2>AI</h2>
+      <div class="docs-sub" id="std-ai-llm">
+        <h3><code>std.ai.llm</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>LanguageModel</code>, <code>load</code></td><td>language model from a GGUF file, on the CPU</td></tr>
+          <tr><td><code>Session</code></td><td>conversation: sampling, generation, chat</td></tr>
+          <tr><td><code>Message</code>, <code>Role</code>, <code>Reasoning</code></td><td>chat messages, thinking</td></tr>
+          <tr><td><code>ChatFormat</code>, <code>detectChatFormat</code></td><td>chat formats of model families</td></tr>
+          <tr><td><code>Tokenizer</code></td><td>BPE and SentencePiece tokenizers</td></tr>
+          <tr><td><code>Stats</code></td><td>prompt and generation speed</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-ai-tensor">
+        <h3><code>std.ai.tensor</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Weights</code>, <code>loadWeights</code></td><td>quantized weights, SIMD matrix-vector multiply</td></tr>
+          <tr><td><code>rmsNorm</code>, <code>layerNorm</code>, <code>softmax</code>, <code>silu</code>, <code>gelu</code>, <code>rope</code></td><td>transformer operations</td></tr>
+        </table>
       </div>
     </section>
 
