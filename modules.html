@@ -184,6 +184,7 @@
           <li><a class="docs-nav-sub" href="#std-gfx">std.gfx</a></li>
           <li><a class="docs-nav-sub" href="#std-gfx-color">std.gfx.color</a></li>
           <li><a class="docs-nav-sub" href="#std-gfx-canvas">std.gfx.canvas</a></li>
+          <li><a class="docs-nav-sub" href="#std-gfx-render">std.gfx.render</a></li>
           <li><a class="docs-nav-sub" href="#std-gfx-processing">std.gfx.processing</a></li>
           <li><a class="docs-nav-sub" href="#std-simd">std.simd</a></li>
           <li><a class="docs-nav-sub" href="#std-gpu">std.gpu</a></li>
@@ -241,6 +242,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>category</code>, <code>Category</code>, <code>combiningClass</code>, <code>script</code></td><td>Unicode 18 character properties</td></tr>
           <tr><td><code>normalize</code>, <code>NormalForm</code>, <code>decompose</code>, <code>compose</code></td><td>normalization (NFC, NFD, NFKC, NFKD)</td></tr>
           <tr><td><code>mirror</code>, <code>isDefaultIgnorable</code>, <code>isExtendedPictographic</code></td><td>bidi mirroring, ignorables, emoji</td></tr>
+          <tr><td><code>lineBreaks</code>, <code>LineBreak</code></td><td>line break opportunities (UAX #14)</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-text-jinja">
@@ -281,6 +283,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Point</code>, <code>Vec2</code>, <code>Vec3</code>, <code>Size</code>, <code>Rect</code>, <code>Rectangle</code></td><td>points, vectors, sizes, rectangles</td></tr>
           <tr><td><code>Circle</code>, <code>Line</code>, <code>Ray</code>, <code>Polygon</code></td><td>shapes</td></tr>
           <tr><td><code>Transform2D</code></td><td>2D affine transform</td></tr>
+          <tr><td><code>Path</code>, <code>FillRule</code>, <code>StrokeStyle</code>, <code>LineCap</code>, <code>LineJoin</code></td><td>paths: build, stroke, dash, measure, trim, morph, boolean operations</td></tr>
           <tr><td><code>BezierPath</code>, <code>QuadraticBezier</code>, <code>CubicBezier</code></td><td>curves</td></tr>
         </table>
       </div>
@@ -541,7 +544,9 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.formats.image</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Image</code>, <code>load</code>, <code>info</code></td><td>image, implements <code>gfx.Raster</code></td></tr>
+          <tr><td><code>ImageSequence</code>, <code>ImageFrame</code></td><td>animations: frames, delays, loops</td></tr>
           <tr><td><code>PNG</code>, <code>APNG</code>, <code>GIF</code>, <code>JPEG</code>, <code>WEBP</code>, <code>BMP</code>, <code>TIFF</code>, <code>PSD</code>, <code>TGA</code>, <code>PCX</code>, <code>XPM</code>, <code>ICO</code>, <code>CUR</code>, <code>ANI</code></td><td>codecs</td></tr>
+          <tr><td><code>SVG.encode</code></td><td>canvas pictures as SVG</td></tr>
           <tr><td><code>SVG.parsePath</code>, <code>SVG.pathData</code></td><td>SVG path data</td></tr>
           <tr><td><code>exif.Tag</code>, <code>exif.IFD</code>, <code>exif.ImageTag</code>, <code>exif.PhotoTag</code>, <code>exif.GPSInfoTag</code></td><td>EXIF tags</td></tr>
         </table>
@@ -724,6 +729,8 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Request</code>, <code>Response</code>, <code>Header</code>, <code>Cookie</code>, <code>CookieJar</code></td><td>messages</td></tr>
           <tr><td><code>FileServer</code>, <code>serveFile</code></td><td>static files</td></tr>
           <tr><td><code>Transport</code></td><td>connection pool, HTTP/1.1 and HTTP/2</td></tr>
+          <tr><td><code>Proxy</code>, <code>EnvironmentProxy</code>, <code>StaticProxy</code></td><td>HTTP and SOCKS5 proxies, from the environment or one URL</td></tr>
+          <tr><td><code>CrossOriginProtection</code></td><td>cross-origin request protection</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-http2">
@@ -999,13 +1006,21 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.gfx.canvas</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Canvas</code></td><td>CPU drawing surface, implements <code>gfx.Raster</code></td></tr>
-          <tr><td><code>Painter</code>, <code>DrawContext</code>, <code>Picture</code>, <code>record</code></td><td>drawing interface, recording and replay</td></tr>
-          <tr><td><code>Paint</code>, <code>LinearGradient</code>, <code>RadialGradient</code>, <code>ConicGradient</code>, <code>Pattern</code>, <code>linear</code>, <code>radial</code></td><td>colors, gradients (OKLab, linear light, sRGB), patterns</td></tr>
+          <tr><td><code>Painter</code>, <code>DrawContext</code>, <code>Picture</code>, <code>record</code></td><td>drawing interface, recording, replay, picking, SVG and PDF export; <code>drawAtlas</code> for sprites, mesh warps</td></tr>
+          <tr><td><code>Paint</code>, <code>LinearGradient</code>, <code>RadialGradient</code>, <code>ConicGradient</code>, <code>Pattern</code>, <code>Noise</code>, <code>MeshGradient</code>, <code>linear</code>, <code>radial</code>, <code>noise</code></td><td>colors, gradients (OKLab, linear light, sRGB), image and picture patterns, noise, mesh gradients</td></tr>
           <tr><td><code>ColorStop</code>, <code>Spread</code>, <code>ColorSpace</code></td><td>gradient stops, spread and interpolation space</td></tr>
           <tr><td><code>DrawState</code>, <code>Composite</code>, <code>Sampling</code>, <code>ClipRegion</code></td><td>transform, clip, alpha, Porter-Duff operators, blend, sampling</td></tr>
+          <tr><td><code>Border</code>, <code>LineStyle</code></td><td>CSS borders: width, paint and style per side, rounded corners</td></tr>
           <tr><td><code>Effect</code>, <code>DropShadow</code>, <code>InnerShadow</code>, <code>OuterGlow</code>, <code>InnerGlow</code>, <code>Blur</code>, <code>Outline</code>, <code>ColorAdjust</code>, <code>ColorMatrix</code></td><td>group effects</td></tr>
           <tr><td><code>Layers</code>, <code>Layer</code>, <code>LayerGroup</code>, <code>LayerItem</code></td><td>layer stacks with masks, clipping layers and folders</td></tr>
-          <tr><td><code>TextStyle</code>, <code>TextAlign</code>, <code>TextBaseline</code>, <code>TextMetrics</code>, <code>GlyphBox</code></td><td>shaped, hinted text</td></tr>
+          <tr><td><code>TextStyle</code>, <code>TextAlign</code>, <code>TextBaseline</code>, <code>TextOrientation</code>, <code>TextMetrics</code>, <code>GlyphBox</code></td><td>shaped, hinted text, horizontal or vertical</td></tr>
+          <tr><td><code>Paragraph</code>, <code>TextSpan</code>, <code>TextLine</code></td><td>wrapped, aligned paragraphs of styled spans</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-gfx-render">
+        <h3><code>std.gfx.render</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>DrawCommand</code>, <code>CommandKind</code></td><td>render commands a recording keeps for GPU renderers (clears, blits, video)</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-gfx-processing">
@@ -1014,7 +1029,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Pipeline</code></td><td>chained image operations</td></tr>
           <tr><td><code>filters</code></td><td>blur, sharpen, grayscale, contrast, …</td></tr>
           <tr><td><code>transform</code></td><td>resize, crop, fit, seam carving</td></tr>
-          <tr><td><code>analysis</code></td><td>saliency, histogram, dominant color</td></tr>
+          <tr><td><code>analysis</code></td><td>saliency, histogram, dominant color, perceptual hashes and similarity, local features, BlurHash</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-simd">
