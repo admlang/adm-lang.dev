@@ -82,6 +82,11 @@
           <li><a class="docs-nav-sub" href="#std-sync">std.sync</a></li>
           <li><a class="docs-nav-sub" href="#std-services">std.services</a></li>
           <li><a class="docs-nav-sub" href="#std-proto">std.proto</a></li>
+          <li><a class="docs-nav-sub" href="#std-auth-jose">std.proto.auth.jose</a></li>
+          <li><a class="docs-nav-sub" href="#std-auth-oauth2">std.proto.auth.oauth2</a></li>
+          <li><a class="docs-nav-sub" href="#std-auth-openid">std.proto.auth.openid</a></li>
+          <li><a class="docs-nav-sub" href="#std-auth-otp">std.proto.auth.otp</a></li>
+          <li><a class="docs-nav-sub" href="#std-auth-webauthn">std.proto.auth.webauthn</a></li>
         </ul>
       </div>
 
@@ -132,6 +137,7 @@
           <li><a class="docs-nav-sub" href="#std-tls">std.net.tls</a></li>
           <li><a class="docs-nav-sub" href="#std-http">std.net.http</a></li>
           <li><a class="docs-nav-sub" href="#std-http2">std.net.http.http2</a></li>
+          <li><a class="docs-nav-sub" href="#std-grpc">std.net.grpc</a></li>
           <li><a class="docs-nav-sub" href="#std-websocket">std.net.http.websocket</a></li>
           <li><a class="docs-nav-sub" href="#std-httptest">std.net.http.httptest</a></li>
           <li><a class="docs-nav-sub" href="#std-webdav">std.net.http.webdav</a></li>
@@ -274,6 +280,7 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>sqrt</code>, <code>sin</code>, <code>cos</code>, <code>atan2</code>, <code>ln</code>, <code>log2</code>, <code>log10</code>, …</td><td>numeric functions</td></tr>
           <tr><td><code>approx</code></td><td>float comparison with a tolerance</td></tr>
+          <tr><td><code>Decimal</code>, <code>parseDecimal</code>, <code>RoundingMode</code></td><td>exact decimal numbers</td></tr>
         </table>
         <p class="exports-note">Other operations are methods on the numeric types; exponentiation is <code>**</code>.</p>
       </div>
@@ -334,6 +341,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>now</code>, <code>since</code>, <code>sleep</code></td><td>clock</td></tr>
           <tr><td><code>parse</code>, <code>parseDuration</code></td><td>RFC 3339 times, durations</td></tr>
           <tr><td><code>Month</code>, <code>Weekday</code></td><td>calendar fields</td></tr>
+          <tr><td><code>Date</code>, <code>TimeOfDay</code>, <code>DateTime</code>, <code>parseDate</code>, <code>parseDateTime</code></td><td>civil dates and times without a zone</td></tr>
           <tr><td><code>Cron</code>, <code>parseCron</code></td><td>cron expressions</td></tr>
           <tr><td><code>formatHTTPDate</code>, <code>parseHTTPDate</code></td><td>HTTP dates</td></tr>
           <tr><td><code>formatMailDate</code>, <code>parseMailDate</code></td><td>RFC 5322 mail dates</td></tr>
@@ -370,7 +378,17 @@ use std.data.encoding::(json)</code></pre>
       </div>
       <div class="docs-sub" id="std-i18n">
         <h3><code>std.i18n</code></h3>
-        <p class="docs-placeholder">Locales, languages, regions, currencies, time zones, number and date formats, plural categories. Reference coming soon.</p>
+        <table class="docs-table exports-table">
+          <tr><td><code>Locale</code>, <code>parseLocale</code>, <code>negotiate</code>, <code>parseAcceptLanguage</code></td><td>locales (BCP 47) and negotiation</td></tr>
+          <tr><td><code>Language</code>, <code>Region</code>, <code>Script</code>, <code>Currency</code></td><td>display names and data from CLDR</td></tr>
+          <tr><td><code>NumberFormat</code>, <code>NumberOptions</code></td><td>numbers, percentages, currencies, units, compact notation</td></tr>
+          <tr><td><code>DateTimeFormat</code>, <code>DateTimeOptions</code></td><td>ECMA-402 date and time formatting, every calendar</td></tr>
+          <tr><td><code>TimeZone</code>, <code>ZonedDateTime</code>, <code>parseTimeZone</code>, <code>systemTimeZone</code></td><td>time zones from the tz database</td></tr>
+          <tr><td><code>Calendar</code>, <code>CalendarDate</code></td><td>Gregorian, Hebrew, Islamic, Chinese, Japanese and other calendars</td></tr>
+          <tr><td><code>pluralCategory</code>, <code>pluralRange</code>, <code>PluralCategory</code></td><td>plural rules</td></tr>
+          <tr><td><code>SpellOut</code></td><td>numbers in words</td></tr>
+          <tr><td><code>translate</code></td><td>message translation</td></tr>
+        </table>
       </div>
       <div class="docs-sub" id="std-validations">
         <h3><code>std.validations</code></h3>
@@ -436,6 +454,55 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>DBusMessage</code>, <code>DBusWriter</code>, <code>DBusReader</code></td><td>D-Bus wire format</td></tr>
         </table>
       </div>
+      <div class="docs-sub" id="std-auth-jose">
+        <h3><code>std.proto.auth.jose</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Jws</code>, <code>sign</code>, <code>parseJws</code></td><td>JSON Web Signature, compact and JSON</td></tr>
+          <tr><td><code>Jwe</code>, <code>encrypt</code>, <code>parseJwe</code></td><td>JSON Web Encryption, one or several recipients</td></tr>
+          <tr><td><code>Jwk</code>, <code>JwkSet</code>, <code>parseKey</code>, <code>parseKeySet</code>, <code>generateKey</code></td><td>JSON Web Keys</td></tr>
+          <tr><td><code>RemoteKeySet</code></td><td>key set fetched from a <code>jwks_uri</code>, with rotation</td></tr>
+          <tr><td><code>Claims</code>, <code>Validation</code>, <code>verifyJwt</code>, <code>parseClaims</code></td><td>JWT with RFC 8725 checks</td></tr>
+          <tr><td><code>SignatureAlgorithm</code>, <code>KeyAlgorithm</code>, <code>ContentEncryption</code></td><td>every JOSE algorithm</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-auth-oauth2">
+        <h3><code>std.proto.auth.oauth2</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code>, <code>Token</code>, <code>AuthorizationRequest</code>, <code>DeviceAuthorization</code></td><td>OAuth 2 client: code with PKCE, client credentials, refresh, device flow, token exchange, DPoP</td></tr>
+          <tr><td><code>AuthorizationServer</code>, <code>ClientStore</code>, <code>GrantStore</code></td><td>authorization server</td></tr>
+          <tr><td><code>ResourceServer</code>, <code>AccessToken</code>, <code>Introspection</code></td><td>resource server: JWT and introspected tokens</td></tr>
+          <tr><td><code>ServerMetadata</code>, <code>discover</code>, <code>ClientRegistration</code></td><td>metadata discovery, dynamic client registration</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-auth-openid">
+        <h3><code>std.proto.auth.openid</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>RelyingParty</code>, <code>connect</code>, <code>Login</code>, <code>IdClaims</code></td><td>OpenID Connect relying party</td></tr>
+          <tr><td><code>Provider</code>, <code>UserStore</code></td><td>OpenID Connect provider</td></tr>
+          <tr><td><code>ProviderMetadata</code>, <code>discover</code></td><td>provider discovery</td></tr>
+          <tr><td><code>LogoutEvent</code></td><td>RP-initiated, front- and back-channel logout</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-auth-otp">
+        <h3><code>std.proto.auth.otp</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>HOTP</code>, <code>TOTP</code></td><td>one-time passwords, RFC 4226 and RFC 6238</td></tr>
+          <tr><td><code>KeyURI</code>, <code>parseKeyURI</code></td><td><code>otpauth://</code> URIs for authenticator apps</td></tr>
+          <tr><td><code>generateSecret</code>, <code>parseSecret</code></td><td>Base32 secrets</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-auth-webauthn">
+        <h3><code>std.proto.auth.webauthn</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>RelyingParty</code>, <code>RegistrationOptions</code>, <code>AuthenticationOptions</code>, <code>Credential</code></td><td>WebAuthn relying party: registration and sign-in</td></tr>
+          <tr><td><code>verifyAttestation</code>, <code>AttestationResult</code></td><td>attestation: packed, TPM, Android key, SafetyNet, FIDO U2F, Apple, compound</td></tr>
+          <tr><td><code>Client</code>, <code>parseRegistrationOptions</code>, <code>parseAuthenticationOptions</code></td><td>the browser's part, for native apps</td></tr>
+          <tr><td><code>SecurityKey</code>, <code>HIDTransport</code>, <code>securityKeys</code></td><td>FIDO2 security keys over USB: CTAP 2.2 and U2F, PIN, credential management, large blobs, fingerprints</td></tr>
+          <tr><td><code>SoftDevice</code>, <code>SoftAuthenticator</code></td><td>authenticators in software</td></tr>
+          <tr><td><code>COSEKey</code>, <code>parseCOSEKey</code>, <code>AuthenticatorData</code></td><td>COSE keys, authenticator data</td></tr>
+        </table>
+        <p class="exports-note">Extensions: credProps, prf, largeBlob, credProtect, credBlob, minPinLength, appid, appidExclude. USB on Linux only for now.</p>
+      </div>
     </section>
 
     <section class="docs-section" id="data">
@@ -447,7 +514,10 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>XML</code>, <code>XMLNode</code>, <code>XMLWriter</code></td><td>XML</td></tr>
           <tr><td><code>YAML</code></td><td>YAML</td></tr>
           <tr><td><code>TOML</code></td><td>TOML</td></tr>
-          <tr><td><code>MsgPack</code></td><td>MessagePack</td></tr>
+          <tr><td><code>JSON.parse</code></td><td>JSON into maps, arrays and scalars</td></tr>
+          <tr><td><code>CBOR</code>, <code>CBORValue</code>, <code>CBORReader</code>, <code>cbor</code></td><td>CBOR (RFC 8949), deterministic encoding</td></tr>
+          <tr><td><code>MsgPack</code>, <code>MsgPackValue</code>, <code>MsgPackReader</code>, <code>msgpack</code></td><td>MessagePack, ext types and timestamps</td></tr>
+          <tr><td><code>Protobuf</code>, <code>ProtoMessage</code>, <code>ProtoReader</code>, <code>ProtoWriter</code>, <code>protobuf</code></td><td>Protocol Buffers wire format, with or without a schema</td></tr>
           <tr><td><code>Base64</code>, <code>Base32</code>, <code>hexencode</code>, <code>hexdecode</code></td><td>Base64, Base32, hex</td></tr>
           <tr><td><code>QuotedPrintable</code></td><td>quoted-printable</td></tr>
           <tr><td><code>htmlEncode</code>, <code>htmlDecode</code></td><td>HTML character references</td></tr>
@@ -488,10 +558,11 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>rand</code>, <code>randRange</code>, <code>randOf</code></td><td>random numbers</td></tr>
           <tr><td><code>UUID</code>, <code>parseUUID</code></td><td>UUIDs</td></tr>
-          <tr><td><code>RSAPublicKey</code>, <code>RSAPrivateKey</code>, <code>generateRSAKey</code></td><td>RSA</td></tr>
+          <tr><td><code>RSAPublicKey</code>, <code>RSAPrivateKey</code>, <code>generateRSAKey</code>, <code>RSAPadding</code></td><td>RSA signatures and encryption (OAEP, PKCS #1 v1.5)</td></tr>
           <tr><td><code>ECDSAPublicKey</code>, <code>ECDSAPrivateKey</code>, <code>generateECDSAKey</code></td><td>ECDSA, P-224 to P-521</td></tr>
           <tr><td><code>Ed25519PublicKey</code>, <code>Ed25519PrivateKey</code></td><td>Ed25519</td></tr>
-          <tr><td><code>x25519</code>, <code>ecdh</code></td><td>key agreement</td></tr>
+          <tr><td><code>Ed448PublicKey</code>, <code>Ed448PrivateKey</code>, <code>generateEd448Key</code></td><td>Ed448 and Ed448ph</td></tr>
+          <tr><td><code>x25519</code>, <code>x448</code>, <code>ecdh</code></td><td>key agreement</td></tr>
           <tr><td><code>MLKEMPublicKey</code>, <code>MLKEMPrivateKey</code>, <code>generateMLKEMKey</code></td><td>ML-KEM (FIPS 203)</td></tr>
           <tr><td><code>bcrypt</code>, <code>bcryptVerify</code></td><td>password hashes</td></tr>
           <tr><td><code>parsePKIXPublicKey</code>, <code>parsePKCS1PrivateKey</code>, <code>parsePKCS8PrivateKey</code>, …</td><td>key encodings</td></tr>
@@ -505,7 +576,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>SHAKE128</code>, <code>SHAKE256</code></td><td>extendable output</td></tr>
           <tr><td><code>CRC8</code> … <code>CRC64</code>, <code>Adler32</code></td><td>checksums</td></tr>
           <tr><td><code>HMAC</code>, <code>hmac</code></td><td>HMAC</td></tr>
-          <tr><td><code>hkdf</code>, <code>pbkdf2</code></td><td>key derivation</td></tr>
+          <tr><td><code>hkdf</code>, <code>pbkdf2</code>, <code>concatKDF</code></td><td>key derivation</td></tr>
           <tr><td><code>Hash</code></td><td>every digest by name</td></tr>
         </table>
       </div>
@@ -514,7 +585,8 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>AES</code>, <code>Blowfish</code>, <code>DES</code>, <code>TripleDES</code></td><td>block ciphers (<code>Block</code>)</td></tr>
           <tr><td><code>CBC</code>, <code>CFB</code>, <code>CTR</code></td><td>modes</td></tr>
-          <tr><td><code>GCM</code>, <code>ChaCha20Poly1305</code>, <code>SIV</code></td><td>authenticated encryption (<code>AEAD</code>)</td></tr>
+          <tr><td><code>GCM</code>, <code>ChaCha20Poly1305</code>, <code>SIV</code>, <code>CBCHMAC</code></td><td>authenticated encryption (<code>AEAD</code>)</td></tr>
+          <tr><td><code>wrapKey</code>, <code>unwrapKey</code></td><td>AES key wrap (RFC 3394, RFC 5649)</td></tr>
           <tr><td><code>cmac</code></td><td>CMAC</td></tr>
         </table>
       </div>
@@ -546,6 +618,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Image</code>, <code>load</code>, <code>info</code></td><td>image, implements <code>gfx.Raster</code></td></tr>
           <tr><td><code>ImageSequence</code>, <code>ImageFrame</code></td><td>animations: frames, delays, loops</td></tr>
           <tr><td><code>PNG</code>, <code>APNG</code>, <code>GIF</code>, <code>JPEG</code>, <code>WEBP</code>, <code>BMP</code>, <code>TIFF</code>, <code>PSD</code>, <code>TGA</code>, <code>PCX</code>, <code>XPM</code>, <code>ICO</code>, <code>CUR</code>, <code>ANI</code></td><td>codecs</td></tr>
+          <tr><td><code>SVG.decode</code>, <code>SVG.picture</code></td><td>SVG and SVGZ rendering, SMIL animation at a given time</td></tr>
           <tr><td><code>SVG.encode</code></td><td>canvas pictures as SVG</td></tr>
           <tr><td><code>SVG.parsePath</code>, <code>SVG.pathData</code></td><td>SVG path data</td></tr>
           <tr><td><code>exif.Tag</code>, <code>exif.IFD</code>, <code>exif.ImageTag</code>, <code>exif.PhotoTag</code>, <code>exif.GPSInfoTag</code></td><td>EXIF tags</td></tr>
@@ -740,6 +813,15 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Encoder</code>, <code>Decoder</code></td><td>HPACK</td></tr>
         </table>
       </div>
+      <div class="docs-sub" id="std-grpc">
+        <h3><code>std.net.grpc</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code>, <code>ClientStream</code>, <code>CallOptions</code></td><td>gRPC client: unary and streaming calls</td></tr>
+          <tr><td><code>Server</code>, <code>ServerCall</code>, <code>UnaryHandler</code>, <code>StreamHandler</code></td><td>gRPC server</td></tr>
+          <tr><td><code>Status</code>, <code>Code</code>, <code>Metadata</code></td><td>status codes and metadata</td></tr>
+          <tr><td><code>Codec</code>, <code>Compression</code></td><td>message codecs, compression</td></tr>
+        </table>
+      </div>
       <div class="docs-sub" id="std-websocket">
         <h3><code>std.net.http.websocket</code></h3>
         <table class="docs-table exports-table">
@@ -895,7 +977,7 @@ use std.data.encoding::(json)</code></pre>
       </div>
       <div class="docs-sub" id="net-planned">
         <h3>Planned</h3>
-        <p class="docs-placeholder"><code>std.net.jmap</code>.</p>
+        <p class="docs-placeholder"><code>std.net.jmap</code>. In progress: <code>std.proto.auth.saml</code>, <code>std.proto.jsonrpc</code>.</p>
       </div>
     </section>
 
@@ -932,6 +1014,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Camera</code>, <code>cameras</code>, <code>openCamera</code></td><td>cameras (V4L2)</td></tr>
           <tr><td><code>Speaker</code>, <code>speakers</code>, <code>defaultSpeaker</code>, <code>openSpeaker</code></td><td>sound output</td></tr>
           <tr><td><code>Microphone</code>, <code>microphones</code>, <code>defaultMicrophone</code>, <code>openMicrophone</code></td><td>sound input</td></tr>
+          <tr><td><code>HidDevice</code>, <code>hidDevices</code>, <code>openHid</code></td><td>raw HID devices: input, output and feature reports, report descriptors</td></tr>
         </table>
         <p class="exports-note">Linux only for now.</p>
       </div>
@@ -1009,6 +1092,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Painter</code>, <code>DrawContext</code>, <code>Picture</code>, <code>record</code></td><td>drawing interface, recording, replay, picking, SVG and PDF export; <code>drawAtlas</code> for sprites, mesh warps</td></tr>
           <tr><td><code>Paint</code>, <code>LinearGradient</code>, <code>RadialGradient</code>, <code>ConicGradient</code>, <code>Pattern</code>, <code>Noise</code>, <code>MeshGradient</code>, <code>linear</code>, <code>radial</code>, <code>noise</code></td><td>colors, gradients (OKLab, linear light, sRGB), image and picture patterns, noise, mesh gradients</td></tr>
           <tr><td><code>ColorStop</code>, <code>Spread</code>, <code>ColorSpace</code></td><td>gradient stops, spread and interpolation space</td></tr>
+          <tr><td><code>ShaderPaint</code></td><td>paint from a <code>@fragment</code> shader, on the GPU or the CPU</td></tr>
           <tr><td><code>DrawState</code>, <code>Composite</code>, <code>Sampling</code>, <code>ClipRegion</code></td><td>transform, clip, alpha, Porter-Duff operators, blend, sampling</td></tr>
           <tr><td><code>Border</code>, <code>LineStyle</code></td><td>CSS borders: width, paint and style per side, rounded corners</td></tr>
           <tr><td><code>Effect</code>, <code>DropShadow</code>, <code>InnerShadow</code>, <code>OuterGlow</code>, <code>InnerGlow</code>, <code>Blur</code>, <code>Outline</code>, <code>ColorAdjust</code>, <code>ColorMatrix</code></td><td>group effects</td></tr>
