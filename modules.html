@@ -82,9 +82,12 @@
           <li><a class="docs-nav-sub" href="#std-sync">std.sync</a></li>
           <li><a class="docs-nav-sub" href="#std-services">std.services</a></li>
           <li><a class="docs-nav-sub" href="#std-proto">std.proto</a></li>
+          <li><a class="docs-nav-sub" href="#std-jsonrpc">std.proto.jsonrpc</a></li>
+          <li><a class="docs-nav-sub" href="#std-msgpackrpc">std.proto.msgpackrpc</a></li>
           <li><a class="docs-nav-sub" href="#std-auth-jose">std.proto.auth.jose</a></li>
           <li><a class="docs-nav-sub" href="#std-auth-oauth2">std.proto.auth.oauth2</a></li>
           <li><a class="docs-nav-sub" href="#std-auth-openid">std.proto.auth.openid</a></li>
+          <li><a class="docs-nav-sub" href="#std-auth-saml">std.proto.auth.saml</a></li>
           <li><a class="docs-nav-sub" href="#std-auth-otp">std.proto.auth.otp</a></li>
           <li><a class="docs-nav-sub" href="#std-auth-webauthn">std.proto.auth.webauthn</a></li>
         </ul>
@@ -289,6 +292,7 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>Point</code>, <code>Vec2</code>, <code>Vec3</code>, <code>Size</code>, <code>Rect</code>, <code>Rectangle</code></td><td>points, vectors, sizes, rectangles</td></tr>
           <tr><td><code>Circle</code>, <code>Line</code>, <code>Ray</code>, <code>Polygon</code></td><td>shapes</td></tr>
+          <tr><td><code>Edges</code>, <code>Corners</code></td><td>per-side and per-corner values</td></tr>
           <tr><td><code>Transform2D</code></td><td>2D affine transform</td></tr>
           <tr><td><code>Path</code>, <code>FillRule</code>, <code>StrokeStyle</code>, <code>LineCap</code>, <code>LineJoin</code></td><td>paths: build, stroke, dash, measure, trim, morph, boolean operations</td></tr>
           <tr><td><code>BezierPath</code>, <code>QuadraticBezier</code>, <code>CubicBezier</code></td><td>curves</td></tr>
@@ -329,6 +333,7 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>Length</code>, <code>Mass</code>, <code>Time</code>, <code>Temperature</code>, <code>Angle</code>, <code>DataSize</code>, …</td><td>base dimensions</td></tr>
           <tr><td><code>Speed</code>, <code>Force</code>, <code>Energy</code>, <code>Voltage</code>, <code>DataRate</code>, …</td><td>derived dimensions</td></tr>
+          <tr><td><code>Pixels</code>, <code>Percent</code>, <code>ViewportHeight</code>, <code>ViewportWidth</code>, <code>FontRelative</code>, <code>Extent</code></td><td>layout dimensions (<a href="units.html#ui-extents">UI extents</a>)</td></tr>
           <tr><td><code>parseUnit</code></td><td>quantity from text</td></tr>
           <tr><td><code>quantity</code></td><td>quantity from a number</td></tr>
         </table>
@@ -387,7 +392,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Calendar</code>, <code>CalendarDate</code></td><td>Gregorian, Hebrew, Islamic, Chinese, Japanese and other calendars</td></tr>
           <tr><td><code>pluralCategory</code>, <code>pluralRange</code>, <code>PluralCategory</code></td><td>plural rules</td></tr>
           <tr><td><code>SpellOut</code></td><td>numbers in words</td></tr>
-          <tr><td><code>translate</code></td><td>message translation</td></tr>
+          <tr><td><code>@translate</code> <span class="api-tag api-planned">planned</span></td><td>translated text on a field; no catalog is read yet</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-validations">
@@ -443,7 +448,8 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-services">
         <h3><code>std.services</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>Application</code>, <code>Storage</code>, <code>Config</code>, <code>Logging</code>, <code>Cache</code>, <code>Scheduler</code>, <code>Runtime</code>, <code>Network</code>, <code>Diagnostics</code>, <code>Policy</code>, <code>Notifications</code>, <code>Clipboard</code>, …</td><td>builtin services</td></tr>
+          <tr><td><code>Application</code>, <code>ServiceStatus</code>, <code>StartMode</code>, <code>RestartMode</code>, <code>Lifecycle</code>, <code>Dependencies</code>, <code>ServiceInfo</code>, <code>ServiceStatusChange</code></td><td>the application service and the types every service shares</td></tr>
+          <tr><td><code>Storage</code>, <code>Config</code>, <code>Logging</code>, <code>Cache</code>, <code>Scheduler</code>, <code>Runtime</code>, <code>Network</code>, <code>Diagnostics</code>, <code>Policy</code>, <code>Notifications</code>, <code>Clipboard</code>, …</td><td>builtin services, each in its own module <code>std.services.&lt;name&gt;</code> (<code>use std.services.cache::(Cache)</code>)</td></tr>
         </table>
         <p class="exports-note">Every method and annotation: <a href="services.html">services reference</a>.</p>
       </div>
@@ -452,6 +458,24 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>DBusConnection</code>, <code>dbusConnect</code></td><td>D-Bus session bus client (Linux)</td></tr>
           <tr><td><code>DBusMessage</code>, <code>DBusWriter</code>, <code>DBusReader</code></td><td>D-Bus wire format</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-jsonrpc">
+        <h3><code>std.proto.jsonrpc</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Peer</code>, <code>Framing</code></td><td>JSON-RPC 2.0 over a byte stream, both directions</td></tr>
+          <tr><td><code>Dispatcher</code></td><td>server methods, also an HTTP handler</td></tr>
+          <tr><td><code>HttpClient</code></td><td>calls over HTTP POST</td></tr>
+          <tr><td><code>Request</code>, <code>Handler</code>, <code>Call</code>, <code>Reply</code></td><td>requests, handlers, batches</td></tr>
+          <tr><td><code>RPCError</code>, <code>ErrorCode</code>, <code>errorOf</code>, <code>kindOf</code></td><td>error objects</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-msgpackrpc">
+        <h3><code>std.proto.msgpackrpc</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Peer</code></td><td>MessagePack-RPC over a byte stream, both directions</td></tr>
+          <tr><td><code>Request</code>, <code>Handler</code></td><td>requests and handlers</td></tr>
+          <tr><td><code>RPCError</code>, <code>ErrorCode</code>, <code>errorOf</code></td><td>error objects</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-auth-jose">
@@ -483,6 +507,17 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>LogoutEvent</code></td><td>RP-initiated, front- and back-channel logout</td></tr>
         </table>
       </div>
+      <div class="docs-sub" id="std-auth-saml">
+        <h3><code>std.proto.auth.saml</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>ServiceProvider</code>, <code>LoginOptions</code>, <code>Assertion</code>, <code>Logout</code></td><td>SAML 2.0 service provider: Web SSO and Single Logout</td></tr>
+          <tr><td><code>IdentityProvider</code>, <code>PendingLogin</code>, <code>Decision</code>, <code>ServiceProviderStore</code>, <code>MemoryServiceProviderStore</code></td><td>identity provider</td></tr>
+          <tr><td><code>EntityDescriptor</code>, <code>IdpDescriptor</code>, <code>SpDescriptor</code>, <code>KeyDescriptor</code>, <code>Endpoint</code>, <code>parseMetadata</code>, <code>parseMetadataSet</code>, <code>writeMetadataSet</code></td><td>metadata, signed or not</td></tr>
+          <tr><td><code>Binding</code></td><td>Redirect, POST, Artifact and SOAP bindings</td></tr>
+          <tr><td><code>NameId</code>, <code>NameIdFormat</code>, <code>Attribute</code>, <code>Attributes</code></td><td>name identifiers and attributes</td></tr>
+          <tr><td><code>SamlError</code>, <code>SamlErrorKind</code>, <code>StatusCode</code></td><td>errors and status codes</td></tr>
+        </table>
+      </div>
       <div class="docs-sub" id="std-auth-otp">
         <h3><code>std.proto.auth.otp</code></h3>
         <table class="docs-table exports-table">
@@ -511,14 +546,18 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.data.encoding</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>JSON</code>, <code>json</code></td><td>JSON</td></tr>
-          <tr><td><code>XML</code>, <code>XMLNode</code>, <code>XMLWriter</code></td><td>XML</td></tr>
+          <tr><td><code>XMLNode</code>, <code>XMLWriter</code>, <code>XML</code></td><td>XML tree, writer and well-formedness check</td></tr>
           <tr><td><code>YAML</code></td><td>YAML</td></tr>
           <tr><td><code>TOML</code></td><td>TOML</td></tr>
           <tr><td><code>JSON.parse</code></td><td>JSON into maps, arrays and scalars</td></tr>
           <tr><td><code>CBOR</code>, <code>CBORValue</code>, <code>CBORReader</code>, <code>cbor</code></td><td>CBOR (RFC 8949), deterministic encoding</td></tr>
           <tr><td><code>MsgPack</code>, <code>MsgPackValue</code>, <code>MsgPackReader</code>, <code>msgpack</code></td><td>MessagePack, ext types and timestamps</td></tr>
-          <tr><td><code>Protobuf</code>, <code>ProtoMessage</code>, <code>ProtoReader</code>, <code>ProtoWriter</code>, <code>protobuf</code></td><td>Protocol Buffers wire format, with or without a schema</td></tr>
-          <tr><td><code>Base64</code>, <code>Base32</code>, <code>hexencode</code>, <code>hexdecode</code></td><td>Base64, Base32, hex</td></tr>
+          <tr><td><code>Protobuf</code>, <code>ProtoMessage</code>, <code>ProtoReader</code>, <code>ProtoWriter</code>, <code>protoField</code></td><td>Protocol Buffers wire format, with or without a schema</td></tr>
+          <tr><td><code>ProtoSchema</code>, <code>ProtoFile</code></td><td><code>.proto</code> files: messages, enums and services</td></tr>
+          <tr><td><code>CSV</code></td><td>CSV, any separator</td></tr>
+          <tr><td><code>XMLSignature</code>, <code>signXML</code>, <code>parseXMLSignature</code>, <code>canonicalize</code></td><td>XML signatures and canonical XML</td></tr>
+          <tr><td><code>encryptXML</code>, <code>decryptXML</code></td><td>XML encryption</td></tr>
+          <tr><td><code>Base64</code>, <code>Base32</code>, <code>Base83</code>, <code>hexencode</code>, <code>hexdecode</code></td><td>Base64, Base32, Base83, hex</td></tr>
           <tr><td><code>QuotedPrintable</code></td><td>quoted-printable</td></tr>
           <tr><td><code>htmlEncode</code>, <code>htmlDecode</code></td><td>HTML character references</td></tr>
           <tr><td><code>PEMBlock</code>, <code>pemDecode</code></td><td>PEM</td></tr>
@@ -977,7 +1016,7 @@ use std.data.encoding::(json)</code></pre>
       </div>
       <div class="docs-sub" id="net-planned">
         <h3>Planned</h3>
-        <p class="docs-placeholder"><code>std.net.jmap</code>. In progress: <code>std.proto.auth.saml</code>, <code>std.proto.jsonrpc</code>.</p>
+        <p class="docs-placeholder"><code>std.net.jmap</code>.</p>
       </div>
     </section>
 
@@ -1048,7 +1087,6 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.ui</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>UI</code>, <code>UIConfig</code></td><td>UI service</td></tr>
-          <tr><td><code>Pixels</code>, <code>Percent</code>, <code>ViewportHeight</code>, <code>ViewportWidth</code>, <code>FontRelative</code>, <code>Extent</code></td><td>layout dimensions (<a href="units.html#ui-extents">UI extents</a>)</td></tr>
           <tr><td><code>StyleNode</code>, <code>StyleClass</code>, <code>BoxStyle</code>, <code>FontStyle</code>, <code>Selector</code></td><td>style model</td></tr>
           <tr><td><code>ClickEvent</code>, <code>KeyEvent</code>, <code>MouseMoveEvent</code>, <code>TextInputEvent</code>, …</td><td>events</td></tr>
           <tr><td><code>Display</code>, <code>Appearance</code>, <code>ColorScheme</code>, <code>Contrast</code></td><td>displays and system appearance (Linux)</td></tr>
@@ -1058,7 +1096,8 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.ui.styles</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Box</code>, <code>Text</code>, <code>Borders</code></td><td>base styles</td></tr>
-          <tr><td><code>Font</code>, <code>Fill</code>, <code>Edges</code>, <code>Corners</code>, <code>Size</code></td><td>style values</td></tr>
+          <tr><td><code>Font</code>, <code>Fill</code>, <code>Size</code>, <code>Auto</code>, <code>Anchors</code>, <code>LineStyle</code></td><td>style values</td></tr>
+          <tr><td><code>Align</code>, <code>Alignment</code>, <code>Position</code>, <code>Layer</code></td><td>alignment and positioning</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-ui-renderer">
@@ -1125,7 +1164,7 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-gpu">
         <h3><code>std.gpu</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>DeviceBuffer</code></td><td>GPU memory kept between <a href="docs.html#functions"><code>cuda def</code></a> launches</td></tr>
+          <tr><td><code>DeviceBuffer</code>, <code>upload</code></td><td>GPU memory kept between <a href="docs.html#functions"><code>cuda def</code></a> launches</td></tr>
           <tr><td><code>available</code>, <code>deviceName</code></td><td>device info</td></tr>
         </table>
       </div>

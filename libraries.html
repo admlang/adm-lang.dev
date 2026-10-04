@@ -194,14 +194,14 @@ repo_salt = "base64:LZU1Nt+IhCAlqAtmKigUEvkpoUP2Goc2VAgkBqFspCg="</code></pre>
           <span class="code-filename">terminal</span>
         </div>
         <pre><code data-hl="off" class="nohighlight">$ adm publish --description "Human-readable bytes, durations, relative times, ordinals and thousands separators."
-✓ built dist/humanize-0.1.0.admlib
-✓ pushed dist/humanize-0.1.0.admlib and tag v0.1.0 to git@github.com:cthackers/humanize.git
+✓ pushed tag humanize@0.1.0 to git@github.com:cthackers/humanize.git
+✓ released https://github.com/cthackers/humanize/releases/download/humanize@0.1.0/humanize-0.1.0.admlib
 ✓ pull request opened: https://github.com/admlang/registry/pull/1
 the registry's pipeline verifies the package and merges on green</code></pre>
       </div>
 
-      <p>What happened: the package was built and signed into <code>dist/</code>, committed and tagged <code>v0.1.0</code>, the tag was pushed, and a pull request added one line to the registry's index for your account. The registry's pipeline then fetches the package from that tag, checks its hash, checksums, signature, name, version and publisher, checks that the pull request comes from the namespace it claims and that the version is newer than the last one listed, and merges on its own. No human review, no upload, no token: your SSH key and <code>gh</code> login are all that is involved. The namespace is your GitHub account (or organisation); it is not part of the library's name, so two accounts may both publish a <code>utils</code>.</p>
-      <p>A version is immutable once published. Bump <code>@manifest(version)</code> and publish again; <code>--dry-run</code> shows the index line without touching git.</p>
+      <p>What happened: the package was built and signed, the source was tagged <code>humanize@0.1.0</code> (one tag per library, so several libraries can share a repository), the tag was pushed, a GitHub release was created with the package as its asset, and a pull request added one line to the registry's index for your account. The package never enters the repository. The registry's pipeline then fetches the package from that release, checks its hash, checksums, signature, name, version and publisher, checks that the pull request comes from the namespace it claims and that the version is newer than the last one listed, and merges on its own. No human review, no upload, no token: your SSH key and <code>gh</code> login are all that is involved. The namespace is your GitHub account (or organisation); it is not part of the library's name, so two accounts may both publish a <code>utils</code>.</p>
+      <p>A version is immutable once published. Bump <code>@manifest(version)</code> and publish again (<code>--bump major|minor|patch</code> does both); <code>--dry-run</code> shows the index line without touching git. Without <code>--description</code> the line comes from <code>description</code> under <code>[apps.&lt;Name&gt;]</code> in <code>adm.toml</code>.</p>
     </section>
 
     <section class="docs-section" id="using">
@@ -221,7 +221,7 @@ fetching cthackers:humanize 0.1.0 from https://github.com/cthackers/humanize...
 lock: ./adm.lock</code></pre>
       </div>
 
-      <p><code>adm get</code> resolves the highest version that is not yanked, downloads the package from the library's repository (a shallow git fetch of the tag, so a private repository works with the same SSH key that reads it), verifies it exactly as the registry did, installs it into the package cache and records it in <code>adm.lock</code>. Dependencies the library declares are fetched the same way. A bare name that several accounts publish is refused with the list; say which one. Ranges: <code>humanize@0.1.0</code>, <code>@^0.1</code>, <code>@~0.1.0</code>, <code>@&gt;=0.1</code>.</p>
+      <p><code>adm get</code> resolves the highest version that is not yanked, downloads the package from the library's repository (the release asset the index line names, through <code>gh</code> for a private repository), verifies it exactly as the registry did, installs it into the package cache and records it in <code>adm.lock</code>. Dependencies the library declares are fetched the same way. A bare name that several accounts publish is refused with the list; say which one. Ranges: <code>humanize@0.1.0</code>, <code>@^0.1</code>, <code>@~0.1.0</code>, <code>@&gt;=0.1</code>.</p>
       <p>In code the namespace disappears; the module is just its name:</p>
       <div class="code-window">
         <div class="code-titlebar">

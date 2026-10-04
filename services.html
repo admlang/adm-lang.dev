@@ -86,7 +86,7 @@
           <li><a class="docs-nav-sub" href="#meta-cacheinvalidate"><code>@cacheInvalidate</code></a></li>
           <li><a class="docs-nav-sub" href="#meta-config"><code>@config</code></a></li>
           <li><a class="docs-nav-sub" href="#meta-trace"><code>@trace</code></a></li>
-          <li><a class="docs-nav-sub" href="#meta-noinline"><code>@noInline</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-noinline"><code>@noinline</code></a></li>
           <li><a class="docs-nav-sub" href="#meta-nooptimize"><code>@noOptimize</code></a></li>
           <li><a class="docs-nav-sub" href="#meta-trackcaller"><code>@trackCaller</code></a></li>
           <li><a class="docs-nav-sub" href="#meta-watch"><code>@watch</code></a></li>
@@ -114,8 +114,9 @@
     <section class="docs-section" id="overview">
       <h2>Services</h2>
       <p>
-        The builtin services are always available - no import of an instance, no construction. The
-        ADM service manager starts them before <code>application.new</code> runs and stops them on
+        Each builtin service lives in its own module, <code>std.services.&lt;name&gt;</code>: import it
+        and call it, there is no instance to construct. The ADM service manager starts the automatic
+        services a program imports before <code>application.new</code> runs and stops them on
         shutdown, so calling one is just <code>Cache.get("k")</code>. For the language rules behind
         <code>service</code> declarations, see <a href="docs.html#services">Services</a> in the docs.
       </p>
@@ -152,7 +153,8 @@
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="code-filename">usage.adm</span>
         </div>
-        <pre><code>use std.services::(Cache, Diagnostics)
+        <pre><code>use std.services.cache::(Cache)
+use std.services.diagnostics::(Diagnostics)
 use std.metrics::(Counter)
 
 def warm(email string) !none {
@@ -233,9 +235,9 @@ def onExpiry(evt Event&lt;string&gt;) {
       <p>
         Services also ship <a href="#annotations">annotations</a> - <code>@cache</code>,
         <code>@metric</code>, <code>@measureTime</code> and friends - that wrap a declaration instead
-        of being called. Import them by name (<code>use std.services::(cache)</code>). An annotation
+        of being called. Import them by name from the service's module (<code>use std.services.cache::(cache)</code>). An annotation
         that accepts more than one kind of target must be written qualified
-        (<code>use std.services</code> then <code>@services.trace()</code>), because a by-name import
+        (<code>use std.services.debugger</code> then <code>@debugger.trace()</code>), because a by-name import
         narrows it to a single target.
       </p>
       <p class="docs-placeholder">
@@ -288,6 +290,15 @@ def onExpiry(evt Event&lt;string&gt;) {
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def version() string</code></div>
             <p class="api-doc">Returns application version, or an empty string if the application is not versioned.</p>
 
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def homePath() !string</code></div>
+            <p class="api-doc">Returns the per-user folder this application owns, creating it on first use. Secrets (Vault), plugins, configuration and caches live under it, so an application never writes anywhere else. It sits in the platform's application-data location, named after the app:</p>
+            <p class="api-doc">Linux    $XDG_DATA_HOME/&lt;name&gt;, default ~/.local/share/&lt;name&gt; macOS    ~/Library/Application Support/&lt;name&gt; Windows  %APPDATA%\&lt;name&gt;</p>
+            <p class="api-doc"><code>ADM_APP_HOME</code>, when set, names the folder directly (portable installs, tests). A folder that already exists there with contents but no <code>version</code> marker belongs to something else and is refused, never adopted or overwritten.</p>
+            <p class="api-doc">The first call also brings the folder up to date with this version:</p>
+            <p class="api-doc">version        last version that used the folder data/          the application's own files backup/&lt;ver&gt;/  snapshot of data/ taken before migrating from &lt;ver&gt;</p>
+            <p class="api-doc">A folder last used by an older version has <code>data/</code> snapshotted to <code>backup/&lt;old&gt;/</code>, then every <code>@migration</code> step newer than <code>&lt;old&gt;</code> runs in order; a failing step restores the snapshot and fails this call. A folder last used by a newer version fails unless the application is annotated <code>@allowDowngrade</code>. Fails when no home directory is known (<code>HOME</code>, or <code>USERPROFILE</code> on Windows). The path <code>home()</code> would use, without creating or upgrading the folder. For code that reads an optional file there (the Policy service's <code>policy.toml</code>) and must not leave a folder behind.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def build() string</code></div>
@@ -512,8 +523,8 @@ def onExpiry(evt Event&lt;string&gt;) {
         </ul>
       </div>
       <div class="docs-sub" id="svc-config">
-        <h3><code>Config</code></h3>
-        <p>Layered configuration with profiles, typed reads, and reload events.</p>
+        <h3><code>Config</code> <span class="api-tag api-planned">planned</span></h3>
+        <p>Layered configuration with profiles, typed reads, and reload events. The methods are declared; none does anything yet.</p>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def switchProfile(profile ?string) !none</code></div>
@@ -580,43 +591,42 @@ def onExpiry(evt Event&lt;string&gt;) {
       </div>
       <div class="docs-sub" id="svc-debugger">
         <h3><code>Debugger</code></h3>
-        <p>Profiling, tracing, heap snapshots, and debug control.</p>
+        <p>CPU and memory profiles and call traces. Both need a debug build.</p>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def profileStart(kind ProfileKind) !ProfileId</code></div>
-            <p class="api-doc">Starts a profile of the given kind and returns its id.</p>
+            <p class="api-doc">Starts a profile of the given kind and returns its id. A CPU profile samples every running task's stack 100 times a second; a Memory profile records the stack and size of every allocation.</p>
+            <p class="api-doc">Fails when a profile of that kind already runs, when the kind is Heap or GPU (not implemented yet), on a platform without profiling signals (CPU), and in release builds.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def profileStop(id ProfileId) !Profile</code></div>
             <p class="api-doc">Stops the profile and returns what it collected.</p>
+            <p class="api-doc">Fails when id names no running profile.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def traceStart() !TraceId</code></div>
-            <p class="api-doc">Starts a trace and returns its id.</p>
+            <p class="api-doc">Starts recording the calls of every <code>@trace</code> function and method, and returns the trace's id.</p>
+            <p class="api-doc">Fails when a trace already runs, and in release builds.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def traceStop(id TraceId) !Trace</code></div>
             <p class="api-doc">Stops the trace and returns what it recorded.</p>
+            <p class="api-doc">Fails when id names no running trace.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def gc() !none</code></div>
-            <p class="api-doc">Triggers a garbage collection cycle.</p>
-
-          </li>
-          <li class="api-item">
-            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def stackTrace() errors.StackTrace</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><span class="api-tag api-planned">planned</span><code class="api-sig">def stackTrace() errors.StackTrace</code></div>
             <p class="api-doc">The stack trace of the calling task.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def heapSnapshot() !HeapSnapshot</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><span class="api-tag api-planned">planned</span><code class="api-sig">def heapSnapshot() !HeapSnapshot</code></div>
             <p class="api-doc">Takes a heap snapshot.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def pause() !none</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><span class="api-tag api-planned">planned</span><code class="api-sig">def pause() !none</code></div>
             <p class="api-doc">Breaks into the debugger when one is attached; otherwise does nothing.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def watched(event WatchEvent) WatchEvent</code></div>
+            <div class="api-head"><span class="api-tag api-emit">emit</span><span class="api-tag api-planned">planned</span><code class="api-sig">def watched(event WatchEvent) WatchEvent</code></div>
             <p class="api-doc">Emitted when a watched field or variable is read or written.</p>
             <p class="api-doc">Which accesses count is the watch's mode.</p>
           </li>
@@ -624,8 +634,54 @@ def onExpiry(evt Event&lt;string&gt;) {
       </div>
       <div class="docs-sub" id="svc-devices">
         <h3><code>Devices</code></h3>
-        <p>Cameras, microphones, USB, and other attached hardware.</p>
-        <p class="docs-placeholder">Planned - no public methods yet.</p>
+        <p>Cameras, microphones, GPUs, USB, and other attached hardware. Linux only for now. Listing needs <code>adm.devices.list</code>.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def list(kind ?DeviceKind = none) !Device[]</code></div>
+            <p class="api-doc">Every connected device, or only those of one kind.</p>
+            <p class="api-doc">Fails when the policy denies listing the devices.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def gpus() Device[]</code></div>
+            <p class="api-doc">The GPUs, one per render node (<code>/dev/dri/renderD128</code>), in node order. Listing them needs no permission: std opens one itself to decode video on it.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def get(id string) !?Device</code></div>
+            <p class="api-doc">The device with that id, or none.</p>
+            <p class="api-doc">Fails when the policy denies listing the devices.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def watch(period duration = 1s) !none</code></div>
+            <p class="api-doc">Starts polling for devices connecting and disconnecting every period; connected/disconnected fire for the changes. The devices already there when watching starts are not reported.</p>
+            <p class="api-doc">Fails when already watching or the period is not positive.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def unwatch() !none</code></div>
+            <p class="api-doc">Stops polling.</p>
+            <p class="api-doc">Fails when not watching.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def watching() bool</code></div>
+            <p class="api-doc">Whether the polling task runs.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def connected(device Device) Device</code></div>
+            <p class="api-doc">Emitted when a device appears.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def disconnected(device Device) Device</code></div>
+            <p class="api-doc">Emitted when a device goes away.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def open(id string) !int</code></div>
+            <p class="api-doc">Opens the device's node for reading and writing and returns its descriptor for Storage.read/write/control/map/wait. Opening asks no permission of its own: the modules that drive a kind of device (<code>std.devices.openCamera</code>, <code>openMicrophone</code>) require the kind's permission themselves.</p>
+            <p class="api-doc">Fails when there is no such device, it has no node, or the node cannot be opened.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def close(fd int) !none</code></div>
+            <p class="api-doc">Closes a descriptor <code>open</code> returned. Fails when it is not open.</p>
+          </li>
+        </ul>
       </div>
       <div class="docs-sub" id="svc-diagnostics">
         <h3><code>Diagnostics</code></h3>
@@ -673,8 +729,8 @@ def onExpiry(evt Event&lt;string&gt;) {
         <p class="docs-placeholder">Planned - no public methods yet.</p>
       </div>
       <div class="docs-sub" id="svc-logging">
-        <h3><code>Logging</code></h3>
-        <p>Leveled logging with structured fields.</p>
+        <h3><code>Logging</code> <span class="api-tag api-planned">planned</span></h3>
+        <p>Leveled logging with structured fields. The methods are declared and callable; nothing is written yet.</p>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def debug(message string, fields map&lt;string, any&gt; = {}) !none</code></div>
@@ -736,17 +792,17 @@ def onExpiry(evt Event&lt;string&gt;) {
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def bind(fd int, addr Endpoint) !none</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def bind(fd int, addr Endpoint) !none</code></div>
             <p class="api-doc">Binds a socket to a local address: `host:port` or `:port` for IPv4, `[host]:port` or `[]:port` for IPv6, an absolute path for a Unix socket. An empty host binds every interface, port 0 picks a free one (`localAddr` tells which). An existing Unix socket path is not removed.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def connect(fd int, addr Endpoint, timeout duration = 30s) !none</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def connect(fd int, addr Endpoint, timeout duration = 30s) !none</code></div>
             <p class="api-doc">Connects a socket to a remote endpoint, waiting at most `timeout` for the handshake; a timeout fails with `ETIMEDOUT` and leaves the socket open for the caller to close or retry.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def accept(fd int) !int</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def accept(fd int) !int</code></div>
             <p class="api-doc">Accept a new connection from a listening stream socket FD.</p>
 
             <p class="api-doc">Returns the accepted connection as a new file descriptor; the caller owns the returned FD and must close it.</p>
@@ -767,7 +823,7 @@ def onExpiry(evt Event&lt;string&gt;) {
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def write(fd int, data byte[], timeout duration = 30s) !int</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def write(fd int, data byte[], timeout duration = 30s) !int</code></div>
             <p class="api-doc">Write bytes to a connected stream socket FD.</p>
 
             <p class="api-doc">Returns the number of bytes written; short writes are normal and callers must loop if they need to send the full buffer (see `std.net.Connection.writeAll`).</p>
@@ -776,7 +832,22 @@ def onExpiry(evt Event&lt;string&gt;) {
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def read(fd int, data byte[], timeout duration = 30s) !int</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def sendUrgent(fd int, value byte) !none</code></div>
+            <p class="api-doc">Sends one byte of TCP urgent (out-of-band) data on a stream socket FD; the peer's socket marks the point in the stream it sits at.</p>
+            <p class="api-doc">Fails when fd is closed or the peer is gone.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def urgentPending(fd int) !bool</code></div>
+            <p class="api-doc">Reports whether urgent data waits to be read on a stream socket FD, without blocking.</p>
+            <p class="api-doc">Fails when fd is not a socket.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def urgentInline(fd int, enabled bool) !none</code></div>
+            <p class="api-doc">Makes urgent data arrive inline on a stream socket FD, in its place among the other bytes, instead of apart.</p>
+            <p class="api-doc">Fails when fd is not a socket.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def read(fd int, data byte[], timeout duration = 30s) !int</code></div>
             <p class="api-doc">Read bytes from a connected stream socket FD.</p>
 
             <p class="api-doc">Returns the number of bytes read (0 indicates EOF / peer shutdown).</p>
@@ -785,28 +856,46 @@ def onExpiry(evt Event&lt;string&gt;) {
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def resolve(dns string) !string[]</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def resolve(name string) !string[]</code></div>
             <p class="api-doc">Resolve a DNS name to IP literals (IPv4 and/or IPv6).</p>
 
             <p class="api-doc">The returned strings never include ports. For "host:port" parsing and socket endpoint construction, see `std.net.Address`.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def dialStream(addr Endpoint, timeout duration = 30s) !int</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def resolverConfig() string</code></div>
+            <p class="api-doc">The text of the system's resolver configuration (<code>/etc/resolv.conf</code>), "" when it cannot be read. Read without a storage permission: name resolution is part of connecting.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def hostsFile() string</code></div>
+            <p class="api-doc">The text of the system's hosts file (<code>/etc/hosts</code>), "" when it cannot be read. Read without a storage permission, as <code>resolverConfig</code> is.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def sendToNameServer(fd int, query byte[], server string, timeout duration = 5s) !int</code></div>
+            <p class="api-doc">Sends a DNS query to one of the system's name servers from a datagram socket. The server is not checked against the <code>connect</code> policy, since resolving a name is part of connecting to it; the names the query asks about are, as hosts.</p>
+            <p class="api-doc">Fails when <code>server</code> is not one of <code>dns.systemConfig().servers</code>, the bytes are not a DNS query, the policy denies one of its names, or the send is refused or times out.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def exchangeWithNameServer(query byte[], server string, timeout duration = 5s) !byte[]</code></div>
+            <p class="api-doc">Sends a DNS query to one of the system's name servers over TCP and returns the response, checked as <code>sendToNameServer</code> checks.</p>
+            <p class="api-doc">Fails as <code>sendToNameServer</code> does, and when the connection fails, times out or closes before a whole response arrived.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def dialStream(addr Endpoint, timeout duration = 30s) !int</code></div>
             <p class="api-doc">Resolve + connect a stream socket and return a connected file descriptor.</p>
 
             <p class="api-doc">This is the lowest-level "dial" helper: it returns a raw FD so higher-level wrappers (`std.net.dialStream`, connection pools, etc.) can build on it.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def sendTo(fd int, data byte[], addr Endpoint, timeout duration = 30s) !int</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def sendTo(fd int, data byte[], addr Endpoint, timeout duration = 30s) !int</code></div>
             <p class="api-doc">Send a datagram to a remote address (UDP / Unix datagram).</p>
 
             <p class="api-doc">Returns the number of bytes sent. For datagrams this is usually either `data.len()` or an error.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def recvFrom(fd int, data byte[], timeout duration = 30s) !(int, string)</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def recvFrom(fd int, data byte[], timeout duration = 30s) !(int, string)</code></div>
             <p class="api-doc">Receive a datagram and return the byte count and sender address string.</p>
 
             <p class="api-doc">The returned address uses the same string format accepted by `sendTo` and `std.net.Address.parse`.</p>
@@ -825,6 +914,11 @@ def onExpiry(evt Event&lt;string&gt;) {
 
             <p class="api-doc">This is typically required for servers that need to restart quickly.</p>
 
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setBroadcast(fd int, enabled bool = true) !none</code></div>
+            <p class="api-doc">Enable or disable SO_BROADCAST, which a datagram socket needs to send to a broadcast address (255.255.255.255, a subnet's last).</p>
+            <p class="api-doc">Fails when the operating system rejects the option for this socket.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setNoDelay(fd int, enabled bool = true) !none</code></div>
@@ -863,6 +957,21 @@ def onExpiry(evt Event&lt;string&gt;) {
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setSendBuf(fd int, bytes int) !none</code></div>
             <p class="api-doc">Set SO_SNDBUF.</p>
 
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def joinGroup(fd int, group string, iface string = &quot;&quot;) !none</code></div>
+            <p class="api-doc">Joins a multicast group on a datagram socket, so that what is sent to the group reaches it: <code>224.0.0.251</code>, <code>ff02::fb</code>. <code>iface</code> names the interface by its address (IPv4) or its name (IPv6); empty leaves the choice to the system's routing.</p>
+            <p class="api-doc">Fails when the address is no multicast group, the interface does not exist or has no multicast, or the system refuses.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def leaveGroup(fd int, group string, iface string = &quot;&quot;) !none</code></div>
+            <p class="api-doc">Leaves a multicast group joined with <code>joinGroup</code>.</p>
+            <p class="api-doc">Fails when the socket is no member of the group.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setMulticast(fd int, ttl int = 1, loop bool = true) !none</code></div>
+            <p class="api-doc">Sets how many hops what the socket sends to a multicast group may travel (1 stays on the link, which is the system's default), and whether this host's own members of the group get it too.</p>
+            <p class="api-doc">Fails when the operating system rejects the option for this socket.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setSockOptInt(fd int, level int, opt int, val int) !none</code></div>
@@ -964,6 +1073,11 @@ def onExpiry(evt Event&lt;string&gt;) {
 
           </li>
           <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def registerResources(permission string, patterns string[]) !none</code></div>
+            <p class="api-doc">Names what std opens on its own account on the way to something the program did ask for: the system's random source behind a DNS query, the trusted certificates behind a TLS connection. The code that opens them registers them, as patterns for the constrained argument of the permission. An <code>ask</code> rule then never puts such a value to the user, who could not judge it; a <code>deny</code> rule still denies it.</p>
+            <p class="api-doc">Fails with PolicyDenied when a package is on the call chain: a library cannot exempt what it opens from the user's questions.</p>
+          </li>
+          <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def configure(text string) !none</code></div>
             <p class="api-doc">Loads rules from policy-file text instead of the file, replacing what was loaded. Fails on an unknown permission, field or kind, or a malformed line, naming the line.</p>
 
@@ -1023,6 +1137,10 @@ def onExpiry(evt Event&lt;string&gt;) {
             <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def decided(entry PolicyLogEntry) PolicyLogEntry</code></div>
             <p class="api-doc">Emitted for every denial, ask and live answer.</p>
 
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def promptText(permission string, value string) string</code></div>
+            <p class="api-doc">What the user reads under the prompt's title: what the permission lets a program do, in the words its service declared, then the file, folder or address it is about to be used on, then the package asking when that is not the application itself. Permission names stay out of it, they are for policy files; one shows only when its service gave no description. A resolver that draws its own dialog can show the same words.</p>
           </li>
         </ul>
       </div>
@@ -1149,10 +1267,10 @@ def onExpiry(evt Event&lt;string&gt;) {
       </div>
       <div class="docs-sub" id="svc-storage">
         <h3><code>Storage</code></h3>
-        <p>Files, directories, disks, and I/O metrics.</p>
+        <p>Files, directories, memory maps, and device control. A <code>Path</code> argument takes a plain string; the policy checks it before the method runs.</p>
         <ul class="api-list">
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def open(path string, mode string) !int</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def open(path Path, mode string) !int</code></div>
             <p class="api-doc">Open a file or folder at the given path with the specified mode.</p>
 
           </li>
@@ -1177,12 +1295,12 @@ def onExpiry(evt Event&lt;string&gt;) {
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def readFile(path string) !byte[]</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def readFile(path Path) !byte[]</code></div>
             <p class="api-doc">Reads a whole file into memory.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def writeFile(path string, data byte[]) !none</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def writeFile(path Path, data byte[]) !none</code></div>
             <p class="api-doc">Writes the bytes to a file, replacing any existing content.</p>
 
           </li>
@@ -1209,69 +1327,120 @@ def onExpiry(evt Event&lt;string&gt;) {
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def exists(path string) !bool</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def mmap(fd int, offset int = 0, length int = 0, access MapAccess = MapAccess.Read) !int</code></div>
+            <p class="api-doc">Maps length bytes of the open descriptor from offset into memory and returns a mapping handle; length 0 maps to the end of the file.</p>
+            <p class="api-doc">A device node reports no size, so a caller mapping one passes the length itself.</p>
+            <p class="api-doc">Fails when the descriptor cannot be mapped.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def mmapRead(handle int, offset int, length int) !byte[]</code></div>
+            <p class="api-doc">The mapped bytes from offset.</p>
+            <p class="api-doc">Fails when the range leaves the mapping.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def mmapWrite(handle int, offset int, data byte[]) !none</code></div>
+            <p class="api-doc">Writes into the mapping at offset.</p>
+            <p class="api-doc">Fails on a read-only mapping or a range that leaves it.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def mmapLength(handle int) int</code></div>
+            <p class="api-doc">Bytes in the mapping, 0 for an unknown handle.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def mmapFlush(handle int) !none</code></div>
+            <p class="api-doc">Pushes a shared mapping's changes to the file.</p>
+            <p class="api-doc">Fails when the handle is not a mapping.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def munmap(handle int) !none</code></div>
+            <p class="api-doc">Releases the mapping.</p>
+            <p class="api-doc">Fails when the handle is not a mapping.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def control(fd int, request int, data byte[]) !byte[]</code></div>
+            <p class="api-doc">Sends a driver request on the descriptor with data as its argument, which the driver may write back; returns the buffer as it is afterwards.</p>
+            <p class="api-doc">Fails when the driver refuses.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def wait(fd int, timeout duration, write bool = false) !bool</code></div>
+            <p class="api-doc">Waits until the descriptor is readable, or writable when <code>write</code> is true, or the timeout passes; true when it is ready.</p>
+            <p class="api-doc">A query, not a commit: the wait must not hold the service's lock while it lasts.</p>
+            <p class="api-doc">Fails when the descriptor cannot be waited on.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def exists(path Path) !bool</code></div>
             <p class="api-doc">Returns whether a file or directory exists at the path.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def remove(path string) !none</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def remove(path Path) !none</code></div>
             <p class="api-doc">Removes a file.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def rename(oldPath string, newPath string) !none</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def rename(oldPath Path, newPath Path) !none</code></div>
             <p class="api-doc">Renames or moves a file or directory.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def mkdir(path string) !none</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def mkdir(path Path) !none</code></div>
             <p class="api-doc">Creates a directory, including any missing parents.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def rmdir(path string) !none</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def rmdir(path Path) !none</code></div>
             <p class="api-doc">Removes an empty directory.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def readDir(path string, depth int = 0) !os.DirEntry[]</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def readDir(path Path, depth int = 0) !os.DirEntry[]</code></div>
             <p class="api-doc">Lists the entries of a directory.</p>
 
             <p class="api-doc">Depth 0 lists the directory itself; a larger depth descends that many levels.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def delete(path string) !none</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def delete(path Path) !none</code></div>
             <p class="api-doc">Delete a file or a folder at the given path</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def stat(path string) !os.FileInfo</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def stat(path Path) !os.FileInfo</code></div>
             <p class="api-doc">Returns size, mode, and timestamps for a path.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def openedFiles()</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def readLink(path Path) !string</code></div>
+            <p class="api-doc">Returns the target a symbolic link holds, as written in the link: a relative target is relative to the link's folder and is not resolved.</p>
+            <p class="api-doc">Fails when the policy denies the path, the path is not a link or the operating system refuses.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><span class="api-tag api-planned">planned</span><code class="api-sig">def openedFiles()</code></div>
             <p class="api-doc">Return a list of opened file descriptors.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def chmod(file string, mode int64) !none</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def chmod(file Path, mode int64) !none</code></div>
             <p class="api-doc">Changes a file's permission bits.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def metrics(fd ?int)</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def touch(file Path, modified time.Time) !none</code></div>
+            <p class="api-doc">Sets a file's modification time; the access time is left as it is.</p>
+            <p class="api-doc">Fails when the policy denies the path or the operating system refuses.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><span class="api-tag api-planned">planned</span><code class="api-sig">def metrics(fd ?int)</code></div>
             <p class="api-doc">Return read/write metrics for a file descriptor if a fd is provided or for all if not</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def freeSpace(disk string)</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><span class="api-tag api-planned">planned</span><code class="api-sig">def freeSpace(disk string)</code></div>
             <p class="api-doc">Get the free space on a specific disk.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def disks()</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><span class="api-tag api-planned">planned</span><code class="api-sig">def disks()</code></div>
             <p class="api-doc">List of all available disks.</p>
 
           </li>
@@ -1284,7 +1453,7 @@ def onExpiry(evt Event&lt;string&gt;) {
       </div>
       <div class="docs-sub" id="svc-ui">
         <h3><code>UI</code></h3>
-        <p>Windows, the renderer, and input events.</p>
+        <p>Windows, the renderer, displays and input events. Lives in <code>std.ui</code>: <code>use std.ui::(UI)</code>.</p>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def openWindow(cfg r.WindowConfig) !r.Window</code></div>
@@ -1341,35 +1510,61 @@ def onExpiry(evt Event&lt;string&gt;) {
             <p class="api-doc">pumpEvents for every open window.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def click(evt ui.ClickEvent) ui.ClickEvent</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def displays() Display[]</code></div>
+            <p class="api-doc">Every monitor attached to the machine, the primary one first.</p>
+            <p class="api-doc">In a browser there is one, the screen the page is on, unless the user grants the Window Management permission.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def appearance() Appearance</code></div>
+            <p class="api-doc">The platform's look settings: colour scheme, accent, contrast, motion, text size and fonts.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def display(win r.Window) !Display</code></div>
+            <p class="api-doc">The display the window is on: the one holding most of it.</p>
+            <p class="api-doc">Fails when the service is not running or the window is unknown.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def displaysChange(displays Display[]) Display[]</code></div>
+            <p class="api-doc">Emitted when a monitor is added or removed, or one changes resolution or scale.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def appearanceChange(appearance Appearance) Appearance</code></div>
+            <p class="api-doc">Emitted when a look setting changes, such as the user switching to dark mode.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def windowDisplayChange(evt WindowDisplayEvent) WindowDisplayEvent</code></div>
+            <p class="api-doc">Emitted when a window moves to another display, or its display changes scale.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def click(evt ClickEvent) ClickEvent</code></div>
             <p class="api-doc">Emitted for a click, resolved to the component under it.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def mouseMove(evt ui.MouseMoveEvent) ui.MouseMoveEvent</code></div>
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def mouseMove(evt MouseMoveEvent) MouseMoveEvent</code></div>
             <p class="api-doc">Emitted when the pointer moves, resolved to the component under it.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def mouseWheel(evt ui.MouseWheelEvent) ui.MouseWheelEvent</code></div>
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def mouseWheel(evt MouseWheelEvent) MouseWheelEvent</code></div>
             <p class="api-doc">Emitted for a wheel or trackpad scroll.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def resize(evt ui.ResizeEvent) ui.ResizeEvent</code></div>
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def resize(evt ResizeEvent) ResizeEvent</code></div>
             <p class="api-doc">Emitted when a window is resized.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def close(evt ui.CloseEvent) ui.CloseEvent</code></div>
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def close(evt CloseEvent) CloseEvent</code></div>
             <p class="api-doc">Emitted when the user asks to close a window.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def keyDown(evt ui.KeyEvent) ui.KeyEvent</code></div>
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def keyDown(evt KeyEvent) KeyEvent</code></div>
             <p class="api-doc">Emitted when a key goes down.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def keyUp(evt ui.KeyEvent) ui.KeyEvent</code></div>
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def keyUp(evt KeyEvent) KeyEvent</code></div>
             <p class="api-doc">Emitted when a key comes up.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def textInput(evt ui.TextInputEvent) ui.TextInputEvent</code></div>
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def textInput(evt TextInputEvent) TextInputEvent</code></div>
             <p class="api-doc">Emitted for typed text.</p>
           </li>
         </ul>
@@ -1401,6 +1596,8 @@ def onExpiry(evt Event&lt;string&gt;) {
             <span class="code-filename">migration.adm</span>
           </div>
           <pre><code>application MyApp {
+	use std.services::(migration)
+
 	@migration(from = "3.54", to = "4.0")
 	def settingsToJson(home string) !none { ... }
 
@@ -1421,7 +1618,10 @@ def onExpiry(evt Event&lt;string&gt;) {
             <span class="code-filename">downgrade.adm</span>
           </div>
           <pre><code>@allowDowngrade()
-application MyApp { ... }</code></pre>
+application MyApp {
+	use std.services::(allowDowngrade)
+	...
+}</code></pre>
         </div>
       </div>
       <div class="docs-sub" id="meta-cache">
@@ -1436,11 +1636,13 @@ application MyApp { ... }</code></pre>
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">cache.adm</span>
           </div>
-          <pre><code>use std.services::(cache)
+          <pre><code>use std.services.cache::(cache)
 
-@cache("user.{email}", ttl = 5m)
-def loadUser(email string) !User {
-	return try db.fetchUser(email)
+type Users {
+	@cache("user.{email}", ttl = 5m)
+	def load(email string) !User {
+		return try db.fetchUser(email)
+	}
 }</code></pre>
         </div>
       </div>
@@ -1456,9 +1658,13 @@ def loadUser(email string) !User {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">cacheinvalidate.adm</span>
           </div>
-          <pre><code>@cacheInvalidate("user.{email}")
-def renameUser(email string, name string) !none {
-	return try db.rename(email, name)
+          <pre><code>use std.services.cache::(cacheInvalidate)
+
+type Users {
+	@cacheInvalidate("user.{email}")
+	def rename(email string, name string) !none {
+		return try db.rename(email, name)
+	}
 }</code></pre>
         </div>
       </div>
@@ -1473,14 +1679,14 @@ def renameUser(email string, name string) !none {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">config.adm</span>
           </div>
-          <pre><code>use std.services::(config)
+          <pre><code>use std.services.config::(config)
 
 @config("server.port", 8080)
 let port = 0</code></pre>
         </div>
       </div>
       <div class="docs-sub" id="meta-trace">
-        <h3><code>@trace</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>@trace</code></h3>
         <p class="api-targets"><strong>Debugger</strong> · targets functions, methods</p>
         <pre class="api-siglist"><code>@trace()</code></pre>
         <p class="api-doc">Records the function's calls while a trace is running.</p>
@@ -1491,32 +1697,33 @@ let port = 0</code></pre>
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">trace.adm</span>
           </div>
-          <pre><code>use std.services
+          <pre><code>use std.services.debugger
 
-@services.trace()
+@debugger.trace()
 def handleRequest(id string) !none {
 	return try route(id)
 }</code></pre>
         </div>
       </div>
       <div class="docs-sub" id="meta-noinline">
-        <h3><code>@noInline</code> <span class="api-tag api-planned">planned</span></h3>
-        <p class="api-targets"><strong>Debugger</strong> · targets functions, methods</p>
-        <pre class="api-siglist"><code>@noInline()</code></pre>
-        <p class="api-doc">Keeps the compiler from inlining the function.</p>
+        <h3><code>@noinline</code></h3>
+        <p class="api-targets"><strong>Prelude</strong> · targets functions, methods</p>
+        <pre class="api-siglist"><code>@noinline()</code></pre>
+        <p class="api-doc">Keeps the compiler from inlining the function, so it keeps its own frame in a debugger and in profiles.</p>
+        <p class="api-doc">A prelude annotation: it needs no import.</p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">noinline.adm</span>
           </div>
-          <pre><code>@services.noInline()
+          <pre><code>@noinline()
 def hotPath(n int) int {
 	return n * 2
 }</code></pre>
         </div>
       </div>
       <div class="docs-sub" id="meta-nooptimize">
-        <h3><code>@noOptimize</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>@noOptimize</code></h3>
         <p class="api-targets"><strong>Debugger</strong> · targets functions, methods</p>
         <pre class="api-siglist"><code>@noOptimize()</code></pre>
         <p class="api-doc">Compiles the function without optimisation.</p>
@@ -1526,7 +1733,9 @@ def hotPath(n int) int {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">nooptimize.adm</span>
           </div>
-          <pre><code>@services.noOptimize()
+          <pre><code>use std.services.debugger
+
+@debugger.noOptimize()
 def underInvestigation(n int) int {
 	return n * 2
 }</code></pre>
@@ -1543,7 +1752,9 @@ def underInvestigation(n int) int {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">trackcaller.adm</span>
           </div>
-          <pre><code>@services.trackCaller()
+          <pre><code>use std.services.debugger
+
+@debugger.trackCaller()
 def logHere(message string) {
 	println("{__file_name__}:{__line__} {message}")
 }</code></pre>
@@ -1561,8 +1772,10 @@ def logHere(message string) {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">watch.adm</span>
           </div>
-          <pre><code>type Session {
-	@services.watch(WatchMode.Write)
+          <pre><code>use std.services.debugger::(watch, WatchMode)
+
+type Session {
+	@watch(WatchMode.Write)
 	token string
 }</code></pre>
         </div>
@@ -1581,7 +1794,7 @@ def logHere(message string) {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">metric.adm</span>
           </div>
-          <pre><code>use std.services::(metric)
+          <pre><code>use std.services.diagnostics::(metric)
 use std.metrics::(Counter, Gauge)
 
 type Uploads {
@@ -1606,9 +1819,13 @@ type Uploads {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">measurecount.adm</span>
           </div>
-          <pre><code>@measureCount("uploads.calls")
-def upload(data byte[]) !none {
-	return try store(data)
+          <pre><code>use std.services.diagnostics::(measureCount)
+
+type Uploads {
+	@measureCount("uploads.calls")
+	def upload(data byte[]) !none {
+		return try store(data)
+	}
 }</code></pre>
         </div>
       </div>
@@ -1625,9 +1842,13 @@ def upload(data byte[]) !none {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">measuretime.adm</span>
           </div>
-          <pre><code>@measureTime("uploads.latency")
-def upload(data byte[]) !none {
-	return try store(data)
+          <pre><code>use std.services.diagnostics::(measureTime)
+
+type Uploads {
+	@measureTime("uploads.latency")
+	def upload(data byte[]) !none {
+		return try store(data)
+	}
 }</code></pre>
         </div>
       </div>
@@ -1644,9 +1865,13 @@ def upload(data byte[]) !none {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">measureerrors.adm</span>
           </div>
-          <pre><code>@measureErrors("uploads.failures")
-def upload(data byte[]) !none {
-	return try store(data)
+          <pre><code>use std.services.diagnostics::(measureErrors)
+
+type Uploads {
+	@measureErrors("uploads.failures")
+	def upload(data byte[]) !none {
+		return try store(data)
+	}
 }</code></pre>
         </div>
       </div>
@@ -1663,9 +1888,13 @@ def upload(data byte[]) !none {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">measureconcurrency.adm</span>
           </div>
-          <pre><code>@measureConcurrency("uploads.active")
-def upload(data byte[]) !none {
-	return try store(data)
+          <pre><code>use std.services.diagnostics::(measureConcurrency)
+
+type Uploads {
+	@measureConcurrency("uploads.active")
+	def upload(data byte[]) !none {
+		return try store(data)
+	}
 }</code></pre>
         </div>
       </div>
@@ -1680,10 +1909,10 @@ def upload(data byte[]) !none {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">log.adm</span>
           </div>
-          <pre><code>use std.services
-use std.services::(LogLevel)
+          <pre><code>use std.services.logging
+use std.services.logging::(LogLevel)
 
-@services.log(LogLevel.Info)
+@logging.log(LogLevel.Info)
 def createOrder(id string) !none {
 	return try persist(id)
 }</code></pre>
@@ -1711,28 +1940,34 @@ def createOrder(id string) !none {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">sensitive.adm</span>
           </div>
-          <pre><code>def login(email string, @services.sensitive() password string) !Session {
+          <pre><code>use std.services.logging
+
+def login(email string, @logging.sensitive() password string) !Session {
 	return try authenticate(email, password)
 }</code></pre>
         </div>
       </div>
       <div class="docs-sub" id="meta-requires">
-        <h3><code>@requires</code> <span class="api-tag api-planned">planned</span></h3>
-        <p class="api-targets"><strong>Policy</strong> · targets functions, methods</p>
-        <pre class="api-siglist"><code>@requires(permissions string[])</code></pre>
+        <h3><code>@requires</code></h3>
+        <p class="api-targets"><strong>Prelude</strong> · targets functions, methods</p>
+        <pre class="api-siglist"><code>@requires(permission string)</code></pre>
+        <p class="api-doc">Gates the function on a permission a service declares: every package on the calling chain must hold it, or the call fails with PolicyDenied. The function must return an errorable.</p>
+        <p class="api-doc">A prelude annotation: it needs no import. The service that declares the permission must be part of the program.</p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">requires.adm</span>
           </div>
-          <pre><code>@services.requires(["net.connect"])
-def fetch(url string) !Response {
+          <pre><code>use std.net.http
+
+@requires("adm.network.connect")
+def fetch(url string) !http.Response {
 	return try http.get(url)
 }</code></pre>
         </div>
       </div>
       <div class="docs-sub" id="meta-cron">
-        <h3><code>@cron</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>@cron</code></h3>
         <p class="api-targets"><strong>Scheduler</strong> · targets functions</p>
         <pre class="api-siglist"><code>@cron(cronExpression string, name string = "")</code></pre>
         <p class="api-doc">Calls the function whenever the cron expression fires.</p>
@@ -1741,7 +1976,7 @@ def fetch(url string) !Response {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">cron.adm</span>
           </div>
-          <pre><code>use std.services::(cron)
+          <pre><code>use std.services.scheduler::(cron)
 
 @cron("0 3 * * *")
 def nightlyCleanup() {
@@ -1750,13 +1985,13 @@ def nightlyCleanup() {
         </div>
       </div>
       <div class="docs-sub" id="meta-at">
-        <h3><code>@at</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>@at</code></h3>
         <p class="api-targets"><strong>Scheduler</strong> · targets functions</p>
         <pre class="api-siglist"><code>@at(timestamp time.Time, name string = "")</code></pre>
         <p class="api-doc">Calls the function once, at the given time.</p>
       </div>
       <div class="docs-sub" id="meta-after">
-        <h3><code>@after</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>@after</code></h3>
         <p class="api-targets"><strong>Scheduler</strong> · targets functions</p>
         <pre class="api-siglist"><code>@after(interval duration, name string = "")</code></pre>
         <p class="api-doc">Calls the function once, after the duration.</p>
@@ -1765,14 +2000,16 @@ def nightlyCleanup() {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">after.adm</span>
           </div>
-          <pre><code>@after(30s)
+          <pre><code>use std.services.scheduler::(after)
+
+@after(30s)
 def warmUp() {
 	primeCaches()
 }</code></pre>
         </div>
       </div>
       <div class="docs-sub" id="meta-runevery">
-        <h3><code>@runEvery</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>@runEvery</code></h3>
         <p class="api-targets"><strong>Scheduler</strong> · targets functions</p>
         <pre class="api-siglist"><code>@runEvery(interval duration, name string = "")</code></pre>
         <p class="api-doc">Calls the function every interval.</p>
@@ -1781,9 +2018,11 @@ def warmUp() {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">runevery.adm</span>
           </div>
-          <pre><code>@runEvery(5m)
+          <pre><code>use std.services.scheduler::(runEvery)
+
+@runEvery(5m)
 def heartbeat() {
-	Logging.info("alive")
+	println("alive")
 }</code></pre>
         </div>
       </div>

@@ -104,6 +104,11 @@
           <li><a class="docs-nav-sub" href="#get">adm get</a></li>
           <li><a class="docs-nav-sub" href="#install">adm install</a></li>
           <li><a class="docs-nav-sub" href="#publish">adm publish</a></li>
+          <li><a class="docs-nav-sub" href="#publisher-new">adm publisher new</a></li>
+          <li><a class="docs-nav-sub" href="#publisher-list">adm publisher list</a></li>
+          <li><a class="docs-nav-sub" href="#publisher-name">adm publisher name</a></li>
+          <li><a class="docs-nav-sub" href="#publisher-export">adm publisher export</a></li>
+          <li><a class="docs-nav-sub" href="#publisher-import">adm publisher import</a></li>
           <li><a class="docs-nav-sub" href="#search">adm search</a></li>
           <li><a class="docs-nav-sub" href="#vendor">adm vendor</a></li>
         </ul>
@@ -131,6 +136,13 @@
           <li><a class="docs-nav-sub" href="#clean">adm clean</a></li>
           <li><a class="docs-nav-sub" href="#config">adm config</a></li>
           <li><a class="docs-nav-sub" href="#completion">adm completion</a></li>
+        </ul>
+      </div>
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#environment">Environment variables</a>
+        <ul class="docs-nav-list">
+          <li><a class="docs-nav-sub" href="#env-toolchain">Toolchain</a></li>
+          <li><a class="docs-nav-sub" href="#env-runtime">Compiled programs</a></li>
         </ul>
       </div>
 
@@ -162,7 +174,7 @@
         <tr><td><code>--out DIR</code></td><td>Output directory for built binaries (default: the current directory).</td></tr>
         <tr><td><code>--release</code></td><td>Fully optimized (<code>-O3 -DNDEBUG</code>, drops debug-only runtime diagnostics); the default is <code>-O2</code>.</td></tr>
         <tr><td><code>--debug</code></td><td>Unoptimized with debug info (<code>-O0 -g</code>).</td></tr>
-        <tr><td><code>--backend llvm|c</code></td><td>Compiler backend (default <code>llvm</code>).</td></tr>
+        <tr><td><code>--backend llvm</code></td><td>Compiler backend; <code>llvm</code> is the only one.</td></tr>
         <tr><td><code>--os, --arch</code></td><td>Target platform (defaults to the host).</td></tr>
         <tr><td><code>--platforms a,b</code></td><td>Build several <code>&lt;os&gt;-&lt;arch&gt;</code> at once; plugins merge into one <code>.admplugin</code>. A cross target needs <code>ADM_SYSROOT_&lt;OS&gt;_&lt;ARCH&gt;</code>.</td></tr>
         <tr><td><code>--runtime static|shared</code></td><td>Runtime linkage; <code>shared</code> is required to load plugins.</td></tr>
@@ -301,7 +313,7 @@ adm run MyApp -- --help</code></pre>
         <tr><td><code>--file TEXT</code></td><td>Only tests whose source file contains the text.</td></tr>
         <tr><td><code>--list / --list-bench</code></td><td>List discovered tests or benchmarks without running.</td></tr>
         <tr><td><code>--bench TEXT</code></td><td>Run benchmarks matching the text (<code>.</code> for all); <code>--bench-count</code>, <code>--bench-time</code> shape the run.</td></tr>
-        <tr><td><code>--coverage</code></td><td>Emit a clang coverage profile to <code>./adm_test.profraw</code> (<code>--coverage-out</code> names the file). <code>--coverage-report</code> prints the line coverage of the modules whose tests ran and keeps the profile in the build's temporary folder; with <code>--json</code> it also reports every module and every source line as covered, partly covered or not covered. <code>--coverage-per-test</code> re-runs each test on its own (slow). Only the C backend instruments module bodies, so pass <code>--backend c</code> for coverage.</td></tr>
+        <tr><td><code>--coverage</code> <span class="api-tag api-planned">planned</span></td><td>Coverage profiles and reports (<code>--coverage-out</code>, <code>--coverage-report</code>, <code>--coverage-per-test</code>). The flags are refused until the LLVM backend emits coverage.</td></tr>
         <tr><td><code>--json</code></td><td>Machine-readable output. With <code>--list</code>: a JSON array of tests (<code>name</code>, <code>module</code>, <code>file</code>, <code>line</code>). Otherwise one JSON event per line (<code>status</code>, <code>diagnostic</code>, <code>run</code>, <code>pass</code>, <code>fail</code>, <code>skip</code>, <code>output</code>, <code>summary</code>, <code>coverage</code>, <code>file_coverage</code>, <code>error</code>, <code>done</code>); the IDE test panel reads this.</td></tr>
         <tr><td><code>--build-only</code></td><td>Build the runner and print <code>ADM_TEST_BIN=&lt;path&gt;</code>.</td></tr>
         <tr><td><code>--out DIR</code></td><td>Keep the compiled runner there.</td></tr>
@@ -314,8 +326,7 @@ adm run MyApp -- --help</code></pre>
         </div>
         <pre><code data-hl="off" class="nohighlight">adm test std/services
 adm test --run TestRule std/services
-adm test --list --json std/io
-adm test --json --coverage-report --backend c .</code></pre>
+adm test --list --json std/io</code></pre>
       </div>
       <h3 id="package-build"><code>adm package build</code></h3>
       <div class="code-window">
@@ -424,6 +435,7 @@ adm audit testdata/desktop_apps/opengl_window</code></pre>
         <tr><th>Flag</th><th>Meaning</th></tr>
         <tr><td><code>--dir DIR</code></td><td>Where to write the manifest.</td></tr>
         <tr><td><code>--private-key-out PATH</code></td><td>Where to write the private key.</td></tr>
+        <tr><td><code>--publisher NAME</code></td><td>Sign as a stored identity (<code>adm publisher list</code>) instead of generating a key.</td></tr>
         <tr><td><code>--git</code></td><td>Initialize a git repository and a <code>.gitignore</code>.</td></tr>
         <tr><td><code>--force</code></td><td>Overwrite an existing manifest.</td></tr>
       </table>
@@ -492,9 +504,9 @@ adm app set --app Main package.files &quot;dist/app=&gt;bin/app:0755, README.md=
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="code-filename">usage</span>
         </div>
-        <pre><code data-hl="off" class="nohighlight">adm app rekey [--dir DIR] [--private-key-out PATH]</code></pre>
+        <pre><code data-hl="off" class="nohighlight">adm app rekey [--dir DIR] [--private-key-out PATH] [--publisher NAME]</code></pre>
       </div>
-      <p>Gives an existing manifest a new key pair and repo salt, rewriting <code>[publisher]</code> in place and writing the new private key where <code>init</code> would. The publisher id and every app id change with it; signing looks only at the default key path or <code>ADM_SIGNING_KEY</code>, so a custom key path needs the variable.</p>
+      <p>Gives an existing manifest a new key pair and repo salt, rewriting <code>[publisher]</code> in place and writing the new private key where <code>init</code> would. The publisher id and every app id change with it; signing looks only at the default key path or <code>ADM_SIGNING_KEY</code>, so a custom key path needs the variable. <code>--publisher NAME</code> uses a stored identity's key (<code>adm publisher list</code>) instead of generating one.</p>
       <h3 id="app-sign"><code>adm app sign</code></h3>
       <div class="code-window">
         <div class="code-titlebar">
@@ -639,7 +651,7 @@ adm app policy set adm.clipboard.read deny</code></pre>
         </div>
         <pre><code data-hl="off" class="nohighlight">adm get [namespace:]name[@range] ... [flags]</code></pre>
       </div>
-      <p>Resolves each library in the configured registries, picks the highest version in range that is not yanked, downloads the container from the library's own repository, verifies it (index hash, checksums, signature, publisher, module ownership) and installs it into the package cache, recording it in <code>adm.lock</code>; dependencies the library declares follow. Then the permissions the package asks for are shown as a checklist, grouped by package, with one more row when the package binds foreign code (<code>@c</code>, <code>@link</code>, <code>@native</code>, <code>@extern</code>); the accepted set goes into the lock (<code>permissions=</code>, and <code>foreign=yes</code> for the bindings) and a later version asking for more, or starting to bind foreign code, is refused until accepted again. With no arguments every <code>[deps]</code> entry the lock does not cover yet is fetched.</p>
+      <p>Resolves each library in the configured registries, picks the highest version in range that is not yanked, downloads the container from the library's own repository, verifies it (index hash, checksums, signature, publisher, module ownership) and installs it into the package cache, recording it in <code>adm.lock</code>; dependencies the library declares follow. Then the permissions the package asks for are shown as a checklist, grouped by package, with one more row when the package binds foreign code (<code>@c</code>, <code>@link</code>, <code>@native</code>); the accepted set goes into the lock (<code>permissions=</code>, and <code>foreign=yes</code> for the bindings) and a later version asking for more, or starting to bind foreign code, is refused until accepted again. With no arguments every <code>[deps]</code> entry the lock does not cover yet is fetched.</p>
       <table class="docs-table">
         <tr><th>Flag</th><th>Meaning</th></tr>
         <tr><td><code>--accept all|none|LIST</code></td><td>Grant without asking: everything, nothing, or a comma-separated list of names and globs (<code>adm.storage.*</code>); the token <code>foreign</code> in a list accepts the package's foreign code (<code>all</code> includes it). Required without a terminal.</td></tr>
@@ -686,16 +698,62 @@ adm get acme:imaging@^1.4 --accept adm.storage.*</code></pre>
         </div>
         <pre><code data-hl="off" class="nohighlight">adm publish [flags]</code></pre>
       </div>
-      <p>In a library's source tree with a clean git working tree and a GitHub origin: builds and signs the <code>.admlib</code>, commits it as <code>dist/&lt;name&gt;-&lt;version&gt;.admlib</code>, tags <code>v&lt;version&gt;</code>, pushes, and opens a pull request on the registry adding the index line. Refuses when the version is not newer than the registry's, when nothing signs the package, or when the tree is dirty.</p>
+      <p>In a library's source tree with a clean git working tree and a GitHub origin: builds and signs the <code>.admlib</code>, tags the source <code>&lt;name&gt;@&lt;version&gt;</code>, pushes the tag, creates its GitHub release with the container as the asset, and opens a pull request on the registry adding the index line. The container never enters the repository. Needs the GitHub CLI (<code>gh</code>), logged in as the account that owns the origin. Refuses when the version is not newer than the registry's, when nothing signs the package, or when the tree is dirty.</p>
       <table class="docs-table">
         <tr><th>Flag</th><th>Meaning</th></tr>
-        <tr><td><code>--description TEXT</code></td><td>One line saying what the library is (required, shown by <code>search</code>).</td></tr>
+        <tr><td><code>--description TEXT</code></td><td>One line saying what the library is, shown by <code>search</code> (default: <code>description</code> under <code>[apps.&lt;Name&gt;]</code> in <code>adm.toml</code>).</td></tr>
+        <tr><td><code>--bump major|minor|patch</code></td><td>Raise the library's <code>@manifest(version)</code> first; the change rides in the release commit.</td></tr>
         <tr><td><code>--library NAME</code></td><td>Which library, when the tree declares several.</td></tr>
         <tr><td><code>--registry NAME</code></td><td>Registry from <code>adm.toml</code> (default: the first).</td></tr>
         <tr><td><code>--dry-run</code></td><td>Build and print the index line, touch nothing.</td></tr>
         <tr><td><code>--no-pr</code></td><td>Push the release but print the index line instead of opening the pull request.</td></tr>
         <tr><td><code>--dir DIR</code></td><td>Library source directory.</td></tr>
       </table>
+      <h3 id="publisher-new"><code>adm publisher new</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm publisher new &lt;name&gt;</code></pre>
+      </div>
+      <p>Generates a key pair and stores it under a local name: the name in <code>~/.config/adm/publishers.toml</code>, the key in <code>~/.config/adm/keys</code>. <code>adm app init --publisher &lt;name&gt;</code> then writes that identity's public key into a new <code>adm.toml</code>, so several repositories sign as one publisher. The name is a local label and is never published.</p>
+      <h3 id="publisher-list"><code>adm publisher list</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm publisher list</code></pre>
+      </div>
+      <p>Lists the stored identities.</p>
+      <h3 id="publisher-name"><code>adm publisher name</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm publisher name &lt;publisher id&gt; &lt;name&gt;</code></pre>
+      </div>
+      <p>Names a key already in the keys directory, one <code>adm app init</code> made.</p>
+      <h3 id="publisher-export"><code>adm publisher export</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm publisher export &lt;name&gt;</code></pre>
+      </div>
+      <p>Prints the identity's private key (base64), for <code>adm publisher import</code> or <code>ADM_SIGNING_KEY</code>.</p>
+      <h3 id="publisher-import"><code>adm publisher import</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm publisher import &lt;name&gt; &lt;file|-&gt;</code></pre>
+      </div>
+      <p>Stores a private key printed by <code>adm publisher export</code> under the name.</p>
       <h3 id="search"><code>adm search</code></h3>
       <div class="code-window">
         <div class="code-titlebar">
@@ -742,10 +800,10 @@ adm get acme:imaging@^1.4 --accept adm.storage.*</code></pre>
         </div>
         <pre><code data-hl="off" class="nohighlight">adm dump &lt;file&gt; [flags]</code></pre>
       </div>
-      <p>Dumps a compilation stage for one file: tokens, the AST, the IR, LLVM IR or the generated C.</p>
+      <p>Dumps a compilation stage for one file: tokens, the AST, the IR or LLVM IR.</p>
       <table class="docs-table">
         <tr><th>Flag</th><th>Meaning</th></tr>
-        <tr><td><code>--stage tokens|ast|ir|llvm|c</code></td><td>Which stage (default <code>ast</code>).</td></tr>
+        <tr><td><code>--stage tokens|ast|ir|llvm</code></td><td>Which stage (default <code>ast</code>).</td></tr>
         <tr><td><code>--ir-verbose</code></td><td>Full IR/MIR/LIR blocks and instructions.</td></tr>
         <tr><td><code>--comments</code></td><td>Include comments in token and AST output (default on).</td></tr>
       </table>
@@ -754,7 +812,7 @@ adm get acme:imaging@^1.4 --accept adm.storage.*</code></pre>
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="code-filename">shell</span>
         </div>
-        <pre><code data-hl="off" class="nohighlight">adm dump main.adm --stage c</code></pre>
+        <pre><code data-hl="off" class="nohighlight">adm dump main.adm --stage llvm</code></pre>
       </div>
       <h3 id="lsp"><code>adm lsp</code></h3>
       <div class="code-window">
@@ -816,6 +874,26 @@ adm get acme:imaging@^1.4 --accept adm.storage.*</code></pre>
         <tr><th>Check</th><th>Reports</th></tr>
         <tr><td><code>unchecked-map-index</code></td><td>A read <code>m[k]</code> of a map where nothing before it established the key, which panics when the key is missing. An earlier <code>m[k] = v</code> or <code>m.set(k, v)</code> in the block, a <code>hasKey(k)</code>, <code>get(k)</code> or <code>k in m</code> check earlier or in an enclosing condition, a <code>for let (k, v) in m</code> loop around the read, or a map literal declaring the key all count as establishing it. <code>m[w] = m[w] + 1</code> still fires: it reads before it writes.</td></tr>
         <tr><td><code>ref-cycle</code></td><td>Two types holding strong references to each other, or a type holding itself through two fields where one is named as a back reference (a tree's <code>parent</code> beside <code>children</code>, a list's <code>prev</code> beside <code>next</code>), so neither instance is ever freed. A node whose self links all point forward, such as <code>children</code> and <code>next</code>, is not reported, nor is one whose links all point up, and two types that hold arrays of each other are a tree of parts, not a cycle. The fix names the field to mark <code>weak</code>.</td></tr>
+        <tr><td><code>closure-cycle</code></td><td>A field holding a function literal that captures <code>self</code>, by name or through a bare field or method: object and closure keep each other alive.</td></tr>
+        <tr><td><code>observer-cycle</code></td><td>A type whose <code>@on</code> handler observes a service the type also holds in a strong field.</td></tr>
+        <tr><td><code>needless-weak</code></td><td>A <code>weak</code> field whose target type never references the owner through the strong field graph.</td></tr>
+        <tr><td><code>large-value-copy</code></td><td>A datatype value estimated above 64 bytes passed to a call inside a loop body, copied on every pass.</td></tr>
+        <tr><td><code>missing-dispose</code></td><td>A type holding a field whose type declares <code>dispose</code>, without a <code>dispose</code> of its own to release it.</td></tr>
+        <tr><td><code>unsynchronised-field</code></td><td>A field written by a task (an <code>async</code> method, or one the type spawns) and used by other methods, without <code>atomic</code>.</td></tr>
+        <tr><td><code>dropped-future</code></td><td>A task started as a statement whose result or error nothing awaits.</td></tr>
+        <tr><td><code>blocking-observer</code></td><td>An <code>@on</code> handler that reaches <code>adm.storage.*</code> or <code>adm.network.*</code> I/O, which blocks the event dispatcher.</td></tr>
+        <tr><td><code>deprecated-use</code></td><td>Every reference to a <code>@deprecated</code> declaration, with the replacement its annotation names.</td></tr>
+        <tr><td><code>bare-booleans</code></td><td>A call passing two or more boolean literals by position; name the arguments or use an enum.</td></tr>
+        <tr><td><code>name-variant-overload</code></td><td><code>readFile</code> beside <code>readFileWith</code> or <code>readFileFrom</code> in one body, where an overload or a default argument would do.</td></tr>
+        <tr><td><code>could-be-internal</code></td><td>An exported function or type of an application module that no other module refers to.</td></tr>
+        <tr><td><code>redundant-internal</code></td><td><code>internal</code> on a service member; a service exposes only its datatypes, interfaces and <code>@commit</code>, <code>@emit</code> and <code>@query</code> members. The fix deletes the keyword.</td></tr>
+        <tr><td><code>array-identity</code></td><td><code>==</code> or <code>!=</code> between an array and an array literal: it compares which array each side is, so it is always false (or true). The fix writes <code>a.equals(b)</code>.</td></tr>
+        <tr><td><code>unreachable</code></td><td>A statement after a <code>return</code>, <code>fail</code>, <code>break</code>, <code>continue</code>, <code>recover</code> or <code>rollback</code> in the same block (contract blocks excepted).</td></tr>
+        <tr><td><code>empty-onerror</code></td><td>An <code>onerror</code> handler with nothing in it, so the error is dropped without a trace.</td></tr>
+        <tr><td><code>self-assign</code></td><td><code>x = x</code>, which changes nothing.</td></tr>
+        <tr><td><code>constant-condition</code></td><td>An <code>if</code>, <code>when</code>, <code>unless</code> or <code>for</code> condition that is a boolean literal or compares an expression with itself.</td></tr>
+        <tr><td><code>unused-local</code></td><td>A local, parameter or pattern binding nothing reads (parameters of stub bodies excepted).</td></tr>
+        <tr><td><code>shadow</code></td><td>A local declared under the name of a parameter, outer local, receiver field or module variable it hides.</td></tr>
         <tr><td><code>undeclared-dependency</code></td><td>A service calling or observing another service that its <code>dependencies</code> field lists under neither <code>hard</code> nor <code>soft</code>. The fix appends it to the <code>hard</code> list.</td></tr>
         <tr><td><code>undeclared-permission</code></td><td>A library reaching a permission its <code>adm.toml</code> does not list under <code>[requires] permissions</code>, shown with the call chain. The library build fails on the same thing.</td></tr>
         <tr><td><code>assertless-test</code></td><td>A <code>@test</code> with no <code>assert</code>, no <code>assert*</code> or <code>expect*</code> helper call and no <code>try</code>: it passes whatever the code does.</td></tr>
@@ -835,7 +913,7 @@ adm get acme:imaging@^1.4 --accept adm.storage.*</code></pre>
         <tr><td><code>accessor-prefix</code></td><td><code>getX()</code> and <code>setX(v)</code> methods over a field, which ADM reads as a property. When both do nothing but read and write the field, the fix rewrites the field into a property block carrying the accessors' doc comments, deletes the methods and turns every caller into <code>o.x</code> or <code>o.x = v</code>. A getter with logic, or a setter used as an expression, is reported without a fix.</td></tr>
         <tr><td><code>todo</code></td><td><code>TODO</code>, <code>FIXME</code>, <code>HACK</code> and <code>XXX</code> comments.</td></tr>
       </table>
-      <p><code>ref-cycle</code>, <code>unchecked-map-index</code>, <code>unused-import</code> and <code>unused-internal</code> are warnings; the rest are informational. Test files skip the naming and documentation checks, and constructors and destructors need no doc comment. <code>--skip</code> leaves checks out; the exit code is 0 either way. Fixes exist for <code>ref-cycle</code> (inserts <code>weak</code> on the optional field), <code>unused-import</code> (removes the line or the name) and <code>accessor-prefix</code>.</p>
+      <p>What leaks, breaks or is dead is a warning: <code>ref-cycle</code>, <code>closure-cycle</code>, <code>observer-cycle</code>, <code>missing-dispose</code>, <code>unsynchronised-field</code>, <code>blocking-observer</code>, <code>unchecked-map-index</code>, <code>array-identity</code>, <code>unreachable</code>, <code>empty-onerror</code>, <code>self-assign</code>, <code>constant-condition</code>, <code>undeclared-dependency</code>, <code>undeclared-permission</code>, <code>assertless-test</code>, <code>suite-file-without-suite</code>, <code>unused-import</code>, <code>unused-internal</code> and <code>unused-local</code>. The rest are informational. Test files skip the naming and documentation checks, and constructors and destructors need no doc comment. <code>--skip</code> leaves checks out; the exit code is 0 either way. Fixes exist for <code>ref-cycle</code> (inserts <code>weak</code> on the optional field), <code>unused-import</code> (removes the line or the name), <code>accessor-prefix</code>, <code>redundant-internal</code>, <code>array-identity</code> and the <code>prefer-*</code> rewrites.</p>
       <div class="code-window">
         <div class="code-titlebar">
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -918,7 +996,7 @@ adm lint --list</code></pre>
         </div>
         <pre><code data-hl="off" class="nohighlight">adm clean</code></pre>
       </div>
-      <p>Removes the build cache (<code>ADM_CACHE</code>, default <code>~/.adm/cache</code>). Every cache entry is keyed on the compiler that wrote it, so after an update the old entries can never be used again.</p>
+      <p>Removes every build cache under <code>ADM_CACHE</code> (default <code>~/.adm/cache</code>).</p>
       <h3 id="config"><code>adm config</code></h3>
       <div class="code-window">
         <div class="code-titlebar">
@@ -945,6 +1023,54 @@ adm lint --list</code></pre>
         </div>
         <pre><code data-hl="off" class="nohighlight">source &lt;(adm completion zsh)</code></pre>
       </div>
+    </section>
+
+    <section class="docs-section" id="environment">
+      <h2>Environment variables</h2>
+      <p>What the toolchain and the programs it builds read from the environment.</p>
+      <h3 id="env-toolchain">Toolchain</h3>
+      <table class="docs-table">
+        <tr><th>Variable</th><th>Meaning</th></tr>
+        <tr><td><code>ADM_LIB</code></td><td>Where the prelude and standard library are read from (default <code>~/.adm/lib</code>, else <code>lib/</code> beside the binary's <code>bin/</code>).</td></tr>
+        <tr><td><code>ADM_PKG</code></td><td>Package cache for <code>adm install</code> and dependency roots (default <code>~/.adm/pkg</code>).</td></tr>
+        <tr><td><code>ADM_CACHE</code></td><td>Root of every build cache (default <code>~/.adm/cache</code>).</td></tr>
+        <tr><td><code>ADM_CATALOG</code></td><td>Directory holding the registry clones <code>search</code>, <code>get</code> and <code>publish</code> pull (default <code>~/.adm/catalog</code>).</td></tr>
+        <tr><td><code>ADM_CATALOG_MAX_AGE</code></td><td>How old a registry clone may be before it is pulled again, a Go duration (default one hour).</td></tr>
+        <tr><td><code>ADM_CLANG</code></td><td>C compiler driver that links the program (default: the bundled <code>tools/clang</code>, else <code>clang</code> on <code>PATH</code>).</td></tr>
+        <tr><td><code>ADM_OS, ADM_ARCH</code></td><td>Target operating system and architecture (default: the host).</td></tr>
+        <tr><td><code>ADM_SYSROOT_&lt;OS&gt;_&lt;ARCH&gt;</code></td><td>Sysroot for a cross target; without it only the host platform links.</td></tr>
+        <tr><td><code>ADM_SIGNING_KEY</code></td><td>Base64 Ed25519 publisher private key used for signing, instead of the key file <code>adm app init</code> wrote.</td></tr>
+        <tr><td><code>ADM_DIST_REPO</code></td><td>GitHub <code>owner/name</code> whose releases <code>adm version</code> and <code>adm update</code> read (default <code>admlang/adm</code>).</td></tr>
+        <tr><td><code>ADM_LLVM_WORKERS</code></td><td>Worker processes a cold build compiles modules in (default: one per core, at most 8, bounded by free memory); <code>0</code> or <code>1</code> compiles in-process.</td></tr>
+        <tr><td><code>ADM_NO_INCREMENTAL</code></td><td><code>1</code> keys the cache on the whole program instead of reusing unchanged modules.</td></tr>
+        <tr><td><code>ADM_NO_SHAKE</code></td><td><code>1</code> compiles the whole program instead of dropping unreachable functions.</td></tr>
+        <tr><td><code>ADM_FULL_LOAD</code></td><td><code>1</code> loads every file of each standard library module a program reaches, instead of only the files it names.</td></tr>
+        <tr><td><code>ADM_NO_OBJ_CACHE, ADM_NO_NATIVE_CACHE, ADM_NO_LINK_CACHE, ADM_NO_LINT_CACHE</code></td><td><code>1</code> bypasses the object cache, the native-support cache, the link stamp or the lint result cache.</td></tr>
+        <tr><td><code>ADM_OBJ_CACHE_MAX</code></td><td>Size cap of the object cache (<code>8G</code>, <code>512M</code>; default 8 GiB).</td></tr>
+        <tr><td><code>ADM_NVCC</code></td><td>The <code>nvcc</code> that compiles <code>cuda def</code> bodies (default: on <code>PATH</code>, then the usual CUDA folders); <code>none</code> builds kernels for the CPU path only. <code>ADM_NVCC_FLAGS</code> appends flags.</td></tr>
+        <tr><td><code>ADM_PHASE_TIMING</code></td><td>File to append per-phase build timings to.</td></tr>
+      </table>
+      <h3 id="env-runtime">Compiled programs</h3>
+      <p>Read at startup by every program the compiler builds.</p>
+      <table class="docs-table">
+        <tr><th>Variable</th><th>Meaning</th></tr>
+        <tr><td><code>ADM_PROCS</code></td><td>Parallelism bound of the scheduler (default: the CPU count).</td></tr>
+        <tr><td><code>ADM_TASK_STACK</code></td><td>Stack reserved per task (default <code>32M</code>; pages become resident only when touched).</td></tr>
+        <tr><td><code>ADM_TASK_GUARD</code></td><td><code>1</code> (default) gives each task a guard page; <code>0</code> allocates stacks in slabs with canaries, for millions of tasks.</td></tr>
+        <tr><td><code>ADM_SCHED_MAX_WORKERS</code></td><td>Cap on carrier threads for tasks blocked in system calls (default 10000).</td></tr>
+        <tr><td><code>ADM_PREEMPT</code></td><td><code>1</code> preempts a task that runs 10 ms without yielding (Linux x86-64); default is cooperative only.</td></tr>
+        <tr><td><code>ADM_SCHED_DEBUG</code></td><td>Traces scheduling decisions to stderr.</td></tr>
+        <tr><td><code>ADM_AFFINITY_CHECK</code></td><td>Panics when a thread-affine call runs on an unpinned task.</td></tr>
+        <tr><td><code>ADM_CPU</code></td><td><code>baseline</code> runs the SSE2 copies of SIMD functions; by default the AVX2/FMA copies run on CPUs that have them.</td></tr>
+        <tr><td><code>ADM_CUDA</code></td><td>Launch path of a <code>cuda def</code>: unset picks the GPU when available, <code>gpu</code> requires it, <code>cpu</code> forces the CPU emulation. <code>ADM_CUDA_DEVICE</code> picks the device ordinal (default <code>0</code>).</td></tr>
+        <tr><td><code>ADM_VIDEO_HW</code></td><td>GPU video decoding in <code>std.formats.video</code>: <code>auto</code> (default), <code>nvdec</code>, <code>vaapi</code> or <code>off</code>.</td></tr>
+        <tr><td><code>ADM_APP_HOME</code></td><td>Overrides the application's home folder; see <a href="app-home.html">Application home</a>.</td></tr>
+        <tr><td><code>ADM_SANDBOX</code></td><td><code>1</code> applies the OS sandbox at startup from the compiled policy; <code>0</code> turns off one the manifest compiled in. See <a href="policy.html">Policy</a>.</td></tr>
+        <tr><td><code>ADM_POLICY_PROMPT</code></td><td><code>0</code> turns off the desktop prompt a policy <code>ask</code> rule raises; the ask then denies.</td></tr>
+        <tr><td><code>ADM_IDE_PORT</code></td><td>Port on <code>127.0.0.1</code> where <code>std.ide</code> serves the IDE service panels.</td></tr>
+        <tr><td><code>ADM_MEM_STATS</code></td><td><code>1</code> prints live, allocated and freed counts every 200k allocations.</td></tr>
+        <tr><td><code>ADM_MEM_TRACE</code></td><td>File to record every allocation and free to, with backtraces.</td></tr>
+      </table>
     </section>
 
   </main>

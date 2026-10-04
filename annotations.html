@@ -119,7 +119,7 @@
     <section class="docs-section" id="using">
       <h2>Using annotations</h2>
       <p>An annotation is a call placed before a declaration: <code>@name(args)</code>, with positional or named arguments like any other call, and empty parentheses when there are none. What it applies to is fixed by the annotation: a function, a method, a field, a parameter, a constant, a module or the <code>application</code> block. Using one on the wrong kind of declaration is a compile error.</p>
-      <p>The ones from the prelude need no import. The ones from a standard library module come in with that module (<code>use std.services::(cache)</code>, or the qualified <code>@services.cache(...)</code> form). Each entry below names the module.</p>
+      <p>The ones from the prelude need no import. The ones from a standard library module come in with that module (<code>use std.services.cache::(cache)</code>, or <code>use std.services.debugger</code> and the qualified <code>@debugger.trace()</code> form). Each entry below names the module.</p>
     </section>
 
     <section class="docs-section" id="compiler">
@@ -147,9 +147,19 @@
 <p>From <code>std.interop</code>. On a module, the header its signature-only declarations need; on a function, binds it to a C symbol. Also available from the prelude as <code>@c(lib)</code> on a module.</p>
       <h4><code>@link(lib)  @native(lib)</code></h4>
 <p>On a module: a linker dependency, or a native-ABI library the module binds to; <code>@native(lib, symbol, name)</code> on a function binds one symbol.</p>
-      <h4><code>@emits(chan = &quot;&quot;)</code></h4>
+      <h4><code>@callback</code></h4>
+<p>On a function parameter of a C declaration: the C library keeps the function and calls it later. The pointer stays valid as long as the function value does; a call from C after that panics. Without it the function is borrowed until the call returns.</p>
+      <h4><code>@kernelOnly()</code></h4>
+<p>On a <code>cuda def</code>: a helper for kernel bodies that is never launched from ADM. It may return a value, and the compiler puts it in front of every kernel that calls it.</p>
+      <h4><code>@fragment()</code></h4>
+<p>A pixel function written in the device subset (numbers, <code>bool</code>, <code>Vec2</code> to <code>Vec4</code>, no allocation), built for the GPU and for eight pixels at a time on the CPU. One taking the position <code>p Vec2</code> first and returning a <code>Vec4</code> colour is a paint; its other parameters are the uniforms.</p>
+      <h4><code>@mutates()</code></h4>
+<p>On a method that changes its receiver in place: calling it on a constant's frozen value is refused.</p>
+      <h4><code>@requires(permission)</code></h4>
+<p>Gates a function or method on a permission a service declares; every package on the calling chain must hold it, or the call fails with <code>PolicyDenied</code>. See <a href="policy.html">Policy &amp; permissions</a>.</p>
+      <h4><code>@emits(chan = &quot;&quot;)</code> <span class="api-tag api-planned">planned</span></h4>
 <p>Declares the channel a function emits on.</p>
-      <h4><code>@python(entry)  @node(entry)</code></h4>
+      <h4><code>@python(entry)  @node(entry)</code> <span class="api-tag api-planned">planned</span></h4>
 <p>Bindings into an embedded interpreter.</p>
     </section>
 
@@ -214,29 +224,41 @@
       <h4><code>@test()</code></h4>
 <p>A test case; <code>assert</code> failures and returned errors fail it.</p>
       <h4><code>@benchmark()</code></h4>
-<p>A benchmark, run by <code>adm test --bench</code>.</p>
-      <h4><code>@fuzz()</code></h4>
+<p>A benchmark, run by <code>adm test --bench .</code> (the text selects benchmarks by name; <code>.</code> matches all).</p>
+      <h4><code>@example()</code></h4>
+<p>A function kept for documentation only; it is never run.</p>
+      <h4><code>@fuzz()</code> <span class="api-tag api-planned">planned</span></h4>
 <p>A fuzz target fed generated inputs.</p>
-      <h4><code>@timeout(limit)</code></h4>
+      <h4><code>@timeout(limit)</code> <span class="api-tag api-planned">planned</span></h4>
 <p>Fails the test when it runs longer than <code>limit</code>.</p>
-      <h4><code>@parallel()</code></h4>
+      <h4><code>@parallel()</code> <span class="api-tag api-planned">planned</span></h4>
 <p>Lets the test run alongside other parallel tests.</p>
       <h4><code>@skip(reason = &quot;&quot;)</code></h4>
 <p>Skips the test, reporting the reason.</p>
       <h4><code>@only()</code></h4>
 <p>Runs just the tests carrying it while it is present.</p>
-      <h4><code>@golden(file)</code></h4>
+      <h4><code>@golden(file)</code> <span class="api-tag api-planned">planned</span></h4>
 <p>Compares the test's output with the named golden file.</p>
     </section>
 
     <section class="docs-section" id="encoding">
       <h2>Encoding</h2>
-      <p>From <code>std.data.encoding</code>, on struct fields and properties. All three take the same core options.</p>
+      <p>From <code>std.data.encoding</code>, on struct fields and properties.</p>
       <h4><code>@json(name = &quot;&quot;, omitempty = false, ignore = false, asString = false, nullable = false)</code></h4>
 <p><code>name</code> replaces the key, <code>omitempty</code> drops the field at its zero value, <code>ignore</code> skips it both ways, <code>asString</code> quotes the value (large integers stay exact), <code>nullable</code> writes <code>null</code> instead of omitting.</p>
-      <h4><code>@yaml(...)</code></h4>
-<p>Same options as <code>@json</code>, for YAML.</p>
-      <h4><code>@xml(name = &quot;&quot;, omitempty = false, attribute = false, ignore = false)</code></h4>
+      <h4><code>@yaml(...)  @toml(...)</code></h4>
+<p>Same options as <code>@json</code>, for YAML and TOML.</p>
+      <h4><code>@cbor(name = &quot;&quot;, key = 0, omitempty = false, ignore = false)</code></h4>
+<p>For CBOR; <code>key</code> gives the field an integer map key instead of its name.</p>
+      <h4><code>@msgpack(name = &quot;&quot;, omitempty = false, ignore = false)</code></h4>
+<p>For MessagePack.</p>
+      <h4><code>@protoField(field = 0, encoding = ProtoEncoding.Varint, packed = true, oneof = &quot;&quot;, unknown = false, ignore = false)</code></h4>
+<p>For Protocol Buffers: the field number, its wire encoding, whether a repeated scalar is packed, and the <code>oneof</code> group it belongs to.</p>
+      <h4><code>@binary(id = 0, name = &quot;&quot;, ignore = false, size = 0, count = 0, pad = 0)</code></h4>
+<p>For <code>Layout</code> and <code>Binary</code>: <code>id</code> and <code>name</code> identify the field in a <code>Binary</code> stream; <code>size</code> fixes the byte width of a <code>byte[]</code> or <code>string</code> field in a <code>Layout</code>, <code>count</code> the element count of an array, <code>pad</code> the zero bytes before the field.</p>
+      <h4><code>@form(name = &quot;&quot;)</code></h4>
+<p>From <code>std.net.http</code>: names the form field, query key or route parameter a struct field is bound from by <code>Request.bind</code>, <code>bindQuery</code> and <code>bindParams</code>.</p>
+      <h4><code>@xml(name = &quot;&quot;, omitempty = false, attribute = false, ignore = false)</code> <span class="api-tag api-planned">planned</span></h4>
 <p>On fields and properties; <code>attribute</code> writes the value as an attribute of the parent element. On a type or struct, <code>@xml(name, ignore)</code> renames or hides the element.</p>
       <div class="code-window">
   <div class="code-titlebar">
@@ -260,17 +282,19 @@
 
     <section class="docs-section" id="validations">
       <h2>Validations</h2>
-      <p>From <code>std.validations</code>, on fields and parameters: <code>@len(min, max)</code>, <code>@url()</code>, <code>@email()</code>, <code>@phone()</code>, <code>@creditcard()</code>, <code>@date()</code>, <code>@time()</code>, <code>@datetime()</code>, <code>@file()</code>, <code>@base64image()</code>, <code>@numeric()</code>, <code>@expression(pattern)</code>, <code>@list()</code>, <code>@truthy()</code>.</p>
-      <p>The same checks are available as functions (<code>validations.isEmail(...)</code>) and as the <code>string.isEmail()</code> family in the prelude.</p>
+      <p><span class="api-tag api-planned">planned</span> From <code>std.validations</code>, on fields and parameters: <code>@len(min, max)</code>, <code>@url()</code>, <code>@email()</code>, <code>@phone()</code>, <code>@creditcard()</code>, <code>@date()</code>, <code>@time()</code>, <code>@datetime()</code>, <code>@file()</code>, <code>@base64image()</code>, <code>@numeric()</code>, <code>@expression(pattern)</code>, <code>@list()</code>, <code>@truthy()</code>.</p>
+      <p>The checks themselves are available today as functions (<code>validations.isEmail(...)</code>) and as the <code>string.isEmail()</code> family in the prelude.</p>
     </section>
 
     <section class="docs-section" id="discovery">
       <h2>Discovery</h2>
       <p>Annotations a service uses to find implementations at start-up, through reflection.</p>
       <h4><code>@codec(name)</code></h4>
-<p>From <code>std.formats.*</code>: registers a type as the image, audio, font or archive codec for <code>name</code>, so the loaders pick it by extension or content.</p>
+<p>From <code>std.formats.*</code>: registers a type as the image, audio, video container, font, archive, document, playlist, calendar, contacts or model codec for <code>name</code>, so the loaders pick it by extension or content. <code>@decoder(name)</code> from <code>std.formats.video</code> does the same for a video decoder.</p>
       <h4><code>@UIRenderer(name)</code></h4>
 <p>From <code>std.ui.renderer</code>: registers a renderer implementation the UI service can select.</p>
+      <h4><code>@tool(name = &quot;&quot;)</code></h4>
+<p>From <code>std.ai.llm</code>: makes a method a tool that <code>Session.use</code> offers the model. The doc comment is the tool's description; the parameters' names, types and defaults are the tool's parameters.</p>
       <h4><code>@ide(kind = IdeKind.Value, label = &quot;&quot;, refresh = 1s, unit = &quot;&quot;)</code></h4>
 <p>From <code>std.ide</code>: publishes a zero-argument service method to the IDE service panel, polled at most every <code>refresh</code>.</p>
     </section>

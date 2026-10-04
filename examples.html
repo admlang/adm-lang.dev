@@ -407,7 +407,7 @@ application Warehouse {
 	}
 
 	def new(args string[]) int {
-		try run()
+		run() onerror return 1
 		return 0
 	}
 }</code></pre>
@@ -531,13 +531,13 @@ application Bits {
 		let labels  = a.mapElem(v =&gt; sprint(v))
 
 		// an anonymous function that names itself can recurse
-		let fib = def fib(n int) int {
+		let f = def fib(n int) int {
 			return n when n &lt; 2
 			return fib(n-1) + fib(n-2)
 		}
 
 		println(doubled.len())
-		println(fib(10))
+		println(f(10))
 		return 0
 	}
 }</code></pre>
@@ -709,7 +709,28 @@ application TagsDemo {
 	use std.services::(*)
 
 	service Storage {
+		description  = "Counts opened files"
+		dependencies = Dependencies{hard: [], soft: []}
+		lifecycle    = Lifecycle{start: StartMode.Manual, restart: RestartMode.Never}
+		permissions  = []
+
 		opened int
+
+		def config&lt;T&gt;(val T) !none {
+			return none
+		}
+
+		async def start() !none {
+			return none
+		}
+
+		async def stop() !none {
+			return none
+		}
+
+		async def restart() !none {
+			return none
+		}
 
 		@query()
 		def openCount() int {
@@ -1101,7 +1122,10 @@ plugin ImageTools {
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="code-filename">path_test.adm</span>
         </div>
-        <pre><code>module std.os {
+        <pre><code>module demo.paths {
+	use std.os::(base, extension)
+	use std.testing::(benchmark, test)
+
 	check "Path" {
 		@test()
 		def TestExtension() {
@@ -1116,7 +1140,7 @@ plugin ImageTools {
 	}
 }</code></pre>
       </div>
-      <p>Run them with <code>adm test</code>, or benchmarks with <code>adm test --bench</code>.</p>
+      <p>Run them with <code>adm test</code>, or benchmarks with <code>adm test --bench .</code></p>
     </section>
 
   </main>

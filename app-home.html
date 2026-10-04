@@ -106,8 +106,10 @@
   </div>
   <pre><code>@manifest(name = &quot;myapp&quot;, version = &quot;1.2.0&quot;)
 application MyApp {
+	use std.services::(Application)
+
 	def new(args string[]) int {
-		let home = try Application.home()
+		let home = Application.home() onerror return 1
 		...
 	}
 }</code></pre>
@@ -137,7 +139,7 @@ application MyApp {
     <span class="code-filename">~/.local/share/myapp</span>
   </div>
   <pre><code>version          the last version that ran this folder, e.g. &quot;3.54&quot;
-vault/           std.services.Vault, secrets and logins; shared across versions
+vault/           std.services.vault.Vault, secrets and logins; shared across versions
 plugins/         extracted plugin objects, keyed by content hash
 data/            the app&#x27;s own files: configuration, caches, documents it owns
 backup/&lt;ver&gt;/    snapshot of data/ taken right before migrating from &lt;ver&gt;</code></pre>
@@ -166,11 +168,15 @@ backup/&lt;ver&gt;/    snapshot of data/ taken right before migrating from &lt;v
     <span class="code-filename">main.adm</span>
   </div>
   <pre><code>application MyApp {
+	use std.os
+	use std.services::(migration)
+
 	@migration(from = &quot;3.54&quot;, to = &quot;4.0&quot;)
 	def settingsToJson(home string) !none {
-		let ini = try os.readText(&quot;{home}/data/settings.ini&quot;)
-		try os.writeText(&quot;{home}/data/settings.json&quot;, toJson(ini))
+		let ini = try os.readFile(&quot;{home}/data/settings.ini&quot;)
+		try os.writeFile(&quot;{home}/data/settings.json&quot;, toJson(ini))
 		try os.remove(&quot;{home}/data/settings.ini&quot;)
+		return none
 	}
 
 	@migration(from = &quot;4.0&quot;, to = &quot;5.63&quot;)

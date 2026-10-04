@@ -416,7 +416,7 @@ println((a[:] += 1))   // every element incremented</code></pre>
         <h3>Applications</h3>
         <p>
           An <code>application</code> block defines an executable target. Applications live at file
-          scope, support annotations (<code>@trace</code>, <code>@flag</code>, etc.), and may be split
+          scope, support annotations (<code>@manifest</code>, <code>@allowDowngrade</code>, etc.), and may be split
           with <code>partial application</code> as long as all fragments share the same identifier and
           directory.
         </p>
@@ -547,7 +547,7 @@ application MainApp {
 	use std.math
 
 	def area(radius float) float {
-		return math.pi * radius * radius
+		return math.Pi * radius * radius
 	}
 }</code></pre>
         </div>
@@ -599,7 +599,7 @@ plugin ImageTools {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">module.adm</span>
           </div>
-          <pre><code>module my.module.name {
+          <pre><code>module my.project.name {
 	// module code
 }</code></pre>
         </div>
@@ -645,9 +645,9 @@ module std.ui.renderer.opengl.gl {
             <span class="code-filename">imports.adm</span>
           </div>
           <pre><code>use std.net.http
-use my.module as mod
-use some.module::(foo, bar as Baz)
-use some.module::*
+use my.tools as mod
+use some.lib::(foo, bar as Baz)
+use some.lib::*
 use (
 	std.io,
 	utils.math,
@@ -657,8 +657,8 @@ use (
         <ul>
           <li>A plain <code>use std.net.http</code> imports the module itself; you reference its exports
             through the module name - <code>http.Response</code>, not the full dotted path.</li>
-          <li><code>use my.module as mod</code> aliases the whole module to a different name.</li>
-          <li><code>use my.module as _</code> links the module without a name. Nothing in the file can
+          <li><code>use my.tools as mod</code> aliases the whole module to a different name.</li>
+          <li><code>use my.tools as _</code> links the module without a name. Nothing in the file can
             refer to it; it is there for what it registers, such as a renderer that
             <code>reflection.attrs</code> discovers by its annotation. The linter leaves these alone.</li>
           <li><code>::(foo, bar as Baz)</code> imports specific symbols by name, optionally renaming any
@@ -913,7 +913,7 @@ a[-2] = 10         // a is now [1, 2, 10, 4]</code></pre>
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">slicing.adm</span>
           </div>
-          <pre><code>let view    = a[:]    // full view
+          <pre><code>let whole   = a[:]    // full view
 let prefix  = a[:2]   // first 2 elements
 let suffix  = a[-2:]  // last 2 elements
 let trimmed = a[:-1]  // drops the last element</code></pre>
@@ -937,14 +937,13 @@ let trimmed = a[:-1]  // drops the last element</code></pre>
 let b = int[3, 4, 5, 6]
 
 let intersection = a & b  // [3, 4]
-let union        = a | b  // [1, 2, 3, 4, 5, 6]
+let joined       = a | b  // [1, 2, 3, 4, 5, 6]
 let concat       = a + b  // [1, 2, 3, 4, 3, 4, 5, 6]
 let diff         = a - b  // [1, 2]
 let xor          = a ^ b  // [1, 2, 5, 6]
 
 a[:] = 0     // mutate every element in place
 a[:] /= 10   // divide every element in place
-let scaled = a / 10
 
 a += [7]     // append; type-checked at compile time</code></pre>
         </div>
@@ -952,18 +951,26 @@ a += [7]     // append; type-checked at compile time</code></pre>
           <code>a = a + ["oops"]</code> on an <code>int[]</code> is a
           compile-time error.
         </p>
+        <p><span class="api-tag api-planned">planned</span> Arithmetic with a scalar that returns a new array, <code>a / 10</code>, is specified but the compiler does not accept it yet; the in-place form <code>a[:] /= 10</code> works.</p>
 
-        <p><strong>Matrices</strong> are arrays with row separators (<code>;</code>) and support matrix multiplication:</p>
+        <p>
+          In an array literal <code>;</code> separates rows: <code>int[1, 2, 3; 4, 5, 6]</code> is an
+          <code>int[][]</code>. Arrays have no matrix arithmetic. <strong>Matrices</strong> are their own
+          type, <code>matrix&lt;T&gt;</code>: a rectangular grid of numbers with the matrix product,
+          element-wise operators and scalar multiply and divide. <code>matrix&lt;T, R, C&gt;</code> fixes
+          the shape in the type, so a shape mismatch is a compile-time error:
+        </p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">matrix.adm</span>
           </div>
-          <pre><code>let m = int[1, 2, 3; 4, 5, 6]     // two rows
-let n = int[7, 8; 9, 10; 11, 12]
+          <pre><code>let m = matrix&lt;float, 2, 3&gt;[1, 2, 3; 4, 5, 6]     // two rows of three
+let n matrix&lt;float, 3, 2&gt; = [7, 8; 9, 10; 11, 12]  // shape from the annotation
 
-let product  = m * n   // standard matrix multiplication
-let hadamard = m .* m  // element-wise</code></pre>
+let product  = m * n   // matrix product: matrix&lt;float, 2, 2&gt;
+let hadamard = m .* m  // element-wise
+let x = m[1][2]        // 6.0: row 1, column 2</code></pre>
         </div>
       </div>
       <div class="docs-sub" id="maps">
@@ -1164,9 +1171,9 @@ struct User {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">new_struct.adm</span>
           </div>
-          <pre><code>let u User = {id: 1, name: "MyName", address: {street: "street"}}
-let c = struct {x: 2, y: 3}  // anonymous, one-off struct</code></pre>
+          <pre><code>let u User = {id: 1, name: "MyName", address: {street: "street"}}</code></pre>
         </div>
+        <p><span class="api-tag api-planned">planned</span> An anonymous one-off literal, <code>struct {x: 2, y: 3}</code>, is specified but the compiler does not accept it yet.</p>
 
         <p>
           <strong>Embedding</strong> a struct - writing its type name as a bare field - copies that
@@ -1428,7 +1435,7 @@ let wrong = distance + t              // error: cannot add Length and Time</code
           </div>
           <pre><code>@controller()
 partial type User&lt;T&gt; {
-	use std.crypto.hashing
+	use std.crypto.hash
 
 	internal atomic id T = defaultValue()
 	name string = "unknown"
@@ -1717,7 +1724,7 @@ if color := "white" || "black" || "blue" {
 // same as: if color == "white" || color == "black" || color == "blue" {}</code></pre>
         </div>
         <p>
-          The same trick works with regexes and <code>&amp;&amp;</code> - each regex tests the same
+          <span class="api-tag api-planned">planned</span> The same trick works with regexes and <code>&amp;&amp;</code> - each regex tests the same
           subject, which reads nicely for validating a password against several patterns at once:
         </p>
         <div class="code-window">
@@ -2259,8 +2266,10 @@ let b = sum(0, ...xs)</code></pre>
 
         <p>
           <code>asm</code>, <code>cuda</code>, and <code>sql</code> functions carry a foreign-language
-          body instead of ADM statements. <code>{name}</code> inside one of these bodies works like
-          string interpolation, substituting any identifier visible in scope:
+          body instead of ADM statements. <code>{name}</code> inside an <code>asm</code> or
+          <code>sql</code> body works like string interpolation, substituting any identifier visible in
+          scope. <span class="api-tag api-planned">planned</span> <code>asm</code> and <code>sql</code> bodies are parsed and checked today;
+          only <code>cuda</code> bodies are compiled:
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -2272,12 +2281,9 @@ let b = sum(0, ...xs)</code></pre>
 	ret
 }
 
-cuda def vectorAdd(a, b, out float[]) {
-	__global__ void kernel(int* buffer) {
-		int idx = blockIdx.x * blockDim.x + threadIdx.x;
-		buffer[idx] = 1;
-	}
-	kernel&lt;&lt;&lt;1, 64&gt;&gt;&gt;({out});
+cuda def vectorAdd(a, b, out float[]) !none {
+	int i = blockIdx.x * blockDim.x + threadIdx.x;
+	if (i &lt; out_len) out[i] = a[i] + b[i];
 }
 
 sql def getUser(email string) !User {
@@ -2295,7 +2301,7 @@ sql def getUser(email string) !User {
           arrives as <code>T* name</code> plus <code>int64_t name_len</code>, copied to the device
           before the launch and back after it. The result is always <code>!none</code>: a launch can
           fail (no driver, rejected kernel), and values come back through the arrays. The grid is one
-          thread per element of the first array parameter, in blocks of <code>@launch(block = N)</code>
+          thread per element of the first array or buffer parameter, in blocks of <code>@launch(block = N)</code>
           threads (default 256), so a body guards with <code>i &lt; name_len</code>;
           <code>@launch(x = "w", y = "h")</code> names integer parameters holding the thread count per
           axis instead.
@@ -2314,7 +2320,7 @@ cuda def scale(values float32[], factor float32) !none {
 
 def new(args string[]) int {
 	let samples = float32[1, 2, 3, 4]
-	try scale(samples, 2.5)
+	scale(samples, 2.5) onerror return 1
 	println(samples)                        // [2.5, 5, 7.5, 10]
 	println(gpu.available())                // true when a driver loaded
 	return 0
@@ -2330,8 +2336,8 @@ def new(args string[]) int {
         </p>
         <p>
           Data that many launches share stays on the device in a <code>std.gpu.DeviceBuffer&lt;T&gt;</code>:
-          <code>gpu.upload(data)</code> copies once, the buffer goes wherever the kernel takes a
-          <code>T[]</code>, <code>download</code> and <code>write</code> move data explicitly, and
+          <code>gpu.upload(data)</code> copies once, the kernel declares the parameter as a
+          <code>gpu.DeviceBuffer&lt;T&gt;</code> and sees it like a <code>T[]</code>, <code>download</code> and <code>write</code> move data explicitly, and
           <code>dispose</code> frees it. <code>async cuda def</code> returns a future, so the scheduler
           keeps other tasks running while the driver works:
         </p>
@@ -2342,7 +2348,7 @@ def new(args string[]) int {
           </div>
           <pre><code>use std.gpu
 
-async cuda def step(cells byte[], width int, height int) !none { ... }
+async cuda def step(cells gpu.DeviceBuffer&lt;byte&gt;, width int, height int) !none { ... }
 
 def simulate(initial byte[], width int, height int, generations int) !byte[] {
 	let cells = try gpu.upload(initial)
@@ -2383,7 +2389,7 @@ def simulate(initial byte[], width int, height int, generations int) !byte[] {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">anonymous_recursive.adm</span>
           </div>
-          <pre><code>let fib = def fib(n int) int {
+          <pre><code>let f = def fib(n int) int {
 	return n when n &lt; 2
 	return fib(n-1) + fib(n-2)
 }</code></pre>
@@ -2506,7 +2512,8 @@ let f File = try open("file")</code></pre>
 // same as
 fail Error{message: "reason"}
 
-// a custom error struct, as long as it has a message field
+// a custom error struct, as long as it has the fields of error
+// (message, code, cause, stack)
 fail MyCustomStruct{message: "reason", traceid: id}</code></pre>
         </div>
         <p>
@@ -2588,7 +2595,7 @@ let c = mightFail(false) onerror return 0</code></pre>
 	expects {
 		assert name != "" onerror fail "Name is required"
 		assert email != "" onerror fail "Email is required"
-	} onerror (err error) fail ExpectationErrors{message: "Invalid input", error: err}
+	} onerror (err error) fail ExpectationErrors{message: "Invalid input", cause: err}
 
 	// save user to db and create a User instance
 	return user
@@ -2906,8 +2913,31 @@ let got = &lt;-ch                  // got.tags() is request.tags()</code></pre>
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="code-filename">service.adm</span>
         </div>
-        <pre><code>service Network {
+        <pre><code>use std.services::(Dependencies, Lifecycle, RestartMode, StartMode)
+
+service Network {
+	description  = "Outgoing connections"
+	dependencies = Dependencies{hard: [], soft: []}
+	lifecycle    = Lifecycle{start: StartMode.Manual, restart: RestartMode.Never}
+	permissions  = []
+
 	connections Connection[]
+
+	def config&lt;T&gt;(val T) !none {
+		return none
+	}
+
+	async def start() !none {
+		return none
+	}
+
+	async def stop() !none {
+		return none
+	}
+
+	async def restart() !none {
+		return none
+	}
 
 	@query()
 	def connectionCount() int {
@@ -2951,26 +2981,32 @@ def log(evt Event&lt;string&gt;) {
       </p>
       <p>
         ADM ships a set of builtin services that cover the platform surface every application
-        needs. Every method signature and every annotation they provide is listed in the
+        needs, each in its own module <code>std.services.&lt;name&gt;</code>
+        (<code>use std.services.cache::(Cache)</code>). Every method signature and every annotation they provide is listed in the
         <a href="services.html">services reference</a>.
       </p>
       <table class="docs-table">
         <tr><th>Service</th><th>Description</th></tr>
-        <tr><td>Application</td><td>Application details (PID, executable path, start time, uptime) and lifecycle methods (exit/restart).</td></tr>
-        <tr><td>Runtime</td><td>The ADM runtime itself - memory/CPU/OS/GC/heap info, environment variable reads.</td></tr>
-        <tr><td>Storage</td><td>Permanent storage (disk) - open files, disk usage, read/write metrics.</td></tr>
-        <tr><td>Network</td><td>All networking - connections, metrics, firewalling.</td></tr>
-        <tr><td>Cache</td><td>Fast in-memory cache, Redis-like.</td></tr>
-        <tr><td>Scheduler</td><td>Cron-style scheduling of methods at configurable intervals or times.</td></tr>
-        <tr><td>Logging</td><td>Leveled logging, log rotation, log shipping.</td></tr>
-        <tr><td>Messaging</td><td>In-memory queue with topics.</td></tr>
-        <tr><td>Diagnostics</td><td>Create and publish metrics.</td></tr>
-        <tr><td>I18N</td><td>Internationalization and localization.</td></tr>
-        <tr><td>UI</td><td>UI, windows, renderer, UI events.</td></tr>
-        <tr><td>Devices</td><td>Webcam, microphone, USB, and other devices.</td></tr>
-        <tr><td>IPC</td><td>Inter-process communication between ADM applications.</td></tr>
-        <tr><td>Telemetry</td><td>Telemetry.</td></tr>
-        <tr><td>Vault</td><td>Encrypted store for secrets.</td></tr>
+        <tr><td>Application</td><td>Identity of the running application (PID, executable path, version, uptime), its home folder, shutdown and exit.</td></tr>
+        <tr><td>Runtime</td><td>The ADM runtime: system and memory information, environment variables, the service list, starting programs.</td></tr>
+        <tr><td>Storage</td><td>Files and directories: open, read, write, list, memory maps.</td></tr>
+        <tr><td>Network</td><td>Sockets, addressing and name resolution; <code>std.net</code> is the usual way in.</td></tr>
+        <tr><td>Cache</td><td>In-memory key-value cache with TTL and idle expiry.</td></tr>
+        <tr><td>Scheduler</td><td>Cron-style scheduling of functions at intervals or times.</td></tr>
+        <tr><td>Policy</td><td>Permissions and policy decisions.</td></tr>
+        <tr><td>Diagnostics</td><td>Metric registry: counters, gauges, histograms.</td></tr>
+        <tr><td>Notifications</td><td>Desktop notifications.</td></tr>
+        <tr><td>Clipboard</td><td>Text copy and paste through the system clipboard.</td></tr>
+        <tr><td>Devices</td><td>Cameras, microphones, GPUs, USB and other devices.</td></tr>
+        <tr><td>Debugger</td><td>CPU and memory profiles, call traces.</td></tr>
+        <tr><td>UI</td><td>Windows, the renderer, UI events (<code>std.ui</code>).</td></tr>
+        <tr><td>Config <span class="api-tag api-planned">planned</span></td><td>Layered configuration with profiles.</td></tr>
+        <tr><td>Logging <span class="api-tag api-planned">planned</span></td><td>Leveled logging with structured fields.</td></tr>
+        <tr><td>Messaging <span class="api-tag api-planned">planned</span></td><td>In-memory queue with topics.</td></tr>
+        <tr><td>I18n <span class="api-tag api-planned">planned</span></td><td>Locale selection and message catalogs.</td></tr>
+        <tr><td>IPC <span class="api-tag api-planned">planned</span></td><td>Inter-process communication between ADM applications.</td></tr>
+        <tr><td>Telemetry <span class="api-tag api-planned">planned</span></td><td>Telemetry.</td></tr>
+        <tr><td>Vault <span class="api-tag api-planned">planned</span></td><td>Encrypted store for secrets.</td></tr>
       </table>
     </section>
 
@@ -2980,6 +3016,11 @@ def log(evt Event&lt;string&gt;) {
         ADM's UI is built from three pieces bound together into a <a href="#components">component</a>:
         a view (structure), a style (appearance), and a controller (behavior) - all written in plain
         ADM, not a separate template language.
+      </p>
+      <p>
+        <span class="api-tag api-planned">planned</span> The standard component set (<code>std.ui.components</code>) is not shipped yet:
+        <code>Button</code>, <code>Text</code>, <code>VStack</code> and the others in the samples below
+        stand for components you declare yourself.
       </p>
 
       <div class="docs-sub" id="views-styles">
@@ -3108,16 +3149,23 @@ component myComponent {
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">component_controller.adm</span>
           </div>
-          <pre><code>type {
-	let state = struct {
-		label = "Submit",
-		loading = false
-	}
+          <pre><code>use std.ui
+use std.ui::(UI)
 
-	@on(UI, "click", "someButtonId")
-	def onClick(event UI.Event) {
-		state.loading = true
-		// do some work here
+component SubmitButton {
+	view {
+	}
+	style {
+	}
+	type {
+		label   string = "Submit"
+		loading bool   = false
+
+		@on(UI.click)
+		def onClick(evt Event&lt;ui.ClickEvent&gt;) {
+			loading = true
+			// do some work here
+		}
 	}
 }</code></pre>
         </div>
@@ -3151,10 +3199,10 @@ component myComponent {
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-            <span class="code-filename">flag.adm</span>
+            <span class="code-filename">env.adm</span>
           </div>
-          <pre><code>@flag("version", "Show application version", default=true)
-internal const version string</code></pre>
+          <pre><code>@env("APP_REGION", defaultValue = "eu-west")
+internal const region string</code></pre>
         </div>
         <p>
           <code>meta def</code> is how an attribute like this gets defined in the first place - it's
@@ -3203,16 +3251,16 @@ const SEPARATOR = "\\"</code></pre>
           flags like <code>--release --features simd,fastmath</code>.
         </p>
         <p>
-          <code>@embed(path)</code> is the other built-in: it stages a file's bytes (or a whole
-          directory) into a <code>const</code> at compile time - <code>byte[]</code> for a file,
-          <code>std.os.FileSystem</code> for a directory. The standard library also reserves names for
-          annotations like <code>@derive</code>, <code>@mock</code>, and <code>@sqlschema</code>, built
-          on the same compile-time mechanism.
+          <code>@embed(path)</code> is the other built-in: it bakes the file at <code>path</code>
+          (relative to the source file) into a <code>byte[]</code> constant at compile time;
+          <code>@embed(path, gzip = true)</code> stores it gzip-compressed, to inflate with
+          <code>std.data.compress.gzip.Reader</code>.
         </p>
         <p>
-          Two more fill in a declaration's value from the outside world. <code>@env(name, ?default)</code>
-          reads an environment variable, and <code>@flag(name, description, ?default)</code> wires a
-          declaration up to a command-line flag:
+          Two more fill in a declaration's value from the outside world. <code>@env(name, defaultValue)</code>
+          reads an environment variable, and <code>@flag(name, description, defaultValue)</code> wires a
+          declaration up to a command-line flag (<span class="api-tag api-planned">planned</span>: the compiler accepts <code>@flag</code> and does
+          nothing with it yet):
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -3223,8 +3271,8 @@ const SEPARATOR = "\\"</code></pre>
 	@env("ADM_TEST", "fallback")
 	const tmp string
 
-	@flag("debug", "Enable debug mode", default=true)
-	const debug bool
+	@flag("debug", "Enable debug mode", defaultValue = "true")
+	let debug string
 }</code></pre>
         </div>
       </div>
@@ -3266,24 +3314,17 @@ const SEPARATOR = "\\"</code></pre>
           <span class="code-filename">ffi.adm</span>
         </div>
         <pre><code>module ffi.math {
-	// Windows dynamic link libraries
-	@external.native("kernel32.dll", convention="stdcall")
-	def Beep(freq, duration uint32) bool;
-
-	// Linux shared objects
-	@external.native("libc.so.6")
+	// a shared library
+	@native("libc.so.6")
 	def getpid() int32;
 
 	// a C header
-	@external.c("math.h")
-	def calc(a int, b int) int;
+	@c("math.h")
+	def cbrt(x float64) float64;
 
-	// other languages
-	@external.python("logger.py")
-	internal async def log(message string);
-
-	@external.node("file.js")
-	def log(message string);
+	// a C symbol under another name
+	@c("math.h", symbol = "fabs")
+	def absolute(x float64) float64;
 }</code></pre>
       </div>
       <p>
@@ -3310,14 +3351,14 @@ module Math {
 	def cos(x float64) float64;
 }</code></pre>
         </div>
-      <p>Every <code>def</code> inside becomes an implicit FFI declaration, without repeating <code>@external</code> on each one.</p>
+      <p>Every <code>def</code> inside becomes an implicit FFI declaration, without repeating the annotation on each one.</p>
 
       <p>The native ABI reaches systems languages directly; two more layers reach interpreted and VM languages:</p>
       <table class="docs-table">
         <tr><th>Layer</th><th>Languages</th></tr>
         <tr><td>Native ABI</td><td>C, C++, Rust, Zig, Go, Swift, Fortran, Nim, D, Pascal, Assembly</td></tr>
-        <tr><td>Embedded VMs</td><td>Python, Node/JavaScript, Lua/LuaJIT, Ruby, PHP, Perl, R, Scheme/Lisp variants, TCL</td></tr>
-        <tr><td>Bridging layers</td><td>Java/JVM, Kotlin, Scala, Clojure, C#/.NET/Mono, WASM, Erlang/Elixir</td></tr>
+        <tr><td>Embedded VMs <span class="api-tag api-planned">planned</span></td><td>Python, Node/JavaScript, Lua/LuaJIT, Ruby, PHP, Perl, R, Scheme/Lisp variants, TCL</td></tr>
+        <tr><td>Bridging layers <span class="api-tag api-planned">planned</span></td><td>Java/JVM, Kotlin, Scala, Clojure, C#/.NET/Mono, WASM, Erlang/Elixir</td></tr>
       </table>
     </section>
 
@@ -3403,10 +3444,11 @@ module Math {
 }</code></pre>
         </div>
         <p>
-          Run benchmarks with <code>adm test --bench</code>. A few other stdlib attributes layer onto
-          the same <code>check</code>/<code>def</code> shape without needing any new grammar:
-          <code>@fuzz()</code>, <code>@skip()</code>, <code>@parallel()</code>, and
-          <code>@timeout(5s)</code>.
+          Run benchmarks with <code>adm test --bench .</code> (the text selects benchmarks by name;
+          <code>.</code> matches all). <code>@skip()</code> leaves a test out and <code>@only()</code>
+          runs just the tests carrying it. <span class="api-tag api-planned">planned</span>
+          <code>@fuzz()</code>, <code>@parallel()</code>, <code>@timeout(5s)</code> and
+          <code>@golden(file)</code> are accepted and do nothing yet.
         </p>
       </div>
     </section>
