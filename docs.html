@@ -190,7 +190,10 @@
       <div class="docs-nav-group">
         <a class="docs-nav-top" href="#interop">Interoperability</a>
         <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#interop-sources">Zig, Rust and Go sources</a></li>
           <li><a class="docs-nav-sub" href="#interop-scripts">Scripting languages</a></li>
+          <li><a class="docs-nav-sub" href="#interop-runtimes">Java and .NET</a></li>
+          <li><a class="docs-nav-sub" href="#interop-wasm">WebAssembly</a></li>
         </ul>
       </div>
 
@@ -810,7 +813,7 @@ let a = /[a-z]{1,}+/mg</code></pre>
         </div>
 
         <p>
-          SIMD's <code>vec4/8/16/32/64/128</code> and <code>mask4/8/16/32/64/128</code> types get their
+          SIMD's <code>vec2/4/8/16/32/64/128</code> and <code>mask2/4/8/16/32/64/128</code> types get their
           own section below, under <a href="#vectors">Vectors (SIMD)</a>.
         </p>
 
@@ -1094,7 +1097,7 @@ let t (int, int) = (1, 2)</code></pre>
       <div class="docs-sub" id="vectors">
         <h3>Vectors (SIMD)</h3>
         <p>
-          <code>vec4/8/16/32/64/128&lt;T&gt;</code> are fixed-width SIMD vectors over a numeric lane
+          <code>vec2/4/8/16/32/64/128&lt;T&gt;</code> are fixed-width SIMD vectors over a numeric lane
           type <code>T</code> - the number is the lane count, and operations run across all lanes at
           once when hardware SIMD is available. <code>mask4/8/16/32/64/128&lt;T&gt;</code> hold the
           per-lane result of a comparison.
@@ -3306,8 +3309,9 @@ const SEPARATOR = "\\"</code></pre>
     <section class="docs-section" id="interop">
       <h2>Interoperability</h2>
       <p>
-        ADM calls into any language that exposes a C-compatible ABI directly, and runs JavaScript and
-        Lua through libraries that embed their engines. Only a <a href="#modules-namespaces">module</a> body
+        ADM calls into any language that exposes a C-compatible ABI directly, builds Zig, Rust and
+        Go sources into the program, and reaches JavaScript, Lua, Python, Java, .NET and WebAssembly
+        through libraries. Only a <a href="#modules-namespaces">module</a> body
         can host a foreign declaration - a function signature with no block body, ending in
         <code>;</code>:
       </p>
@@ -3356,13 +3360,60 @@ module Math {
         </div>
       <p>Every <code>def</code> inside becomes an implicit FFI declaration, without repeating the annotation on each one.</p>
 
+      <div class="docs-sub" id="interop-sources">
+      <h3>Zig, Rust and Go sources</h3>
+      <p>
+        A module can name a source file of another compiled language. The build compiles it with
+        that language's own compiler and links it into the program, so there is no library to build
+        by hand and no <code>@link</code> line:
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">numbers.adm</span>
+        </div>
+        <pre><code>@zig("numbers.zig", prefix = "numbers_")
+module numbers {
+	def hash(data byte[], n uint) uint;
+
+	def primes(out uint32[], capacity uint) uint;
+
+	// Zig calls the ADM function it is given.
+	def collatz(start uint, visit def(uint)) int;
+}</code></pre>
+      </div>
+      <ul>
+        <li><code>@zig("file.zig")</code> builds a Zig file: each declaration is one of its
+          <code>export fn</code>s.</li>
+        <li><code>@rust("file.rs")</code> builds a Rust file, and <code>@rust("folder")</code> a
+          crate (the folder with <code>Cargo.toml</code>) through cargo: each declaration is a
+          <code>#[no_mangle] pub extern "C" fn</code>. A single file takes no crate attributes
+          (<code>#![...]</code>).</li>
+        <li><code>@go("folder")</code> builds a Go package: each declaration is a function the
+          package marks <code>//export</code>. The package is an ordinary one inside a Go module,
+          not <code>package main</code>.</li>
+        <li>The path is relative to the source file. <code>prefix</code> is what the exported names
+          start with (<code>hash</code> above is <code>numbers_hash</code>); the same annotation on a
+          function with <code>symbol = "..."</code> names an export that does not follow it.</li>
+        <li>Types cross as they do for <code>@c</code>: numbers, <code>bool</code>, strings as C
+          strings, arrays of numbers as a pointer to their elements, structs by value, functions as
+          function pointers.</li>
+        <li>The build needs the language's compiler on <code>PATH</code> (or named by
+          <code>ADM_ZIG</code>, <code>ADM_RUSTC</code>, <code>ADM_CARGO</code>, <code>ADM_GO</code>)
+          and downloads nothing. A panic in Rust or Go ends the program.</li>
+        <li>Declarations are not yet checked against the source: a type that differs from the
+          function's is not reported.</li>
+      </ul>
+      </div>
+
       <div class="docs-sub" id="interop-scripts">
       <h3>Scripting languages</h3>
       <p>
         A scripting language comes as a library that embeds its engine: the engine's C sources ship
         with the library and are compiled into the program, so nothing else has to be installed.
-        Write the script as an ordinary module of its language, then declare its functions in ADM
-        without a body, under the library's annotation:
+        Add one to a project with <code>adm get admlang:adm.interop.js</code> (or
+        <code>adm.interop.lua</code>, <code>adm.interop.python</code>). Write the script as an ordinary module of its language, then
+        declare its functions in ADM without a body, under the library's annotation:
       </p>
       <div class="code-window">
         <div class="code-titlebar">
@@ -3425,6 +3476,9 @@ let due = try billing.total(cart)</code></pre>
 	def discount(customer Customer) !float;
 }</code></pre>
       </div>
+      <p>Python works the same way through <code>adm.interop.python</code>, which embeds
+        MicroPython: <code>@python("rules.py")</code> binds a declaration to the function of the
+        same name in the file.</p>
       <p>
         These annotations are ordinary <code>meta def</code>s, so a library can bind any engine the
         same way: a body-less declaration under a function meta is answered by the meta, which reads
@@ -3433,12 +3487,91 @@ let due = try billing.total(cart)</code></pre>
       </p>
       </div>
 
+      <div class="docs-sub" id="interop-runtimes">
+      <h3>Java and .NET</h3>
+      <p>
+        <code>adm.interop.java</code> and <code>adm.interop.dotnet</code> load the Java VM or the
+        .NET runtime installed on the machine when the program first uses it; building the program
+        needs neither. A declaration without a body is a static method of the class or type the
+        annotation names:
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">pricing.adm</span>
+        </div>
+        <pre><code>module pricing {
+	use adm.interop.java::*
+
+	@java("Pricing")
+	def total(prices float[], quantities int32[], customer string) !float;
+
+	// Java's null arrives as none.
+	@java("Pricing")
+	def coupon(code string) !?string;
+}
+
+try java.runtime().start(classPath = ["classes"])
+let due = try pricing.total(prices, quantities, "ana@partner.example")</code></pre>
+      </div>
+      <ul>
+        <li>Numbers, bools, strings and their arrays cross each way, copied. <code>@dotnet("Acme.Pricing")</code>
+          declares a .NET method the same way; a declaration <code>total</code> also binds <code>Total</code>.</li>
+        <li>An exception fails the call with a <code>ScriptError</code> that carries the stack trace
+          and the exception itself as a value.</li>
+        <li><code>runtime()</code> reaches everything else: <code>load</code> a class or type,
+          <code>construct</code> objects, <code>invoke</code> methods, <code>get</code> and
+          <code>set</code> fields and properties. An ADM function goes where Java takes an
+          interface and .NET a delegate or an interface.</li>
+        <li>Running the program needs Java 8 or later (<code>JAVA_HOME</code>, or <code>java</code>
+          on <code>PATH</code>), or .NET 8 or later (<code>DOTNET_ROOT</code>, or
+          <code>dotnet</code> on <code>PATH</code>).</li>
+      </ul>
+      </div>
+
+      <div class="docs-sub" id="interop-wasm">
+      <h3>WebAssembly</h3>
+      <p>
+        <code>adm.interop.wasm</code> runs WebAssembly 2.0 modules, the 128-bit vector instructions
+        included. It is written in ADM, so it adds no foreign code to the program:
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">run.adm</span>
+        </div>
+        <pre><code>use adm.interop.wasm
+
+let loaded = try wasm.decode(bytes)
+let store = new wasm.Store()
+store.fuel(1000000)
+let instance = try store.instantiate(loaded)
+let results = try instance.invoke("add", wasm.Value[
+	wasm.Value{kind: wasm.ValueType.I32, bits: 2},
+	wasm.Value{kind: wasm.ValueType.I32, bits: 3}
+])</code></pre>
+      </div>
+      <ul>
+        <li><code>decode</code> reads a binary into a <code>Module</code>; <code>validate</code>
+          checks it without running anything.</li>
+        <li>A <code>Store</code> holds what instances share. Its <code>function</code>,
+          <code>global</code>, <code>table</code> and <code>memory</code> make things a module can
+          import, <code>provide</code> names them.</li>
+        <li><code>fuel</code> limits what the code may run. A trap, running out of fuel included,
+          is an ADM error of type <code>Trap</code>.</li>
+        <li>Typed calls, WASI and the text format are not there yet.</li>
+      </ul>
+      </div>
+
       <table class="docs-table">
         <tr><th>Layer</th><th>Languages</th></tr>
         <tr><td>Native ABI</td><td>C, C++, Rust, Zig, Go, Swift, Fortran, Nim, D, Pascal, Assembly</td></tr>
-        <tr><td>Embedded engines</td><td>JavaScript (<code>adm.interop.js</code>, QuickJS-ng), Lua (<code>adm.interop.lua</code>, Lua 5.4) <span class="api-tag api-planned">registry listing pending</span></td></tr>
-        <tr><td>Embedded engines <span class="api-tag api-planned">planned</span></td><td>Python, Ruby, PHP, Perl, R, Scheme/Lisp variants, TCL</td></tr>
-        <tr><td>Bridging layers <span class="api-tag api-planned">planned</span></td><td>Java/JVM, Kotlin, Scala, Clojure, C#/.NET/Mono, WASM, Erlang/Elixir</td></tr>
+        <tr><td>Sources built with the program</td><td>Zig (<code>@zig</code>), Rust (<code>@rust</code>), Go (<code>@go</code>)</td></tr>
+        <tr><td>Embedded engines</td><td>JavaScript (<code>adm.interop.js</code>, QuickJS-ng), Lua (<code>adm.interop.lua</code>, Lua 5.4)</td></tr>
+        <tr><td>Embedded engines <span class="api-tag api-planned">registry listing pending</span></td><td>Python (<code>adm.interop.python</code>, MicroPython 1.29), WebAssembly (<code>adm.interop.wasm</code>, written in ADM)</td></tr>
+        <tr><td>Installed runtimes <span class="api-tag api-planned">registry listing pending</span></td><td>Java (<code>adm.interop.java</code>, Java 8 or later), .NET (<code>adm.interop.dotnet</code>, .NET 8 or later)</td></tr>
+        <tr><td>Embedded engines <span class="api-tag api-planned">planned</span></td><td>CPython, Ruby, PHP, Perl, R, Scheme/Lisp variants, TCL</td></tr>
+        <tr><td>Bridging layers <span class="api-tag api-planned">planned</span></td><td>Kotlin, Scala, Clojure, Erlang/Elixir</td></tr>
       </table>
     </section>
 

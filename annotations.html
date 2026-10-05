@@ -147,6 +147,8 @@
 <p>From <code>std.interop</code>. On a module, the header its signature-only declarations need; on a function, binds it to a C symbol. Also available from the prelude as <code>@c(lib)</code> on a module.</p>
       <h4><code>@link(lib)  @native(lib)</code></h4>
 <p>On a module: a linker dependency, or a native-ABI library the module binds to; <code>@native(lib, symbol, name)</code> on a function binds one symbol.</p>
+      <h4><code>@zig(file, prefix = &quot;&quot;)  @rust(file, prefix = &quot;&quot;)  @go(folder, prefix = &quot;&quot;)</code></h4>
+<p>On a module: builds the Zig file, the Rust file or crate folder, or the Go package with that language's compiler and links it; every function the module declares without a body is one of its exported functions, named <code>prefix</code> plus the declaration's name. On a function, <code>@zig(file = &quot;&quot;, symbol = &quot;&quot;)</code> (and the same for the other two) names another exported symbol or another source. See <a href="docs.html#interop-sources">Zig, Rust and Go sources</a>.</p>
       <h4><code>@callback</code></h4>
 <p>On a function parameter of a C declaration: the C library keeps the function and calls it later. The pointer stays valid as long as the function value does; a call from C after that panics. Without it the function is borrowed until the call returns.</p>
       <h4><code>@kernelOnly()</code></h4>
@@ -159,8 +161,8 @@
 <p>Gates a function or method on a permission a service declares; every package on the calling chain must hold it, or the call fails with <code>PolicyDenied</code>. See <a href="policy.html">Policy &amp; permissions</a>.</p>
       <h4><code>@emits(chan = &quot;&quot;)</code> <span class="api-tag api-planned">planned</span></h4>
 <p>Declares the channel a function emits on.</p>
-      <h4><code>@python(entry)  @node(entry)</code> <span class="api-tag api-planned">planned</span></h4>
-<p>Bindings into an embedded interpreter.</p>
+      <h4><code>@js(file)  @lua(file)  @python(file)  @java(className, method = &quot;&quot;)  @dotnet(typeName, method = &quot;&quot;)</code></h4>
+<p>From the <code>adm.interop.*</code> libraries, not the prelude: each binds a function declared without a body to a function of a script file built into the program, or to a static method of a Java class or .NET type. See <a href="docs.html#interop-scripts">Scripting languages</a> and <a href="docs.html#interop-runtimes">Java and .NET</a>.</p>
     </section>
 
     <section class="docs-section" id="runtime">

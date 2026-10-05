@@ -1047,6 +1047,7 @@ adm lint --list</code></pre>
         <tr><td><code>ADM_FULL_LOAD</code></td><td><code>1</code> loads every file of each standard library module a program reaches, instead of only the files it names.</td></tr>
         <tr><td><code>ADM_NO_OBJ_CACHE, ADM_NO_NATIVE_CACHE, ADM_NO_LINK_CACHE, ADM_NO_LINT_CACHE</code></td><td><code>1</code> bypasses the object cache, the native-support cache, the link stamp or the lint result cache.</td></tr>
         <tr><td><code>ADM_OBJ_CACHE_MAX</code></td><td>Size cap of the object cache (<code>8G</code>, <code>512M</code>; default 8 GiB).</td></tr>
+        <tr><td><code>ADM_ZIG</code>, <code>ADM_RUSTC</code>, <code>ADM_CARGO</code>, <code>ADM_GO</code></td><td>The compilers that build the source <code>@zig</code>, <code>@rust</code> and <code>@go</code> annotations name (default: on <code>PATH</code>). A program that uses one and has no compiler for it stops with what to install.</td></tr>
         <tr><td><code>ADM_NVCC</code></td><td>The <code>nvcc</code> that compiles <code>cuda def</code> bodies (default: on <code>PATH</code>, then the usual CUDA folders); <code>none</code> builds kernels for the CPU path only. <code>ADM_NVCC_FLAGS</code> appends flags.</td></tr>
         <tr><td><code>ADM_PHASE_TIMING</code></td><td>File to append per-phase build timings to.</td></tr>
       </table>
