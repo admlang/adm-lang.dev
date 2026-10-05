@@ -302,7 +302,7 @@
     <section class="docs-section" id="writing">
       <h2>Writing your own</h2>
       <p>An annotation is a <code>meta def</code> whose first parameter is the context it applies to: <code>FunctionMetaContext</code>, <code>MethodMetaContext</code>, <code>FieldMetaContext</code>, <code>ParameterMetaContext</code>, <code>ConstMetaContext</code>, <code>VariableMetaContext</code>, <code>TypeMetaContext</code>, <code>ModuleMetaContext</code>, or the broad <code>DeclarationMetaContext</code>. A function or method meta runs on every call and decides what happens to the body:</p>
-      <ul><li><code>target.invoke()</code> runs it; <code>target.skip()</code> does not, and the caller gets the zero value;</li><li><code>target.resolve(value)</code> supplies the result without running it;</li><li><code>target.result()</code> and <code>target.failed()</code> read what the body produced;</li><li><code>target.detach()</code> copies the call so it can be invoked later, from a task or a timer (this is what <code>@delay</code> and <code>@debounce</code> do);</li><li><code>target.ctx.storage</code> is a small string store scoped to the annotated function, kept across calls.</li></ul>
+      <ul><li><code>target.invoke()</code> runs it; <code>target.skip()</code> does not, and the caller gets the zero value;</li><li><code>target.resolve(value)</code> supplies the result without running it, converted to the declared result type: a number to the declared numeric type, <code>none</code> for an optional, a plain value for <code>!T</code> and <code>?T</code>, an <code>any[]</code> to the declared array and a <code>map&lt;string, any&gt;</code> to the declared map. A value of another type panics;</li><li><code>target.reject(err)</code> makes an errorable function return <code>err</code> without running it;</li><li><code>target.args()</code> is the call's arguments as <code>any[]</code>, each boxed as its declared type (an absent optional is <code>none</code>); arrays and objects are the caller's own;</li><li><code>target.slot()</code> and <code>target.slot(value)</code> read and keep one value per annotated declaration, shared by all its calls;</li><li><code>target.descriptor</code> describes the declaration: its name, parameters and result type;</li><li><code>target.result()</code> and <code>target.failed()</code> read what the body produced;</li><li><code>target.detach()</code> copies the call so it can be invoked later, from a task or a timer (this is what <code>@delay</code> and <code>@debounce</code> do);</li><li><code>target.ctx.storage</code> is a small string store scoped to the annotated function, kept across calls.</li></ul>
       <div class="code-window">
   <div class="code-titlebar">
     <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -318,6 +318,28 @@
 @retry(attempts = 5)
 def fetch(url string) !Response { ... }</code></pre>
 </div>
+      <div class="docs-sub" id="declarations">
+      <h3>Declarations without a body</h3>
+      <p>A module-level function may be declared with a signature and no body under an annotation whose meta takes a <code>FunctionMetaContext</code>. Its metas answer every call with <code>resolve</code>, <code>reject</code>, or <code>skip</code> for a function that returns nothing; a call none of them answered returns an error from an errorable declaration and panics otherwise. Such a declaration cannot be <code>async</code>.</p>
+      <p>A meta parameter of type <code>reflection.EmbeddedFile</code> takes a file: the annotation names it with a string literal, relative to the annotated source file, and its bytes are built into the program (<code>file.path</code>, <code>file.data</code>). A missing file is a compile error, and changing the file rebuilds the module.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">greeting.adm</span>
+        </div>
+        <pre><code>use std.reflection::(FunctionMetaContext, EmbeddedFile)
+
+// Answers the call with the file's text and the first argument.
+meta def template(target FunctionMetaContext, file EmbeddedFile) {
+	let name = target.args()[0]
+	target.resolve("{string(file.data).trim()} {name}")
+}
+
+@template("greeting.txt")
+def greet(name string) string;</code></pre>
+      </div>
+      <p>This is how the <a href="docs.html#interop-scripts">scripting libraries</a> bind a script's functions: their meta converts <code>args()</code>, calls the script built in as an <code>EmbeddedFile</code>, and resolves what it returns.</p>
+      </div>
       <p>The wrapped call's arguments and context live only for the duration of the call; anything that must outlive it goes through <code>detach()</code>. See <a href="docs.html#attributes">Attributes</a> in the language reference for the full rules on where an annotation may appear.</p>
     </section>
   </main>

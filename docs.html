@@ -189,6 +189,9 @@
 
       <div class="docs-nav-group">
         <a class="docs-nav-top" href="#interop">Interoperability</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#interop-scripts">Scripting languages</a></li>
+        </ul>
       </div>
 
       <div class="docs-nav-group">
@@ -3303,8 +3306,8 @@ const SEPARATOR = "\\"</code></pre>
     <section class="docs-section" id="interop">
       <h2>Interoperability</h2>
       <p>
-        ADM can call into any language that exposes a C-compatible ABI directly, and reach a few more
-        through embedded VMs or bridging layers. Only a <a href="#modules-namespaces">module</a> body
+        ADM calls into any language that exposes a C-compatible ABI directly, and runs JavaScript and
+        Lua through libraries that embed their engines. Only a <a href="#modules-namespaces">module</a> body
         can host a foreign declaration - a function signature with no block body, ending in
         <code>;</code>:
       </p>
@@ -3331,7 +3334,7 @@ const SEPARATOR = "\\"</code></pre>
         A few rules keep these declarations honest: only module bodies can have a body-less
         <code>def</code> - applications, types, and services always need a real one. They can't be
         <code>asm</code>, <code>sql</code>, <code>cuda</code>, <code>meta</code>, or <code>infix</code>,
-        and every parameter/return type has to be representable in the target language - no channels,
+        and every parameter/return type of a C declaration has to be representable in C - no channels,
         optionals, errorables, or ADM-only composites. <code>atomic</code>/<code>async</code> still work
         as wrappers around the call even though the body itself is foreign.
       </p>
@@ -3353,11 +3356,88 @@ module Math {
         </div>
       <p>Every <code>def</code> inside becomes an implicit FFI declaration, without repeating the annotation on each one.</p>
 
-      <p>The native ABI reaches systems languages directly; two more layers reach interpreted and VM languages:</p>
+      <div class="docs-sub" id="interop-scripts">
+      <h3>Scripting languages</h3>
+      <p>
+        A scripting language comes as a library that embeds its engine: the engine's C sources ship
+        with the library and are compiled into the program, so nothing else has to be installed.
+        Write the script as an ordinary module of its language, then declare its functions in ADM
+        without a body, under the library's annotation:
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">billing.js</span>
+        </div>
+        <pre><code>export function total(items) {
+    return items.reduce((sum, item) =&gt; sum + item.price * item.quantity, 0)
+}</code></pre>
+      </div>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">billing.adm</span>
+        </div>
+        <pre><code>module billing {
+	use adm.interop.js::*
+
+	struct Item {
+		price    float
+		quantity int
+	}
+
+	@js("billing.js")
+	def total(items Item[]) !float;
+}
+
+let due = try billing.total(cart)</code></pre>
+      </div>
+      <ul>
+        <li>The file is named relative to the source file and is built into the program; nothing is
+          read at run time, and changing the script rebuilds the module. Each declaration is the
+          script's function of the same name.</li>
+        <li>Arguments and results convert by their declared types: numbers, bools, strings,
+          <code>byte[]</code>, arrays, structs (field by field, nested ones included),
+          <code>map&lt;string, V&gt;</code> and optionals. A number that does not fit the declared
+          type fails the call.</li>
+        <li>A script that throws fails an errorable declaration (<code>!T</code>) with a
+          <code>ScriptError</code>; a declaration that cannot fail panics instead.</li>
+        <li>The library's <code>Runtime</code> type is the engine itself, for scripts that arrive at
+          run time: <code>eval</code>, values, calls in both directions, and limits on memory and
+          time for code the program does not trust.</li>
+      </ul>
+      <p>Lua works the same way, with a file that returns a table of functions:</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">shop.adm</span>
+        </div>
+        <pre><code>module shop {
+	use adm.interop.lua::*
+
+	struct Customer {
+		name   string
+		years  int
+		orders int
+	}
+
+	@lua("rules.lua")
+	def discount(customer Customer) !float;
+}</code></pre>
+      </div>
+      <p>
+        These annotations are ordinary <code>meta def</code>s, so a library can bind any engine the
+        same way: a body-less declaration under a function meta is answered by the meta, which reads
+        the arguments, takes the script as a file built into the program and supplies the result.
+        See <a href="annotations.html#writing">Writing your own</a>.
+      </p>
+      </div>
+
       <table class="docs-table">
         <tr><th>Layer</th><th>Languages</th></tr>
         <tr><td>Native ABI</td><td>C, C++, Rust, Zig, Go, Swift, Fortran, Nim, D, Pascal, Assembly</td></tr>
-        <tr><td>Embedded VMs <span class="api-tag api-planned">planned</span></td><td>Python, Node/JavaScript, Lua/LuaJIT, Ruby, PHP, Perl, R, Scheme/Lisp variants, TCL</td></tr>
+        <tr><td>Embedded engines</td><td>JavaScript (<code>adm.interop.js</code>, QuickJS-ng), Lua (<code>adm.interop.lua</code>, Lua 5.4) <span class="api-tag api-planned">registry listing pending</span></td></tr>
+        <tr><td>Embedded engines <span class="api-tag api-planned">planned</span></td><td>Python, Ruby, PHP, Perl, R, Scheme/Lisp variants, TCL</td></tr>
         <tr><td>Bridging layers <span class="api-tag api-planned">planned</span></td><td>Java/JVM, Kotlin, Scala, Clojure, C#/.NET/Mono, WASM, Erlang/Elixir</td></tr>
       </table>
     </section>

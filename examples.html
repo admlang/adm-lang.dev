@@ -64,6 +64,7 @@
       <div class="docs-nav-group"><a class="docs-nav-top" href="#annotations">Custom Annotations</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#simd">SIMD</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#ffi">C Interop</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#scripts">Script Interop</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#gpu">GPU Kernels</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#data-collections">Collections</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#semver">Semantic Versions</a></div>
@@ -889,6 +890,70 @@ module gl {
 module libm {
 	def sin(x float64) float64;
 	def cos(x float64) float64;
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="scripts">
+      <h2>Script Interop</h2>
+      <p>
+        Pricing rules written in JavaScript, called from ADM through typed declarations. The script
+        is built into the program; <code>js.runtime()</code> is the engine the declarations run in,
+        and a function set on its global object is one the script can call.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">pricing.js</span>
+        </div>
+        <pre><code>export function total(items) {
+    return items.reduce((sum, item) =&gt; sum + item.price * item.quantity, 0)
+}
+
+export function discount(amount, code) {
+    if (code !== "SPRING") throw new Error("unknown code " + code)
+    return amount * 0.1
+}</code></pre>
+      </div>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">shop.adm</span>
+        </div>
+        <pre><code>module shop {
+	use adm.interop.js::*
+
+	struct Item {
+		name     string
+		price    float
+		quantity int
+	}
+
+	@js("pricing.js")
+	def total(items Item[]) float;
+
+	// Fails with a js.ScriptError when the script throws.
+	@js("pricing.js")
+	def discount(amount float, code string) !float;
+}
+
+application Shop {
+	use (
+		shop
+		shop::(Item)
+	)
+
+	def new(args string[]) !int {
+		let cart = [Item{name: "notebook", price: 4.5, quantity: 3}, Item{name: "pen", price: 1.2, quantity: 10}]
+		let due = shop.total(cart)
+		println("total  {"%.2f".format(due)}")
+		println("spring {"%.2f".format(try shop.discount(due, "SPRING"))} off")
+		shop.discount(due, "FREE") onerror (err error) {
+			println("free   {err.message}")
+			recover 0.0
+		}
+		return 0
+	}
 }</code></pre>
       </div>
     </section>
