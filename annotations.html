@@ -143,8 +143,8 @@
 <p>Asks the backend to inline the function, or forbids it.</p>
       <h4><code>@launch(block = 256, x = &quot;&quot;, y = &quot;&quot;, z = &quot;&quot;, cpu = true)</code></h4>
 <p>Launch shape of a <code>cuda def</code>: threads per block, the integer parameters that give the thread count per axis, and whether a CPU fallback is built. See the language reference on CUDA kernels.</p>
-      <h4><code>@c(header)  @c(header = &quot;&quot;, symbol = &quot;&quot;, name = &quot;&quot;, ret = &quot;&quot;, params = [])</code></h4>
-<p>From <code>std.interop</code>. On a module, the header its signature-only declarations need; on a function, binds it to a C symbol. Also available from the prelude as <code>@c(lib)</code> on a module.</p>
+      <h4><code>@c(lib, header = &quot;&quot;)  @c(header = &quot;&quot;, symbol = &quot;&quot;, name = &quot;&quot;, ret = &quot;&quot;, params = [], convention = &quot;&quot;)</code></h4>
+<p>On a module: the C library its signature-only declarations come from, and with <code>header</code> the header they are checked against. On a function: binds it to a C symbol, checked against <code>header</code> when one is named; <code>ret</code> and <code>params</code> write the C types by hand, <code>convention</code> names the calling convention.</p>
       <h4><code>@link(lib)  @native(lib)</code></h4>
 <p>On a module: a linker dependency, or a native-ABI library the module binds to; <code>@native(lib, symbol, name)</code> on a function binds one symbol.</p>
       <h4><code>@zig(file, prefix = &quot;&quot;)  @rust(file, prefix = &quot;&quot;)  @go(folder, prefix = &quot;&quot;)</code></h4>
