@@ -1263,6 +1263,11 @@ let same = f == Flags.ReadWrite  // true</code></pre>
           one member changes the bits for all of them - reading a different member reinterprets those
           same bytes as its type. Unions don't track which variant was last written.
         </p>
+        <p>
+          A union whose members are numbers and <code>bool</code> can be a parameter, a result or a
+          struct field of a <a href="#interop">C declaration</a>: it is the C <code>union</code> of
+          the same members.
+        </p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -3335,7 +3340,7 @@ const SEPARATOR = "\\"</code></pre>
 }</code></pre>
       </div>
       <p>
-        A few rules keep these declarations honest: only module bodies can have a body-less
+        A few rules: only module bodies can have a body-less
         <code>def</code> - applications, types, and services always need a real one. They can't be
         <code>asm</code>, <code>sql</code>, <code>cuda</code>, <code>meta</code>, or <code>infix</code>,
         and every parameter/return type of a C declaration has to be representable in C - no channels,
@@ -3396,13 +3401,15 @@ module numbers {
           start with (<code>hash</code> above is <code>numbers_hash</code>); the same annotation on a
           function with <code>symbol = "..."</code> names an export that does not follow it.</li>
         <li>Types cross as they do for <code>@c</code>: numbers, <code>bool</code>, strings as C
-          strings, arrays of numbers as a pointer to their elements, structs by value, functions as
-          function pointers.</li>
+          strings, arrays of numbers as a pointer to their elements, structs and unions by value,
+          functions as function pointers.</li>
         <li>The build needs the language's compiler on <code>PATH</code> (or named by
           <code>ADM_ZIG</code>, <code>ADM_RUSTC</code>, <code>ADM_CARGO</code>, <code>ADM_GO</code>)
           and downloads nothing. A panic in Rust or Go ends the program.</li>
-        <li>Declarations are not yet checked against the source: a type that differs from the
-          function's is not reported.</li>
+        <li>After a Zig or Rust source is built, each declaration is compared with the function it
+          exports: a parameter or result of another width, sign or kind, another number of
+          parameters, or a function the source does not export stops the build with both sides
+          named. Go declarations are checked for existing only.</li>
       </ul>
       </div>
 
@@ -3567,9 +3574,8 @@ let results = try instance.invoke("add", wasm.Value[
         <tr><th>Layer</th><th>Languages</th></tr>
         <tr><td>Native ABI</td><td>C, C++, Rust, Zig, Go, Swift, Fortran, Nim, D, Pascal, Assembly</td></tr>
         <tr><td>Sources built with the program</td><td>Zig (<code>@zig</code>), Rust (<code>@rust</code>), Go (<code>@go</code>)</td></tr>
-        <tr><td>Embedded engines</td><td>JavaScript (<code>adm.interop.js</code>, QuickJS-ng), Lua (<code>adm.interop.lua</code>, Lua 5.4)</td></tr>
-        <tr><td>Embedded engines <span class="api-tag api-planned">registry listing pending</span></td><td>Python (<code>adm.interop.python</code>, MicroPython 1.29), WebAssembly (<code>adm.interop.wasm</code>, written in ADM)</td></tr>
-        <tr><td>Installed runtimes <span class="api-tag api-planned">registry listing pending</span></td><td>Java (<code>adm.interop.java</code>, Java 8 or later), .NET (<code>adm.interop.dotnet</code>, .NET 8 or later)</td></tr>
+        <tr><td>Embedded engines</td><td>JavaScript (<code>adm.interop.js</code>, QuickJS-ng), Lua (<code>adm.interop.lua</code>, Lua 5.4), Python (<code>adm.interop.python</code>, MicroPython 1.29), WebAssembly (<code>adm.interop.wasm</code>, written in ADM)</td></tr>
+        <tr><td>Installed runtimes</td><td>Java (<code>adm.interop.java</code>, Java 8 or later), .NET (<code>adm.interop.dotnet</code>, .NET 8 or later)</td></tr>
         <tr><td>Embedded engines <span class="api-tag api-planned">planned</span></td><td>CPython, Ruby, PHP, Perl, R, Scheme/Lisp variants, TCL</td></tr>
         <tr><td>Bridging layers <span class="api-tag api-planned">planned</span></td><td>Kotlin, Scala, Clojure, Erlang/Elixir</td></tr>
       </table>
