@@ -311,10 +311,12 @@ adm run MyApp -- --help</code></pre>
         <tr><th>Flag</th><th>Meaning</th></tr>
         <tr><td><code>--run TEXT</code></td><td>Only tests whose name contains the text (repeatable; <code>=</code> prefix for an exact match).</td></tr>
         <tr><td><code>--file TEXT</code></td><td>Only tests whose source file contains the text.</td></tr>
+        <tr><td><code>--timeout LIMIT</code></td><td>Fail a test that runs longer than the limit (<code>30s</code>, <code>500ms</code>, <code>2min</code>) and go on with the next one; a test's own <code>@timeout</code> takes precedence.</td></tr>
         <tr><td><code>--list / --list-bench</code></td><td>List discovered tests or benchmarks without running.</td></tr>
         <tr><td><code>--bench TEXT</code></td><td>Run benchmarks matching the text (<code>.</code> for all); <code>--bench-count</code>, <code>--bench-time</code> shape the run.</td></tr>
         <tr><td><code>--coverage</code> <span class="api-tag api-planned">planned</span></td><td>Coverage profiles and reports (<code>--coverage-out</code>, <code>--coverage-report</code>, <code>--coverage-per-test</code>). The flags are refused until the LLVM backend emits coverage.</td></tr>
         <tr><td><code>--json</code></td><td>Machine-readable output. With <code>--list</code>: a JSON array of tests (<code>name</code>, <code>module</code>, <code>file</code>, <code>line</code>). Otherwise one JSON event per line (<code>status</code>, <code>diagnostic</code>, <code>run</code>, <code>pass</code>, <code>fail</code>, <code>skip</code>, <code>output</code>, <code>summary</code>, <code>coverage</code>, <code>file_coverage</code>, <code>error</code>, <code>done</code>); the IDE test panel reads this.</td></tr>
+        <tr><td><code>--plain</code></td><td>Print each test as it runs. Without it, a terminal gets a live view: a line per finished suite, a progress bar for the build and for the run, failures with their output, and totals (suites, tests, passed, failed, skipped, time). Pipes, IDE consoles, <code>--json</code>, <code>--list</code>, <code>--build-only</code> and <code>--bench</code> always get the plain output.</td></tr>
         <tr><td><code>--build-only</code></td><td>Build the runner and print <code>ADM_TEST_BIN=&lt;path&gt;</code>.</td></tr>
         <tr><td><code>--out DIR</code></td><td>Keep the compiled runner there.</td></tr>
         <tr><td><code>--backend, --release, --debug, --no-cache</code></td><td>As for <code>build</code>.</td></tr>

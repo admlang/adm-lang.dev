@@ -3665,8 +3665,11 @@ let results = try instance.invoke("add", wasm.Value[
         <p>
           Run benchmarks with <code>adm test --bench .</code> (the text selects benchmarks by name;
           <code>.</code> matches all). <code>@skip()</code> leaves a test out and <code>@only()</code>
-          runs just the tests carrying it. <span class="api-tag api-planned">planned</span>
-          <code>@fuzz()</code>, <code>@parallel()</code>, <code>@timeout(5s)</code> and
+          runs just the tests carrying it. <code>@timeout(5s)</code> fails a test that runs longer
+          than the limit; on a <code>check</code> suite it is the time the suite's tests may take
+          together. All three also go on a suite, and <code>adm test --timeout 30s</code> limits
+          every test without its own. <span class="api-tag api-planned">planned</span>
+          <code>@fuzz()</code>, <code>@parallel()</code> and
           <code>@golden(file)</code> are accepted and do nothing yet.
         </p>
       </div>

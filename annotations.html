@@ -231,14 +231,14 @@
 <p>A function kept for documentation only; it is never run.</p>
       <h4><code>@fuzz()</code> <span class="api-tag api-planned">planned</span></h4>
 <p>A fuzz target fed generated inputs.</p>
-      <h4><code>@timeout(limit)</code> <span class="api-tag api-planned">planned</span></h4>
-<p>Fails the test when it runs longer than <code>limit</code>.</p>
+      <h4><code>@timeout(limit)</code></h4>
+<p>On a test: fails it when it runs longer than <code>limit</code> (a duration such as <code>5s</code>), and the run goes on with the next test. On a <code>check</code> suite: the time its tests may take together; when it runs out, the tests of the suite that have not completed fail. <code>adm test --timeout LIMIT</code> sets the limit of tests without their own.</p>
       <h4><code>@parallel()</code> <span class="api-tag api-planned">planned</span></h4>
 <p>Lets the test run alongside other parallel tests.</p>
       <h4><code>@skip(reason = &quot;&quot;)</code></h4>
-<p>Skips the test, reporting the reason.</p>
+<p>Skips the test, reporting the reason. On a <code>check</code> suite: skips all its tests and benchmarks, nested suites included.</p>
       <h4><code>@only()</code></h4>
-<p>Runs just the tests carrying it while it is present.</p>
+<p>Runs just the tests carrying it while it is present. On a <code>check</code> suite: all its tests carry it.</p>
       <h4><code>@golden(file)</code> <span class="api-tag api-planned">planned</span></h4>
 <p>Compares the test's output with the named golden file.</p>
     </section>
