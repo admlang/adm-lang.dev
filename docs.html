@@ -1605,7 +1605,7 @@ print(b.count)  // 3</code></pre>
         <p>
           Both accessors are optional: drop <code>get</code> for a write-only property, drop
           <code>set</code> and it becomes computed (read-only) instead. Accessors are ordinary
-          <code>def</code>s and can be <code>internal</code>, <code>atomic</code>, <code>asm</code>,
+          <code>def</code>s and can be <code>internal</code>, <code>atomic</code>,
           <code>cuda</code>, or <code>sql</code> - but never <code>async</code> or <code>infix</code>. A
           property itself can't be <code>partial</code> and can't declare its own <code>where</code>
           block; specialize the surrounding type instead.
@@ -2205,7 +2205,7 @@ internal atomic async def funcName&lt;A, B: Serializable&gt;(a int, b string = "
             type methods can be <code>infix</code>, so it's covered under <a href="#type-methods">Types → Methods</a>.</li>
           <li><code>meta</code> - turns the function itself into a reusable annotation, the way
             <code>@trim</code> (below) is defined. Covered in depth under <a href="#attributes-modifiers">Attributes &amp; Modifiers</a>.</li>
-          <li><code>asm</code>, <code>cuda</code>, <code>sql</code> - the body is a foreign-language DSL
+          <li><code>cuda</code>, <code>sql</code> - the body is a foreign-language DSL
             instead of ADM statements (below).</li>
         </ul>
 
@@ -2276,10 +2276,10 @@ let b = sum(0, ...xs)</code></pre>
         </p>
 
         <p>
-          <code>asm</code>, <code>cuda</code>, and <code>sql</code> functions carry a foreign-language
-          body instead of ADM statements. <code>{name}</code> inside an <code>asm</code> or
+          <code>cuda</code> and <code>sql</code> functions carry a foreign-language
+          body instead of ADM statements. <code>{name}</code> inside a
           <code>sql</code> body works like string interpolation, substituting any identifier visible in
-          scope. <span class="api-tag api-planned">planned</span> <code>asm</code> and <code>sql</code> bodies are parsed and checked today;
+          scope. <span class="api-tag api-planned">planned</span> <code>sql</code> bodies are parsed and checked today;
           only <code>cuda</code> bodies are compiled:
         </p>
         <div class="code-window">
@@ -2287,12 +2287,7 @@ let b = sum(0, ...xs)</code></pre>
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">foreign_bodies.adm</span>
           </div>
-          <pre><code>asm def func(dst int, src int) int {
-	mov {dst}, {src}
-	ret
-}
-
-cuda def vectorAdd(a, b, out float[]) !none {
+          <pre><code>cuda def vectorAdd(a, b, out float[]) !none {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 	if (i &lt; out_len) out[i] = a[i] + b[i];
 }
@@ -2406,7 +2401,7 @@ def simulate(initial byte[], width int, height int, generations int) !byte[] {
 }</code></pre>
         </div>
         <p>
-          An anonymous function can still have an <code>asm</code>, <code>sql</code>, or <code>cuda</code>
+          An anonymous function can still have a <code>sql</code> or <code>cuda</code>
           body - but it can't be <code>meta</code> or <code>infix</code>, and doesn't accept
           <code>internal</code> or <code>atomic</code>; those only make sense on a named declaration.
         </p>
@@ -3303,7 +3298,7 @@ const SEPARATOR = "\\"</code></pre>
             <td>A non-owning optional reference (<code>weak parent ?Node</code>): never keeps its target alive, reads <code>none</code> once the target is gone. For back references, so parent and child form no cycle. See <a href="memory.html#weak-references">Memory → Weak references</a>.</td></tr>
           <tr><td><code>async</code></td><td>functions, types</td>
             <td>Returns a future instead of running immediately. See <a href="#async-await-futures">Async / Await / Futures</a>.</td></tr>
-          <tr><td><code>asm</code>, <code>cuda</code>, <code>sql</code>, <code>meta</code></td><td>functions</td>
+          <tr><td><code>cuda</code>, <code>sql</code>, <code>meta</code></td><td>functions</td>
             <td>Body is a foreign DSL, or (for <code>meta</code>) defines a new attribute. See <a href="#params-returns">Params &amp; Returns</a>.</td></tr>
           <tr><td><code>infix</code></td><td>methods</td>
             <td>Operator-style invocation (<code>a + b</code>). Only on type methods - see <a href="#type-methods">Types → Methods</a>.</td></tr>
@@ -3342,7 +3337,7 @@ const SEPARATOR = "\\"</code></pre>
       <p>
         A few rules: only module bodies can have a body-less
         <code>def</code> - applications, types, and services always need a real one. They can't be
-        <code>asm</code>, <code>sql</code>, <code>cuda</code>, <code>meta</code>, or <code>infix</code>,
+        <code>sql</code>, <code>cuda</code>, <code>meta</code>, or <code>infix</code>,
         and every parameter/return type of a C declaration has to be representable in C - no channels,
         optionals, errorables, or ADM-only composites. <code>atomic</code>/<code>async</code> still work
         as wrappers around the call even though the body itself is foreign.
@@ -3668,8 +3663,11 @@ let results = try instance.invoke("add", wasm.Value[
           runs just the tests carrying it. <code>@timeout(5s)</code> fails a test that runs longer
           than the limit; on a <code>check</code> suite it is the time the suite's tests may take
           together. All three also go on a suite, and <code>adm test --timeout 30s</code> limits
-          every test without its own. <span class="api-tag api-planned">planned</span>
-          <code>@fuzz()</code>, <code>@parallel()</code> and
+          every test without its own. <code>@fuzz()</code> on a function with parameters makes it a
+          fuzz target: <code>adm test</code> runs it on the empty input and on the files of
+          <code>testdata/fuzz/&lt;target&gt;/</code>, and <code>adm test --fuzz .</code> generates
+          inputs and saves one that fails there.
+          <span class="api-tag api-planned">planned</span> <code>@parallel()</code> and
           <code>@golden(file)</code> are accepted and do nothing yet.
         </p>
       </div>

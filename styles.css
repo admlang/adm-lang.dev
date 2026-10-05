@@ -481,6 +481,18 @@ code, pre, .code-window {
   margin-bottom: 0;
 }
 
+/* Links in page text are told apart from the text around them without
+   hovering; the sidebar and the top menu keep their own look. */
+.docs-content a {
+  color: var(--accent-dark);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.docs-content a:hover {
+  color: var(--accent);
+}
+
 .docs-content p code,
 .docs-content li code,
 .docs-content td code,

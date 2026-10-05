@@ -229,8 +229,8 @@
 <p>A benchmark, run by <code>adm test --bench .</code> (the text selects benchmarks by name; <code>.</code> matches all).</p>
       <h4><code>@example()</code></h4>
 <p>A function kept for documentation only; it is never run.</p>
-      <h4><code>@fuzz()</code> <span class="api-tag api-planned">planned</span></h4>
-<p>A fuzz target fed generated inputs.</p>
+      <h4><code>@fuzz()</code></h4>
+<p>A fuzz target: a function whose parameters the runner supplies (<code>byte[]</code>, <code>string</code>, <code>bool</code>, <code>char</code>, <code>duration</code>, integers, <code>float32</code>, <code>float64</code>). It fails when it returns an error, fails an <code>assert</code>, crashes or runs past its limit. <code>adm test</code> runs it on the empty input and on each file of <code>testdata/fuzz/&lt;target&gt;/</code> beside the source (<code>demo.parser.neverPanics</code> for the function <code>neverPanics</code> of suite <code>"parser"</code> in module <code>demo</code>). <code>adm test --fuzz TEXT</code> generates inputs for the targets whose name contains the text, keeps the ones that reach new code, and writes a failing input, made as small as it can, to that folder, where every later run replays it.</p>
       <h4><code>@timeout(limit)</code></h4>
 <p>On a test: fails it when it runs longer than <code>limit</code> (a duration such as <code>5s</code>), and the run goes on with the next test. On a <code>check</code> suite: the time its tests may take together; when it runs out, the tests of the suite that have not completed fail. <code>adm test --timeout LIMIT</code> sets the limit of tests without their own.</p>
       <h4><code>@parallel()</code> <span class="api-tag api-planned">planned</span></h4>
