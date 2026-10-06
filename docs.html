@@ -829,7 +829,9 @@ let a = /[a-z]{1,}+/mg</code></pre>
           <pre><code>let bytes = byte[]("test")   // string  -> byte[]
 let str   = string(bytes)   // byte[]  -> string
 let i     = int32(1.5)      // numeric -> numeric
-let letter = string('Z')    // char    -> string</code></pre>
+let letter = string('Z')    // char    -> string
+let held any = 7
+let seven = int(held)       // any     -> the type it holds; another type panics</code></pre>
         </div>
 
         <p>
@@ -2119,6 +2121,15 @@ match width {
         </p>
 
         <p>
+          A member that is errorable or optional is written in parentheses,
+          <code>(!string) | User</code>, since <code>!string | User</code> is the errorable of
+          <code>string | User</code>. The wrapper does not stay in the value: a failed
+          <code>!string</code> is its <code>error</code>, an empty optional is <code>none</code>,
+          so <code>match</code> has <code>case error</code> or <code>case none</code> beside the
+          member types.
+        </p>
+
+        <p>
           An intersection type, <code>T1 &amp; T2</code>, requires both at once. It shows up mostly in
           generic bounds, combining an interface and a datatype constraint the way
           <a href="#interfaces-datatypes"><code>UserLike &amp; Serializable</code></a> did earlier.
@@ -2342,8 +2353,20 @@ type Users {
           value is stored in. The <a href="examples.html#databases">Databases example</a> shows both.
         </p>
         <p>
-          <span class="api-tag api-planned">planned</span> Stored procedures as bodies and
-          <code>transaction</code> blocks spanning <code>sql def</code> calls are not built yet.
+          A <code>sql def</code> can also be written where it is used, as an anonymous function:
+          <code>let count = sql def (least int) !int { SELECT COUNT(*) FROM stock WHERE quantity &gt;= {least} }</code>.
+          It runs on the connection of the type whose method holds it, else on the service's, and its
+          placeholders read its parameters and the variables around it.
+        </p>
+        <p>
+          Inside a <code>transaction { }</code> block the <code>sql def</code> calls run in a database
+          transaction, with nothing to write at the call sites: the first call on a connection begins
+          it, later calls on that connection reuse it (nested blocks and called functions included),
+          the end of the block commits it and a failure in the block rolls it back. A block that
+          touches two databases holds one transaction on each; their commits are separate.
+        </p>
+        <p>
+          <span class="api-tag api-planned">planned</span> Stored procedures as bodies are not built yet.
         </p>
         <p>
           Everything outside a <code>{name}</code> placeholder is plain text in the target language -
@@ -2710,6 +2733,14 @@ def someFunction(x int) {
 	return none
 }</code></pre>
         </div>
+        <p>
+          A resource can also end with the block: anything with <code>commitTx() !none</code> and
+          <code>rollbackTx() !none</code>, such as a database transaction. A library joins it to
+          the running block on first use; when the body is done the block commits its resources
+          in the order they joined, and a commit that fails rolls back the ones after it and
+          arrives in <code>onerror</code>. When the body fails they are rolled back, newest
+          first. A nested block joins the outermost one.
+        </p>
       </div>
     </section>
 
@@ -3678,9 +3709,12 @@ let results = try instance.invoke("add", wasm.Value[
         </div>
         <p>
           A suite can also declare <code>use</code> imports, constants, structs, and helper functions -
-          all scoped to that suite, never exported - plus lifecycle hooks from <code>std.testing</code>
-          (<code>beforeAll</code>, <code>beforeEach</code>, <code>afterAll</code>, <code>afterEach</code>),
-          and can nest other <code>check</code> blocks to group related tests. Files named
+          all scoped to that suite, never exported - and can nest other <code>check</code> blocks to
+          group related tests. Lifecycle hooks from <code>std.testing</code> are calls in the suite's
+          body that take a function: <code>beforeAll(handler)</code> runs it once before the suite's
+          first test, <code>afterAll</code> once after its last, <code>beforeEach</code> and
+          <code>afterEach</code> around every test, those of nested suites included. A hook that
+          fails fails the test it ran for. Files named
           <code>_test.adm</code> or <code>.test.adm</code> are discovered automatically; run everything
           with <code>adm test</code>.
         </p>
@@ -3716,8 +3750,10 @@ let results = try instance.invoke("add", wasm.Value[
           fuzz target: <code>adm test</code> runs it on the empty input and on the files of
           <code>testdata/fuzz/&lt;target&gt;/</code>, and <code>adm test --fuzz .</code> generates
           inputs and saves one that fails there.
-          <span class="api-tag api-planned">planned</span> <code>@parallel()</code> and
-          <code>@golden(file)</code> are accepted and do nothing yet.
+          <code>@parallel()</code> tests of a suite run at the same time, after its other tests.
+          <code>@golden("testdata/report.txt")</code> compares the <code>string</code> or
+          <code>byte[]</code> a test returns with that file, beside the test's source;
+          <code>adm test --update-golden</code> writes it.
         </p>
       </div>
     </section>

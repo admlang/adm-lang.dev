@@ -383,7 +383,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Statement</code>, <code>Rows</code>, <code>Column</code>, <code>Result</code></td><td>prepared statements; rows read one at a time with typed readers</td></tr>
           <tr><td><code>read</code>, <code>readAll</code>, <code>values</code>, <code>@column</code>, <code>Stored</code></td><td>rows to objects and objects to arguments</td></tr>
           <tr><td><code>positional</code>, <code>placeholders</code>, <code>Placeholder</code></td><td><code>:name</code> placeholders rewritten for a database that binds by position</td></tr>
-          <tr><td><code>@connection</code>, <code>sqlExec</code>, <code>sqlOne</code>, <code>sqlOptional</code>, <code>sqlAll</code>, <code>sqlRow</code>, <code>sqlOptionalRow</code>, <code>sqlRows</code>, <code>sqlCell</code>, <code>sqlOptionalCell</code>, <code>sqlDefault</code>, <code>sqlNamed</code>, <code>provide</code></td><td>what a <code>sql def</code> compiles to, and where one without a <code>@connection</code> finds its connection</td></tr>
+          <tr><td><code>@connection</code>, <code>sqlExec</code>, <code>sqlOne</code>, <code>sqlOptional</code>, <code>sqlAll</code>, <code>sqlRow</code>, <code>sqlOptionalRow</code>, <code>sqlRows</code>, <code>sqlCell</code>, <code>sqlOptionalCell</code>, <code>sqlBound</code>, <code>sqlDefault</code>, <code>sqlNamed</code>, <code>provide</code></td><td>what a <code>sql def</code> compiles to, and where one without a <code>@connection</code> finds its connection</td></tr>
           <tr><td><code>Driver</code>, <code>@driver</code>, <code>Isolation</code></td><td>what a driver library implements and registers</td></tr>
           <tr><td><code>DbError</code>, <code>ErrorKind</code>, <code>errorOf</code></td><td>failures with their kind, SQLSTATE and the database's error number</td></tr>
         </table>
@@ -1189,7 +1189,8 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-testing">
         <h3><code>std.testing</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>@test</code>, <code>@benchmark</code>, <code>@skip</code>, <code>@only</code></td><td>annotations for <a href="docs.html#testing">check suites</a></td></tr>
+          <tr><td><code>@test</code>, <code>@benchmark</code>, <code>@fuzz</code>, <code>@skip</code>, <code>@only</code>, <code>@timeout</code>, <code>@parallel</code>, <code>@golden</code></td><td>annotations for <a href="docs.html#testing">check suites</a></td></tr>
+          <tr><td><code>beforeAll</code>, <code>beforeEach</code>, <code>afterEach</code>, <code>afterAll</code></td><td>lifecycle hooks of a suite</td></tr>
           <tr><td><code>expect</code>, <code>expectEqual</code>, <code>expectTrue</code>, <code>expectError</code>, …</td><td>assertions</td></tr>
         </table>
       </div>
@@ -1201,7 +1202,10 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>MetaContext</code>, …</td><td>meta contexts</td></tr>
           <tr><td><code>instantiate</code>, <code>field</code>, <code>elements</code></td><td>building and reading values by descriptor</td></tr>
           <tr><td><code>EmbeddedFile</code></td><td>a file an annotation builds into the program</td></tr>
+          <tr><td><code>BuildMetaContext&lt;T&gt;</code></td><td>context of an <a href="annotations.html#writing">annotation that runs during the build</a></td></tr>
+          <tr><td><code>SourceEditor</code>, <code>SourceField</code>, <code>SourceAnnotation</code></td><td>the fields a build-time annotation of a type reads, and the members and declarations it adds</td></tr>
         </table>
+        <p><code>std.reflection.buildhost</code> (<code>run</code>, <code>runType</code>) is the build machine's side of those annotations; the compiler's helper programs call it.</p>
       </div>
       <div class="docs-sub" id="std-ide">
         <h3><code>std.ide</code></h3>
