@@ -273,6 +273,12 @@
 	@xml(attribute = true) role string
 }</code></pre>
 </div>
+      <h4><code>@column(name = &quot;&quot;, stored = Stored.Auto, ignore = false)</code></h4>
+<p>From <code>std.data.db</code>: how a field is kept in a database row. <code>name</code> is the column when it differs from the field, <code>stored</code> the form the value takes in it (<code>Text</code>, <code>Integer</code>, <code>Float</code>, <code>Bytes</code>, <code>JSON</code>), <code>ignore</code> leaves the field out. Read by <code>db.read</code>, <code>db.readAll</code>, <code>db.values</code> and the row results of <code>sql def</code>.</p>
+      <h4><code>@db(name)</code></h4>
+<p>From <code>std.services.database</code>: names the connection of the <code>Database</code> service a <code>sql def</code> runs on, when it is not a method of a type with a <code>@connection</code> property. Without it such a function runs on the default connection.</p>
+      <h4><code>@connection()</code></h4>
+<p>From <code>std.data.db</code>: marks the property of a type that holds the connection its <code>sql def</code> methods run on (a <code>db.Queryable</code>: a connection or a transaction). One per type.</p>
     </section>
 
     <section class="docs-section" id="parameters">
@@ -293,6 +299,8 @@
       <p>Annotations a service uses to find implementations at start-up, through reflection.</p>
       <h4><code>@codec(name)</code></h4>
 <p>From <code>std.formats.*</code>: registers a type as the image, audio, video container, font, archive, document, playlist, calendar, contacts or model codec for <code>name</code>, so the loaders pick it by extension or content. <code>@decoder(name)</code> from <code>std.formats.video</code> does the same for a video decoder.</p>
+      <h4><code>@driver(schemes...)</code></h4>
+<p>From <code>std.data.db</code>: registers a type as the database driver for the URL schemes listed (<code>@driver(&quot;postgres&quot;, &quot;postgresql&quot;)</code>), so <code>db.connect</code> picks it by the URL's scheme. The official drivers are the <code>adm.database.*</code> libraries.</p>
       <h4><code>@UIRenderer(name)</code></h4>
 <p>From <code>std.ui.renderer</code>: registers a renderer implementation the UI service can select.</p>
       <h4><code>@tool(name = &quot;&quot;)</code></h4>

@@ -2156,6 +2156,11 @@ def read(b ?Box) int {
 	return b.value
 }</code></pre>
         </div>
+        <p>
+          Converted to <code>any</code>, an optional does not stay one: an empty <code>?T</code> becomes
+          <code>none</code> and a set one becomes its <code>T</code>, so <code>v is none</code> and
+          <code>case T</code> work on the <code>any</code> as they do on the optional.
+        </p>
         <p>The same value narrows just as well with <code>match</code>:</p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -2278,9 +2283,8 @@ let b = sum(0, ...xs)</code></pre>
         <p>
           <code>cuda</code> and <code>sql</code> functions carry a foreign-language
           body instead of ADM statements. <code>{name}</code> inside a
-          <code>sql</code> body works like string interpolation, substituting any identifier visible in
-          scope. <span class="api-tag api-planned">planned</span> <code>sql</code> bodies are parsed and checked today;
-          only <code>cuda</code> bodies are compiled:
+          <code>sql</code> body names a parameter or a field of the type; it reaches the database as a
+          bound parameter, never as text pasted into the statement:
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -2292,10 +2296,55 @@ let b = sum(0, ...xs)</code></pre>
 	if (i &lt; out_len) out[i] = a[i] + b[i];
 }
 
-sql def getUser(email string) !User {
-	SELECT * FROM users WHERE email = {email} LIMIT 1;
+type Users {
+	@connection()
+	conn db.Queryable
+
+	sql def find(email string) !?User {
+		SELECT * FROM users WHERE email = {email}
+	}
+
+	sql def rename(id int, name string) !none {
+		UPDATE users SET name = {name} WHERE id = {id}
+	}
+
+	sql def emails() !string[] {
+		SELECT email FROM users
+	}
 }</code></pre>
         </div>
+        <p>
+          A <code>sql def</code> is a method of a type that holds its connection: one property marked
+          <code>@connection</code> (from <code>std.data.db</code>) holding a <code>db.Queryable</code>, a
+          connection or a transaction. The result type says how the rows are read, and is always errorable:
+        </p>
+        <ul>
+          <li><code>!none</code> runs the statement; <code>!db.Result</code> returns what it changed;</li>
+          <li><code>!User</code> reads the first row into the struct or type, column by field name, and fails
+            when there is none; <code>!?User</code> returns <code>none</code> then; <code>!User[]</code> reads every row;</li>
+          <li><code>!int</code>, <code>!string</code>, <code>!bool</code>, <code>!float</code>, <code>!byte[]</code>, sized
+            numbers, dates and times read the first column; <code>?</code> turns a missing row or a NULL into
+            <code>none</code>, <code>[]</code> reads the column of every row;</li>
+          <li>a tuple such as <code>!(int, ?string)</code> reads one column per element.</li>
+        </ul>
+        <p>
+          A <code>sql def</code> outside a type, or in a type that marks no property, takes its connection
+          from the <code>Database</code> service: the one <code>@db("name")</code> names, else the default
+          connection. A missing connection fails the call, not the build.
+        </p>
+        <p>
+          The statement is the same text for every database: the compiler hands it to the driver with the
+          driver's own placeholders (<code>?</code>, <code>$1</code>, <code>:name</code>). The connection
+          comes from <code>std.data.db</code> (<code>db.connect(url)</code>, <code>db.pool(url)</code>)
+          with one of the driver libraries linked: <code>adm.database.sqlite</code>,
+          <code>adm.database.postgres</code>, <code>adm.database.mysql</code>. Rows map onto a struct's
+          fields by column name; <code>@column</code> on a field names another column or the form the
+          value is stored in. The <a href="examples.html#databases">Databases example</a> shows both.
+        </p>
+        <p>
+          <span class="api-tag api-planned">planned</span> Stored procedures as bodies and
+          <code>transaction</code> blocks spanning <code>sql def</code> calls are not built yet.
+        </p>
         <p>
           Everything outside a <code>{name}</code> placeholder is plain text in the target language -
           the compiler doesn't try to understand it, just records the identifiers it needs to

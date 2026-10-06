@@ -65,6 +65,7 @@
       <div class="docs-nav-group"><a class="docs-nav-top" href="#simd">SIMD</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#ffi">C Interop</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#scripts">Script Interop</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#databases">Databases</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#gpu">GPU Kernels</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#data-collections">Collections</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#semver">Semantic Versions</a></div>
@@ -958,6 +959,163 @@ application Shop {
 			println("free   {err.message}")
 			recover 0.0
 		}
+		return 0
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="databases">
+      <h2>Databases</h2>
+      <p>
+        SQL through <code>std.data.db</code>: one API for every database, with the driver picked by the
+        URL's scheme. The drivers are libraries (<code>adm.database.sqlite</code>,
+        <code>adm.database.postgres</code>, <code>adm.database.mysql</code>); importing one is what
+        registers its scheme. Values are always bound, never pasted into the statement, and a
+        <code>sql def</code> turns a statement into a typed method.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">bookshelf.adm</span>
+        </div>
+        <pre><code>module books {
+	use (
+		std.data.db
+		std.time
+	)
+
+	struct Book {
+		id     int
+		title  string
+		author string
+		// The column is called `published`.
+		@db.column("published")
+		year   int
+		rating ?float
+		// Text in the row, a time in the program.
+		@db.column(stored = db.Stored.Text)
+		added  time.Time
+	}
+
+	// The statements as methods; `{name}` is a bound argument.
+	type Shelf {
+		@db.connection()
+		conn db.Queryable
+
+		def new(conn db.Queryable) {
+			self.conn = conn
+		}
+
+		sql def find(id int) !?Book {
+			SELECT * FROM books WHERE id = {id}
+		}
+
+		sql def by(author string) !Book[] {
+			SELECT * FROM books WHERE author = {author} ORDER BY published
+		}
+
+		sql def rate(id int, rating float) !db.Result {
+			UPDATE books SET rating = {rating} WHERE id = {id}
+		}
+
+		sql def best() !(string, float) {
+			SELECT title, rating FROM books WHERE rating IS NOT NULL ORDER BY rating DESC LIMIT 1
+		}
+	}
+}
+
+application Bookshelf {
+	use (
+		std.data.db
+		std.time
+		adm.database.sqlite        // makes the `sqlite:` scheme known
+		books::(Book, Shelf)
+	)
+
+	def new(args string[]) !int {
+		let conn = try db.connect("sqlite:books.db")
+		try conn.exec("CREATE TABLE IF NOT EXISTS books (id INTEGER PRIMARY KEY, title TEXT NOT NULL UNIQUE, author TEXT NOT NULL, published INTEGER NOT NULL, rating REAL, added TEXT NOT NULL)")
+
+		// Arguments are bound to the placeholders in order.
+		let res = try conn.exec("INSERT INTO books (title, author, published, added) VALUES (?, ?, ?, ?)", "Dune", "Frank Herbert", 1965, time.now())
+		println("inserted id {res.lastInsertId}")
+
+		// A struct's fields as named arguments.
+		let book = Book{id: 2, title: "Solaris", author: "Stanisław Lem", year: 1961, rating: 4.5, added: time.now()}
+		try conn.exec("INSERT INTO books (id, title, author, published, rating, added) VALUES (:id, :title, :author, :published, :rating, :added)", db.values(book))
+
+		// Rows into structs, by column name.
+		let all = try db.readAll&lt;Book&gt;(try conn.query("SELECT * FROM books ORDER BY id"))
+		println("{all.len()} books")
+
+		// A failure says what kind it is.
+		conn.exec("INSERT INTO books (title, author, published, added) VALUES (?, ?, ?, ?)", "Dune", "Someone Else", 2000, time.now()) onerror (err error) {
+			if err is db.DbError {
+				println("{err.kind.name}: {err.message}")    // Constraint: sqlite: UNIQUE constraint failed: books.title
+			}
+			recover db.Result{affected: 0, lastInsertId: 0}
+		}
+
+		let shelf = new Shelf(conn)
+		try shelf.rate(1, 4.8)
+		let (title, rating) = try shelf.best()
+		println("best: {title} ({"%.1f".format(rating)})")
+		for let (_, b) in try shelf.by("Stanisław Lem") {
+			println("{b.year} {b.title}")
+		}
+		return 0
+	}
+}</code></pre>
+      </div>
+      <p>
+        The <code>Database</code> service holds connections by name, each a pool shared between tasks.
+        A <code>sql def</code> written as a plain function runs on the service's default connection,
+        or on the one <code>@db("name")</code> names, so the code that uses it never passes a
+        connection around. PostgreSQL writes its placeholders <code>$1</code> and SQLite
+        <code>?</code>; a <code>sql def</code> is the same text for both.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">shop.adm</span>
+        </div>
+        <pre><code>module shop {
+	use std.services.database::(Database, db)
+
+	// Outside a type a `sql def` runs on the service's default connection.
+	sql def place(customer string, total float) !none {
+		INSERT INTO orders (customer, total) VALUES ({customer}, {total})
+	}
+
+	sql def revenue() !float {
+		SELECT coalesce(sum(total), 0.0) FROM orders
+	}
+
+	// `@db` names another of the service's connections.
+	@db("audit")
+	sql def record(event string) !none {
+		INSERT INTO events (event) VALUES ({event})
+	}
+}
+
+application Shop {
+	use (
+		std.services.database::(Database)
+		adm.database.postgres
+		adm.database.sqlite
+		shop
+	)
+
+	def new(args string[]) !int {
+		try await Database.start()
+		// Each connection is a pool that tasks share.
+		try Database.add("postgres://app:secret@db.internal/shop?sslmode=verify-full")
+		try Database.add("audit", "sqlite:audit.db")
+
+		try shop.place("ana", 19.90)
+		try shop.record("order for ana")
+		println("revenue {"%.2f".format(try shop.revenue())}")
 		return 0
 	}
 }</code></pre>

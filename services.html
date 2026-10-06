@@ -57,6 +57,7 @@
         <ul class="docs-sub-list">
           <li><a class="docs-nav-sub" href="#svc-application"><code>Application</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-cache"><code>Cache</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-database"><code>Database</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-clipboard"><code>Clipboard</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-config"><code>Config</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-debugger"><code>Debugger</code></a></li>
@@ -474,6 +475,44 @@ def onExpiry(evt Event&lt;string&gt;) {
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def created(key string) string</code></div>
             <p class="api-doc">Emitted when a key is stored for the first time.</p>
+          </li>
+        </ul>
+      </div>
+      <div class="docs-sub" id="svc-database">
+        <h3><code>Database</code></h3>
+        <p>Named SQL database connections, each a pool shared between tasks. Import with <code>use std.services.database::(Database)</code>; the driver for each URL comes from an <code>adm.database.*</code> library.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">atomic def add(name string, target string, limit int = 8) !none</code></div>
+            <p class="api-doc">Registers a connection under a name: a pool of up to <code>limit</code> connections to the database the URL names, opened as statements need them.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">atomic def add(target string) !none</code></div>
+            <p class="api-doc">Registers the default connection, the one <code>get()</code> returns.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def get(name string) !db.Pool</code></div>
+            <p class="api-doc">The connection registered under a name.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def get() !db.Pool</code></div>
+            <p class="api-doc">The default connection: the one added without a name, else the only one registered.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def names() string[]</code></div>
+            <p class="api-doc">The registered names, the default's as "".</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def exec(statement string, args ...any) !db.Result</code></div>
+            <p class="api-doc">Runs a statement on the default connection.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def query(statement string, args ...any) !db.Rows</code></div>
+            <p class="api-doc">Runs a statement on the default connection and returns its rows.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def remove(name string) !none</code></div>
+            <p class="api-doc">Closes a connection's pool and forgets its name.</p>
           </li>
         </ul>
       </div>

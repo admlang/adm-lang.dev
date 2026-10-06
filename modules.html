@@ -66,6 +66,7 @@
           <li><a class="docs-nav-sub" href="#std-time">std.time</a></li>
           <li><a class="docs-nav-sub" href="#std-errors">std.errors</a></li>
           <li><a class="docs-nav-sub" href="#std-collections">std.data.collections</a></li>
+          <li><a class="docs-nav-sub" href="#std-db">std.data.db</a></li>
           <li><a class="docs-nav-sub" href="#std-semver">std.data.semver</a></li>
           <li><a class="docs-nav-sub" href="#std-i18n">std.i18n</a></li>
           <li><a class="docs-nav-sub" href="#std-validations">std.validations</a></li>
@@ -371,6 +372,20 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>SparseArray</code>, <code>SparseSet</code>, <code>SparseMatrix</code></td><td>sparse storage</td></tr>
           <tr><td><code>sort</code>, <code>Comparable</code>, <code>SortMethod</code></td><td><code>std.data.collections.sort</code></td></tr>
           <tr><td><code>search</code>, <code>SearchMethod</code></td><td><code>std.data.collections.search</code></td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-db">
+        <h3><code>std.data.db</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>connect</code>, <code>drivers</code></td><td>open a SQL database by URL with the driver linked for its scheme; drivers are the libraries <code>adm.database.sqlite</code>, <code>adm.database.postgres</code>, <code>adm.database.mysql</code></td></tr>
+          <tr><td><code>Connection</code>, <code>Transaction</code>, <code>Queryable</code></td><td><code>exec</code>, <code>query</code>, <code>prepare</code> with positional or named arguments; <code>beginTx</code>, <code>commitTx</code>, <code>rollbackTx</code></td></tr>
+          <tr><td><code>pool</code>, <code>Pool</code></td><td>a connection shared between tasks: up to <code>limit</code> real connections, one lent per statement, result, transaction or prepared statement</td></tr>
+          <tr><td><code>Statement</code>, <code>Rows</code>, <code>Column</code>, <code>Result</code></td><td>prepared statements; rows read one at a time with typed readers</td></tr>
+          <tr><td><code>read</code>, <code>readAll</code>, <code>values</code>, <code>@column</code>, <code>Stored</code></td><td>rows to objects and objects to arguments</td></tr>
+          <tr><td><code>positional</code>, <code>placeholders</code>, <code>Placeholder</code></td><td><code>:name</code> placeholders rewritten for a database that binds by position</td></tr>
+          <tr><td><code>@connection</code>, <code>sqlExec</code>, <code>sqlOne</code>, <code>sqlOptional</code>, <code>sqlAll</code>, <code>sqlRow</code>, <code>sqlOptionalRow</code>, <code>sqlRows</code>, <code>sqlCell</code>, <code>sqlOptionalCell</code>, <code>sqlDefault</code>, <code>sqlNamed</code>, <code>provide</code></td><td>what a <code>sql def</code> compiles to, and where one without a <code>@connection</code> finds its connection</td></tr>
+          <tr><td><code>Driver</code>, <code>@driver</code>, <code>Isolation</code></td><td>what a driver library implements and registers</td></tr>
+          <tr><td><code>DbError</code>, <code>ErrorKind</code>, <code>errorOf</code></td><td>failures with their kind, SQLSTATE and the database's error number</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-semver">
