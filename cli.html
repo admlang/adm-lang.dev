@@ -286,6 +286,7 @@ adm fmt --check src/</code></pre>
         <tr><th>Flag</th><th>Meaning</th></tr>
         <tr><td><code>--keep</code></td><td>Keep the executable.</td></tr>
         <tr><td><code>--watch</code></td><td>Rebuild and restart whenever a source file changes.</td></tr>
+        <tr><td><code>--hot</code></td><td>Rebuild whenever a source file changes and swap the changed function bodies into the running program, which keeps its state. Function literals count: a handler written inline takes its new body. A change that is more than function bodies (a type's fields, a module variable, a signature, a function literal added or removed) restarts the program and says why; a build error leaves it running. Linux.</td></tr>
         <tr><td><code>--path DIR</code></td><td>Build targets under the directory.</td></tr>
         <tr><td><code>--release / --debug</code></td><td>Optimization level, as for <code>build</code>.</td></tr>
         <tr><td><code>--backend, --os, --arch, --features, --no-cache</code></td><td>As for <code>build</code>.</td></tr>
@@ -1075,6 +1076,7 @@ adm lint --list</code></pre>
         <tr><td><code>ADM_APP_HOME</code></td><td>Overrides the application's home folder; see <a href="app-home.html">Application home</a>.</td></tr>
         <tr><td><code>ADM_SANDBOX</code></td><td><code>1</code> applies the OS sandbox at startup from the compiled policy; <code>0</code> turns off one the manifest compiled in. See <a href="policy.html">Policy</a>.</td></tr>
         <tr><td><code>ADM_POLICY_PROMPT</code></td><td><code>0</code> turns off the desktop prompt a policy <code>ask</code> rule raises; the ask then denies.</td></tr>
+        <tr><td><code>ADM_HOT_DIR</code></td><td>Folder a program built by <code>adm run --hot</code> watches for the reload objects to load; <code>adm run --hot</code> sets it.</td></tr>
         <tr><td><code>ADM_COVERAGE_FILE</code></td><td>Where a test runner built by <code>adm test --coverage*</code> appends its block counters; <code>adm test</code> sets it and reads the file.</td></tr>
         <tr><td><code>ADM_IDE_PORT</code></td><td>Port on <code>127.0.0.1</code> where <code>std.ide</code> serves the IDE service panels.</td></tr>
         <tr><td><code>ADM_MEM_STATS</code></td><td><code>1</code> prints live, allocated and freed counts every 200k allocations.</td></tr>

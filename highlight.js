@@ -22,7 +22,7 @@
     "finish", "switch", "match", "select", "where", "case", "continue",
     "default", "return",
     // errors & transactions
-    "fail", "expects", "provides", "begin", "rollback", "transaction", "defer",
+    "fail", "expects", "provides", "begin", "rollback", "transaction", "defer", "yield",
     "try", "onerror", "recover", "assert", "await",
     // operators-as-words & misc
     "as", "is", "in", "new", "dispose", "self", "true", "false", "none"

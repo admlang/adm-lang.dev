@@ -1944,6 +1944,48 @@ for let n in new Countdown(3) {
 let it Iterator&lt;int&gt; = new Countdown(2)
 for let n in it { ... }</code></pre>
         </div>
+        <p>
+          A <em>generator</em> writes the same thing as a function. A function or method that returns
+          <code>Iterator&lt;T&gt;</code> and contains <code>yield</code> produces its values one at a
+          time: calling it returns the iterator without running the body, and each
+          <code>iterate()</code> runs the body up to the next <code>yield</code>. Locals, parameters
+          and <code>self</code> keep their values in between. A bare <code>return</code> or the end
+          of the body ends the sequence, and the iterator then starts again from the arguments of the
+          call:
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">generator.adm</span>
+          </div>
+          <pre><code>def fibonacci() Iterator&lt;int&gt; {
+	let (a, b) = (0, 1)
+	for {
+		yield a
+		(a, b) = (b, a + b)
+	}
+}
+
+for let n in fibonacci() {
+	break when n &gt; 100
+	println(n)              // 0, 1, 1, 2, 3, 5, ...
+}
+
+def countdown(from int) Iterator&lt;int&gt; {
+	for from &gt; 0 {
+		yield from
+		from--
+	}
+}</code></pre>
+        </div>
+        <p>
+          <code>yield</code> is a statement and takes <code>when</code> / <code>unless</code> guards.
+          A generator is a plain function (not <code>async</code>, <code>atomic</code>,
+          <code>sql</code>, <code>cuda</code> or <code>meta</code>); <code>yield</code> cannot stand
+          inside <code>forall</code>, <code>transaction</code> or an anonymous function, and
+          <code>defer</code> is not available in a generator. It costs one object and needs no
+          cleanup when a sequence is left unfinished.
+        </p>
       </div>
       <div class="docs-sub" id="match">
         <h3>Switch / Match</h3>
@@ -2826,6 +2868,75 @@ print("int") when v is int</code></pre>
           <pre><code>let homepage async string = load("https://adm-lang.dev")
 homepage.timeout(3s)</code></pre>
         </div>
+        <p>
+          Cancelling is cooperative. A cancelled or timed-out future is finished at once, so
+          <code>await</code> returns without waiting for the body and never panics:
+          an <code>async T</code> gives the value an uninitialised <code>let</code> of
+          <code>T</code> holds (<code>0</code>, <code>""</code>, an empty array, a default
+          instance), an <code>async ?T</code> gives <code>none</code>, and an
+          <code>async !T</code> gives an error with code <code>canceled</code> or
+          <code>timeout</code> whose message is the reason passed to <code>cancel</code>.
+          <code>.canceled()</code> tells a cancelled result from a computed one.
+        </p>
+        <p>
+          The task running the body is told, not stopped: its <code>time.sleep</code> returns
+          early, an <code>await</code> inside it cancels the future it waits for (unless that
+          future is <code>.keepAlive()</code>), and a socket operation it waits in fails with code
+          <code>canceled</code>. A channel it waits on behaves, for that task only, as if it were
+          closed and empty: a receive yields the zero value, a <code>for</code> over the channel
+          ends, a <code>select</code> runs no case, and a send with no room does not send; the
+          channel stays open for everyone else. Code that computes without waiting asks
+          <code>canceled()</code>, which is true in a cancelled task:
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">canceled.adm</span>
+          </div>
+          <pre><code>async def index(files string[]) int {
+    let count = 0
+    for let file in files {
+        return count when canceled()
+        count += indexOne(file)
+    }
+    return count
+}</code></pre>
+        </div>
+        <p>
+          A future cancelled before its task first runs never runs its body. A task waiting for a
+          lock or inside foreign code is not interrupted.
+        </p>
+        <p>
+          An <code>AsyncScope</code> handles futures as a group. <code>async&lt;group&gt; call()</code>
+          starts a call as a member (the scope is a name, a field or a call), and a future that
+          already exists joins with <code>.scope(group)</code>; <code>await group</code> returns
+          when no member is running and fails with the first member's error. A member that fails cancels the others
+          (<code>new AsyncScope(failFast=false)</code> lets them finish), and a scope that is
+          dropped cancels the members still running:
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">async_scope.adm</span>
+          </div>
+          <pre><code>def load() !Page {
+    let group = new AsyncScope()
+    let profile = async&lt;group&gt; fetchProfile()
+    let teams = async&lt;group&gt; fetchTeams()
+
+    try await group
+    return new Page(await profile, await teams)
+}</code></pre>
+        </div>
+        <p>
+          <code>group.cancel(?reason)</code> cancels the members still running and those that
+          join later, <code>group.timeout(duration)</code> gives the group one deadline,
+          <code>group.limit(count)</code> lets at most that many members started with
+          <code>async&lt;group&gt;</code> run at once,
+          <code>group.running()</code>, <code>group.done()</code> and <code>group.len()</code>
+          report its state, and <code>group.errors()</code> lists the errors of the members
+          that failed. <code>group.wait()</code> is the method form of <code>await group</code>.
+        </p>
         <p>
           <code>try</code> and <code>await</code> compose in either order on an errorable future -
           <code>try await f()</code> and <code>await try f()</code> both work.

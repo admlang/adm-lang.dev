@@ -1201,6 +1201,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>typeName</code>, <code>kindOf</code></td><td>runtime type info</td></tr>
           <tr><td><code>MetaContext</code>, …</td><td>meta contexts</td></tr>
           <tr><td><code>instantiate</code>, <code>field</code>, <code>elements</code></td><td>building and reading values by descriptor</td></tr>
+          <tr><td><code>TypeDescriptor</code>, <code>TypeKind</code></td><td>a type as spelled in a signature or field: <code>kind</code>, <code>typeName</code>, the <code>optional</code>/<code>errorable</code>/<code>future</code> flags, an array's or map's <code>element</code> and <code>key</code>, a tuple's <code>elements</code></td></tr>
           <tr><td><code>EmbeddedFile</code></td><td>a file an annotation builds into the program</td></tr>
           <tr><td><code>BuildMetaContext&lt;T&gt;</code></td><td>context of an <a href="annotations.html#writing">annotation that runs during the build</a></td></tr>
           <tr><td><code>SourceEditor</code>, <code>SourceField</code>, <code>SourceAnnotation</code></td><td>the fields a build-time annotation of a type reads, and the members and declarations it adds</td></tr>

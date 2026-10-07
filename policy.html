@@ -399,6 +399,7 @@ sandbox = true</code></pre>
   <tr><th>Files</th><th></th></tr>
   <tr><td><code>adm.toml [requires] permissions</code></td><td>A package narrowing what it wants to be granted</td></tr>
   <tr><td><code>adm.toml [policy] sandbox</code></td><td>Compile the sandbox in</td></tr>
+  <tr><td><code>adm.toml [policy] build_read</code></td><td>Paths outside the project that an annotation running during the build may read (it reads the project's own files without asking); relative to <code>adm.toml</code>, <code>**</code> globs</td></tr>
   <tr><td><code>adm.lock</code></td><td>The grants accepted per installed package (<code>permissions=</code>) and whether its C bindings were accepted (<code>foreign=yes</code>)</td></tr>
   <tr><td><code>&lt;app home&gt;/policy.toml</code></td><td>The user's rules, read at startup</td></tr>
   <tr><td><code>&lt;app home&gt;/policy.log</code></td><td>Every decision, with the package that asked</td></tr>
