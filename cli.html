@@ -1134,7 +1134,7 @@ adm lint --list</code></pre>
         <tr><td><code>ADM_POLICY_PROMPT</code></td><td><code>0</code> turns off the desktop prompt a policy <code>ask</code> rule raises; the ask then denies.</td></tr>
         <tr><td><code>ADM_HOT_DIR</code></td><td>Folder a program built by <code>adm run --hot</code> watches for the reload objects to load; <code>adm run --hot</code> sets it.</td></tr>
         <tr><td><code>ADM_COVERAGE_FILE</code></td><td>Where a test runner built by <code>adm test --coverage*</code> appends its block counters; <code>adm test</code> sets it and reads the file.</td></tr>
-        <tr><td><code>ADM_IDE_PORT</code></td><td>Port on <code>127.0.0.1</code> where <code>std.ide</code> serves the IDE service panels.</td></tr>
+        <tr><td><code>ADM_IDE_PORT</code></td><td>Port on <code>127.0.0.1</code> where <code>std.ide</code> serves the IDE service panels. It must also be set when the program is built (<code>adm run</code> does both): only such a build includes the service.</td></tr>
         <tr><td><code>ADM_MEM_STATS</code></td><td><code>1</code> prints live, allocated and freed counts every 200k allocations.</td></tr>
         <tr><td><code>ADM_MEM_TRACE</code></td><td>File to record every allocation and free to, with backtraces.</td></tr>
       </table>
@@ -1143,6 +1143,13 @@ adm lint --list</code></pre>
   </main>
 
 </div>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>adm programming language</span>
+    <span class="footer-muted">Statically typed &middot; multi-paradigm</span>
+  </div>
+</footer>
 
 <script src="docs.js"></script>
 <script src="highlight.js"></script>

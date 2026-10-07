@@ -1270,7 +1270,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Field</code></td><td>one field of a value: its name, kind, type and annotations (<code>attr</code>, <code>hasAttr</code>), the doc comment of an annotated field (<code>doc</code>), typed reads and writes, and <code>set</code>, which stores a boxed value of any kind the field holds</td></tr>
           <tr><td><code>typeName</code>, <code>kindOf</code></td><td>runtime type info</td></tr>
           <tr><td><code>MetaContext</code>, …</td><td>meta contexts</td></tr>
-          <tr><td><code>instantiate</code>, <code>field</code>, <code>elements</code>, <code>arrayOf</code>, <code>mapOf</code></td><td>building and reading values by descriptor; <code>arrayOf</code> makes an array of a described element type from boxed values, <code>mapOf</code> a <code>map&lt;string, V&gt;</code> of a described value type</td></tr>
+          <tr><td><code>instantiate</code>, <code>field</code>, <code>elements</code>, <code>arrayOf</code>, <code>mapOf</code>, <code>defaultOf</code></td><td><code>defaultOf</code> computes the default a parameter of an annotated function is declared with; building and reading values by descriptor; <code>arrayOf</code> makes an array of a described element type from boxed values, <code>mapOf</code> a <code>map&lt;string, V&gt;</code> of a described value type</td></tr>
           <tr><td><code>TypeDescriptor</code>, <code>TypeKind</code></td><td>a type as spelled in a signature or field: <code>kind</code>, <code>typeName</code>, the <code>optional</code>/<code>errorable</code>/<code>future</code> flags, an array's or map's <code>element</code> and <code>key</code>, a tuple's <code>elements</code></td></tr>
           <tr><td><code>EmbeddedFile</code></td><td>a file an annotation builds into the program</td></tr>
           <tr><td><code>BuildMetaContext&lt;T&gt;</code></td><td>context of an <a href="annotations.html#writing">annotation that runs during the build</a></td></tr>
@@ -1310,6 +1310,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>input</code>, <code>password</code></td><td>read a line; read a line from the terminal without echo, as a <code>Secret&lt;string&gt;</code></td></tr>
           <tr><td><code>readKey</code>, <code>Key</code>, <code>KeyCode</code></td><td>one key press, with an optional wait</td></tr>
           <tr><td><code>keyReleases</code>, <code>KeyAction</code></td><td>keys reported as they go down, repeat and come up (<code>Key.action</code>), on terminals with the kitty keyboard protocol</td></tr>
+          <tr><td><code>drawImage</code>, <code>imageProtocol</code>, <code>ImageProtocol</code></td><td>a <code>std.formats.image</code> <code>Image</code> drawn at the cursor, fitted into a number of cells, on terminals with the kitty graphics protocol or iTerm2 inline images; false on the others</td></tr>
           <tr><td><code>supports</code>, <code>Feature</code></td><td>asks the terminal whether it knows a protocol: extended keys, synchronized output, bracketed paste, the mouse, mouse moves</td></tr>
           <tr><td><code>readEvent</code>, <code>Event</code>, <code>EventKind</code></td><td>a key press, a resize of the terminal window, pasted text or a mouse report</td></tr>
           <tr><td><code>bracketedPaste</code>, <code>mouse</code>, <code>Mouse</code>, <code>MouseButton</code>, <code>MouseAction</code></td><td>pastes as one event; mouse presses, releases, drags and the wheel</td></tr>
@@ -1346,6 +1347,13 @@ use std.data.encoding::(json)</code></pre>
   </main>
 
 </div>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>adm programming language</span>
+    <span class="footer-muted">Statically typed &middot; multi-paradigm</span>
+  </div>
+</footer>
 
 <script src="docs.js"></script>
 <script src="highlight.js"></script>
