@@ -256,7 +256,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.text.unicode</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>category</code>, <code>Category</code>, <code>combiningClass</code>, <code>script</code></td><td>Unicode 18 character properties</td></tr>
-          <tr><td><code>displayWidth</code></td><td>the columns a character or a text takes in fixed-pitch layout: 2 for East Asian wide characters, 0 for combining marks</td></tr>
+          <tr><td><code>displayWidth</code></td><td>the columns a character or a text takes in fixed-pitch layout: 2 for East Asian wide characters, 0 for combining marks; in a text an emoji made of several characters counts once</td></tr>
           <tr><td><code>normalize</code>, <code>NormalForm</code>, <code>decompose</code>, <code>compose</code></td><td>normalization (NFC, NFD, NFKC, NFKD)</td></tr>
           <tr><td><code>mirror</code>, <code>isDefaultIgnorable</code>, <code>isExtendedPictographic</code></td><td>bidi mirroring, ignorables, emoji</td></tr>
           <tr><td><code>lineBreaks</code>, <code>LineBreak</code></td><td>line break opportunities (UAX #14)</td></tr>
@@ -678,7 +678,7 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>AES</code>, <code>Blowfish</code>, <code>DES</code>, <code>TripleDES</code></td><td>block ciphers (<code>Block</code>)</td></tr>
           <tr><td><code>CBC</code>, <code>CFB</code>, <code>CTR</code></td><td>modes</td></tr>
-          <tr><td><code>GCM</code>, <code>ChaCha20Poly1305</code>, <code>SIV</code>, <code>CBCHMAC</code></td><td>authenticated encryption (<code>AEAD</code>)</td></tr>
+          <tr><td><code>GCM</code>, <code>ChaCha20Poly1305</code>, <code>XChaCha20Poly1305</code>, <code>SIV</code>, <code>CBCHMAC</code></td><td>authenticated encryption (<code>AEAD</code>)</td></tr>
           <tr><td><code>wrapKey</code>, <code>unwrapKey</code></td><td>AES key wrap (RFC 3394, RFC 5649)</td></tr>
           <tr><td><code>cmac</code></td><td>CMAC</td></tr>
         </table>
@@ -1267,9 +1267,10 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.reflection</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>attrs</code>, <code>decls</code>, <code>fields</code>, <code>methods</code>, <code>invoke</code></td><td>discovery and calls, behind <a href="docs.html#attributes">attributes</a></td></tr>
+          <tr><td><code>Field</code></td><td>one field of a value: its name, kind, type and annotations (<code>attr</code>, <code>hasAttr</code>), the doc comment of an annotated field (<code>doc</code>), typed reads and writes, and <code>set</code>, which stores a boxed value of any kind the field holds</td></tr>
           <tr><td><code>typeName</code>, <code>kindOf</code></td><td>runtime type info</td></tr>
           <tr><td><code>MetaContext</code>, …</td><td>meta contexts</td></tr>
-          <tr><td><code>instantiate</code>, <code>field</code>, <code>elements</code>, <code>arrayOf</code></td><td>building and reading values by descriptor; <code>arrayOf</code> makes an array of a described element type from boxed values</td></tr>
+          <tr><td><code>instantiate</code>, <code>field</code>, <code>elements</code>, <code>arrayOf</code>, <code>mapOf</code></td><td>building and reading values by descriptor; <code>arrayOf</code> makes an array of a described element type from boxed values, <code>mapOf</code> a <code>map&lt;string, V&gt;</code> of a described value type</td></tr>
           <tr><td><code>TypeDescriptor</code>, <code>TypeKind</code></td><td>a type as spelled in a signature or field: <code>kind</code>, <code>typeName</code>, the <code>optional</code>/<code>errorable</code>/<code>future</code> flags, an array's or map's <code>element</code> and <code>key</code>, a tuple's <code>elements</code></td></tr>
           <tr><td><code>EmbeddedFile</code></td><td>a file an annotation builds into the program</td></tr>
           <tr><td><code>BuildMetaContext&lt;T&gt;</code></td><td>context of an <a href="annotations.html#writing">annotation that runs during the build</a></td></tr>
@@ -1287,12 +1288,16 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-cli">
         <h3><code>std.cli</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>parseArgs</code>, <code>Args</code></td><td>the command line, read by asking: <code>has</code>, <code>flag</code>, <code>count</code>, <code>value</code> (string, int, float, duration), <code>values</code>, then <code>unknown</code> and <code>rest</code>, or <code>end</code>, which gives the positionals and refuses a name nobody asked for with a "did you mean"</td></tr>
-          <tr><td><code>@flag</code></td><td>annotation: fills a module variable or constant from the command line (<a href="annotations.html">annotations</a>)</td></tr>
+          <tr><td><code>parseArgs</code>, <code>Args</code></td><td>the command line, read by asking: <code>has</code>, <code>flag</code>, <code>count</code>, <code>value</code> (string, int, float, duration, an enum member), <code>values</code>, then <code>unknown</code> and <code>rest</code>, or <code>end</code>, which gives the positionals and refuses a name nobody asked for with a "did you mean" (<code>hide</code> keeps a name out of those)</td></tr>
+          <tr><td><code>@flag</code></td><td>annotation: fills a module variable or constant from the command line; on a field or a parameter, a flag of a command (<a href="annotations.html">annotations</a>)</td></tr>
+          <tr><td><code>@command</code>, <code>@arg</code></td><td>annotations: a function, method or type as a command or a group of commands; a field or parameter as a positional argument</td></tr>
+          <tr><td><code>run</code></td><td>runs the command the command line names and returns the exit status; <code>--help</code> and <code>help</code> at every level; <code>completion bash|zsh|fish|powershell</code> writes the shell's completion script (<code>eval "$(tool completion bash)"</code>), which completes commands, flags and enum values; a program with <code>@flag</code> variables and no commands writes it for <code>--completion &lt;shell&gt;</code></td></tr>
+          <tr><td><code>complete</code></td><td>gives completion the candidates for a value only the program knows: a flag or argument by name (<code>"profile"</code>, <code>"remote add name"</code>), or the words of a command added by a call</td></tr>
+          <tr><td><code>addCommand</code></td><td>adds a command by a call: a path (<code>"cache clear"</code>), a description and a function that reads the <code>Args</code> left for it</td></tr>
           <tr><td><code>help</code>, <code>helpTemplate</code>, <code>helpMarkdown</code></td><td>the help screen <code>--help</code> prints for the <code>@flag</code> variables; a Jinja template that draws it instead of the built-in layout; descriptions read as Markdown</td></tr>
           <tr><td><code>UsageError</code>, <code>UsageKind</code></td><td>what is wrong with a command line</td></tr>
         </table>
-        <p class="docs-placeholder">Commands and subcommands: coming soon.</p>
+
       </div>
       <div class="docs-sub" id="std-cli-terminal">
         <h3><code>std.cli.terminal</code></h3>
@@ -1304,9 +1309,12 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Theme</code>, <code>theme</code>, <code>defaultTheme</code>, <code>darkTheme</code>, <code>lightTheme</code>, <code>autoTheme</code>, <code>parseTheme</code>, <code>loadTheme</code></td><td>role styles, the current theme, shipped themes, themes from TOML</td></tr>
           <tr><td><code>input</code>, <code>password</code></td><td>read a line; read a line from the terminal without echo, as a <code>Secret&lt;string&gt;</code></td></tr>
           <tr><td><code>readKey</code>, <code>Key</code>, <code>KeyCode</code></td><td>one key press, with an optional wait</td></tr>
+          <tr><td><code>keyReleases</code>, <code>KeyAction</code></td><td>keys reported as they go down, repeat and come up (<code>Key.action</code>), on terminals with the kitty keyboard protocol</td></tr>
+          <tr><td><code>supports</code>, <code>Feature</code></td><td>asks the terminal whether it knows a protocol: extended keys, synchronized output, bracketed paste, the mouse, mouse moves</td></tr>
           <tr><td><code>readEvent</code>, <code>Event</code>, <code>EventKind</code></td><td>a key press, a resize of the terminal window, pasted text or a mouse report</td></tr>
           <tr><td><code>bracketedPaste</code>, <code>mouse</code>, <code>Mouse</code>, <code>MouseButton</code>, <code>MouseAction</code></td><td>pastes as one event; mouse presses, releases, drags and the wheel</td></tr>
-          <tr><td><code>extendedKeys</code>, <code>synchronizedOutput</code>, <code>copy</code></td><td>unambiguous keys (kitty keyboard protocol), a redraw shown at once, text to the clipboard (OSC 52)</td></tr>
+          <tr><td><code>extendedKeys</code>, <code>synchronizedOutput</code>, <code>mouseMoves</code></td><td>unambiguous keys (kitty keyboard protocol), a redraw shown at once, pointer moves with no button held</td></tr>
+          <tr><td><code>copy</code>, <code>clipboard</code></td><td>text to and from the system clipboard through the terminal (OSC 52)</td></tr>
           <tr><td><code>render</code></td><td>a <code>std.formats.docs</code> <code>Document</code> (Markdown, HTML, …) laid out for the terminal: wrapped text, lists, boxed tables, with the theme's styles and clickable links</td></tr>
           <tr><td><code>raw</code>, <code>alternateScreen</code>, <code>showCursor</code></td><td>terminal modes, switched on and off; put back however the program ends</td></tr>
           <tr><td><code>moveTo</code>, <code>clear</code>, <code>clearLine</code></td><td>cursor and screen control</td></tr>
@@ -1317,10 +1325,12 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.cli.prompts</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>ask</code></td><td>a line of text, with a fallback and a validation that keeps the question open</td></tr>
+          <tr><td><code>text</code></td><td>text of several lines: Enter starts a line, Ctrl+D ends the text</td></tr>
+          <tr><td><code>secret</code>, <code>date</code>, <code>file</code></td><td>a line shown as dots; a date; a file picked by walking folders, optionally only files of given extensions, dot files on request</td></tr>
           <tr><td><code>confirm</code></td><td>a yes-or-no question</td></tr>
           <tr><td><code>choose</code>, <code>chooseMany</code></td><td>one or several choices from a list the arrow keys move in and typing narrows</td></tr>
-          <tr><td><code>spinner</code>, <code>Spinner</code></td><td>a turning mark beside a label while work runs: <code>label</code>, <code>done</code>, <code>failed</code></td></tr>
-          <tr><td><code>progress</code>, <code>Progress</code></td><td>a bar that fills as steps are reported: <code>advance</code>, <code>update</code>, <code>done</code>, <code>failed</code></td></tr>
+          <tr><td><code>spinner</code>, <code>Spinner</code></td><td>a turning mark beside a label while work runs: <code>label</code>, <code>log</code> (a line written above it), <code>done</code>, <code>failed</code></td></tr>
+          <tr><td><code>progress</code>, <code>Progress</code></td><td>a bar that fills as steps are reported: <code>advance</code>, <code>update</code>, <code>log</code>, <code>done</code>, <code>failed</code></td></tr>
           <tr><td><code>Cancelled</code></td><td>the error a question fails with on Escape or Ctrl+C</td></tr>
         </table>
         <p>Questions are asked key by key on a terminal; with input or output redirected each answer is read as a line.</p>

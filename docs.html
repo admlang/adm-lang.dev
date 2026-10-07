@@ -2357,7 +2357,9 @@ let b = sum(0, ...xs)</code></pre>
           Functions and methods can share a name as long as their full signatures - parameter types
           and count, plus the receiver type for methods - differ. Overload resolution happens entirely
           at compile time; a call must match exactly one candidate or it's a compile error, never a
-          runtime guess.
+          runtime guess. Used as a value, an overloaded name takes the overload the expected function
+          type asks for (<code>let f def (int) string = show</code>); a <code>let</code> without a
+          declared type cannot take one.
         </p>
 
         <p>
@@ -2967,6 +2969,13 @@ homepage.timeout(3s)</code></pre>
         <p>
           <code>try</code> and <code>await</code> compose in either order on an errorable future -
           <code>try await f()</code> and <code>await try f()</code> both work.
+        </p>
+        <p>
+          An <code>onerror</code> handler may follow an awaited expression, as it may follow a call:
+          <code>let page = await task onerror recover emptyPage()</code>. It takes the failure of the
+          awaited <code>!T</code> and leaves the <code>T</code>, for a future in a variable, an awaited
+          call (<code>await fetch(id) onerror ...</code>) and an <code>AsyncScope</code>
+          (<code>await group onerror (err error) { ... recover none }</code>).
         </p>
       </div>
 
