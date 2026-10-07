@@ -122,6 +122,9 @@
           <li><a class="docs-nav-sub" href="#std-playlist">std.formats.playlist</a></li>
           <li><a class="docs-nav-sub" href="#std-calendar">std.formats.calendar</a></li>
           <li><a class="docs-nav-sub" href="#std-contacts">std.formats.contacts</a></li>
+          <li><a class="docs-nav-sub" href="#std-formats-data">std.formats.data</a></li>
+          <li><a class="docs-nav-sub" href="#std-formats-sheets">std.formats.sheets</a></li>
+          <li><a class="docs-nav-sub" href="#std-formats-mmdb">std.formats.data.mmdb</a></li>
           <li><a class="docs-nav-sub" href="#std-formats-ai">std.formats.ai</a></li>
           <li><a class="docs-nav-sub" href="#std-barcodes">std.barcodes</a></li>
           <li><a class="docs-nav-sub" href="#std-barcodes-qr">std.barcodes.qr</a></li>
@@ -208,6 +211,7 @@
           <li><a class="docs-nav-sub" href="#std-reflection">std.reflection</a></li>
           <li><a class="docs-nav-sub" href="#std-ide">std.ide</a></li>
           <li><a class="docs-nav-sub" href="#std-cli">std.cli</a></li>
+          <li><a class="docs-nav-sub" href="#std-cli-terminal">std.cli.terminal</a></li>
           <li><a class="docs-nav-sub" href="#std-metrics">std.metrics</a></li>
         </ul>
       </div>
@@ -428,6 +432,8 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>join</code>, <code>dir</code>, <code>base</code>, <code>extension</code>, <code>split</code>, <code>clean</code>, <code>isAbs</code></td><td>paths</td></tr>
           <tr><td><code>run</code>, <code>output</code></td><td>start a program (needs <code>adm.runtime.spawn</code>)</td></tr>
           <tr><td><code>mapFile</code>, <code>Mapping</code></td><td>memory-mapped files</td></tr>
+          <tr><td><code>symlink</code>, <code>freeSpace</code>, <code>totalSpace</code>, <code>unixMode</code>, <code>fromUnixMode</code></td><td>links, disk space, Unix mode bits</td></tr>
+          <tr><td><code>watch</code>, <code>Watcher</code>, <code>Change</code>, <code>ChangeKind</code></td><td>changes to files and directories</td></tr>
           <tr><td><code>appHome</code></td><td>the application's own folder</td></tr>
         </table>
       </div>
@@ -457,7 +463,11 @@ use std.data.encoding::(json)</code></pre>
       </div>
       <div class="docs-sub" id="std-sync">
         <h3><code>std.sync</code></h3>
-        <p class="docs-placeholder">Synchronization primitives beyond channels. Reference coming soon.</p>
+        <table class="docs-table exports-table">
+          <tr><td><code>Mutex</code>, <code>ReadWriteLock</code></td><td>locks a task may hold across calls that wait</td></tr>
+          <tr><td><code>Semaphore</code></td><td>a number of permits, to bound how many tasks run something at once</td></tr>
+          <tr><td><code>WaitGroup</code>, <code>Once</code></td><td>wait for work to end; run a function one time</td></tr>
+        </table>
       </div>
       <div class="docs-sub" id="std-services">
         <h3><code>std.services</code></h3>
@@ -560,7 +570,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.data.encoding</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>JSON</code>, <code>json</code></td><td>JSON</td></tr>
-          <tr><td><code>XMLNode</code>, <code>XMLWriter</code>, <code>XML</code></td><td>XML tree, writer and well-formedness check</td></tr>
+          <tr><td><code>XMLNode</code>, <code>XMLWriter</code>, <code>XML</code></td><td>XML objects (<code>encode</code>, <code>decode</code>, <code>@xml</code>), tree, writer and well-formedness check</td></tr>
           <tr><td><code>YAML</code></td><td>YAML</td></tr>
           <tr><td><code>TOML</code></td><td>TOML</td></tr>
           <tr><td><code>JSON.parse</code></td><td>JSON into maps, arrays and scalars</td></tr>
@@ -568,7 +578,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>MsgPack</code>, <code>MsgPackValue</code>, <code>MsgPackReader</code>, <code>msgpack</code></td><td>MessagePack, ext types and timestamps</td></tr>
           <tr><td><code>Protobuf</code>, <code>ProtoMessage</code>, <code>ProtoReader</code>, <code>ProtoWriter</code>, <code>protoField</code></td><td>Protocol Buffers wire format, with or without a schema</td></tr>
           <tr><td><code>ProtoSchema</code>, <code>ProtoFile</code></td><td><code>.proto</code> files: messages, enums and services</td></tr>
-          <tr><td><code>CSV</code></td><td>CSV, any separator</td></tr>
+          <tr><td><code>CSV</code>, <code>CSVReader</code>, <code>CSVWriter</code>, <code>csv</code></td><td>CSV, any separator: whole texts or streams, rows bound to objects by header, separator detection</td></tr>
           <tr><td><code>XMLSignature</code>, <code>signXML</code>, <code>parseXMLSignature</code>, <code>canonicalize</code></td><td>XML signatures and canonical XML</td></tr>
           <tr><td><code>encryptXML</code>, <code>decryptXML</code></td><td>XML encryption</td></tr>
           <tr><td><code>Base64</code>, <code>Base32</code>, <code>Base83</code>, <code>hexencode</code>, <code>hexdecode</code></td><td>Base64, Base32, Base83, hex</td></tr>
@@ -604,6 +614,9 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>lzma</code></td><td>LZMA and LZMA2</td></tr>
           <tr><td><code>xz</code></td><td>xz, with the delta and x86 filters</td></tr>
           <tr><td><code>brotli</code></td><td>Brotli, reading only</td></tr>
+          <tr><td><code>lz4</code></td><td>LZ4 blocks and frames</td></tr>
+          <tr><td><code>snappy</code></td><td>Snappy blocks and framed streams</td></tr>
+          <tr><td><code>zstd</code></td><td>Zstandard, reading and writing, with dictionaries</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-crypto">
@@ -711,7 +724,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Archive</code>, <code>ArchiveWriter</code>, <code>load</code></td><td>archive by signature</td></tr>
           <tr><td><code>extractAll</code>, <code>extractEntry</code></td><td>extraction</td></tr>
           <tr><td><code>Zip</code>, <code>Tar</code>, <code>SevenZip</code></td><td>archives</td></tr>
-          <tr><td><code>Gz</code>, <code>Bz2</code>, <code>Xz</code>, <code>Tgz</code>, <code>Tbz2</code>, <code>TarXz</code></td><td>compressed files and tarballs</td></tr>
+          <tr><td><code>Gz</code>, <code>Bz2</code>, <code>Xz</code>, <code>Tgz</code>, <code>Tbz2</code>, <code>TarXz</code>, <code>Zst</code>, <code>TarZst</code></td><td>compressed files and tarballs</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-docs">
@@ -767,6 +780,22 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>VCard</code>, <code>XCard</code>, <code>LDIF</code>, <code>ContactsCSV</code></td><td>codecs</td></tr>
         </table>
       </div>
+      <div class="docs-sub" id="std-formats-data">
+        <h3><code>std.formats.data</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>INI</code>, <code>INIFile</code>, <code>INISection</code>, <code>INIEntry</code>, <code>ini</code></td><td>INI files: sections, comments, typed getters, objects bound by field</td></tr>
+          <tr><td><code>DotEnv</code>, <code>dotenv</code></td><td><code>.env</code> files: variables with quotes and <code>${NAME}</code> expansion, loading into the environment</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-formats-mmdb">
+        <h3><code>std.formats.data.mmdb</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>open</code>, <code>Database</code>, <code>Metadata</code></td><td>MaxMind DB files (GeoIP2, GeoLite2, DB-IP, IPinfo)</td></tr>
+          <tr><td><code>Record</code></td><td>the data stored for an IP address and its network</td></tr>
+          <tr><td><code>Location</code>, <code>Place</code></td><td>continent, country, subdivisions, city, coordinates, time zone</td></tr>
+          <tr><td><code>AutonomousSystem</code></td><td>AS number and organization</td></tr>
+        </table>
+      </div>
       <div class="docs-sub" id="std-formats-ai">
         <h3><code>std.formats.ai</code></h3>
         <table class="docs-table exports-table">
@@ -816,9 +845,19 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>encode</code>, <code>decode</code></td><td>EAN-13/8, UPC-A/E with add-ons, Code 128, Code 39, Code 93, ITF, Codabar</td></tr>
         </table>
       </div>
+      <div class="docs-sub" id="std-formats-sheets">
+        <h3><code>std.formats.sheets</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Workbook</code>, <code>Sheet</code>, <code>Cell</code>, <code>CellKind</code>, <code>Range</code></td><td>spreadsheets: sheets of typed cells with formulas and number formats</td></tr>
+          <tr><td><code>load</code>, <code>save</code></td><td>read and write by signature or extension</td></tr>
+          <tr><td><code>Xlsx</code>, <code>Csv</code></td><td>codecs</td></tr>
+          <tr><td><code>reference</code>, <code>parseReference</code>, <code>parseRange</code>, <code>columnName</code></td><td><code>B2</code> and <code>A1:C3</code> references</td></tr>
+          <tr><td><code>serialOf</code>, <code>timeOf</code></td><td>spreadsheet day numbers and <code>time.Time</code></td></tr>
+        </table>
+      </div>
       <div class="docs-sub" id="formats-planned">
         <h3>Planned</h3>
-        <p class="docs-placeholder"><code>std.formats.sheets</code>, <code>.slides</code> and <code>.data</code>.</p>
+        <p class="docs-placeholder"><code>std.formats.slides</code> and the container formats of <code>std.formats.data</code>.</p>
       </div>
     </section>
 
@@ -831,6 +870,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Listener</code>, <code>Server</code>, <code>StreamServer</code>, <code>DatagramServer</code></td><td>server interfaces</td></tr>
           <tr><td><code>NetError</code>, <code>ErrorCode</code></td><td>typed failures</td></tr>
           <tr><td><code>resolve</code>, <code>NetInterface</code></td><td>name resolution, interfaces</td></tr>
+          <tr><td><code>parseIPText</code>, <code>ipText</code></td><td>IP address text to bytes and back</td></tr>
           <tr><td><code>RemoteFiles</code></td><td>remote file access (FTP, SFTP, WebDAV)</td></tr>
         </table>
       </div>
@@ -1217,7 +1257,28 @@ use std.data.encoding::(json)</code></pre>
       </div>
       <div class="docs-sub" id="std-cli">
         <h3><code>std.cli</code></h3>
-        <p class="docs-placeholder">Argument parsing, flags, and terminal output. Reference coming soon.</p>
+        <table class="docs-table exports-table">
+          <tr><td><code>parseArgs</code>, <code>Args</code></td><td>the command line, read by asking: <code>has</code>, <code>flag</code>, <code>count</code>, <code>value</code>, <code>values</code>, then <code>unknown</code> and <code>rest</code></td></tr>
+          <tr><td><code>@flag</code></td><td>annotation: fills a module variable or constant from the command line (<a href="annotations.html">annotations</a>)</td></tr>
+          <tr><td><code>UsageError</code>, <code>UsageKind</code></td><td>what is wrong with a command line</td></tr>
+        </table>
+        <p class="docs-placeholder">Commands and subcommands: coming soon.</p>
+      </div>
+      <div class="docs-sub" id="std-cli-terminal">
+        <h3><code>std.cli.terminal</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>isTTY</code>, <code>size</code>, <code>colors</code></td><td>whether a standard stream is a terminal, its <code>Size</code> in cells, how many colors it shows (<code>ColorDepth</code>)</td></tr>
+          <tr><td><code>failure</code>, <code>warning</code>, <code>success</code>, <code>info</code>, <code>heading</code>, <code>emphasis</code>, <code>dim</code>, <code>link</code>, <code>code</code>, <code>prompt</code></td><td>style text for a theme role; plain text when the stream shows no colors</td></tr>
+          <tr><td><code>role</code>, <code>color</code></td><td>the style function of an application's own role; one-off color and attributes</td></tr>
+          <tr><td><code>Color</code>, <code>Ansi</code>, <code>parseColor</code>, <code>TextStyle</code></td><td>palette, indexed and RGB colors, degraded to what the terminal shows; colors and attributes of a role</td></tr>
+          <tr><td><code>Theme</code>, <code>theme</code>, <code>defaultTheme</code>, <code>darkTheme</code>, <code>lightTheme</code>, <code>autoTheme</code>, <code>parseTheme</code>, <code>loadTheme</code></td><td>role styles, the current theme, shipped themes, themes from TOML</td></tr>
+          <tr><td><code>input</code>, <code>password</code></td><td>read a line; read a line from the terminal without echo, as a <code>Secret&lt;string&gt;</code></td></tr>
+          <tr><td><code>readKey</code>, <code>Key</code>, <code>KeyCode</code></td><td>one key press, with an optional wait</td></tr>
+          <tr><td><code>readEvent</code>, <code>Event</code>, <code>EventKind</code></td><td>a key press or a resize of the terminal window</td></tr>
+          <tr><td><code>raw</code>, <code>alternateScreen</code>, <code>showCursor</code></td><td>terminal modes, switched on and off; put back however the program ends</td></tr>
+          <tr><td><code>moveTo</code>, <code>clear</code>, <code>clearLine</code></td><td>cursor and screen control</td></tr>
+        </table>
+        <p class="exports-note">Colors follow <code>NO_COLOR</code>, <code>FORCE_COLOR</code>, <code>CLICOLOR_FORCE</code>, <code>TERM</code> and <code>COLORTERM</code>.</p>
       </div>
       <div class="docs-sub" id="std-metrics">
         <h3><code>std.metrics</code></h3>

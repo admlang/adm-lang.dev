@@ -3461,9 +3461,9 @@ const SEPARATOR = "\\"</code></pre>
         </p>
         <p>
           Two more fill in a declaration's value from the outside world. <code>@env(name, defaultValue)</code>
-          reads an environment variable, and <code>@flag(name, description, defaultValue)</code> wires a
-          declaration up to a command-line flag (<span class="api-tag api-planned">planned</span>: the compiler accepts <code>@flag</code> and does
-          nothing with it yet):
+          reads an environment variable, and <code>@flag</code>, from <code>std.cli</code>, fills a variable from the command line when the
+          program first uses it; the variable's type says whether the flag is a switch or takes a value, its name
+          is the flag's name and its doc comment the help text:
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -3471,11 +3471,18 @@ const SEPARATOR = "\\"</code></pre>
             <span class="code-filename">env_flag.adm</span>
           </div>
           <pre><code>module demo.globals {
+	use std.cli::(flag)
+
 	@env("ADM_TEST", "fallback")
 	const tmp string
 
-	@flag("debug", "Enable debug mode", defaultValue = "true")
-	let debug string
+	// Enable debug mode.
+	@flag
+	let debug bool = false      // --debug
+
+	// Port to listen on.
+	@flag(short = "p")
+	let port int = 8080         // --port 9000, -p 9000
 }</code></pre>
         </div>
       </div>

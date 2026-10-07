@@ -1,26 +1,230 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>adm - Programming Language</title>
-<meta name="description" content="ADM is a statically-typed, multi-paradigm programming language for applications, services, and UI workloads.">
-<link rel="icon" type="image/svg+xml" href="assets/adm.svg">
-<link rel="canonical" href="https://adm-lang.dev/">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="adm">
-<meta property="og:title" content="adm - a statically typed, multi-paradigm programming language">
-<meta property="og:description" content="ADM is a statically-typed, multi-paradigm language for applications, services, and UI workloads.">
-<meta property="og:url" content="https://adm-lang.dev/">
-<meta property="og:image" content="https://adm-lang.dev/assets/og.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="adm - a statically typed, multi-paradigm programming language">
-<meta name="twitter:description" content="ADM is a statically-typed, multi-paradigm language for applications, services, and UI workloads.">
-<meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
-<link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>adm - Programming Language</title>
+  <meta name="description" content="ADM is a statically-typed, multi-paradigm programming language for applications, services, UI, native code, GPU workloads, and polyglot applications.">
+  <link rel="icon" type="image/svg+xml" href="assets/adm.svg">
+  <link rel="canonical" href="https://adm-lang.dev/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="adm">
+  <meta property="og:title" content="adm - one language for apps, services, interfaces, and everything around them">
+  <meta property="og:description" content="Native binaries, contracts, transactions, services, UI, GPU code, and interoperability with other language ecosystems.">
+  <meta property="og:url" content="https://adm-lang.dev/">
+  <meta property="og:image" content="https://adm-lang.dev/assets/og.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="adm - programming language">
+  <meta name="twitter:description" content="Native binaries, contracts, transactions, services, UI, GPU code, and interoperability with other language ecosystems.">
+  <meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Homepage-only layout additions. They intentionally reuse the site's existing
+       variables, typography, colors, borders and code styling. -->
+  <style>
+    .home-section-intro {
+      max-width: 720px;
+      margin: -22px 0 38px;
+      color: var(--text-muted);
+      font-size: 16px;
+      line-height: 1.65;
+    }
+
+    .feature-card--wide {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, .92fr);
+      gap: 44px;
+      align-items: center;
+      padding: 36px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .feature-card--wide::after {
+      content: "";
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      right: -95px;
+      top: -120px;
+      background: color-mix(in srgb, var(--accent) 10%, transparent);
+      pointer-events: none;
+    }
+
+    .feature-card--wide h3 {
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+
+    .feature-card--wide p {
+      font-size: 15.5px;
+      line-height: 1.7;
+      max-width: 62ch;
+    }
+
+    .interop-languages {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .interop-language {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 650;
+      color: var(--text);
+    }
+
+    .feature-kicker {
+      display: inline-block;
+      margin-bottom: 9px;
+      color: var(--accent-dark);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .feature-card a,
+    .feature-card--wide a {
+      color: var(--accent-dark);
+      text-decoration: none;
+    }
+
+    .feature-card a:hover,
+    .feature-card--wide a:hover {
+      text-decoration: underline;
+    }
+
+    .adm-things {
+      padding: 88px 0;
+    }
+
+    .adm-things-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .adm-thing {
+      padding: 28px 26px;
+      min-width: 0;
+    }
+
+    .adm-thing + .adm-thing {
+      border-left: 1px solid var(--border);
+    }
+
+    .adm-thing code {
+      display: inline-block;
+      margin-bottom: 13px;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 4px 8px;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .adm-thing h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .adm-thing p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 13.5px;
+      line-height: 1.55;
+    }
+
+    .home-path {
+      padding: 78px 0 84px;
+      background: var(--bg-alt);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .home-path-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      margin-top: 36px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .home-path-step {
+      padding: 26px 24px;
+      min-width: 0;
+    }
+
+    .home-path-step + .home-path-step {
+      border-left: 1px solid var(--border);
+    }
+
+    .home-path-step strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .home-path-step span {
+      display: block;
+      color: var(--text-muted);
+      font-size: 13.5px;
+      line-height: 1.55;
+    }
+
+    .home-path-step code {
+      display: inline-block;
+      margin-bottom: 11px;
+      color: var(--accent-dark);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 860px) {
+      .feature-card--wide {
+        grid-template-columns: 1fr;
+        gap: 28px;
+        padding: 28px;
+      }
+
+      .interop-languages {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .adm-things-grid,
+      .home-path-row {
+        grid-template-columns: 1fr;
+      }
+
+      .adm-thing + .adm-thing,
+      .home-path-step + .home-path-step {
+        border-left: 0;
+        border-top: 1px solid var(--border);
+      }
+    }
+  </style>
 </head>
 <body>
-
 <header class="site-header">
   <div class="wrap header-inner">
     <a class="brand" href="#top">
@@ -42,16 +246,15 @@
 </header>
 
 <main id="top">
-
   <section class="hero wrap">
     <div class="hero-copy">
-      <img src="./assets/bot.png" alt="ADM Bot" class="hero-bot" width="400" fetchpriority="high" decoding="async" />
+      <img src="./assets/bot.png" alt="ADM Bot" class="hero-bot" width="400" fetchpriority="high" decoding="async">
       <p class="eyebrow">Programming Language</p>
       <h1>One language for apps,<br>services, and interfaces.</h1>
       <p class="lede">
         ADM is statically typed and compiles to native binaries. Contracts, transactions,
-        background services, and UI components are part of the language - not libraries
-        you bolt on.
+        services, UI components, GPU code, and interoperability with other language ecosystems
+        are part of the system rather than separate worlds you have to stitch together.
       </p>
       <div class="cta-row">
         <a class="btn btn-primary" href="docs.html">Read the Docs</a>
@@ -65,112 +268,188 @@
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="code-filename">launch.adm</span>
         </div>
-        <pre><code>module rocket {
-	use std.units::*
+<pre><code>module rocket {
+    use std.units::*
 
-	// Contracts: checked when the function starts and when it returns.
-	def burnTime(fuel Mass, rate MassFlow) !Time {
-		expects {
-			assert rate &gt; 0 onerror fail &quot;engine off&quot;
-		}
-		let t = fuel / rate
-		return t
-		provides {
-			assert t &lt; 10(min) onerror fail &quot;burn too long: {t.str(min)}&quot;
-		}
-	}
+    // Contracts belong to the function.
+    def burnTime(fuel Mass, rate MassFlow) !Time {
+        expects {
+            assert rate &gt; 0 onerror fail "engine off"
+        }
 
-	// Compiled for the GPU; runs on the CPU when there is none.
-	cuda def cool(temps float64[], by float64) !none {
-		int i = blockIdx.x * blockDim.x + threadIdx.x;
-		if (i &lt; temps_len) temps[i] -= by;
-	}
+        let t = fuel / rate
+        return t
 
-	async def weather() string {
-		use std.net.http
-		let reply = http.get(&quot;https://wttr.in/Cape+Canaveral?format=3&quot;) onerror return &quot;no go&quot;
-		return reply.text() onerror recover &quot;no go&quot;
-	}
+        provides {
+            assert t &lt; 10(min) onerror fail "burn too long"
+        }
+    }
 
-	async def range() string {
-		return &quot;go&quot;
-	}
+    // A function that can run on the GPU.
+    cuda def cool(temps float64[], by float64) !none {
+        int i = blockIdx.x * blockDim.x + threadIdx.x;
+        if (i &lt; temps_len) temps[i] -= by;
+    }
+
+    // Foreign runtimes are callable too.
+    @external.node("telemetry.js")
+    async def publish(message string);
 }
 
 application Launch {
-	use (
-		std.units::*
-		rocket
-	)
+    use (std.units::* rocket)
 
-	let fuel Mass = 0
+    let fuel Mass = 0
 
-	def load(m Mass) {
-		begin { fuel += m }
-		rollback { fuel -= m }
-	}
+    def load(m Mass) {
+        begin { fuel += m }
+        rollback { fuel -= m }
+    }
 
-	// When anything inside fails, every rollback runs.
-	def fuelUp(m Mass) !none {
-		transaction {
-			load(m)
-			let t = try rocket.burnTime(fuel, 2.5(t/s))
-			println(&quot;burn for {t.str(s)}&quot;)
-		} onerror (err error) {
-			println(&quot;scrubbed: {err.message}, fuel back to {fuel.str(t)}&quot;)
-			recover none
-		}
-		return none
-	}
+    def fuelUp(m Mass) !none {
+        transaction {
+            load(m)
+            let t = try rocket.burnTime(fuel, 2.5(t/s))
+            println("burn for {t.str(s)}")
+        } onerror (err error) {
+            println("scrubbed: {err.message}")
+            recover none
+        }
+        return none
+    }
 
-	def new(args string[]) int {
-		fuelUp(2000(t)) onerror return 1
-		fuelUp(400(t)) onerror return 1
+    def new(args string[]) int {
+        fuelUp(2000(t)) onerror return 1
 
-		// Both checks run at once; the first answer wins.
-		let status = await (rocket.weather() || rocket.range())
-		println(&quot;status: {status}&quot;)
+        let temps = float64[910.0, 870.0, 1020.0, 880.0]
 
-		// All four engines compared in one SIMD instruction.
-		let temps = float64[910.0, 870.0, 1020.0, 880.0]
-		let v vec4&lt;float64&gt;
-		let hot = v.load(temps, 0).gt(v.splat(1000.0))
-		if hot.any() {
-			rocket.cool(temps, 50.0) onerror recover none
-		}
+        // One iteration per CPU worker.
+        forall let (i, temp) in temps {
+            rocket.publish("engine {i}: {int(temp)} K")
+        }
 
-		// One task per engine, spread across cores, reporting on a channel.
-		let telemetry channel&lt;string&gt; = new(size = 4)
-		forall let (i, t) in temps {
-			telemetry &lt;- &quot;engine {i}: {int(t)} K&quot;
-		}
-		telemetry.close()
-		for let line in telemetry {
-			println(line)
-		}
-		return 0
-	}
-}
-</code></pre>
+        // SIMD is a language-level type.
+        let v vec4&lt;float64&gt;
+        if v.load(temps, 0).gt(v.splat(1000.0)).any() {
+            rocket.cool(temps, 50.0) onerror recover none
+        }
+
+        return 0
+    }
+}</code></pre>
       </div>
     </div>
   </section>
 
   <section class="features" id="features">
     <div class="wrap">
-      <h2 class="section-title">What's in the box</h2>
+      <h2 class="section-title">Built into the language</h2>
+      <p class="home-section-intro">
+        ADM is not trying to win by adding one more spelling for classes and loops. The interesting
+        parts are the things that usually live in frameworks, build systems, runtimes, or entirely
+        different toolchains.
+      </p>
+
       <div class="feature-grid">
+        <article class="feature-card feature-card--wide">
+          <div>
+            <span class="feature-kicker">Polyglot by design</span>
+            <h3>Use the code you already have.</h3>
+            <p>
+              Interop in ADM is not just a C FFI. Bind functions from native libraries, or call code
+              running in JavaScript/Node, Python, Lua, Ruby, PHP, R and other embedded runtimes. Bridging
+              layers reach JVM languages such as Java and Kotlin, .NET languages such as C#, and more.
+              A foreign function still looks like a typed ADM function at the call site.
+            </p>
+            <p style="margin-top:14px">
+              <a href="docs.html">Read about external functions and FFI →</a>
+            </p>
+          </div>
+          <div class="interop-languages" aria-label="Languages ADM can interoperate with">
+            <span class="interop-language">JavaScript</span>
+            <span class="interop-language">Java / JVM</span>
+            <span class="interop-language">.NET / C#</span>
+            <span class="interop-language">Python</span>
+            <span class="interop-language">Lua / LuaJIT</span>
+            <span class="interop-language">Ruby</span>
+            <span class="interop-language">C / C++</span>
+            <span class="interop-language">Rust / Go</span>
+            <span class="interop-language">WASM + more</span>
+          </div>
+        </article>
 
         <article class="feature-card">
           <div class="feature-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-              <path d="M12 2 3 7v10l9 5 9-5V7l-9-5Z"/>
-              <path d="M12 12v10M12 12 3 7M12 12l9-5"/>
+              <path d="M4 7h16M7 4v6M17 4v6M5 13h5v6H5zM14 13h5v6h-5z"/>
             </svg>
           </div>
-          <h3>Structured</h3>
-          <p>Structs, enums, unions, interfaces, and datatypes for describing data. A type satisfies
-             an interface or datatype by having the right members, with no <code>implements</code> clause.</p>
+          <h3>Contracts &amp; transactions</h3>
+          <p>
+            Functions can declare what they expect and provide. A function can also define its own
+            <code>begin</code> and <code>rollback</code> behavior, then participate in a larger
+            <code>transaction</code> without a transaction framework around it.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 2v3M12 19v3M4.9 4.9 7 7M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1 7 17M17 7l2.1-2.1"/>
+            </svg>
+          </div>
+          <h3>Services are a language concept</h3>
+          <p>
+            Long-running stateful systems get a shared model: queries, commits, events, observers and
+            lifecycle. Logging, storage, schedulers, messaging, UI and your own services speak the same
+            language-level vocabulary.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6l-8-3Z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+          </div>
+          <h3>Dependencies do not get everything</h3>
+          <p>
+            ADM traces a package's path to files, the network, devices and other privileged services.
+            The developer chooses what dependencies may reach; runtime policy lets the user narrow that
+            access further. <code>adm audit</code> shows why a permission is needed.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M4 18 9 6l3 7 3-5 5 10"/>
+              <path d="M3 18h18"/>
+            </svg>
+          </div>
+          <h3>From a loop to the GPU</h3>
+          <p>
+            Use ordinary loops, spread work across cores with <code>forall</code>, operate on native SIMD
+            vector types, or compile a <code>cuda def</code> for the GPU. Parallelism is not hidden behind
+            a collection of unrelated libraries.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M3 17 17 3l4 4L7 21l-4-4Z"/>
+              <path d="M7 13l2 2M10 10l2 2M13 7l2 2"/>
+            </svg>
+          </div>
+          <h3>Units that calculate</h3>
+          <p>
+            Numbers can carry units: <code>100(km)</code>, <code>9.81(m/s²)</code>. Arithmetic derives the
+            resulting dimension, and a value can be displayed in any compatible unit. Hundreds of units
+            and prefixed forms are built in.
+          </p>
         </article>
 
         <article class="feature-card">
@@ -181,62 +460,76 @@ application Launch {
               <circle cx="12" cy="12" r=".9" fill="currentColor" stroke="none"/>
             </svg>
           </div>
-          <h3>Expressive</h3>
-          <p>Pattern matching, string interpolation, async/await, and channels. Errors are values:
-             <code>!T</code> to return one, <code>try</code> to pass it up, <code>onerror</code> to handle it.</p>
+          <h3>Programmable metadata</h3>
+          <p>
+            ADM annotations are not just decorative labels. <code>meta def</code> lets libraries define
+            typed metadata behavior for specific compiler/reflection contexts, so validation, flags,
+            serialization and tooling can share one mechanism.
+          </p>
         </article>
+      </div>
+    </div>
+  </section>
 
-        <article class="feature-card">
-          <div class="feature-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-              <rect x="3" y="4" width="18" height="16" rx="2"/>
-              <path d="M3 8h18"/>
-              <path d="M7 12l2.5 2L7 16M12 16h4"/>
-            </svg>
-          </div>
-          <h3>Native</h3>
-          <p>Compiles ahead of time for Linux, macOS, Windows, Android, iOS, and WASM. SIMD vectors
-             are built into the language, and a <code>cuda def</code> function runs on the GPU.</p>
+  <section class="adm-things">
+    <div class="wrap">
+      <h2 class="section-title">A few very ADM things</h2>
+      <p class="home-section-intro">
+        Small ideas matter too. These are the details that make everyday ADM code feel like ADM.
+      </p>
+
+      <div class="adm-things-grid">
+        <article class="adm-thing">
+          <code>datatype UserLike</code>
+          <h3>Describe shape separately from behavior</h3>
+          <p>Interfaces describe methods. Datatypes describe the properties a value has. Both are satisfied structurally.</p>
         </article>
-
-        <article class="feature-card">
-          <div class="feature-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-              <path d="M3 17 17 3l4 4L7 21l-4-4Z"/>
-              <path d="M7 13l2 2M10 10l2 2M13 7l2 2"/>
-            </svg>
-          </div>
-          <h3>Units of measure</h3>
-          <p>Numbers can carry units: <code>100(km)</code>, <code>9.81(m/s²)</code>. Distance divided
-             by time gives a speed, which you can print in km/h, m/s or any other speed unit. Over 700
-             units are built in, counting prefixed forms like km and MiB.</p>
+        <article class="adm-thing">
+          <code>value.tags()</code>
+          <h3>Metadata can travel with a value</h3>
+          <p>Tags follow a value through assignments, calls, collections and channels instead of disappearing at the next boundary.</p>
         </article>
-
-        <article class="feature-card">
-          <div class="feature-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-              <rect x="3" y="7" width="18" height="13" rx="2"/>
-              <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18"/>
-            </svg>
-          </div>
-          <h3>Batteries included</h3>
-          <p>The standard library is written in ADM: networking, cryptography, compression, and codecs
-             for many file formats (images, audio, video, fonts, documents, archives, mail).</p>
+        <article class="adm-thing">
+          <code>component Login</code>
+          <h3>UI stays in the language</h3>
+          <p>View, style and controller use ADM syntax, ADM control flow and ADM types rather than a separate template language.</p>
         </article>
-
-        <article class="feature-card">
-          <div class="feature-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-              <path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6l-8-3Z"/>
-              <path d="m9 12 2 2 4-4"/>
-            </svg>
-          </div>
-          <h3>Permissions</h3>
-          <p>Control what each program and each library can access (files, the network, devices)
-             through permissions and policies. You see what a library needs before you add it, and
-             the user decides what the app gets when it runs.</p>
+        <article class="adm-thing">
+          <code>application / library / plugin</code>
+          <h3>The compiler knows what you are building</h3>
+          <p>Applications, libraries, plugins and modules are compilation units, not conventions invented by an external build tool.</p>
         </article>
+      </div>
+    </div>
+  </section>
 
+  <section class="home-path">
+    <div class="wrap">
+      <h2 class="section-title">Scale the code, not the ceremony</h2>
+      <p class="home-section-intro">
+        Start with ordinary typed code. Reach for more of the language only when the problem actually needs it.
+      </p>
+      <div class="home-path-row">
+        <div class="home-path-step">
+          <code>def</code>
+          <strong>Write the function</strong>
+          <span>Typed values, generics, errors, pattern matching and ordinary control flow.</span>
+        </div>
+        <div class="home-path-step">
+          <code>async · channel · forall</code>
+          <strong>Add concurrency</strong>
+          <span>Coordinate tasks or spread work across cores without changing ecosystems.</span>
+        </div>
+        <div class="home-path-step">
+          <code>vec&lt;T&gt; · cuda def</code>
+          <strong>Push the hot path</strong>
+          <span>Use native SIMD or move the work to the GPU when the data says it is worth it.</span>
+        </div>
+        <div class="home-path-step">
+          <code>@external.*</code>
+          <strong>Reuse another ecosystem</strong>
+          <span>Call existing code instead of rewriting it merely because it was written in another language.</span>
+        </div>
       </div>
     </div>
   </section>
@@ -247,18 +540,29 @@ application Launch {
       <p class="lede">
         ADM ships as a single self-contained package: the compiler, the standard library and a
         bundled C toolchain. The standard library still has gaps; read the
-        <a href="docs.html">docs</a> or browse the <a href="examples.html">examples</a> to see
-        where it's heading.
+        <a href="docs.html">docs</a> or browse the <a href="examples.html">examples</a> to see where it's heading.
       </p>
+
       <div class="dl" id="download">
         <div class="dl-tabs" role="tablist" aria-label="Operating system">
-          <button class="dl-tab" role="tab" data-os="mac" aria-selected="false"><svg class="dl-icon" viewBox="0 0 1024 1024" fill="currentColor" aria-hidden="true"><path d="M747.4 535.7c-.4-68.2 30.5-119.6 92.9-157.5-34.9-50-87.7-77.5-157.3-82.8-65.9-5.2-138 38.4-164.4 38.4-27.9 0-91.7-36.6-141.9-36.6C273.1 298.8 163 379.8 163 544.6c0 48.7 8.9 99 26.7 150.8 23.8 68.2 109.6 235.3 199.1 232.6 46.8-1.1 79.9-33.2 140.8-33.2 59.1 0 89.7 33.2 141.9 33.2 90.3-1.3 167.9-153.2 190.5-221.6-121.1-57.1-114.6-167.2-114.6-170.7zm-105.1-305c50.7-60.2 46.1-115 44.6-134.7-44.8 2.6-96.6 30.5-126.1 64.8-32.5 36.8-51.6 82.3-47.5 133.6 48.4 3.7 92.6-21.2 129-63.7z"/></svg><span>macOS</span></button>
-          <button class="dl-tab is-active" role="tab" data-os="linux" aria-selected="true"><svg class="dl-icon" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M220.8 123.3c1 .5 1.8 1.7 3 1.7 1.1 0 2.8-.4 2.9-1.5.2-1.4-1.9-2.3-3.2-2.9-1.7-.7-3.9-1-5.5-.1-.4.2-.8.7-.6 1.1.3 1.3 2.3 1.1 3.4 1.7zm-21.9 1.7c1.2 0 2-1.2 3-1.7 1.1-.6 3.1-.4 3.5-1.6.2-.4-.2-.9-.6-1.1-1.6-.9-3.8-.6-5.5.1-1.3.6-3.4 1.5-3.2 2.9.1 1 1.8 1.5 2.8 1.4zM420 403.8c-3.6-4-5.3-11.6-7.2-19.7-1.8-8.1-3.9-16.8-10.5-22.4-1.3-1.1-2.6-2.1-4-2.9-1.3-.8-2.7-1.5-4.1-2 9.2-27.3 5.6-54.5-3.7-79.1-11.4-30.1-31.3-56.4-46.5-74.4-17.1-21.5-33.7-41.9-33.4-72C311.1 85.4 315.7.1 234.8 0 132.4-.2 158 103.4 156.9 135.2c-1.7 23.4-6.4 41.8-22.5 64.7-18.9 22.5-45.5 58.8-58.1 96.7-6 17.9-8.8 36.1-6.2 53.3-6.5 5.8-11.4 14.7-16.6 20.2-4.2 4.3-10.3 5.9-17 8.3s-14 6-18.5 14.5c-2.1 3.9-2.8 8.1-2.8 12.4 0 3.9.6 7.9 1.2 11.8 1.2 8.1 2.5 15.7.8 20.8-5.2 14.4-5.9 24.4-2.2 31.7 3.8 7.3 11.4 10.5 20.1 12.3 17.3 3.6 40.8 2.7 59.3 12.5 19.8 10.4 39.9 14.1 55.9 10.4 11.6-2.6 21.1-9.6 25.9-20.2 12.5-.1 26.3-5.4 48.3-6.6 14.9-1.2 33.6 5.3 55.1 4.1.6 2.3 1.4 4.6 2.5 6.7v.1c8.3 16.7 23.8 24.3 40.3 23 16.6-1.3 34.1-11 48.3-27.9 13.6-16.4 36-23.2 50.9-32.2 7.4-4.5 13.4-10.1 13.9-18.3.4-8.2-4.4-17.3-15.5-29.7zM223.7 87.3c9.8-22.2 34.2-21.8 44-.4 6.5 14.2 3.6 30.9-4.3 40.4-1.6-.8-5.9-2.6-12.6-4.9 1.1-1.2 3.1-2.7 3.9-4.6 4.8-11.8-.2-27-9.1-27.3-7.3-.5-13.9 10.8-11.8 23-4.1-2-9.4-3.5-13-4.4-1-6.9-.3-14.6 2.9-21.8zM183 75.8c10.1 0 20.8 14.2 19.1 33.5-3.5 1-7.1 2.5-10.2 4.6 1.2-8.9-3.3-20.1-9.6-19.6-8.4.7-9.8 21.2-1.8 28.1 1 .8 1.9-.2-5.9 5.5-15.6-14.6-10.5-52.1 8.4-52.1zm-13.6 60.7c6.2-4.6 13.6-10 14.1-10.5 4.7-4.4 13.5-14.2 27.9-14.2 7.1 0 15.6 2.3 25.9 8.9 6.3 4.1 11.3 4.4 22.6 9.3 8.4 3.5 13.7 9.7 10.5 18.2-2.6 7.1-11 14.4-22.7 18.1-11.1 3.6-19.8 16-38.2 14.9-3.9-.2-7-1-9.6-2.1-8-3.5-12.2-10.4-20-15-8.6-4.8-13.2-10.4-14.7-15.3-1.4-4.9 0-9 4.2-12.3zm3.3 334c-2.7 35.1-43.9 34.4-75.3 18-29.9-15.8-68.6-6.5-76.5-21.9-2.4-4.7-2.4-12.7 2.6-26.4v-.2c2.4-7.6.6-16-.6-23.9-1.2-7.8-1.8-15 .9-20 3.5-6.7 8.5-9.1 14.8-11.3 10.3-3.7 11.8-3.4 19.6-9.9 5.5-5.7 9.5-12.9 14.3-18 5.1-5.5 10-8.1 17.7-6.9 8.1 1.2 15.1 6.8 21.9 16l19.6 35.6c9.5 19.9 43.1 48.4 41 68.9zm-1.4-25.9c-4.1-6.6-9.6-13.6-14.4-19.6 7.1 0 14.2-2.2 16.7-8.9 2.3-6.2 0-14.9-7.4-24.9-13.5-18.2-38.3-32.5-38.3-32.5-13.5-8.4-21.1-18.7-24.6-29.9s-3-23.3-.3-35.2c5.2-22.9 18.6-45.2 27.2-59.2 2.3-1.7.8 3.2-8.7 20.8-8.5 16.1-24.4 53.3-2.6 82.4.6-20.7 5.5-41.8 13.8-61.5 12-27.4 37.3-74.9 39.3-112.7 1.1.8 4.6 3.2 6.2 4.1 4.6 2.7 8.1 6.7 12.6 10.3 12.4 10 28.5 9.2 42.4 1.2 6.2-3.5 11.2-7.5 15.9-9 9.9-3.1 17.8-8.6 22.3-15 7.7 30.4 25.7 74.3 37.2 95.7 6.1 11.4 18.3 35.5 23.6 64.6 3.3-.1 7 .4 10.9 1.4 13.8-35.7-11.7-74.2-23.3-84.9-4.7-4.6-4.9-6.6-2.6-6.5 12.6 11.2 29.2 33.7 35.2 59 2.8 11.6 3.3 23.7.4 35.7 16.4 6.8 35.9 17.9 30.7 34.8-2.2-.1-3.2 0-4.2 0 3.2-10.1-3.9-17.6-22.8-26.1-19.6-8.6-36-8.6-38.3 12.5-12.1 4.2-18.3 14.7-21.4 27.3-2.8 11.2-3.6 24.7-4.4 39.9-.5 7.7-3.6 18-6.8 29-32.1 22.9-76.7 32.9-114.3 7.2zm257.4-11.5c-.9 16.8-41.2 19.9-63.2 46.5-13.2 15.7-29.4 24.4-43.6 25.5s-26.5-4.8-33.7-19.3c-4.7-11.1-2.4-23.1 1.1-36.3 3.7-14.2 9.2-28.8 9.9-40.6.8-15.2 1.7-28.5 4.2-38.7 2.6-10.3 6.6-17.2 13.7-21.1.3-.2.7-.3 1-.5.8 13.2 7.3 26.6 18.8 29.5 12.6 3.3 30.7-7.5 38.4-16.3 9-.3 15.7-.9 22.6 5.1 9.9 8.5 7.1 30.3 17.1 41.6 10.6 11.6 14 19.5 13.7 24.6zM173.3 148.7c2 1.9 4.7 4.5 8 7.1 6.6 5.2 15.8 10.6 27.3 10.6 11.6 0 22.5-5.9 31.8-10.8 4.9-2.6 10.9-7 14.8-10.4s5.9-6.3 3.1-6.6-2.6 2.6-6 5.1c-4.4 3.2-9.7 7.4-13.9 9.8-7.4 4.2-19.5 10.2-29.9 10.2s-18.7-4.8-24.9-9.7c-3.1-2.5-5.7-5-7.7-6.9-1.5-1.4-1.9-4.6-4.3-4.9-1.4-.1-1.8 3.7 1.7 6.5z"/></svg><span>Linux</span></button>
-          <button class="dl-tab" role="tab" data-os="windows" aria-selected="false"><svg class="dl-icon" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M0 93.7l183.6-25.3v177.4H0V93.7zm0 324.6l183.6 25.3V268.4H0v149.9zm203.8 28L448 480V268.4H203.8v177.9zm0-380.6v180.1H448V32L203.8 65.7z"/></svg><span>Windows</span></button>
+          <button class="dl-tab" role="tab" data-os="mac" aria-selected="false">
+            <svg class="dl-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.1 12.5c0-2.6 2.1-3.9 2.2-4-1.2-1.8-3.1-2-3.8-2-1.6-.2-3.2 1-4 1-.9 0-2.2-1-3.6-1-1.9 0-3.7 1.1-4.7 2.8-2 3.5-.5 8.7 1.4 11.5.9 1.4 2.1 3 3.6 2.9 1.4-.1 2-1 3.7-1s2.2 1 3.7 1c1.5 0 2.5-1.4 3.4-2.8 1.1-1.6 1.5-3.1 1.5-3.2-.1 0-3.4-1.3-3.4-5.2ZM14.5 4.8c.8-1 1.4-2.4 1.2-3.8-1.2.1-2.7.8-3.6 1.8-.8.9-1.5 2.3-1.3 3.7 1.4.1 2.8-.7 3.7-1.7Z"/></svg>
+            <span>macOS</span>
+          </button>
+          <button class="dl-tab is-active" role="tab" data-os="linux" aria-selected="true">
+            <svg class="dl-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c-2.9 0-4.2 2.4-4.2 5.2 0 1.4-.4 2.6-1.2 3.8-1.2 1.7-2 3.7-1.5 5.7.3 1.2 1.2 1.7 2.1 1.7.7 0 1.4-.3 2-.7.8.7 1.8 1.1 2.8 1.1s2-.4 2.8-1.1c.6.4 1.3.7 2 .7.9 0 1.8-.5 2.1-1.7.5-2-.3-4-1.5-5.7-.8-1.2-1.2-2.4-1.2-3.8C16.2 4.4 14.9 2 12 2Zm-1.8 5.3c-.5 0-.8-.5-.8-1s.3-1 .8-1 .8.5.8 1-.3 1-.8 1Zm3.6 0c-.5 0-.8-.5-.8-1s.3-1 .8-1 .8.5.8 1-.3 1-.8 1Z"/></svg>
+            <span>Linux</span>
+          </button>
+          <button class="dl-tab" role="tab" data-os="windows" aria-selected="false">
+            <svg class="dl-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.6 10.3 4.6v7H3v-6Zm0 12.8 7.3 1v-6.8H3v5.8Zm8.3 1.2L21 21V12.6h-9.7v7Zm0-15.2v7.2H21V3l-9.7 1.4Z"/></svg>
+            <span>Windows</span>
+          </button>
         </div>
+
         <div class="dl-panel" data-os="mac" hidden>
           <p class="dl-soon">Not yet. The macOS package is coming; Linux is the only platform released today.</p>
         </div>
+
         <div class="dl-panel" data-os="linux">
           <p class="dl-label">Install with one command (current user, no sudo):</p>
           <div class="dl-cmd-wrap">
@@ -276,13 +580,13 @@ application Launch {
             anywhere and put its <code>bin/</code> on PATH. The IntelliJ plugin is on the same page.
           </p>
         </div>
+
         <div class="dl-panel" data-os="windows" hidden>
           <p class="dl-soon">Not yet. The Windows package is coming; Linux is the only platform released today.</p>
         </div>
       </div>
     </div>
   </section>
-
 </main>
 
 <footer class="site-footer" id="docs">
@@ -294,7 +598,6 @@ application Launch {
 
 <script src="highlight.js"></script>
 <script>
-  // Download tabs: one panel per operating system.
   document.querySelectorAll('.dl-tab').forEach(function (tab) {
     tab.addEventListener('click', function () {
       var os = tab.dataset.os;
@@ -303,23 +606,32 @@ application Launch {
         t.classList.toggle('is-active', on);
         t.setAttribute('aria-selected', on ? 'true' : 'false');
       });
-      document.querySelectorAll('.dl-panel').forEach(function (p) { p.hidden = p.dataset.os !== os; });
+      document.querySelectorAll('.dl-panel').forEach(function (p) {
+        p.hidden = p.dataset.os !== os;
+      });
     });
   });
-  // Copy the install command to the clipboard.
+
   document.querySelectorAll('.dl-copy').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var done = function () {
         btn.classList.add('is-copied');
         btn.title = 'Copied';
-        setTimeout(function () { btn.classList.remove('is-copied'); btn.title = 'Copy'; }, 2000);
+        setTimeout(function () {
+          btn.classList.remove('is-copied');
+          btn.title = 'Copy';
+        }, 2000);
       };
+
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(btn.dataset.copy).then(done, done);
       } else {
         var ta = document.createElement('textarea');
-        ta.value = btn.dataset.copy; document.body.appendChild(ta); ta.select();
-        try { document.execCommand('copy'); done(); } finally { document.body.removeChild(ta); }
+        ta.value = btn.dataset.copy;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); }
+        finally { document.body.removeChild(ta); }
       }
     });
   });

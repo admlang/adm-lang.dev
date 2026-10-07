@@ -315,7 +315,7 @@ def onExpiry(evt Event&lt;string&gt;) {
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def arguments() string[]</code></div>
-            <p class="api-doc">Returns command-line arguments passed to the application.</p>
+            <p class="api-doc">Returns the command-line arguments the application was started with, the program's own path first.</p>
 
           </li>
           <li class="api-item">
@@ -325,7 +325,7 @@ def onExpiry(evt Event&lt;string&gt;) {
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def shutdown(code int = 0) !none</code></div>
-            <p class="api-doc">Requests graceful application shutdown.</p>
+            <p class="api-doc">Requests graceful application shutdown: <code>shutdownRequested</code> is emitted, so observers can finish their work, then the running services are stopped, last started first, and the process exits with the code. An interrupt (Ctrl-C) or terminate signal requests it with code 128 + the signal's number; a second such signal ends the process at once.</p>
 
           </li>
           <li class="api-item">
@@ -335,7 +335,7 @@ def onExpiry(evt Event&lt;string&gt;) {
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def shutdownRequested(code int) int</code></div>
-            <p class="api-doc">Emitted when graceful application shutdown is requested.</p>
+            <p class="api-doc">Emitted when graceful application shutdown is requested, before the services are stopped. Handlers that are not <code>async</code> have run to their end when the services stop.</p>
 
           </li>
           <li class="api-item">
