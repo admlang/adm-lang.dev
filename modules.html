@@ -62,6 +62,8 @@
           <li><a class="docs-nav-sub" href="#std-math-easing">std.math.easing</a></li>
           <li><a class="docs-nav-sub" href="#std-math-processing">std.math.processing</a></li>
           <li><a class="docs-nav-sub" href="#std-math-ecc">std.math.ecc</a></li>
+          <li><a class="docs-nav-sub" href="#std-math-linalg">std.math.linalg</a></li>
+          <li><a class="docs-nav-sub" href="#std-math-stats">std.math.stats</a></li>
           <li><a class="docs-nav-sub" href="#std-units">std.units</a></li>
           <li><a class="docs-nav-sub" href="#std-time">std.time</a></li>
           <li><a class="docs-nav-sub" href="#std-errors">std.errors</a></li>
@@ -212,6 +214,7 @@
           <li><a class="docs-nav-sub" href="#std-ide">std.ide</a></li>
           <li><a class="docs-nav-sub" href="#std-cli">std.cli</a></li>
           <li><a class="docs-nav-sub" href="#std-cli-terminal">std.cli.terminal</a></li>
+          <li><a class="docs-nav-sub" href="#std-cli-prompts">std.cli.prompts</a></li>
           <li><a class="docs-nav-sub" href="#std-metrics">std.metrics</a></li>
         </ul>
       </div>
@@ -253,6 +256,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.text.unicode</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>category</code>, <code>Category</code>, <code>combiningClass</code>, <code>script</code></td><td>Unicode 18 character properties</td></tr>
+          <tr><td><code>displayWidth</code></td><td>the columns a character or a text takes in fixed-pitch layout: 2 for East Asian wide characters, 0 for combining marks</td></tr>
           <tr><td><code>normalize</code>, <code>NormalForm</code>, <code>decompose</code>, <code>compose</code></td><td>normalization (NFC, NFD, NFKC, NFKD)</td></tr>
           <tr><td><code>mirror</code>, <code>isDefaultIgnorable</code>, <code>isExtendedPictographic</code></td><td>bidi mirroring, ignorables, emoji</td></tr>
           <tr><td><code>lineBreaks</code>, <code>LineBreak</code></td><td>line break opportunities (UAX #14)</td></tr>
@@ -287,6 +291,7 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>sqrt</code>, <code>sin</code>, <code>cos</code>, <code>atan2</code>, <code>ln</code>, <code>log2</code>, <code>log10</code>, …</td><td>numeric functions</td></tr>
           <tr><td><code>approx</code></td><td>float comparison with a tolerance</td></tr>
+          <tr><td><code>erf</code>, <code>erfc</code></td><td>error function and its complement</td></tr>
           <tr><td><code>Decimal</code>, <code>parseDecimal</code>, <code>RoundingMode</code></td><td>exact decimal numbers</td></tr>
         </table>
         <p class="exports-note">Other operations are methods on the numeric types; exponentiation is <code>**</code>.</p>
@@ -330,6 +335,26 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>Field</code>, <code>BinaryField</code>, <code>PrimeField</code></td><td>finite fields: GF(2^m), GF(p)</td></tr>
           <tr><td><code>ReedSolomon</code></td><td>Reed-Solomon: <code>encode</code>, <code>correct</code> with errors and erasures</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-math-linalg">
+        <h3><code>std.math.linalg</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>solve</code>, <code>leastSquares</code>, <code>inverse</code>, <code>pseudoInverse</code>, <code>determinant</code></td><td>linear systems on <code>matrix&lt;float&gt;</code></td></tr>
+          <tr><td><code>lu</code>, <code>cholesky</code>, <code>qr</code>, <code>svd</code>, <code>eigen</code>, <code>eigenSymmetric</code></td><td>decompositions (<code>LU</code>, <code>Cholesky</code>, <code>QR</code>, <code>SVD</code>, <code>Eigen</code>, <code>SymmetricEigen</code>)</td></tr>
+          <tr><td><code>norm</code>, <code>Norm</code>, <code>rank</code>, <code>condition</code>, <code>trace</code></td><td>measures of a matrix</td></tr>
+          <tr><td><code>zeros</code>, <code>identity</code>, <code>diagonal</code></td><td>builders</td></tr>
+          <tr><td><code>LinalgError</code>, <code>LinalgErrorKind</code></td><td>why an operation failed: shape, singular, no convergence</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-math-stats">
+        <h3><code>std.math.stats</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>mean</code>, <code>median</code>, <code>quantile</code>, <code>mode</code>, <code>variance</code>, <code>deviation</code>, <code>skewness</code>, <code>kurtosis</code>, <code>sum</code>, <code>min</code>, <code>max</code></td><td>descriptive statistics of a <code>float[]</code></td></tr>
+          <tr><td><code>covariance</code>, <code>correlation</code>, <code>rankCorrelation</code>, <code>linearRegression</code>, <code>Regression</code></td><td>two samples</td></tr>
+          <tr><td><code>covarianceMatrix</code>, <code>correlationMatrix</code></td><td>many variables in a matrix</td></tr>
+          <tr><td><code>zscores</code>, <code>ranks</code>, <code>histogram</code>, <code>Histogram</code></td><td>transforms and counts</td></tr>
+          <tr><td><code>Normal</code>, <code>Summary</code></td><td>the normal distribution; running statistics of a stream</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-units">
@@ -432,9 +457,11 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>join</code>, <code>dir</code>, <code>base</code>, <code>extension</code>, <code>split</code>, <code>clean</code>, <code>isAbs</code></td><td>paths</td></tr>
           <tr><td><code>run</code>, <code>output</code></td><td>start a program (needs <code>adm.runtime.spawn</code>)</td></tr>
           <tr><td><code>mapFile</code>, <code>Mapping</code></td><td>memory-mapped files</td></tr>
+          <tr><td><code>File.sync</code>, <code>File.lock</code>, <code>File.unlock</code></td><td>push writes to the device, advisory whole-file locks</td></tr>
           <tr><td><code>symlink</code>, <code>freeSpace</code>, <code>totalSpace</code>, <code>unixMode</code>, <code>fromUnixMode</code></td><td>links, disk space, Unix mode bits</td></tr>
           <tr><td><code>watch</code>, <code>Watcher</code>, <code>Change</code>, <code>ChangeKind</code></td><td>changes to files and directories</td></tr>
           <tr><td><code>appHome</code></td><td>the application's own folder</td></tr>
+          <tr><td><code>homeDir</code>, <code>resolve</code></td><td>the user's home folder; the absolute, shortest form of a path, where <code>~</code> is that folder and a relative path starts at the working directory</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-io">
@@ -731,7 +758,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.formats.docs</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Document</code>, <code>Block</code>, <code>Inline</code>, <code>load</code></td><td>document model</td></tr>
-          <tr><td><code>Markdown</code>, <code>PlainText</code>, <code>Rtf</code>, <code>Html</code>, <code>Pdf</code>, <code>Docx</code>, <code>Odt</code>, <code>Epub</code></td><td>codecs</td></tr>
+          <tr><td><code>Markdown</code>, <code>PlainText</code>, <code>Rtf</code>, <code>Html</code>, <code>Pdf</code>, <code>Docx</code>, <code>Odt</code>, <code>Epub</code></td><td>codecs; <code>PlainText.marks</code> (<code>PlainTextMarks</code>) says what its layout writes around styled text</td></tr>
           <tr><td><code>PdfFile</code>, <code>PdfObject</code></td><td>PDF objects</td></tr>
         </table>
       </div>
@@ -850,7 +877,9 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>Workbook</code>, <code>Sheet</code>, <code>Cell</code>, <code>CellKind</code>, <code>Range</code></td><td>spreadsheets: sheets of typed cells with formulas and number formats</td></tr>
           <tr><td><code>load</code>, <code>save</code></td><td>read and write by signature or extension</td></tr>
-          <tr><td><code>Xlsx</code>, <code>Csv</code></td><td>codecs</td></tr>
+          <tr><td><code>Workbook.calculate</code>, <code>Workbook.evaluate</code></td><td>formula evaluation: operators, references across sheets, about 110 functions</td></tr>
+          <tr><td><code>document</code></td><td>a workbook as a <code>docs.Document</code> of tables</td></tr>
+          <tr><td><code>Xlsx</code>, <code>Ods</code>, <code>Csv</code></td><td>codecs</td></tr>
           <tr><td><code>reference</code>, <code>parseReference</code>, <code>parseRange</code>, <code>columnName</code></td><td><code>B2</code> and <code>A1:C3</code> references</td></tr>
           <tr><td><code>serialOf</code>, <code>timeOf</code></td><td>spreadsheet day numbers and <code>time.Time</code></td></tr>
         </table>
@@ -1240,7 +1269,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>attrs</code>, <code>decls</code>, <code>fields</code>, <code>methods</code>, <code>invoke</code></td><td>discovery and calls, behind <a href="docs.html#attributes">attributes</a></td></tr>
           <tr><td><code>typeName</code>, <code>kindOf</code></td><td>runtime type info</td></tr>
           <tr><td><code>MetaContext</code>, …</td><td>meta contexts</td></tr>
-          <tr><td><code>instantiate</code>, <code>field</code>, <code>elements</code></td><td>building and reading values by descriptor</td></tr>
+          <tr><td><code>instantiate</code>, <code>field</code>, <code>elements</code>, <code>arrayOf</code></td><td>building and reading values by descriptor; <code>arrayOf</code> makes an array of a described element type from boxed values</td></tr>
           <tr><td><code>TypeDescriptor</code>, <code>TypeKind</code></td><td>a type as spelled in a signature or field: <code>kind</code>, <code>typeName</code>, the <code>optional</code>/<code>errorable</code>/<code>future</code> flags, an array's or map's <code>element</code> and <code>key</code>, a tuple's <code>elements</code></td></tr>
           <tr><td><code>EmbeddedFile</code></td><td>a file an annotation builds into the program</td></tr>
           <tr><td><code>BuildMetaContext&lt;T&gt;</code></td><td>context of an <a href="annotations.html#writing">annotation that runs during the build</a></td></tr>
@@ -1258,8 +1287,9 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-cli">
         <h3><code>std.cli</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>parseArgs</code>, <code>Args</code></td><td>the command line, read by asking: <code>has</code>, <code>flag</code>, <code>count</code>, <code>value</code>, <code>values</code>, then <code>unknown</code> and <code>rest</code></td></tr>
+          <tr><td><code>parseArgs</code>, <code>Args</code></td><td>the command line, read by asking: <code>has</code>, <code>flag</code>, <code>count</code>, <code>value</code> (string, int, float, duration), <code>values</code>, then <code>unknown</code> and <code>rest</code>, or <code>end</code>, which gives the positionals and refuses a name nobody asked for with a "did you mean"</td></tr>
           <tr><td><code>@flag</code></td><td>annotation: fills a module variable or constant from the command line (<a href="annotations.html">annotations</a>)</td></tr>
+          <tr><td><code>help</code>, <code>helpTemplate</code>, <code>helpMarkdown</code></td><td>the help screen <code>--help</code> prints for the <code>@flag</code> variables; a Jinja template that draws it instead of the built-in layout; descriptions read as Markdown</td></tr>
           <tr><td><code>UsageError</code>, <code>UsageKind</code></td><td>what is wrong with a command line</td></tr>
         </table>
         <p class="docs-placeholder">Commands and subcommands: coming soon.</p>
@@ -1274,11 +1304,26 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Theme</code>, <code>theme</code>, <code>defaultTheme</code>, <code>darkTheme</code>, <code>lightTheme</code>, <code>autoTheme</code>, <code>parseTheme</code>, <code>loadTheme</code></td><td>role styles, the current theme, shipped themes, themes from TOML</td></tr>
           <tr><td><code>input</code>, <code>password</code></td><td>read a line; read a line from the terminal without echo, as a <code>Secret&lt;string&gt;</code></td></tr>
           <tr><td><code>readKey</code>, <code>Key</code>, <code>KeyCode</code></td><td>one key press, with an optional wait</td></tr>
-          <tr><td><code>readEvent</code>, <code>Event</code>, <code>EventKind</code></td><td>a key press or a resize of the terminal window</td></tr>
+          <tr><td><code>readEvent</code>, <code>Event</code>, <code>EventKind</code></td><td>a key press, a resize of the terminal window, pasted text or a mouse report</td></tr>
+          <tr><td><code>bracketedPaste</code>, <code>mouse</code>, <code>Mouse</code>, <code>MouseButton</code>, <code>MouseAction</code></td><td>pastes as one event; mouse presses, releases, drags and the wheel</td></tr>
+          <tr><td><code>extendedKeys</code>, <code>synchronizedOutput</code>, <code>copy</code></td><td>unambiguous keys (kitty keyboard protocol), a redraw shown at once, text to the clipboard (OSC 52)</td></tr>
+          <tr><td><code>render</code></td><td>a <code>std.formats.docs</code> <code>Document</code> (Markdown, HTML, …) laid out for the terminal: wrapped text, lists, boxed tables, with the theme's styles and clickable links</td></tr>
           <tr><td><code>raw</code>, <code>alternateScreen</code>, <code>showCursor</code></td><td>terminal modes, switched on and off; put back however the program ends</td></tr>
           <tr><td><code>moveTo</code>, <code>clear</code>, <code>clearLine</code></td><td>cursor and screen control</td></tr>
         </table>
         <p class="exports-note">Colors follow <code>NO_COLOR</code>, <code>FORCE_COLOR</code>, <code>CLICOLOR_FORCE</code>, <code>TERM</code> and <code>COLORTERM</code>.</p>
+      </div>
+      <div class="docs-sub" id="std-cli-prompts">
+        <h3><code>std.cli.prompts</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>ask</code></td><td>a line of text, with a fallback and a validation that keeps the question open</td></tr>
+          <tr><td><code>confirm</code></td><td>a yes-or-no question</td></tr>
+          <tr><td><code>choose</code>, <code>chooseMany</code></td><td>one or several choices from a list the arrow keys move in and typing narrows</td></tr>
+          <tr><td><code>spinner</code>, <code>Spinner</code></td><td>a turning mark beside a label while work runs: <code>label</code>, <code>done</code>, <code>failed</code></td></tr>
+          <tr><td><code>progress</code>, <code>Progress</code></td><td>a bar that fills as steps are reported: <code>advance</code>, <code>update</code>, <code>done</code>, <code>failed</code></td></tr>
+          <tr><td><code>Cancelled</code></td><td>the error a question fails with on Escape or Ctrl+C</td></tr>
+        </table>
+        <p>Questions are asked key by key on a terminal; with input or output redirected each answer is read as a line.</p>
       </div>
       <div class="docs-sub" id="std-metrics">
         <h3><code>std.metrics</code></h3>

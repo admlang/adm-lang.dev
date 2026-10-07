@@ -1366,6 +1366,21 @@ def onExpiry(evt Event&lt;string&gt;) {
 
           </li>
           <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def sync(fd int, dataOnly bool = false) !none</code></div>
+            <p class="api-doc">Pushes what was written to the file through to the storage device, so it survives a crash or a power cut. With dataOnly the content alone, without the file's times.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def lock(fd int, exclusive bool = true, wait bool = true) !bool</code></div>
+            <p class="api-doc">Takes an advisory lock on the whole file: exclusive, or shared with other shared holders. With wait it returns once the lock is held; without, false when someone else holds it.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def unlock(fd int) !none</code></div>
+            <p class="api-doc">Gives up the lock <code>lock</code> took.</p>
+
+          </li>
+          <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def mmap(fd int, offset int = 0, length int = 0, access MapAccess = MapAccess.Read) !int</code></div>
             <p class="api-doc">Maps length bytes of the open descriptor from offset into memory and returns a mapping handle; length 0 maps to the end of the file.</p>
             <p class="api-doc">A device node reports no size, so a caller mapping one passes the length itself.</p>
@@ -1447,6 +1462,16 @@ def onExpiry(evt Event&lt;string&gt;) {
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def stat(path Path) !os.FileInfo</code></div>
             <p class="api-doc">Returns size, mode, and timestamps for a path.</p>
 
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def homeDir() !string</code></div>
+            <p class="api-doc">Returns the user's home folder: <code>HOME</code>, or <code>USERPROFILE</code> on Windows. <code>os.homeDir()</code> is the same call.</p>
+            <p class="api-doc">Fails when the environment names none.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def resolve(path string) !string</code></div>
+            <p class="api-doc">Returns the absolute path a path names, in its shortest form: <code>~</code> and <code>~/...</code> start at the user's home folder, a relative path at the working directory, and a package path is the file the package shipped. <code>os.resolve(path)</code> is the same call.</p>
+            <p class="api-doc">Fails when the path starts with <code>~</code> and no home folder is known, or names a package without shipped files.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def readLink(path Path) !string</code></div>

@@ -902,6 +902,27 @@ let row any[] = [1, &quot;two&quot;]           // any[] by declaration
 def log(fields any[]) { ... }
 log([now(), &quot;started&quot;, 200])         // the parameter type reaches the literal</code></pre>
         </div>
+        <p>
+          The element type is part of a container's type and is never converted: an
+          <code>int[]</code> is not an <code>any[]</code>, a <code>Dog[]</code> is not an
+          <code>Animal[]</code>, a <code>map&lt;string, int&gt;</code> is not a
+          <code>map&lt;string, any&gt;</code>, and passing one for the other is a compile error.
+          Literals are the exception, since they have no type yet: a map literal argument takes the
+          parameter's type the same way an array literal does.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">element_types.adm</span>
+          </div>
+          <pre><code>def save(fields map&lt;string, any&gt;) { ... }
+save({&quot;retries&quot;: 3})                  // built as map&lt;string, any&gt;
+
+let counts = {&quot;retries&quot;: 3}           // map&lt;string, int&gt;
+save(counts)                          // error: not a map&lt;string, any&gt;
+let fields map&lt;string, any&gt; = {&quot;retries&quot;: 3}
+save(fields)</code></pre>
+        </div>
 
         <p><strong>Indexing</strong> supports negative indexes, which count from the end:</p>
         <div class="code-window">
@@ -3462,8 +3483,8 @@ const SEPARATOR = "\\"</code></pre>
         <p>
           Two more fill in a declaration's value from the outside world. <code>@env(name, defaultValue)</code>
           reads an environment variable, and <code>@flag</code>, from <code>std.cli</code>, fills a variable from the command line when the
-          program first uses it; the variable's type says whether the flag is a switch or takes a value, its name
-          is the flag's name and its doc comment the help text:
+          program first uses it; the variable's type says what the flag takes, its name is the flag's name, its
+          declared value the default and its doc comment the help text <code>--help</code> prints:
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -3471,7 +3492,10 @@ const SEPARATOR = "\\"</code></pre>
             <span class="code-filename">env_flag.adm</span>
           </div>
           <pre><code>module demo.globals {
-	use std.cli::(flag)
+	use (
+		std.cli::(flag)
+		std.os
+	)
 
 	@env("ADM_TEST", "fallback")
 	const tmp string
@@ -3483,6 +3507,14 @@ const SEPARATOR = "\\"</code></pre>
 	// Port to listen on.
 	@flag(short = "p")
 	let port int = 8080         // --port 9000, -p 9000
+
+	// How long a request may take.
+	@flag
+	let wait duration = 30s     // --wait 1m30s
+
+	// File read instead of standard input.
+	@flag
+	let input ?os.File          // --input ~/notes.txt
 }</code></pre>
         </div>
       </div>
