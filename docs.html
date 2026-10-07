@@ -984,10 +984,16 @@ let x = m[1][2]        // 6.0: row 1, column 2</code></pre>
       <div class="docs-sub" id="maps">
         <h3>Maps</h3>
         <p>
-          Maps are <code>map&lt;K, V&gt;</code>, with a literal syntax that mirrors structs. Keys must
-          satisfy <code>Serializable</code> - primitives and enums qualify by default. (Today a key is
-          hashed and compared by its serialized bytes; a hashing/equality interface is planned to replace
-          that constraint.) <code>a + b</code> on two maps merges <code>b</code> into a copy of
+          Maps are <code>map&lt;K, V&gt;</code>, with a literal syntax that mirrors structs. A key is a number,
+          <code>bool</code>, <code>char</code>, <code>string</code> or enum (equal values are one key), a
+          <code>struct</code> (equal when every field is, so its fields must be key types too), or a
+          <code>type</code>. Two instances of a type are different keys even with equal fields, unless the
+          type declares both <code>def hash() uint64</code> and <code>def equals(other T) bool</code>: the
+          map then hashes and compares through them, and instances that are <code>equals</code> must
+          return the same hash (<code>new KeyHasher().add(a).add(b).sum()</code> builds one from the
+          compared values). Declaring only one of the two is a compile error where the type is used as a
+          key; functions, arrays, maps, tuples, optionals and interfaces cannot be keys. A key must not
+          change while it is in a map. <code>a + b</code> on two maps merges <code>b</code> into a copy of
           <code>a</code> and returns the copy, like the array operators, neither operand changes;
           <code>merge(other)</code> is the in-place form.
         </p>

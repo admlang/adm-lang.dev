@@ -104,6 +104,7 @@
           <li><a class="docs-nav-sub" href="#get">adm get</a></li>
           <li><a class="docs-nav-sub" href="#install">adm install</a></li>
           <li><a class="docs-nav-sub" href="#publish">adm publish</a></li>
+          <li><a class="docs-nav-sub" href="#yank">adm yank</a></li>
           <li><a class="docs-nav-sub" href="#publisher-new">adm publisher new</a></li>
           <li><a class="docs-nav-sub" href="#publisher-list">adm publisher list</a></li>
           <li><a class="docs-nav-sub" href="#publisher-name">adm publisher name</a></li>
@@ -717,6 +718,24 @@ adm get acme:imaging@^1.4 --accept adm.storage.*</code></pre>
         <tr><td><code>--no-pr</code></td><td>Push the release but print the index line instead of opening the pull request.</td></tr>
         <tr><td><code>--dir DIR</code></td><td>Library source directory.</td></tr>
       </table>
+      <h3 id="yank"><code>adm yank</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm yank [NAMESPACE:]NAME@VERSION [flags]</code></pre>
+      </div>
+      <p>Withdraws a published version: opens a pull request on the registry that adds a yank line for it. <code>adm get</code> and <code>adm search</code> no longer offer the version and a range no longer resolves to it. A project that already has it in <code>adm.lock</code> keeps installing it, with a warning that shows the reason. Nothing is deleted, and the version number is never reused. The pull request must come from the GitHub account that owns the namespace, which is what <code>gh</code> is logged in as.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--reason TEXT</code></td><td>Why the version is withdrawn, shown to projects that have it locked.</td></tr>
+        <tr><td><code>--undo</code></td><td>Bring a yanked version back.</td></tr>
+        <tr><td><code>--registry NAME</code></td><td>Registry from <code>adm.toml</code> (default: the first).</td></tr>
+        <tr><td><code>--dry-run</code></td><td>Print the index line without doing anything.</td></tr>
+        <tr><td><code>--no-pr</code></td><td>Print the index line instead of opening the pull request.</td></tr>
+        <tr><td><code>--dir DIR</code></td><td>Project directory; its <code>adm.toml</code> names the registries.</td></tr>
+      </table>
       <h3 id="publisher-new"><code>adm publisher new</code></h3>
       <div class="code-window">
         <div class="code-titlebar">
@@ -855,20 +874,57 @@ adm get acme:imaging@^1.4 --accept adm.storage.*</code></pre>
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="code-filename">usage</span>
         </div>
-        <pre><code data-hl="off" class="nohighlight">adm fix</code></pre>
+        <pre><code data-hl="off" class="nohighlight">adm fix [PATHS...] [flags]</code></pre>
       </div>
-      <p>Applies automatic safe rewrites.</p>
-      <p><em>Not implemented yet.</em></p>
+      <p>Rewrites code written for an older adm to what this one expects. A release that changes the language or the standard library (a renamed annotation, a construct spelled another way) ships a fix for it; <code>adm fix</code> runs them over the <code>.adm</code> files under <code>PATHS</code> (the current directory by default) and writes the files back. Each fix recognises the old form by itself: nothing records which version a file was written for, current code is left alone, and a second run changes nothing. Fixes read tokens, so they work on a file the compiler no longer parses. A fix is skipped, with the reason, when the program declares something of its own that the old form would mean. Hidden folders and <code>vendor</code> are not walked. Lint findings are repaired by <code>adm lint --fix</code>, not here.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--list</code></td><td>List the fixes (name, the day the change landed, what it rewrites) and exit.</td></tr>
+        <tr><td><code>--diff</code></td><td>Print what would change; write nothing.</td></tr>
+        <tr><td><code>--only NAME,...</code></td><td>Run only these fixes.</td></tr>
+        <tr><td><code>--skip NAME,...</code></td><td>Leave these fixes out.</td></tr>
+      </table>
+      <table class="docs-table">
+        <tr><th>Fix</th><th>Changed</th><th>Rewrites</th></tr>
+        <tr><td><code>proto-field</code></td><td>2026-10-03</td><td><code>@protobuf(...)</code> on a field becomes <code>@protoField(...)</code>.</td></tr>
+      </table>
       <h3 id="graph"><code>adm graph</code></h3>
       <div class="code-window">
         <div class="code-titlebar">
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="code-filename">usage</span>
         </div>
-        <pre><code data-hl="off" class="nohighlight">adm graph</code></pre>
+        <pre><code data-hl="off" class="nohighlight">adm graph [DIR] [flags]
+adm graph packages [--dir DIR] [flags]
+adm graph services [DIR] [flags]</code></pre>
       </div>
-      <p>Shows the dependency graph.</p>
-      <p><em>Not implemented yet.</em></p>
+      <p>Shows what depends on what. <code>adm graph</code> prints the import graph of the applications, libraries, plugins and modules under <code>DIR</code> (the current directory by default) as a tree. A module already listed above is marked <code>(*)</code> and not expanded again; <code>(cycle)</code> marks an import that leads back to a module it is nested under. Standard library modules are shown where they are imported but not expanded. <code>adm graph packages</code> shows the libraries <code>adm.lock</code> pins, with their versions and which was built against which. <code>adm graph services</code> shows the services and their dependencies; a soft dependency is marked <code>(soft)</code> and drawn dashed.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">output</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">Shop [application]
+├── adm.database.sqlite admlang
+│   ├── std.data.db
+│   └── std.net.url
+├── shop
+│   ├── std.data.db
+│   └── std.services.database
+└── std.services.database</code></pre>
+      </div>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--format tree|json|dot|svg</code></td><td>Output: the tree (default), JSON (nodes, edges, roots, cycles), Graphviz DOT, or an SVG drawing laid out by adm itself, which follows the viewer's light or dark colour scheme.</td></tr>
+        <tr><td><code>--json</code></td><td>Same as <code>--format json</code>.</td></tr>
+        <tr><td><code>--out FILE</code></td><td>Write to a file instead of the terminal.</td></tr>
+        <tr><td><code>--why NAME</code></td><td>Print the shortest chain of dependencies from each root to <code>NAME</code>.</td></tr>
+        <tr><td><code>--cycles</code></td><td>List the dependency cycles, one loop per group of nodes that depend on each other.</td></tr>
+        <tr><td><code>--root NAME</code></td><td>Show only what <code>NAME</code> reaches (repeatable).</td></tr>
+        <tr><td><code>--depth N</code></td><td>Tree only: stop below <code>N</code> levels.</td></tr>
+        <tr><td><code>--std</code></td><td>Modules only: expand standard library modules.</td></tr>
+        <tr><td><code>--no-std</code></td><td>Modules only: leave standard library modules out.</td></tr>
+      </table>
       <h3 id="lint"><code>adm lint</code></h3>
       <div class="code-window">
         <div class="code-titlebar">
