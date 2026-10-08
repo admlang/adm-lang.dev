@@ -1520,16 +1520,8 @@ def onExpiry(evt Event&lt;string&gt;) {
         <p>Windows, the renderer, displays and input events. Lives in <code>std.ui</code>: <code>use std.ui::(UI)</code>.</p>
         <ul class="api-list">
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def openWindow(cfg r.WindowConfig) !r.Window</code></div>
-            <p class="api-doc">Opens a window on the configured renderer. The handle stays valid until the window closes.</p>
-          </li>
-          <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def openWindow&lt;T: component&gt;(root T, cfg r.WindowConfig) !r.Window</code></div>
-            <p class="api-doc">Opens a window with root as the component it renders.</p>
-          </li>
-          <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def openDefaultWindow() !r.Window</code></div>
-            <p class="api-doc">Opens a window with the `UIConfig.defaultWindow` settings.</p>
+            <p class="api-doc">Opens a window that shows root: the component that stands for the window. Call it again for each further window; run serves them all.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def openDefaultWindow&lt;T: component&gt;(root T) !r.Window</code></div>
@@ -1559,7 +1551,7 @@ def onExpiry(evt Event&lt;string&gt;) {
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">async def run&lt;T: component&gt;(root T, cfg r.WindowConfig) !none</code></div>
-            <p class="api-doc">Opens a window for `root` and returns when the user closes it. The whole of a single-window application's main.</p>
+            <p class="api-doc">Opens a window for `root` and returns when the user closes it: an application's main. Windows opened meanwhile with openWindow get their events and frames from the same loop; closing one of them closes only it, closing the first ends run and closes the rest.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">async def run&lt;T: component&gt;(root T) !none</code></div>
@@ -1601,7 +1593,7 @@ def onExpiry(evt Event&lt;string&gt;) {
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def click(evt ClickEvent) ClickEvent</code></div>
-            <p class="api-doc">Emitted for a click, resolved to the component under it.</p>
+            <p class="api-doc">Emitted for a click. <code>target</code> is the component under it, the window's root when no other component is there.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def mouseMove(evt MouseMoveEvent) MouseMoveEvent</code></div>

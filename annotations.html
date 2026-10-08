@@ -189,6 +189,8 @@ type Remote {
 <p>A pixel function written in the device subset (numbers, <code>bool</code>, <code>Vec2</code> to <code>Vec4</code>, no allocation), built for the GPU and for eight pixels at a time on the CPU. One taking the position <code>p Vec2</code> first and returning a <code>Vec4</code> colour is a paint; its other parameters are the uniforms.</p>
       <h4><code>@mutates()</code></h4>
 <p>On a method that changes its receiver in place: calling it on a constant's frozen value is refused.</p>
+      <h4><code>@portable</code></h4>
+<p>On a <code>type</code> whose fields are its whole state: a value of it may be sent to another process, where it is rebuilt field by field without running <code>new</code>. Every field must be able to cross itself (numbers, text, enums, quantities, structs, arrays, maps, optionals, tuples, unions and other portable types); a <code>weak</code> field is exempt. A struct needs no mark. A type that should send only part of itself, or another form of itself, declares <code>toWire() W</code> and <code>fromWire(wire W) !none</code> instead (the interface <code>Portable&lt;W&gt;</code> of <code>std.services.ipc</code>): it crosses as the <code>W</code> it returns. Leave it off a type that holds a descriptor, a handle or a cache.</p>
       <h4><code>@requires(permission)</code></h4>
 <p>Gates a function or method on a permission a service declares; every package on the calling chain must hold it, or the call fails with <code>PolicyDenied</code>. See <a href="policy.html">Policy &amp; permissions</a>.</p>
       <h4><code>@emits(chan = &quot;&quot;)</code> <span class="api-tag api-planned">planned</span></h4>

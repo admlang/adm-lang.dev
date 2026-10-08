@@ -144,8 +144,11 @@
           <li><a class="docs-nav-sub" href="#std-net">std.net</a></li>
           <li><a class="docs-nav-sub" href="#std-tcp">std.net.tcp</a></li>
           <li><a class="docs-nav-sub" href="#std-tls">std.net.tls</a></li>
+          <li><a class="docs-nav-sub" href="#std-proxy">std.net.proxy</a></li>
+          <li><a class="docs-nav-sub" href="#std-quic">std.net.quic</a></li>
           <li><a class="docs-nav-sub" href="#std-http">std.net.http</a></li>
           <li><a class="docs-nav-sub" href="#std-http2">std.net.http.http2</a></li>
+          <li><a class="docs-nav-sub" href="#std-http3">std.net.http.http3</a></li>
           <li><a class="docs-nav-sub" href="#std-grpc">std.net.grpc</a></li>
           <li><a class="docs-nav-sub" href="#std-websocket">std.net.http.websocket</a></li>
           <li><a class="docs-nav-sub" href="#std-httptest">std.net.http.httptest</a></li>
@@ -301,7 +304,7 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>Point</code>, <code>Vec2</code>, <code>Vec3</code>, <code>Size</code>, <code>Rect</code>, <code>Rectangle</code></td><td>points, vectors, sizes, rectangles</td></tr>
           <tr><td><code>Circle</code>, <code>Line</code>, <code>Ray</code>, <code>Polygon</code></td><td>shapes</td></tr>
-          <tr><td><code>Edges</code>, <code>Corners</code></td><td>per-side and per-corner values</td></tr>
+          <tr><td><code>Edges</code>, <code>Corners</code>, <code>Axes</code></td><td>per-side, per-corner and per-axis values</td></tr>
           <tr><td><code>Transform2D</code></td><td>2D affine transform</td></tr>
           <tr><td><code>Path</code>, <code>FillRule</code>, <code>StrokeStyle</code>, <code>LineCap</code>, <code>LineJoin</code></td><td>paths: build, stroke, dash, measure, trim, morph, boolean operations</td></tr>
           <tr><td><code>BezierPath</code>, <code>QuadraticBezier</code>, <code>CubicBezier</code></td><td>curves</td></tr>
@@ -912,8 +915,29 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-tls">
         <h3><code>std.net.tls</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>Conn</code>, <code>dial</code>, <code>client</code>, <code>server</code></td><td>TLS 1.3 and 1.2 connection</td></tr>
+          <tr><td><code>Conn</code>, <code>dial</code>, <code>client</code>, <code>server</code></td><td>TLS 1.3 and 1.2 connection, over a socket or any stream</td></tr>
+          <tr><td><code>HandshakeCarrier</code></td><td>TLS 1.3 handshake without records, for QUIC</td></tr>
           <tr><td><code>Config</code></td><td>certificates, names, versions</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-quic">
+        <h3><code>std.net.quic</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>dial</code>, <code>listen</code>, <code>Listener</code></td><td>QUIC client and server (RFC 9000, 9001, 9002)</td></tr>
+          <tr><td><code>Connection</code>, <code>Stream</code></td><td>bidirectional and one-way streams, datagrams, key update</td></tr>
+          <tr><td><code>Config</code></td><td>TLS settings, limits, idle timeout, keep-alive, Retry</td></tr>
+          <tr><td><code>TransportError</code>, <code>TransportCode</code>, <code>ApplicationError</code>, <code>ClosedError</code></td><td>errors</td></tr>
+          <tr><td><code>appendVarint</code>, <code>varintLength</code>, <code>parseVarint</code></td><td>variable-length integers</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-proxy">
+        <h3><code>std.net.proxy</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Dialer</code>, <code>connect</code></td><td>tunnels through SOCKS4, SOCKS4a, SOCKS5, HTTP and HTTPS proxies; chains</td></tr>
+          <tr><td><code>Binding</code>, <code>Association</code></td><td>SOCKS <code>BIND</code> and SOCKS5 UDP relay</td></tr>
+          <tr><td><code>SocksServer</code>, <code>Request</code>, <code>Command</code></td><td>SOCKS4, SOCKS4a and SOCKS5 server</td></tr>
+          <tr><td><code>relay</code></td><td>copies both ways between two streams</td></tr>
+          <tr><td><code>ProxyError</code>, <code>ErrorKind</code></td><td>errors</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-http">
@@ -923,8 +947,10 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Server</code>, <code>ServeMux</code>, <code>Context</code>, <code>Handler</code>, <code>Middleware</code></td><td>server</td></tr>
           <tr><td><code>Request</code>, <code>Response</code>, <code>Header</code>, <code>Cookie</code>, <code>CookieJar</code></td><td>messages</td></tr>
           <tr><td><code>FileServer</code>, <code>serveFile</code></td><td>static files</td></tr>
-          <tr><td><code>Transport</code></td><td>connection pool, HTTP/1.1 and HTTP/2</td></tr>
-          <tr><td><code>Proxy</code>, <code>EnvironmentProxy</code>, <code>StaticProxy</code></td><td>HTTP and SOCKS5 proxies, from the environment or one URL</td></tr>
+          <tr><td><code>Transport</code></td><td>connection pool, HTTP/1.1, HTTP/2 and HTTP/3</td></tr>
+          <tr><td><code>HTTP3Mode</code></td><td>when the client uses HTTP/3: <code>Off</code>, <code>Advertised</code> (Alt-Svc), <code>Always</code></td></tr>
+          <tr><td><code>Proxy</code>, <code>EnvironmentProxy</code>, <code>StaticProxy</code></td><td>HTTP, HTTPS and SOCKS proxies for the client, from the environment or one URL</td></tr>
+          <tr><td><code>ForwardProxy</code></td><td>handler that serves as an HTTP proxy (<code>CONNECT</code> tunnels, forwarded requests)</td></tr>
           <tr><td><code>CrossOriginProtection</code></td><td>cross-origin request protection</td></tr>
         </table>
       </div>
@@ -933,6 +959,14 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>Conn</code>, <code>Stream</code>, <code>Framer</code></td><td>HTTP/2</td></tr>
           <tr><td><code>Encoder</code>, <code>Decoder</code></td><td>HPACK</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-http3">
+        <h3><code>std.net.http.http3</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Conn</code>, <code>Stream</code>, <code>Settings</code></td><td>HTTP/3 over QUIC</td></tr>
+          <tr><td><code>Encoder</code>, <code>Decoder</code>, <code>Table</code></td><td>QPACK</td></tr>
+          <tr><td><code>Http3Error</code>, <code>ErrorCode</code></td><td>errors</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-grpc">
@@ -1170,17 +1204,21 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.ui</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>UI</code>, <code>UIConfig</code></td><td>UI service</td></tr>
+          <tr><td><code>ComponentRenderer</code>, <code>RenderContext</code>, <code>RenderPasses</code>, <code>Geometry</code>, <code>TextKind</code>, <code>StateChange</code>, <code>@action</code>, <code>Viewport</code>, <code>Theme</code>, <code>Palette</code></td><td>component drawing, resolved layout, state events, actions</td></tr>
           <tr><td><code>StyleNode</code>, <code>StyleClass</code>, <code>BoxStyle</code>, <code>FontStyle</code>, <code>Selector</code></td><td>style model</td></tr>
-          <tr><td><code>ClickEvent</code>, <code>KeyEvent</code>, <code>MouseMoveEvent</code>, <code>TextInputEvent</code>, …</td><td>events</td></tr>
+          <tr><td><code>ClickEvent</code>, <code>KeyEvent</code>, <code>MouseMoveEvent</code>, <code>TextInputEvent</code>, …</td><td>events; <code>target</code> is the component under the pointer, the window's root when no other is</td></tr>
           <tr><td><code>Display</code>, <code>Appearance</code>, <code>ColorScheme</code>, <code>Contrast</code></td><td>displays and system appearance (Linux)</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-ui-styles">
         <h3><code>std.ui.styles</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>Box</code>, <code>Text</code>, <code>Borders</code></td><td>base styles</td></tr>
-          <tr><td><code>Font</code>, <code>Fill</code>, <code>Size</code>, <code>Auto</code>, <code>Anchors</code>, <code>LineStyle</code></td><td>style values</td></tr>
-          <tr><td><code>Align</code>, <code>Alignment</code>, <code>Position</code>, <code>Layer</code></td><td>alignment and positioning</td></tr>
+          <tr><td><code>Box</code>, <code>Layout</code>, <code>Tracks</code>, <code>Clipping</code></td><td>size, placement and arrangement</td></tr>
+          <tr><td><code>Shape</code>, <code>Background</code>, <code>Borders</code>, <code>Outline</code>, <code>Shadows</code>, <code>Filters</code>, <code>Backdrop</code>, <code>Compositing</code>, <code>Effects</code>, <code>Transforms</code></td><td>painting and effects</td></tr>
+          <tr><td><code>Foreground</code>, <code>Typography</code>, <code>Editable</code>, <code>TextRendering</code></td><td>text</td></tr>
+          <tr><td><code>Interaction</code>, <code>Scrollbars</code>, <code>ImageContent</code>, <code>Motion</code></td><td>pointer, scrollbars, images, transitions</td></tr>
+          <tr><td><code>Font</code>, <code>Fill</code>, <code>Sizing</code>, <code>Auto</code>, <code>Anchors</code>, <code>AnchorLine</code>, <code>AnchorEdge</code>, <code>LineStyle</code>, <code>Border</code>, <code>Paint</code>, <code>BackgroundFill</code>, <code>Ring</code>, <code>Shadow</code>, <code>Filter</code>, <code>Transform</code>, <code>Track</code>, <code>Cell</code>, <code>FontWeight</code>, <code>ParagraphLayout</code>, <code>Decoration</code>, <code>TextRun</code>, <code>Cursor</code>, <code>Scrollbar</code>, <code>Transition</code>, <code>Easing</code></td><td>style values</td></tr>
+          <tr><td><code>Align</code>, <code>Alignment</code>, <code>Direction</code>, <code>Arrange</code>, <code>Distribute</code>, <code>Position</code>, <code>Layer</code></td><td>alignment, direction, arrangement and positioning</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-ui-renderer">

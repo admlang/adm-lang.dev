@@ -1108,7 +1108,7 @@ adm lint --list</code></pre>
         <tr><td><code>ADM_LLVM_WORKERS</code></td><td>Worker processes a cold build compiles modules in (default: one per core, at most 8, bounded by free memory); <code>0</code> or <code>1</code> compiles in-process.</td></tr>
         <tr><td><code>ADM_NO_INCREMENTAL</code></td><td><code>1</code> keys the cache on the whole program instead of reusing unchanged modules.</td></tr>
         <tr><td><code>ADM_NO_SHAKE</code></td><td><code>1</code> compiles the whole program instead of dropping unreachable functions.</td></tr>
-        <tr><td><code>ADM_FULL_LOAD</code></td><td><code>1</code> loads every file of each standard library module a program reaches, instead of only the files it names.</td></tr>
+        <tr><td><code>ADM_FULL_LOAD</code></td><td><code>1</code> loads every file of each standard library module a program reaches, instead of only the files it names. The IR cache and the lint result cache keep such runs apart.</td></tr>
         <tr><td><code>ADM_NO_OBJ_CACHE, ADM_NO_NATIVE_CACHE, ADM_NO_LINK_CACHE, ADM_NO_LINT_CACHE</code></td><td><code>1</code> bypasses the object cache, the native-support cache, the link stamp or the lint result cache.</td></tr>
         <tr><td><code>ADM_OBJ_CACHE_MAX</code></td><td>Size cap of the object cache (<code>8G</code>, <code>512M</code>; default 8 GiB).</td></tr>
         <tr><td><code>ADM_ZIG</code>, <code>ADM_RUSTC</code>, <code>ADM_CARGO</code>, <code>ADM_GO</code></td><td>The compilers that build the source <code>@zig</code>, <code>@rust</code> and <code>@go</code> annotations name (default: on <code>PATH</code>). A program that uses one and has no compiler for it stops with what to install.</td></tr>

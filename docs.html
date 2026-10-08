@@ -2902,7 +2902,7 @@ homepage.timeout(3s)</code></pre>
           <code>await</code> returns without waiting for the body and never panics:
           an <code>async T</code> gives the value an uninitialised <code>let</code> of
           <code>T</code> holds (<code>0</code>, <code>""</code>, an empty array, a default
-          instance), an <code>async ?T</code> gives <code>none</code>, and an
+          instance, nothing for <code>any</code> or a union), an <code>async ?T</code> gives <code>none</code>, and an
           <code>async !T</code> gives an error with code <code>canceled</code> or
           <code>timeout</code> whose message is the reason passed to <code>cancel</code>.
           <code>.canceled()</code> tells a cancelled result from a computed one.
@@ -3408,6 +3408,37 @@ component SubmitButton {
           <a href="#services">UI service</a>; a controller method opts in by annotating itself, the way
           <code>onClick</code> does above.
         </p>
+        <p>
+          Every component has the members of the prelude's <code>Component&lt;T&gt;</code>: inputs such as
+          <code>enabled</code>, the tree (<code>childNodes</code>, <code>parent()</code>) and the lifecycle
+          (<code>attached()</code>, <code>detached()</code>, <code>render(ctx)</code>). A controller method
+          with the same name and parameters replaces one of them for that component. A value typed
+          <code>component</code> holds any component, and a call such as <code>c.render(ctx)</code> runs the
+          method of the component it holds.
+        </p>
+        <p>
+          <code>c.style</code> of a value typed <code>component</code> is typed <code>style</code>, the kind
+          of every style, with the members every style has (<code>variant</code>, <code>geom</code>).
+          <code>is</code> with a datatype tests whether the style has the datatype's fields and narrows it
+          in that branch, where the fields are read and written on the style itself:
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">style_view.adm</span>
+          </div>
+          <pre><code>datatype Sized {
+	width, height Sizing
+	visible bool
+}
+
+def hide(c component) {
+	let look = c.style
+	if look is Sized {
+		look.visible = false
+	}
+}</code></pre>
+        </div>
       </div>
     </section>
 
