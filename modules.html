@@ -53,6 +53,7 @@
         <ul class="docs-sub-list">
           <li><a class="docs-nav-sub" href="#std-strings">std.strings</a></li>
           <li><a class="docs-nav-sub" href="#std-text-unicode">std.text.unicode</a></li>
+          <li><a class="docs-nav-sub" href="#std-text-precis">std.text.precis</a></li>
           <li><a class="docs-nav-sub" href="#std-text-jinja">std.text.templates.jinja</a></li>
           <li><a class="docs-nav-sub" href="#std-glob">std.glob</a></li>
           <li><a class="docs-nav-sub" href="#std-bytes">std.bytes</a></li>
@@ -146,6 +147,11 @@
           <li><a class="docs-nav-sub" href="#std-tls">std.net.tls</a></li>
           <li><a class="docs-nav-sub" href="#std-proxy">std.net.proxy</a></li>
           <li><a class="docs-nav-sub" href="#std-quic">std.net.quic</a></li>
+          <li><a class="docs-nav-sub" href="#std-stun">std.net.stun</a></li>
+          <li><a class="docs-nav-sub" href="#std-sdp">std.net.sdp</a></li>
+          <li><a class="docs-nav-sub" href="#std-rtp">std.net.rtp</a></li>
+          <li><a class="docs-nav-sub" href="#std-sctp">std.net.sctp</a></li>
+          <li><a class="docs-nav-sub" href="#std-webrtc">std.net.webrtc</a></li>
           <li><a class="docs-nav-sub" href="#std-http">std.net.http</a></li>
           <li><a class="docs-nav-sub" href="#std-http2">std.net.http.http2</a></li>
           <li><a class="docs-nav-sub" href="#std-http3">std.net.http.http3</a></li>
@@ -179,6 +185,7 @@
         <a class="docs-nav-top" href="#media">Media &amp; Devices</a>
         <ul class="docs-sub-list">
           <li><a class="docs-nav-sub" href="#std-media-player">std.media.player</a></li>
+          <li><a class="docs-nav-sub" href="#std-media-call">std.media.call</a></li>
           <li><a class="docs-nav-sub" href="#std-media-dsp">std.media.dsp</a></li>
           <li><a class="docs-nav-sub" href="#std-media-synth">std.media.synth</a></li>
           <li><a class="docs-nav-sub" href="#std-devices">std.devices</a></li>
@@ -263,6 +270,17 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>normalize</code>, <code>NormalForm</code>, <code>decompose</code>, <code>compose</code></td><td>normalization (NFC, NFD, NFKC, NFKD)</td></tr>
           <tr><td><code>mirror</code>, <code>isDefaultIgnorable</code>, <code>isExtendedPictographic</code></td><td>bidi mirroring, ignorables, emoji</td></tr>
           <tr><td><code>lineBreaks</code>, <code>LineBreak</code></td><td>line break opportunities (UAX #14)</td></tr>
+          <tr><td><code>toLower</code>, <code>toUpper</code>, <code>toTitle</code>, <code>caseFold</code></td><td>Unicode case mapping and folding, full mappings, final sigma</td></tr>
+          <tr><td><code>isCased</code>, <code>isCaseIgnorable</code>, <code>isNoncharacter</code>, <code>codePoints</code></td><td>casing properties, noncharacters, a text as code points</td></tr>
+          <tr><td><code>decompositionType</code>, <code>joiningType</code>, <code>hangulSyllableType</code></td><td>decomposition tags, cursive joining, Hangul syllable types</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-text-precis">
+        <h3><code>std.text.precis</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>enforce</code>, <code>prepare</code>, <code>compare</code>, <code>Profile</code></td><td>PRECIS (RFC 8264): usernames, opaque strings (passwords) and nicknames (RFC 8265, RFC 8266)</td></tr>
+          <tr><td><code>derivedProperty</code>, <code>allowed</code>, <code>StringClass</code>, <code>bidiRule</code></td><td>the derived property of a code point, the string classes, the Bidi Rule</td></tr>
+          <tr><td><code>PrecisError</code></td><td>errors</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-text-jinja">
@@ -729,6 +747,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>AudioFormat</code>, <code>AudioDecoder</code>, <code>AudioEncoder</code>, <code>AudioCodec</code>, <code>@codec</code></td><td>codec interfaces, registering a format</td></tr>
           <tr><td><code>AudioTags</code>, <code>tags</code></td><td>tags and covers for every format</td></tr>
           <tr><td><code>ID3Tags</code>, <code>OpusTags</code>, <code>M4aMetadata</code>, <code>FlacMetadata</code>, <code>FlacPicture</code>, <code>WAVCue</code>, <code>AIFFMarker</code>, <code>AIFFComment</code></td><td>format-specific metadata</td></tr>
+          <tr><td><code>OpusEncoder</code></td><td>Opus one packet at a time (2.5 to 60 ms, discontinuous transmission), for live connections</td></tr>
           <tr><td><code>Converter</code></td><td>sample rate and channel conversion</td></tr>
           <tr><td><code>Midi</code>, <code>MidiTrack</code></td><td>MIDI files</td></tr>
           <tr><td><code>SoundFont</code></td><td>SoundFont banks</td></tr>
@@ -741,10 +760,12 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>Video</code>, <code>open</code></td><td>video file: tracks, frames, sound</td></tr>
           <tr><td><code>VideoFrame</code>, <code>toImage</code>, <code>draw</code>, <code>fittedSize</code></td><td>decoded picture</td></tr>
+          <tr><td><code>fromPacked</code>, <code>PackedLayout</code></td><td>packed 4:2:2 camera bytes (YUYV, UYVY) to a picture</td></tr>
           <tr><td><code>VideoInfo</code>, <code>Track</code>, <code>Packet</code>, <code>FrameRate</code>, <code>VideoStream</code></td><td>tracks and packets</td></tr>
           <tr><td><code>Container</code>, <code>ContainerFormat</code>, <code>VideoDecoder</code>, <code>ContainerCodec</code>, <code>@codec</code>, <code>@decoder</code></td><td>container and decoder interfaces, registering a format</td></tr>
           <tr><td><code>MP4</code>, <code>MKV</code>, <code>AVI</code>, <code>FLV</code>, <code>OGV</code>, <code>MPEG</code>, <code>TS</code>, <code>ASF</code>, <code>MXF</code>, <code>ElementaryStream</code></td><td>containers</td></tr>
           <tr><td><code>H264</code>, <code>HEVC</code>, <code>AV1</code>, <code>Mpeg2</code>, <code>Mpeg4Part2</code>, <code>Msmpeg4v2</code>, <code>VP8</code>, <code>Theora</code>, <code>MJPEG</code></td><td>decoders</td></tr>
+          <tr><td><code>VideoEncoder</code>, <code>VP8Encoder</code></td><td>encoding pictures to packets at a bitrate (VP8: key frames on request, temporal layers)</td></tr>
           <tr><td><code>VideoHardware</code>, <code>HardwareDecoder</code>, <code>GpuPicture</code>, <code>download</code></td><td>GPU decoding (NVDEC, VA-API), frames kept on the GPU</td></tr>
         </table>
       </div>
@@ -899,10 +920,12 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.net</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Socket</code>, <code>Address</code>, <code>Connection</code>, <code>Stream</code></td><td>sockets and connections</td></tr>
+          <tr><td><code>DatagramTransport</code></td><td>whole datagrams to and from one peer</td></tr>
           <tr><td><code>Listener</code>, <code>Server</code>, <code>StreamServer</code>, <code>DatagramServer</code></td><td>server interfaces</td></tr>
           <tr><td><code>NetError</code>, <code>ErrorCode</code></td><td>typed failures</td></tr>
           <tr><td><code>resolve</code>, <code>NetInterface</code></td><td>name resolution, interfaces</td></tr>
           <tr><td><code>parseIPText</code>, <code>ipText</code></td><td>IP address text to bytes and back</td></tr>
+          <tr><td><code>writeAll</code>, <code>readFull</code></td><td>every byte to, or a full buffer from, any stream</td></tr>
           <tr><td><code>RemoteFiles</code></td><td>remote file access (FTP, SFTP, WebDAV)</td></tr>
         </table>
       </div>
@@ -910,6 +933,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.net.tcp</code>, <code>std.net.udp</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Client</code>, <code>Server</code></td><td>TCP and UDP clients and servers</td></tr>
+          <tr><td><code>dial</code>, <code>Peer</code></td><td>UDP socket bound to one peer, a datagram transport</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-tls">
@@ -918,6 +942,9 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Conn</code>, <code>dial</code>, <code>client</code>, <code>server</code></td><td>TLS 1.3 and 1.2 connection, over a socket or any stream</td></tr>
           <tr><td><code>HandshakeCarrier</code></td><td>TLS 1.3 handshake without records, for QUIC</td></tr>
           <tr><td><code>Config</code></td><td>certificates, names, versions</td></tr>
+          <tr><td><code>DTLSConn</code>, <code>dtlsDial</code>, <code>dtlsClient</code>, <code>dtlsServer</code></td><td>DTLS 1.3 and 1.2 over any datagram transport</td></tr>
+          <tr><td><code>DTLSListener</code>, <code>dtlsListen</code></td><td>DTLS server on a UDP socket, stateless cookies</td></tr>
+          <tr><td><code>DTLSConfig</code>, <code>SRTPProfile</code>, <code>SRTPKeys</code></td><td>DTLS settings, DTLS-SRTP profiles and keys, connection IDs</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-quic">
@@ -928,6 +955,61 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Config</code></td><td>TLS settings, limits, idle timeout, keep-alive, Retry</td></tr>
           <tr><td><code>TransportError</code>, <code>TransportCode</code>, <code>ApplicationError</code>, <code>ClosedError</code></td><td>errors</td></tr>
           <tr><td><code>appendVarint</code>, <code>varintLength</code>, <code>parseVarint</code></td><td>variable-length integers</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-stun">
+        <h3><code>std.net.stun</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>dial</code>, <code>client</code>, <code>Client</code>, <code>ClientConfig</code></td><td>STUN and TURN client (RFC 8489, RFC 8656): <code>binding</code>, <code>allocate</code></td></tr>
+          <tr><td><code>Allocation</code>, <code>RelayedPeer</code>, <code>AllocateOptions</code>, <code>Relayed</code></td><td>a relayed address on a TURN server: permissions, channels, UDP and TCP relays (RFC 6062)</td></tr>
+          <tr><td><code>Server</code></td><td>STUN and TURN server over UDP, TCP, TLS and DTLS</td></tr>
+          <tr><td><code>Message</code>, <code>parseMessage</code>, <code>isMessage</code>, <code>Method</code>, <code>AttributeType</code>, <code>Integrity</code></td><td>the message codec, integrity and fingerprint</td></tr>
+          <tr><td><code>longTermKey</code>, <code>shortTermKey</code>, <code>restCredentials</code></td><td>credentials: long-term (MD5, SHA-256), short-term, shared secret</td></tr>
+          <tr><td><code>parseURI</code>, <code>resolveURI</code>, <code>ServerURI</code>, <code>Transport</code></td><td><code>stun:</code>, <code>stuns:</code>, <code>turn:</code> and <code>turns:</code> URIs</td></tr>
+          <tr><td><code>StunError</code>, <code>ErrorCode</code></td><td>errors, with the server's error code</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-sdp">
+        <h3><code>std.net.sdp</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>parse</code>, <code>SessionDescription</code>, <code>MediaDescription</code>, <code>Attribute</code></td><td>SDP session descriptions (RFC 8866), read and written</td></tr>
+          <tr><td><code>RtpMap</code>, <code>FormatParameters</code>, <code>RtcpFeedback</code>, <code>Extension</code>, <code>SourceAttribute</code>, <code>SourceGroup</code>, <code>Rid</code>, <code>Simulcast</code>, <code>Msid</code></td><td>the media attributes WebRTC uses</td></tr>
+          <tr><td><code>Group</code>, <code>Fingerprint</code>, <code>TransportParameters</code>, <code>Setup</code>, <code>Direction</code></td><td>BUNDLE groups, certificate fingerprints, ICE and DTLS parameters, directions</td></tr>
+          <tr><td><code>Candidate</code>, <code>parseCandidate</code>, <code>candidateText</code>, <code>CandidateType</code></td><td>ICE candidates, in a description or trickled</td></tr>
+          <tr><td><code>SdpError</code></td><td>errors, with the line</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-rtp">
+        <h3><code>std.net.rtp</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Packet</code>, <code>parsePacket</code>, <code>isRtcp</code></td><td>RTP packets (RFC 3550) read without copying and written into a buffer, header extensions (RFC 8285)</td></tr>
+          <tr><td><code>parseRtcp</code>, <code>Compound</code>, <code>SenderReport</code>, <code>ReceiverReport</code>, <code>ReceptionReport</code>, <code>SourceDescription</code>, <code>Bye</code></td><td>RTCP reports</td></tr>
+          <tr><td><code>Nack</code>, <code>Pli</code>, <code>Fir</code>, <code>Remb</code>, <code>TransportFeedback</code></td><td>RTCP feedback (RFC 4585, RFC 5104, REMB, transport-wide congestion control)</td></tr>
+          <tr><td><code>Packetizer</code>, <code>depacketize</code>, <code>PayloadFormat</code>, <code>startsFrame</code>, <code>startsKeyframe</code>, <code>temporalLayer</code></td><td>payload formats: Opus, VP8 (with temporal layers), VP9, H.264, AV1</td></tr>
+          <tr><td><code>retransmission</code>, <code>original</code>, <code>FecSender</code>, <code>FecReceiver</code></td><td>retransmission packets (RFC 4588) and FlexFEC repair packets (RFC 8627)</td></tr>
+          <tr><td><code>JitterBuffer</code>, <code>Frame</code></td><td>packets in any order, frames out in order</td></tr>
+          <tr><td><code>srtp</code>, <code>SrtpSession</code></td><td>SRTP and SRTCP (RFC 3711, RFC 7714), keyed from DTLS-SRTP, packets protected in place</td></tr>
+          <tr><td><code>RtpError</code></td><td>errors</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-sctp">
+        <h3><code>std.net.sctp</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>connect</code>, <code>accept</code>, <code>Association</code>, <code>AssociationState</code>, <code>Options</code></td><td>SCTP associations (RFC 9260) in user space over any datagram transport, as WebRTC runs them over DTLS</td></tr>
+          <tr><td><code>Stream</code>, <code>Message</code>, <code>PayloadProtocol</code></td><td>streams of whole messages, ordered or not, reliable or given up after a number of sends or a lifetime, with stream reset</td></tr>
+          <tr><td><code>SctpError</code></td><td>errors</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-webrtc">
+        <h3><code>std.net.webrtc</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>PeerConnection</code>, <code>Configuration</code>, <code>IceServer</code>, <code>IceTransportPolicy</code></td><td>a connection to a browser or another program through NATs (ICE, DTLS, SCTP), set up by offer and answer</td></tr>
+          <tr><td><code>LocalTrack</code>, <code>RemoteTrack</code>, <code>TrackKind</code>, <code>Stats</code>, <code>SendStats</code>, <code>ReceiveStats</code></td><td>audio and video tracks: encoded frames (Opus, VP8, VP9, H.264, AV1) written and read whole; simulcast layers (<code>addSimulcast</code>, <code>rid</code>); <code>skip</code> for sound left out</td></tr>
+          <tr><td><code>SessionDescription</code>, <code>SdpType</code>, <code>IceCandidate</code></td><td>what signalling carries: descriptions and candidates</td></tr>
+          <tr><td><code>DataChannel</code>, <code>DataChannelOptions</code>, <code>DataMessage</code></td><td>data channels: text and binary messages, ordered or not, reliable or given up after a count or a time</td></tr>
+          <tr><td><code>PeerConnectionState</code>, <code>SignalingState</code>, <code>IceConnectionState</code>, <code>IceGatheringState</code>, <code>DataChannelState</code></td><td>states</td></tr>
+          <tr><td><code>WhipClient</code>, <code>WhepClient</code>, <code>WhipServer</code>, <code>WhepServer</code></td><td>publishing to and playing from a server with one HTTP request (WHIP, WHEP)</td></tr>
+          <tr><td><code>WebRtcError</code></td><td>errors</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-proxy">
@@ -1003,6 +1085,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.net.dns</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Client</code>, <code>lookup</code>, <code>lookupHost</code>, <code>lookupMX</code>, …</td><td>resolver</td></tr>
+          <tr><td><code>serviceTargets</code></td><td>the <code>host:port</code> of a service's SRV targets, in order</td></tr>
           <tr><td><code>Server</code>, <code>Zone</code>, <code>Mux</code>, <code>Forwarder</code>, <code>Secondary</code></td><td>server</td></tr>
           <tr><td><code>Message</code>, <code>Record</code></td><td>wire format</td></tr>
           <tr><td><code>Update</code>, <code>TSIGKey</code></td><td>dynamic updates, TSIG</td></tr>
@@ -1148,6 +1231,14 @@ use std.data.encoding::(json)</code></pre>
         </table>
         <p class="exports-note">See the <a href="examples.html#media-player">example</a>.</p>
       </div>
+      <div class="docs-sub" id="std-media-call">
+        <h3><code>std.media.call</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>localAudio</code>, <code>localVideo</code></td><td>a microphone or sound stream, a camera or video stream, as WebRTC tracks (Opus, VP8)</td></tr>
+          <tr><td><code>play</code></td><td>a remote sound track through a speaker</td></tr>
+          <tr><td><code>frames</code>, <code>RemoteVideo</code></td><td>the decoded pictures of a remote track</td></tr>
+        </table>
+      </div>
       <div class="docs-sub" id="std-media-dsp">
         <h3><code>std.media.dsp</code></h3>
         <table class="docs-table exports-table">
@@ -1204,9 +1295,10 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.ui</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>UI</code>, <code>UIConfig</code></td><td>UI service</td></tr>
-          <tr><td><code>ComponentRenderer</code>, <code>RenderContext</code>, <code>RenderPasses</code>, <code>Geometry</code>, <code>TextKind</code>, <code>StateChange</code>, <code>@action</code>, <code>Viewport</code>, <code>Theme</code>, <code>Palette</code></td><td>component drawing, resolved layout, state events, actions</td></tr>
+          <tr><td><code>ComponentRenderer</code>, <code>RenderContext</code>, <code>RenderPasses</code>, <code>Geometry</code>, <code>TextKind</code>, <code>WindowState</code>, <code>CloseRequest</code>, <code>MenuEntry</code>, <code>PointerEvent</code>, <code>PointerPhase</code>, <code>Modifiers</code>, <code>Limit</code>, <code>TextInputClient</code>, <code>TextRange</code>, <code>StateChange</code>, <code>@action</code>, <code>Viewport</code>, <code>Theme</code>, <code>Palette</code></td><td>component drawing, resolved layout, state events, actions</td></tr>
           <tr><td><code>StyleNode</code>, <code>StyleClass</code>, <code>BoxStyle</code>, <code>FontStyle</code>, <code>Selector</code></td><td>style model</td></tr>
           <tr><td><code>ClickEvent</code>, <code>KeyEvent</code>, <code>MouseMoveEvent</code>, <code>TextInputEvent</code>, …</td><td>events; <code>target</code> is the component under the pointer, the window's root when no other is</td></tr>
+          <tr><td><code>Key</code>, <code>typesCharacter</code></td><td>the key of a <code>KeyEvent</code> by its meaning in the layout (<code>Key.A</code>, <code>Key.Enter</code>, <code>Key.F5</code>); whether a key types a character</td></tr>
           <tr><td><code>Display</code>, <code>Appearance</code>, <code>ColorScheme</code>, <code>Contrast</code></td><td>displays and system appearance (Linux)</td></tr>
         </table>
       </div>
@@ -1224,8 +1316,9 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-ui-renderer">
         <h3><code>std.ui.renderer</code></h3>
         <table class="docs-table exports-table">
+          <tr><td><code>Host</code>, <code>GLSurface</code></td><td>what a window system provides: windows, events, text input, clipboard, displays, tray; OpenGL surfaces</td></tr>
           <tr><td><code>Renderer</code>, <code>getRenderer</code></td><td>renderer interface</td></tr>
-          <tr><td><code>Window</code>, <code>WindowConfig</code></td><td>windows</td></tr>
+          <tr><td><code>Window</code>, <code>WindowConfig</code>, <code>PlatformEvent</code>, <code>Frame</code></td><td>windows, low-level events, frames</td></tr>
           <tr><td><code>opengl</code>, <code>cpu</code></td><td>renderers</td></tr>
         </table>
       </div>

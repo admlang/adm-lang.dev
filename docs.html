@@ -3129,7 +3129,7 @@ let got = &lt;-ch                  // got.tags() is request.tags()</code></pre>
         A service method is one of three kinds: <code>@query()</code> reads a snapshot of its state,
         <code>@commit()</code> mutates it and emits a typed <code>Event&lt;T&gt;</code> that other code
         can react to, and <code>@emit()</code> only exists to describe that event's shape - it can't be
-        called directly.
+        called directly. An event emitted inside a commit reaches its handlers after the outermost commit completes; <code>@emit(immediate = true)</code> runs them at the call.
       </p>
       <p>
         Those annotated methods are the whole public surface. Fields are always private to the
@@ -3411,10 +3411,21 @@ component SubmitButton {
         <p>
           Every component has the members of the prelude's <code>Component&lt;T&gt;</code>: inputs such as
           <code>enabled</code>, the tree (<code>childNodes</code>, <code>parent()</code>) and the lifecycle
-          (<code>attached()</code>, <code>detached()</code>, <code>render(ctx)</code>). A controller method
+          (<code>attached()</code>, <code>detached()</code>, <code>render(ctx)</code>, <code>rerun()</code> which runs its view again, <code>unmount()</code> which lets go of the children its view placed once it has left the tree). A controller method
           with the same name and parameters replaces one of them for that component. A value typed
           <code>component</code> holds any component, and a call such as <code>c.render(ctx)</code> runs the
-          method of the component it holds.
+          method of the component it holds. <code>c is Scroller</code> tests whether that component's
+          controller implements an interface and adds the interface's methods in the branch;
+          <code>c is ScrollView</code> narrows to the component itself.
+        </p>
+        <p>
+          A view names its controller's fields, properties and methods directly in the arguments of the
+          components it places (<code>Text(text = title)</code>). The view runs again on every frame
+          that runs: an argument whose value differs from what was passed the last time is assigned to
+          the child's input. An <code>if</code>, <code>match</code> or <code>when</code> in a view is
+          evaluated again too, so components enter and leave with their branch, and a loop is iterated
+          again, keeping its children by position. A view body must therefore be cheap and without
+          effects. Literals and handlers (<code>onClick = f</code>) are bound when the component is built; a handler names a function, a method of the controller, or is a function literal closing over the controller and the view's locals (each child of a loop gets the values of its own pass). Optional and tuple arguments are compared member by member. <code>new Name(...)</code> on a component is the call <code>Name(...)</code>: the view is mounted.
         </p>
         <p>
           <code>c.style</code> of a value typed <code>component</code> is typed <code>style</code>, the kind

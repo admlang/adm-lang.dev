@@ -231,12 +231,12 @@ acme:core:41ab…:2.1.0 publisher=k7… permissions=adm.clipboard.read</code></p
 <div class="code-window">
   <div class="code-titlebar">
     <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-    <span class="code-filename">glfw.adm</span>
+    <span class="code-filename">lib.adm</span>
   </div>
-  <pre><code>@link(&quot;glfw&quot;)
-module std.ui.renderer.opengl.glfw {
-	@c(&quot;GLFW/glfw3.h&quot;, ret = &quot;int&quot;)
-	def glfwInit() int;
+  <pre><code>@link(&quot;SDL3&quot;)
+module std.ui.host.sdl.lib {
+	@c(&quot;SDL3/SDL.h&quot;, ret = &quot;bool&quot;, params = [&quot;SDL_InitFlags&quot;])
+	def SDL_Init(flags uint32) bool;
 	...
 }</code></pre>
 </div>
