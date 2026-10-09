@@ -1021,7 +1021,7 @@ adm lint --list</code></pre>
         </div>
         <pre><code data-hl="off" class="nohighlight">adm targets</code></pre>
       </div>
-      <p>Prints every <code>&lt;os&gt;-&lt;arch&gt;</code> the build accepts, the clang triple it maps to and whether it can be linked here: the host always, another platform only when <code>ADM_SYSROOT_&lt;OS&gt;_&lt;ARCH&gt;</code> points at a sysroot.</p>
+      <p>Prints every <code>&lt;os&gt;-&lt;arch&gt;</code> the build accepts, the clang triple it maps to and whether it can be linked here: the host always, another platform only when <code>ADM_SYSROOT_&lt;OS&gt;_&lt;ARCH&gt;</code> points at a sysroot or the toolchain ships a baseline for it. The sysroot a platform would use is shown.</p>
       <h3 id="update"><code>adm update</code></h3>
       <div class="code-window">
         <div class="code-titlebar">
@@ -1103,7 +1103,7 @@ adm lint --list</code></pre>
         <tr><td><code>ADM_CATALOG_MAX_AGE</code></td><td>How old a registry clone may be before it is pulled again, a Go duration (default one hour).</td></tr>
         <tr><td><code>ADM_CLANG</code></td><td>C compiler driver that links the program (default: the bundled <code>tools/clang</code>, else <code>clang</code> on <code>PATH</code>).</td></tr>
         <tr><td><code>ADM_OS, ADM_ARCH</code></td><td>Target operating system and architecture (default: the host).</td></tr>
-        <tr><td><code>ADM_SYSROOT_&lt;OS&gt;_&lt;ARCH&gt;</code></td><td>Sysroot for a target; without it only the host platform links, against the build machine's glibc. Set for the host's own platform to a sysroot with an older glibc, the program runs on systems from that glibc on.</td></tr>
+        <tr><td><code>ADM_SYSROOT_&lt;OS&gt;_&lt;ARCH&gt;</code></td><td>Sysroot for a target. Unset: <code>adm build</code> links a Linux program against the baseline sysroot shipped in <code>lib/sysroots/</code> (glibc 2.35) when it holds every library the program links, so the program runs on systems from that glibc on; when a library is missing there it links against the build machine's files and says so. <code>adm run</code> and <code>adm test</code> link against the build machine's files; another platform needs the variable. A path: that sysroot, for every command. <code>host</code>: the build machine's files.</td></tr>
         <tr><td><code>ADM_SIGNING_KEY</code></td><td>Base64 Ed25519 publisher private key used for signing, instead of the key file <code>adm app init</code> wrote.</td></tr>
         <tr><td><code>ADM_DIST_REPO</code></td><td>GitHub <code>owner/name</code> whose releases <code>adm version</code> and <code>adm update</code> read (default <code>admlang/adm</code>).</td></tr>
         <tr><td><code>ADM_LLVM_WORKERS</code></td><td>Worker processes a cold build compiles modules in (default: one per core, at most 8, bounded by free memory); <code>0</code> or <code>1</code> compiles in-process.</td></tr>

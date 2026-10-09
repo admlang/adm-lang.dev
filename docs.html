@@ -3486,6 +3486,19 @@ Card(title = "Profile") {
           once per view and not inside a loop.
         </p>
         <p>
+          A component takes type parameters after its name, as a type does:
+          <code>component List&lt;T&gt; { ... }</code>. The parameter is in scope in its
+          <code>type { }</code> and its view (<code>items T[]</code>, <code>def first() ?T</code>),
+          and <code>List&lt;File&gt;</code> is a type (<code>weak list ?List&lt;File&gt;</code>,
+          <code>c is List&lt;File&gt;</code>). A call writes the type arguments,
+          <code>List&lt;File&gt;(files)</code>, or leaves them to its arguments,
+          <code>List(files)</code>; a parameter no argument settles takes its default or is a compile
+          error. Each instance is compiled for its own type arguments. A <code>ref</code> on such a
+          call needs the type arguments written, a generic component declares its controller in its
+          own <code>type { }</code>, and a type parameter cannot be named in the component's inline
+          <code>style { }</code>.
+        </p>
+        <p>
           A method of a component's <code>type { }</code> marked <code>@emit()</code> is an event of
           the component. A listener is a function or method marked <code>@on</code> that takes
           <code>ComponentEvent&lt;T&gt;</code> (<code>source</code>, <code>name</code>,
@@ -3557,6 +3570,51 @@ def hide(c component) {
 	}
 }</code></pre>
         </div>
+        <p>
+          <code>look is Card</code>, with a style declaration, tests that the value is that style
+          and narrows it to it. <code>style.clone()</code> returns a copy of a style with the same
+          property values, which no component has as its <code>style</code>.
+        </p>
+        <h3>Enter and exit</h3>
+        <p>
+          A style body may assign <code>enter</code> and <code>exit</code>: the look a component
+          appears from and the look it leaves to. Each lists properties of the style; a nested
+          literal changes the fields it names of the value the property holds. A component whose
+          style has <code>Motion</code> travels between that look and its own over its
+          <code>transition</code> (<code>style.transition = Transition{duration: 150ms}</code>
+          in the controller).
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">fade.adm</span>
+          </div>
+          <pre><code>style Fade {
+	Box
+	Compositing
+	Transforms
+	Motion
+	enter = {opacity: 0.0, transform: {translate: {y: 8(px)}}}
+	exit = {opacity: 0.0}
+}</code></pre>
+        </div>
+        <ul>
+          <li><code>style.enter</code> and <code>style.exit</code> are functions,
+            <code>?def(look style)</code>, none in a style that writes none: calling one assigns the
+            listed properties on the style given (a <code>clone()</code>, when the component's own
+            look must stay).</li>
+          <li>A value may name what the module sees and the style's own <code>let</code>s.
+            Embedding a style does not bring its <code>enter</code> and <code>exit</code>.</li>
+          <li>A child a view no longer places, whose style has an <code>exit</code>, leaves
+            <code>children</code> for its parent's <code>leaving</code> and stays drawn until the
+            exit has played; <code>parent.finishLeaving(child)</code> lets go of it (the UI
+            runtime calls it). Its <code>ref</code> member reads none meanwhile.</li>
+          <li>A view that reaches the call again before that (the branch taken again, the same
+            <code>key</code> in a loop, the same position in a loop without keys) places the same
+            component, which travels back.</li>
+          <li>A component's own field may not have the name of a field every component has
+            (<code>children</code>, <code>leaving</code>, <code>enabled</code>).</li>
+        </ul>
       </div>
     </section>
 
