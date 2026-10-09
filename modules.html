@@ -990,6 +990,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Nack</code>, <code>Pli</code>, <code>Fir</code>, <code>Remb</code>, <code>TransportFeedback</code></td><td>RTCP feedback (RFC 4585, RFC 5104, REMB, transport-wide congestion control)</td></tr>
           <tr><td><code>Packetizer</code>, <code>depacketize</code>, <code>PayloadFormat</code>, <code>startsFrame</code>, <code>startsKeyframe</code>, <code>temporalLayer</code></td><td>payload formats: Opus, VP8 (with temporal layers), VP9, H.264, AV1</td></tr>
           <tr><td><code>retransmission</code>, <code>original</code>, <code>FecSender</code>, <code>FecReceiver</code></td><td>retransmission packets (RFC 4588) and FlexFEC repair packets (RFC 8627)</td></tr>
+          <tr><td><code>redBlock</code>, <code>redundant</code>, <code>redundantCount</code>, <code>writeRedundant</code>, <code>ulpAsFlex</code></td><td>redundant data (RFC 2198): the primary block, the blocks sound carries again, ULPFEC repair blocks (RFC 5109)</td></tr>
           <tr><td><code>JitterBuffer</code>, <code>Frame</code></td><td>packets in any order, frames out in order</td></tr>
           <tr><td><code>srtp</code>, <code>SrtpSession</code></td><td>SRTP and SRTCP (RFC 3711, RFC 7714), keyed from DTLS-SRTP, packets protected in place</td></tr>
           <tr><td><code>RtpError</code></td><td>errors</td></tr>
@@ -1237,7 +1238,7 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-media-call">
         <h3><code>std.media.call</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>localAudio</code>, <code>localVideo</code></td><td>a microphone or sound stream, a camera or video stream, as WebRTC tracks (Opus, VP8)</td></tr>
+          <tr><td><code>localAudio</code>, <code>localVideo</code></td><td>a microphone or sound stream, a camera or video stream, as WebRTC tracks (Opus; VP8 or H.264)</td></tr>
           <tr><td><code>play</code></td><td>a remote sound track through a speaker</td></tr>
           <tr><td><code>frames</code>, <code>RemoteVideo</code></td><td>the decoded pictures of a remote track</td></tr>
         </table>
@@ -1298,11 +1299,12 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.ui</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>UI</code>, <code>UIConfig</code></td><td>UI service</td></tr>
-          <tr><td><code>ComponentRenderer</code>, <code>RenderContext</code>, <code>RenderPasses</code>, <code>Geometry</code>, <code>TextKind</code>, <code>WindowState</code>, <code>CloseRequest</code>, <code>MenuEntry</code>, <code>PointerEvent</code>, <code>PointerPhase</code>, <code>Modifiers</code>, <code>Limit</code>, <code>TextInputClient</code>, <code>TextRange</code>, <code>StateChange</code>, <code>@action</code>, <code>Viewport</code>, <code>Theme</code>, <code>Palette</code></td><td>component drawing, resolved layout, state events, actions</td></tr>
+          <tr><td><code>ComponentRenderer</code>, <code>RenderContext</code>, <code>RenderPasses</code>, <code>Geometry</code>, <code>TextKind</code>, <code>WindowState</code>, <code>WindowKind</code>, <code>CloseRequest</code>, <code>MenuEntry</code>, <code>PointerEvent</code>, <code>PointerPhase</code>, <code>Modifiers</code>, <code>Limit</code>, <code>TextInputClient</code>, <code>TextRange</code>, <code>StateChange</code>, <code>@action</code>, <code>Viewport</code>, <code>Theme</code>, <code>Palette</code></td><td>component drawing, resolved layout, state events, actions</td></tr>
+          <tr><td><code>DragData</code>, <code>DropEffect</code></td><td>what is dragged: a value of the application's own, text, file paths, other forms by MIME type; what a drop would do (none, copy, move, link)</td></tr>
           <tr><td><code>StyleNode</code>, <code>StyleClass</code>, <code>BoxStyle</code>, <code>FontStyle</code>, <code>Selector</code></td><td>style model</td></tr>
           <tr><td><code>IconSet</code></td><td>named icons an application adds with <code>UI.addIcons</code>; components take an icon by name (<code>Button(icon = "plus")</code>)</td></tr>
           <tr><td><code>ClickEvent</code>, <code>KeyEvent</code>, <code>MouseMoveEvent</code>, <code>TextInputEvent</code>, …</td><td>events; <code>target</code> is the component under the pointer, the window's root when no other is</td></tr>
-          <tr><td><code>Key</code>, <code>typesCharacter</code></td><td>the key of a <code>KeyEvent</code> by its meaning in the layout (<code>Key.A</code>, <code>Key.Enter</code>, <code>Key.F5</code>); whether a key types a character</td></tr>
+          <tr><td><code>Key</code>, <code>KeyCode</code>, <code>typesCharacter</code></td><td>the key of a <code>KeyEvent</code> by its meaning in the layout (<code>Key.A</code>, <code>Key.Enter</code>, <code>Key.F5</code>); whether a key types a character</td></tr>
           <tr><td><code>Display</code>, <code>Appearance</code>, <code>ColorScheme</code>, <code>Contrast</code></td><td>displays and system appearance (Linux)</td></tr>
         </table>
       </div>
@@ -1320,7 +1322,10 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-ui-components">
         <h3><code>std.ui.components</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>Row</code>, <code>Column</code>, <code>HBox</code>, <code>VBox</code>, <code>Grid</code>, <code>Layered</code>, <code>Panel</code>, <code>ScrollView</code>, <code>SplitPane</code>, <code>Spacer</code>, <code>Divider</code></td><td>layout: rows, columns, grids, stacked layers, scrolling, panes a divider resizes</td></tr>
+          <tr><td><code>Row</code>, <code>Column</code>, <code>HBox</code>, <code>VBox</code>, <code>Grid</code>, <code>Layered</code>, <code>Panel</code>, <code>ScrollView</code>, <code>SplitPane</code>, <code>Spacer</code>, <code>Divider</code>, <code>WindowDrag</code></td><td>layout: rows, columns, grids, stacked layers, scrolling, panes a divider resizes, the bar an undecorated window is moved by</td></tr>
+          <tr><td><code>TabMove</code></td><td>a tab of a <code>TabStrip</code> dragged from one place to another (<code>onMove</code>, event <code>moved</code>); <code>onClose</code> gives each tab a cross</td></tr>
+          <tr><td><code>FocusScope</code></td><td>remembers which component in it had the keyboard focus and gives it back when Tab returns; <code>trap</code> keeps Tab inside</td></tr>
+          <tr><td><code>Draggable</code>, <code>DropTarget</code></td><td>something dragged inside a window, with a preview that follows the pointer; a place it, or files and text dragged in from another application, are dropped on</td></tr>
           <tr><td><code>Text</code>, <code>Heading</code>, <code>Label</code>, <code>Link</code>, <code>Image</code>, <code>Icon</code>, <code>Badge</code>, <code>Chip</code>, <code>Avatar</code></td><td>text, pictures, icons by name, short notes and tokens</td></tr>
           <tr><td><code>Canvas</code></td><td>a box the application draws in itself</td></tr>
           <tr><td><code>Button</code>, <code>ToggleButton</code>, <code>SplitButton</code>, <code>Pressable</code></td><td>buttons; anything made pressable</td></tr>

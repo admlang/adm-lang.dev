@@ -3477,13 +3477,22 @@ Card(title = "Profile") {
           is the view of that call.
         </p>
         <p>
-          <code>ref = name</code> on a component call of a view names the component the call places.
-          When <code>name</code> is a field of the controller it is declared
-          <code>weak name ?TextField</code>: the view sets it when the child is built, and it reads
-          <code>none</code> once the child has left the view. Any other name is new, a local of the view
-          that holds the component for what follows
-          (<code>TextField(ref = named); Label(target = named)</code>); one that nothing reads is a
-          compile error. A ref is given once per view and not inside a loop.
+          <code>ref = name</code> on a component call of a view names the component the call places
+          and declares <code>name</code> as a member of the component, usable in its type, style and
+          view. The member is a weak <code>?TextField</code> for <code>TextField(ref = named)</code>:
+          the view sets it when the child is built, and it reads <code>none</code> while the child is
+          not in the view (<code>TextField(ref = named); Label(target = named)</code>). No field is
+          written for it; a field or method of that name is a duplicate identifier. A ref is given
+          once per view and not inside a loop.
+        </p>
+        <p>
+          A method of a component's <code>type { }</code> marked <code>@emit()</code> is an event of
+          the component. A listener is a function or method marked <code>@on</code> that takes
+          <code>ComponentEvent&lt;T&gt;</code> (<code>source</code>, <code>name</code>,
+          <code>result</code>): <code>@on(Button.clicked)</code> hears every button,
+          <code>@on(save.clicked)</code> the one the ref <code>save</code> holds, and
+          <code>@on(Button.clicked, ref("save"))</code> those a selector matches. A listening method
+          runs for each live instance of its type.
         </p>
         <p>
           The unnamed argument of a component call (<code>Text("hi")</code>) sets the controller field
@@ -3492,6 +3501,19 @@ Card(title = "Profile") {
           reaches what the caller passed when that is a field marked <code>@bindable</code> (itself, or
           its whole struct or type) or a property with a setter, named alone or as the last member of a
           path such as <code>model.email</code>. Anything else the caller passes is a copy.
+        </p>
+        <p>
+          A field of a component's <code>type { }</code> marked <code>@state</code> is a state of the
+          component: an assignment that changes its value emits <code>UI.stateChange</code> (in
+          <code>std.ui</code>) with <code>StateChange { source; state; value; previous }</code>, the
+          component, the field's name, the new value and the one it replaced. Listeners
+          (<code>@on(UI.stateChange)</code>, taking <code>Event&lt;StateChange&gt;</code>) run at the
+          assignment, whoever makes it: a method, other code, the parent's view passing the input
+          another value, a bound input assigned by the child. Numbers, strings and enums compare by
+          value, objects, arrays and maps by identity (a change in place is no assignment); an equal
+          value emits nothing, nor do the values a component is built with. A selector picks the changes
+          a listener hears: <code>@on(UI.stateChange, ref("mainTabs").state("selected"))</code>, or
+          <code>own().state("file")</code> in a method of the component itself.
         </p>
         <p>
           Every component has the members of the prelude's <code>Component&lt;T&gt;</code>: inputs such as

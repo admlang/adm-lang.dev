@@ -240,17 +240,28 @@ type Remote {
       <h4><code>@commit()</code></h4>
 <p>A primary event: the method changes state and every commit is implicitly atomic.</p>
       <h4><code>@emit(immediate = false)</code></h4>
-<p>A named event that only the declaring service can emit. Synchronous and side-effect free. Called inside a commit, the event reaches its handlers once the outermost commit has completed, after that commit's own event. With <code>immediate = true</code> the handlers run at the call, inside a commit too, so what they wrote into the event is there when the emitting code goes on. The argument is a bool literal.</p>
+<p>A named event that only the declaring service, or the component whose <code>type { }</code> declares it, can emit. Synchronous and side-effect free. Called inside a commit, the event reaches its handlers once the outermost commit has completed, after that commit's own event. With <code>immediate = true</code> the handlers run at the call, inside a commit too, so what they wrote into the event is there when the emitting code goes on. The argument is a bool literal.</p>
       <h4><code>@query()</code></h4>
 <p>A read-only method that returns a snapshot of state without producing an event. Synchronous and side-effect free.</p>
       <h4><code>@on(serviceMethod, filter = none)</code></h4>
-<p>Declares an observer of another service's event, optionally filtered by a <code>def(Event) bool</code>.</p>
+<p>Declares an observer of another service's event, optionally filtered by a <code>def(Event) bool</code>. The handler takes <code>Event&lt;T&gt;</code>. In place of the filter may stand a matcher, a value with <code>def matchesEvent(result T, listener ?component) bool</code> (<code>EventMatcher&lt;T&gt;</code>): <code>listener</code> is the component whose method listens, <code>none</code> for a function. <code>@on(UI.stateChange, own().state("open"))</code> hears that state of the listening component.</p>
+      <h4><code>@on(Component.event, matcher = none)</code></h4>
+<p>Declares a listener of a component's <code>@emit</code> event; the handler takes <code>ComponentEvent&lt;T&gt;</code> (<code>source</code>, <code>name</code>, <code>result</code>). <code>@on(Button.clicked)</code> hears every <code>Button</code>; <code>@on(save.clicked)</code>, in a component whose view has <code>ref = save</code>, hears that one; a second argument with <code>matches(c component) bool</code>, such as a <code>std.ui</code> selector (<code>ref("save")</code>), says which components are heard. A listening method runs for each live instance of its type.</p>
       <h4><code>@scoped</code></h4>
       <p>
         Marks a component as a scope: it is in the component tree for what it does (a context, the
         keys of what is under it, a behaviour) and is neither laid out nor drawn; its children are
         placed as if they were its parent's. A scoped component names no style and declares no
         <code>render</code>, and <code>isScoped</code> reads true on it.
+      </p>
+      <h4><code>@state</code></h4>
+      <p>
+        On a field written in a component's <code>type { }</code>: the field is a state of the
+        component. An assignment that changes its value emits <code>UI.stateChange</code> with a
+        <code>StateChange</code> (<code>source</code>, <code>state</code>, <code>value</code>,
+        <code>previous</code>); a listener is <code>@on(UI.stateChange)</code> taking
+        <code>Event&lt;StateChange&gt;</code>. An equal value emits nothing (objects, arrays and
+        maps compare by identity), and neither do the values a component is built with.
       </p>
       <h4><code>@controller()</code></h4>
 <p>Marks a type as the controller of a UI component.</p>
