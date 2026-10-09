@@ -2651,6 +2651,11 @@ let f File = try open("file")</code></pre>
           Failing with a string is shorthand for building the builtin <code>Error</code> struct;
           failing with any struct that has the same shape works too, so you can attach extra fields:
         </p>
+        <p>
+          A <code>return</code> without a value ends a function that has no result, one declared
+          <code>none</code>, and one declared <code>!none</code> (it returns without a failure). In a
+          function with any other result it is an error.
+        </p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -3003,6 +3008,12 @@ println(v)</code></pre>
           <code>ChanMode.LIFO</code>) defaults to FIFO. A channel exposes a <code>closed</code> property, and the range form of
           <code>for</code> drains it until the producer closes it: <code>for let value in channel { ... }</code>.
         </p>
+        <p>
+          <code>ch.offer(value)</code> sends only when that needs no waiting and returns whether it sent:
+          a buffered channel must have room, a channel of size 0 a receiver waiting. It never waits and
+          returns <code>false</code> on a closed channel. A wake-up signal several tasks may raise is
+          <code>signal.offer(none)</code> on a <code>channel&lt;none&gt;(1)</code>.
+        </p>
       </div>
 
       <div class="docs-sub" id="select">
@@ -3251,16 +3262,17 @@ def log(evt Event&lt;string&gt;) {
         ADM, not a separate template language.
       </p>
       <p>
-        <span class="api-tag api-planned">planned</span> The standard component set (<code>std.ui.components</code>) is not shipped yet:
-        <code>Button</code>, <code>Text</code>, <code>VStack</code> and the others in the samples below
-        stand for components you declare yourself.
+        The standard component set is <a href="modules.html#std-ui-components"><code>std.ui.components</code></a>:
+        <code>Button</code>, <code>Text</code>, <code>Row</code>, <code>TextField</code> and the rest. A name in the
+        samples below that is not in it (<code>MessageCard</code>) stands for a component you declare
+        yourself.
       </p>
 
       <div class="docs-sub" id="views-styles">
         <h3>Views &amp; Styles</h3>
         <p>
           A view body is a regular ADM block. Components are instantiated like function calls
-          (<code>Button("Logout", onClick=doLogout())</code>), children go in a trailing
+          with arguments passed by name (<code>Button(label = "Logout", onClick = doLogout)</code>), children go in a trailing
           <code>{ ... }</code> block, and ordinary control flow - <code>if</code>/<code>else</code>,
           <code>for</code>, <code>match</code>, the <code>when</code> guard - works right inside it:
         </p>
@@ -3270,24 +3282,22 @@ def log(evt Event&lt;string&gt;) {
             <span class="code-filename">view.adm</span>
           </div>
           <pre><code>view MyView {
-	Button("Logout", onClick=doLogout()) when user.isLoggedIn
+	Button(label = "Logout", onClick = doLogout) when user.isLoggedIn
 
 	if user.isLoggedIn {
-		Text("Welcome back, {user.name}")
+		Text(text = "Welcome back, {user.name}")
 
 		for let (_, item) in messages {
 			MessageCard(item)
 		} empty {
-            Text("You have no messages")
-        }
+			Text(text = "You have no messages")
+		}
 	} else {
-		VStack() {
-			Row() {
-				Text("Welcome", mode="heading")
-				TextField(email)
-				PasswordField(password, placeholder="Please enter your password")
-				Button("Login", onPressed=submit())
-			}
+		Column(gap = 8(px)) {
+			Heading(text = "Welcome")
+			TextField(email, placeholder = "Email", kind = TextKind.Email)
+			TextField(password, placeholder = "Password", kind = TextKind.Password, onSubmit = submit)
+			Button(label = "Login", onClick = submit)
 		}
 	}
 }</code></pre>
@@ -3407,6 +3417,23 @@ component SubmitButton {
           component wrapper splits across files. UI events are delivered through the
           <a href="#services">UI service</a>; a controller method opts in by annotating itself, the way
           <code>onClick</code> does above.
+        </p>
+        <p>
+          <code>children()</code> as a statement of a view is the place of what the caller wrote in the
+          block after the call: <code>view { Text(title); children(); Divider() }</code> puts the block's
+          components between the view's own two parts. It may stand under an <code>if</code> and in the
+          block of a call of the view (<code>Box() { children() }</code>), which hands them on to that
+          child. Their arguments are evaluated in the caller's view, and their <code>parent()</code> is the
+          component whose view placed them. A block that reaches a component, on a call of a component
+          whose view has no <code>children()</code>, is a compile error.
+        </p>
+        <p>
+          The unnamed argument of a component call (<code>Text("hi")</code>) sets the controller field
+          marked <code>@input(value = true)</code>; every other argument is passed by name. A field
+          declared <code>@input(bind = true)</code> is an input its component may assign: the assignment
+          reaches what the caller passed when that is a field marked <code>@bindable</code> (itself, or
+          its whole struct or type) or a property with a setter, named alone or as the last member of a
+          path such as <code>model.email</code>. Anything else the caller passes is a copy.
         </p>
         <p>
           Every component has the members of the prelude's <code>Component&lt;T&gt;</code>: inputs such as

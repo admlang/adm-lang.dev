@@ -1604,6 +1604,14 @@ def onExpiry(evt Event&lt;string&gt;) {
             <p class="api-doc">Emitted when a look setting changes, such as the user switching to dark mode.</p>
           </li>
           <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def addIcons(set IconSet)</code></div>
+            <p class="api-doc">Makes the icons of `set` known by name to components (`Icon("save")`, `Button(icon = "save")`). A set added later is looked in first; one with the name of a set already there replaces it.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def icon(name string) ?canvas.Picture</code></div>
+            <p class="api-doc">The picture of the icon called `name` (`set/name` for the one of that set); none when no set holds it.</p>
+          </li>
+          <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def showTray(icon image.Image, tooltip string = &quot;&quot;, menu MenuEntry[] = []) !none</code></div>
             <p class="api-doc">Shows the application's icon in the system tray, or replaces what the tray shows. `menu` opens from the icon. Fails when the desktop has no tray.</p>
           </li>

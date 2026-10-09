@@ -205,6 +205,7 @@
         <ul class="docs-sub-list">
           <li><a class="docs-nav-sub" href="#std-ui">std.ui</a></li>
           <li><a class="docs-nav-sub" href="#std-ui-styles">std.ui.styles</a></li>
+          <li><a class="docs-nav-sub" href="#std-ui-components">std.ui.components</a></li>
           <li><a class="docs-nav-sub" href="#std-ui-renderer">std.ui.renderer</a></li>
           <li><a class="docs-nav-sub" href="#std-gfx">std.gfx</a></li>
           <li><a class="docs-nav-sub" href="#std-gfx-color">std.gfx.color</a></li>
@@ -665,6 +666,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>lz4</code></td><td>LZ4 blocks and frames</td></tr>
           <tr><td><code>snappy</code></td><td>Snappy blocks and framed streams</td></tr>
           <tr><td><code>zstd</code></td><td>Zstandard, reading and writing, with dictionaries</td></tr>
+          <tr><td><code>ppm</code></td><td>PPMd variant H, reading only (7z and RAR streams)</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-crypto">
@@ -804,6 +806,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>shape</code>, <code>features</code>, <code>ShapedRun</code>, <code>ShapedGlyph</code>, <code>ShapeOptions</code>, <code>TextDirection</code></td><td>OpenType shaping</td></tr>
           <tr><td><code>Hinting</code>, <code>Baselines</code>, <code>Axis</code></td><td>hinted outlines (TrueType, CFF), baselines</td></tr>
           <tr><td><code>VariableFace</code>, <code>VariationAxis</code>, <code>OpenTypeFace</code></td><td>variable fonts, OpenType tables</td></tr>
+          <tr><td><code>sfnt.Sfnt</code>, <code>sfnt.Cmap</code>, <code>sfnt.Head</code>, <code>sfnt.Hhea</code>, <code>sfnt.Names</code>, <code>sfnt.Os2</code>, <code>sfnt.Post</code></td><td>the SFNT container and its tables</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-playlist">
@@ -1297,6 +1300,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>UI</code>, <code>UIConfig</code></td><td>UI service</td></tr>
           <tr><td><code>ComponentRenderer</code>, <code>RenderContext</code>, <code>RenderPasses</code>, <code>Geometry</code>, <code>TextKind</code>, <code>WindowState</code>, <code>CloseRequest</code>, <code>MenuEntry</code>, <code>PointerEvent</code>, <code>PointerPhase</code>, <code>Modifiers</code>, <code>Limit</code>, <code>TextInputClient</code>, <code>TextRange</code>, <code>StateChange</code>, <code>@action</code>, <code>Viewport</code>, <code>Theme</code>, <code>Palette</code></td><td>component drawing, resolved layout, state events, actions</td></tr>
           <tr><td><code>StyleNode</code>, <code>StyleClass</code>, <code>BoxStyle</code>, <code>FontStyle</code>, <code>Selector</code></td><td>style model</td></tr>
+          <tr><td><code>IconSet</code></td><td>named icons an application adds with <code>UI.addIcons</code>; components take an icon by name (<code>Button(icon = "plus")</code>)</td></tr>
           <tr><td><code>ClickEvent</code>, <code>KeyEvent</code>, <code>MouseMoveEvent</code>, <code>TextInputEvent</code>, …</td><td>events; <code>target</code> is the component under the pointer, the window's root when no other is</td></tr>
           <tr><td><code>Key</code>, <code>typesCharacter</code></td><td>the key of a <code>KeyEvent</code> by its meaning in the layout (<code>Key.A</code>, <code>Key.Enter</code>, <code>Key.F5</code>); whether a key types a character</td></tr>
           <tr><td><code>Display</code>, <code>Appearance</code>, <code>ColorScheme</code>, <code>Contrast</code></td><td>displays and system appearance (Linux)</td></tr>
@@ -1311,6 +1315,22 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Interaction</code>, <code>Scrollbars</code>, <code>ImageContent</code>, <code>Motion</code></td><td>pointer, scrollbars, images, transitions</td></tr>
           <tr><td><code>Font</code>, <code>Fill</code>, <code>Sizing</code>, <code>Auto</code>, <code>Anchors</code>, <code>AnchorLine</code>, <code>AnchorEdge</code>, <code>LineStyle</code>, <code>Border</code>, <code>Paint</code>, <code>BackgroundFill</code>, <code>Ring</code>, <code>Shadow</code>, <code>Filter</code>, <code>Transform</code>, <code>Track</code>, <code>Cell</code>, <code>FontWeight</code>, <code>ParagraphLayout</code>, <code>Decoration</code>, <code>TextRun</code>, <code>Cursor</code>, <code>Scrollbar</code>, <code>Transition</code>, <code>Easing</code></td><td>style values</td></tr>
           <tr><td><code>Align</code>, <code>Alignment</code>, <code>Direction</code>, <code>Arrange</code>, <code>Distribute</code>, <code>Position</code>, <code>Layer</code></td><td>alignment, direction, arrangement and positioning</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-ui-components">
+        <h3><code>std.ui.components</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Row</code>, <code>Column</code>, <code>HBox</code>, <code>VBox</code>, <code>Grid</code>, <code>Layered</code>, <code>Panel</code>, <code>ScrollView</code>, <code>SplitPane</code>, <code>Spacer</code>, <code>Divider</code></td><td>layout: rows, columns, grids, stacked layers, scrolling, panes a divider resizes</td></tr>
+          <tr><td><code>Text</code>, <code>Heading</code>, <code>Label</code>, <code>Link</code>, <code>Image</code>, <code>Icon</code>, <code>Badge</code>, <code>Chip</code>, <code>Avatar</code></td><td>text, pictures, icons by name, short notes and tokens</td></tr>
+          <tr><td><code>Canvas</code></td><td>a box the application draws in itself</td></tr>
+          <tr><td><code>Button</code>, <code>ToggleButton</code>, <code>SplitButton</code>, <code>Pressable</code></td><td>buttons; anything made pressable</td></tr>
+          <tr><td><code>Checkbox</code>, <code>Radio</code>, <code>Switch</code>, <code>Slider</code>, <code>Dropdown</code>, <code>ComboBox</code></td><td>choices</td></tr>
+          <tr><td><code>TextField</code>, <code>TextArea</code>, <code>SearchField</code>, <code>NumberField</code></td><td>text and number entry</td></tr>
+          <tr><td><code>MenuBar</code>, <code>Menu</code>, <code>MenuItem</code>, <code>MenuSeparator</code>, <code>ContextMenu</code></td><td>menus</td></tr>
+          <tr><td><code>Tabs</code>, <code>Tab</code>, <code>TabStrip</code>, <code>Breadcrumbs</code>, <code>Accordion</code>, <code>AccordionItem</code>, <code>Toolbar</code>, <code>StatusBar</code></td><td>pages, sections, bars</td></tr>
+          <tr><td><code>Popover</code>, <code>Dialog</code>, <code>HoverCard</code>, <code>Toast</code>, <code>Side</code></td><td>content that floats over the window; the side it opens on</td></tr>
+          <tr><td><code>ProgressBar</code>, <code>Spinner</code></td><td>progress</td></tr>
+          <tr><td><code>ButtonStyle</code>, <code>TextStyle</code>, <code>TextFieldStyle</code>, <code>PanelStyle</code>, <code>RowStyle</code>, <code>ColumnStyle</code>, <code>GridStyle</code>, <code>ScrollViewStyle</code>, <code>DialogStyle</code>, <code>PopoverStyle</code>, <code>DropdownStyle</code>, <code>MenuBarStyle</code>, <code>AccordionItemStyle</code>, <code>PressableStyle</code>, <code>ControlStyle</code>, <code>BarStyle</code>, <code>BarAreaStyle</code>, <code>FigureStyle</code>, <code>BoxStyle</code></td><td>the components' styles</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-ui-renderer">
