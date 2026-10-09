@@ -1500,7 +1500,8 @@ partial type User&lt;T&gt; {
 }</code></pre>
         </div>
         <p>
-          Fields work like struct fields, but can take a default value (<code>name string = "unknown"</code>),
+          Fields work like struct fields, but can take a default value (<code>name string = "unknown"</code>;
+          it is evaluated before the instance exists, so it can't name another member or <code>self</code>),
           and the type itself can carry annotations and modifiers the same way a function can - this one
           is <code>partial</code>, so the rest of it can live in another file, as long as every fragment
           repeats the <code>&lt;T&gt;</code> generic parameter list. <code>use</code> inside a type is
@@ -1778,6 +1779,8 @@ if password := /:alpha/ &amp;&amp; /:digit/ &amp;&amp; /:punct/ {
 	// ...
 }</code></pre>
         </div>
+        <p>A junction beside another condition is written in parentheses:
+          <code>a == b || (c := d || f)</code>. Without them it is a compile error.</p>
       </div>
       <div class="docs-sub" id="loops">
         <h3>Loops</h3>
@@ -3413,6 +3416,9 @@ component SubmitButton {
 }</code></pre>
         </div>
         <p>
+          A component can be <code>internal</code>: it stays inside its module, a part that the
+          module's own components place and that nothing outside can name, so a control split into
+          parts exposes only the one that assembles them.
           A component can be <code>partial</code>, but its embedded view and style can't be - only the
           component wrapper splits across files. UI events are delivered through the
           <a href="#services">UI service</a>; a controller method opts in by annotating itself, the way
@@ -3426,6 +3432,58 @@ component SubmitButton {
           child. Their arguments are evaluated in the caller's view, and their <code>parent()</code> is the
           component whose view placed them. A block that reaches a component, on a call of a component
           whose view has no <code>children()</code>, is a compile error.
+        </p>
+        <p>
+          A <strong>slot</strong> is an input typed <code>view</code>. The caller fills it inside the
+          block of the call with an assignment, and the component's view places it by calling it:
+        </p>
+        <pre><code>component Card {
+    type {
+        @input
+        title string = ""
+        // A slot with a fallback, and an optional one.
+        @input
+        header view = view { Text(title) }
+        @input
+        footer ?view = none
+    }
+    view {
+        header()
+        children()
+        if !(footer is none) {
+            footer()
+        }
+    }
+    style Plain
+}
+
+Card(title = "Profile") {
+    header = view { Icon("user"); Text(user.name) }
+    if canEdit {
+        footer = view { Button("Edit") }
+    }
+    Text(user.bio)
+}</code></pre>
+        <p>
+          <code>view { ... }</code> is an expression: its statements are a view's, written in the scope
+          of whoever writes it, and it has no box of its own. Where it is placed its components become
+          children of the component around the call; placed twice, it is mounted twice. A slot has a
+          fallback, shown while nothing filled it, or is optional and placed under
+          <code>if !(name is none)</code>. Only slots are assigned in a block, and a slot whose name is
+          also in scope where the block is written is a compile error: one of the two is renamed. A slot
+          that receives something is a function returning a view
+          (<code>row ?(def(Item) view) = none</code>, placed with <code>row(item)</code>), filled with
+          <code>row = (it Item) =&gt; Row(it)</code>: a component call written where a view is expected
+          is the view of that call.
+        </p>
+        <p>
+          <code>ref = name</code> on a component call of a view names the component the call places.
+          When <code>name</code> is a field of the controller it is declared
+          <code>weak name ?TextField</code>: the view sets it when the child is built, and it reads
+          <code>none</code> once the child has left the view. Any other name is new, a local of the view
+          that holds the component for what follows
+          (<code>TextField(ref = named); Label(target = named)</code>); one that nothing reads is a
+          compile error. A ref is given once per view and not inside a loop.
         </p>
         <p>
           The unnamed argument of a component call (<code>Text("hi")</code>) sets the controller field

@@ -245,6 +245,13 @@ type Remote {
 <p>A read-only method that returns a snapshot of state without producing an event. Synchronous and side-effect free.</p>
       <h4><code>@on(serviceMethod, filter = none)</code></h4>
 <p>Declares an observer of another service's event, optionally filtered by a <code>def(Event) bool</code>.</p>
+      <h4><code>@scoped</code></h4>
+      <p>
+        Marks a component as a scope: it is in the component tree for what it does (a context, the
+        keys of what is under it, a behaviour) and is neither laid out nor drawn; its children are
+        placed as if they were its parent's. A scoped component names no style and declares no
+        <code>render</code>, and <code>isScoped</code> reads true on it.
+      </p>
       <h4><code>@controller()</code></h4>
 <p>Marks a type as the controller of a UI component.</p>
     </section>

@@ -767,7 +767,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Container</code>, <code>ContainerFormat</code>, <code>VideoDecoder</code>, <code>ContainerCodec</code>, <code>@codec</code>, <code>@decoder</code></td><td>container and decoder interfaces, registering a format</td></tr>
           <tr><td><code>MP4</code>, <code>MKV</code>, <code>AVI</code>, <code>FLV</code>, <code>OGV</code>, <code>MPEG</code>, <code>TS</code>, <code>ASF</code>, <code>MXF</code>, <code>ElementaryStream</code></td><td>containers</td></tr>
           <tr><td><code>H264</code>, <code>HEVC</code>, <code>AV1</code>, <code>Mpeg2</code>, <code>Mpeg4Part2</code>, <code>Msmpeg4v2</code>, <code>VP8</code>, <code>Theora</code>, <code>MJPEG</code></td><td>decoders</td></tr>
-          <tr><td><code>VideoEncoder</code>, <code>VP8Encoder</code></td><td>encoding pictures to packets at a bitrate (VP8: key frames on request, temporal layers)</td></tr>
+          <tr><td><code>VideoEncoder</code>, <code>VP8Encoder</code>, <code>H264Encoder</code></td><td>encoding pictures to packets at a bitrate (VP8, H.264 Constrained Baseline: key frames on request, temporal layers)</td></tr>
           <tr><td><code>VideoHardware</code>, <code>HardwareDecoder</code>, <code>GpuPicture</code>, <code>download</code></td><td>GPU decoding (NVDEC, VA-API), frames kept on the GPU</td></tr>
         </table>
       </div>
@@ -1326,9 +1326,9 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Button</code>, <code>ToggleButton</code>, <code>SplitButton</code>, <code>Pressable</code></td><td>buttons; anything made pressable</td></tr>
           <tr><td><code>Checkbox</code>, <code>Radio</code>, <code>Switch</code>, <code>Slider</code>, <code>Dropdown</code>, <code>ComboBox</code></td><td>choices</td></tr>
           <tr><td><code>TextField</code>, <code>TextArea</code>, <code>SearchField</code>, <code>NumberField</code></td><td>text and number entry</td></tr>
-          <tr><td><code>MenuBar</code>, <code>Menu</code>, <code>MenuItem</code>, <code>MenuSeparator</code>, <code>ContextMenu</code></td><td>menus</td></tr>
+          <tr><td><code>MenuBar</code>, <code>Menu</code>, <code>MenuItem</code>, <code>SubMenu</code>, <code>MenuSeparator</code>, <code>ContextMenu</code></td><td>menus</td></tr>
           <tr><td><code>Tabs</code>, <code>Tab</code>, <code>TabStrip</code>, <code>Breadcrumbs</code>, <code>Accordion</code>, <code>AccordionItem</code>, <code>Toolbar</code>, <code>StatusBar</code></td><td>pages, sections, bars</td></tr>
-          <tr><td><code>Popover</code>, <code>Dialog</code>, <code>HoverCard</code>, <code>Toast</code>, <code>Side</code></td><td>content that floats over the window; the side it opens on</td></tr>
+          <tr><td><code>Popover</code>, <code>Dialog</code>, <code>HoverCard</code>, <code>Tooltip</code>, <code>Toast</code>, <code>Side</code></td><td>content that floats over the window; the side it opens on</td></tr>
           <tr><td><code>ProgressBar</code>, <code>Spinner</code></td><td>progress</td></tr>
           <tr><td><code>ButtonStyle</code>, <code>TextStyle</code>, <code>TextFieldStyle</code>, <code>PanelStyle</code>, <code>RowStyle</code>, <code>ColumnStyle</code>, <code>GridStyle</code>, <code>ScrollViewStyle</code>, <code>DialogStyle</code>, <code>PopoverStyle</code>, <code>DropdownStyle</code>, <code>MenuBarStyle</code>, <code>AccordionItemStyle</code>, <code>PressableStyle</code>, <code>ControlStyle</code>, <code>BarStyle</code>, <code>BarAreaStyle</code>, <code>FigureStyle</code>, <code>BoxStyle</code></td><td>the components' styles</td></tr>
         </table>
