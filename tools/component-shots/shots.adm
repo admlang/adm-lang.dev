@@ -233,8 +233,8 @@ module shots {
 			Box
 			Layout
 			arrange = Arrange.Row
-			gap = new Axes<Extent>(8(px))
-			align = Align{vertical: Alignment.Center}
+			gap     = new Axes(8(px))
+			align   = Align{vertical: Alignment.Center}
 		}
 	}
 
@@ -245,17 +245,16 @@ module shots {
 		Layout
 		Decorated
 		Compositing
-		let palette = UI.theme().palette
 
 		width = 300(px)
-		padding = new Edges<Extent>(12(px))
-		gap = new Axes<Extent>(8(px))
-		radius = new Corners<Extent>(8(px))
-		background = new BackgroundFill(palette.surface)
-		border = new Edges<Border>(Border{width: 1(px), paint: palette.border})
+		padding = new Edges(12(px))
+		gap = new Axes(8(px))
+		radius = new Corners(8(px))
+		background = new BackgroundFill(theme.palette.surface)
+		border = new Edges(Border{width: 1(px), paint: theme.palette.border})
 		on = {
-			hover:    {background: new BackgroundFill(palette.surfaceRaised)},
-			pressed:  {background: new BackgroundFill(palette.surfaceSunken)},
+			hover:    {background: new BackgroundFill(theme.palette.surfaceRaised)},
+			pressed:  {background: new BackgroundFill(theme.palette.surfaceSunken)},
 			disabled: {opacity: 0.4},
 		}
 	}
@@ -338,13 +337,12 @@ module shots {
 	style MeterLook {
 		Box
 		Decorated
-		let palette = UI.theme().palette
 
 		width = 180(px)
 		height = 14(px)
-		radius = new Corners<Extent>(7(px))
-		background = new BackgroundFill(palette.surfaceSunken)
-		border = new Edges<Border>(Border{width: 1(px), paint: palette.border})
+		radius = new Corners(7(px))
+		background = new BackgroundFill(theme.palette.surfaceSunken)
+		border = new Edges(Border{width: 1(px), paint: theme.palette.border})
 	}
 
 	component Meter {
@@ -378,23 +376,14 @@ module shots {
 			Box
 			Layout
 			position = Position.Relative
-			anchors = Anchors{top: 6(px), right: 6(px)}
-			layer = Layer.Floating
+			anchors  = Anchors{top: 6(px), right: 6(px)}
+			layer    = Layer.Floating
 		}
 	}
 
-	// Placed against another component: under its bottom edge, from its left edge.
+	// Placed against another component: under the one before it, from its left edge.
 	component Hint {
-		type {
-			@input
-			target ?component = none
-
-			def attached() {
-				let under = new AnchorLine(target, AnchorEdge.Bottom)
-				under.offset = 4(px)
-				style.anchors = Anchors{top: under, left: new AnchorLine(target, AnchorEdge.Left)}
-			}
-		}
+		type {}
 
 		view {
 			Text(text = "Saves the file")
@@ -404,7 +393,23 @@ module shots {
 			Box
 			Layout
 			position = Position.Absolute
-			layer = Layer.Tooltip
+			layer    = Layer.Tooltip
+			anchors  = {top: $prev.geom.bottom + 4(px), left: $prev.geom.left}
+		}
+	}
+
+	// A component whose style starts as another component's.
+	component NoteCard {
+		type {}
+
+		view {
+			children()
+		}
+
+		style {
+			Card.style
+			width  = 200(px)
+			radius = new Corners(2(px))
 		}
 	}
 
@@ -524,8 +529,8 @@ module shots {
 			def new() {
 				style.width = fill
 				style.height = fill
-				style.padding = new Edges<Extent>(12(px))
-				style.gap = new Axes<Extent>(8(px))
+				style.padding = new Edges(12(px))
+				style.gap = new Axes(8(px))
 			}
 		}
 
@@ -773,8 +778,8 @@ module shots {
 						}
 					}
 				case "hint":
-					Button(label = "Save", ref = save)
-					Hint(target = save)
+					Button(label = "Save")
+					Hint()
 				case "settings":
 					SettingsPage()
 				default:

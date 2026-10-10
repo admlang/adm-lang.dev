@@ -1530,6 +1530,14 @@ partial type User&lt;T&gt; {
           <code>Secret&lt;string&gt;/string</code>.
         </p>
         <p>
+          A <code>new</code> may leave out what the code around it says. The type arguments of a
+          generic type come from where the value goes when that is declared, otherwise from the
+          constructor's arguments: <code>padding Edges&lt;Extent&gt; = new Edges(12(px))</code>,
+          <code>let free = new Edges(2.5)</code>. Where the whole type is declared,
+          <code>new(...)</code> is enough: <code>card.padding = new(9.0)</code>,
+          <code>return new(7.0)</code>.
+        </p>
+        <p>
           A <code>where T is Constraint { ... }</code> block adds members that only exist when the
           generic parameter satisfies that constraint. Instantiate the type with a type argument that
           doesn't match, and those members simply aren't there:

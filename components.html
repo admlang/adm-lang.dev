@@ -191,7 +191,7 @@ component Counter {
 		Box
 		Layout
 		arrange = Arrange.Row
-		gap = new Axes&lt;Extent&gt;(8(px))
+		gap = new Axes(8(px))
 		align = Align{vertical: Alignment.Center}
 	}
 }</code></pre>
@@ -783,8 +783,8 @@ style CardLook {
         <h3>Setting properties</h3>
         <p>
           The style block is where a component's look is written: after the styles it embeds, each
-          line assigns a property. A <code>let</code> is a value of the body's own, read by the lines
-          after it.
+          line assigns a property. <code>theme</code> is the application's theme, and a property
+          assigned from it follows the theme when it changes.
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -795,14 +795,13 @@ style CardLook {
 	Box
 	Layout
 	Decorated
-	let palette = UI.theme().palette
 
 	width = 300(px)
-	padding = new Edges&lt;Extent&gt;(12(px))
-	gap = new Axes&lt;Extent&gt;(8(px))
-	radius = new Corners&lt;Extent&gt;(8(px))
-	background = new BackgroundFill(palette.surface)
-	border = new Edges&lt;Border&gt;(Border{width: 1(px), paint: palette.border})
+	padding = new Edges(12(px))
+	gap = new Axes(8(px))
+	radius = new Corners(8(px))
+	background = new BackgroundFill(theme.palette.surface)
+	border = new Edges(Border{width: 1(px), paint: theme.palette.border})
 }</code></pre>
         </div>
         <ul>
@@ -812,13 +811,50 @@ style CardLook {
             <code>margin = {left: 16(px)}</code>.</li>
           <li>A property the style does not embed is a compile error: a style of <code>Box</code> and
             <code>Layout</code> has no <code>background</code> to set.</li>
-          <li>The body runs once for each component, when its style is made.</li>
-          <li>A style that embeds another style of yours takes that style's properties and their
-            defaults, not the assignments its body makes.</li>
+          <li>A <code>let</code> is a value of the body's own, set once when the style is made and read
+            by the lines after it; it cannot read <code>theme</code>.</li>
+          <li>The assignments are made once for each component, when its style is made. Those that
+            read <code>theme</code>, or a property assigned from it above, are made again when the
+            theme changes; a state's look in
+            <code>on</code> reads the theme each time it applies.</li>
+          <li>In a component's own style block <code>self</code> is the component:
+            <code>gap = new Axes(self.gap)</code> takes the input <code>gap</code> and follows it.</li>
+          <li>A style that embeds another takes what that style's body assigns too, as if it were
+            written where the style is named, and then makes its own assignments. So do the embedded
+            style's <code>on</code>, <code>enter</code> and <code>exit</code>, which apply before its
+            own.</li>
         </ul>
         <p>
-          The controller reaches the same object as <code>style</code>, for what depends on its inputs
-          or changes while the component lives:
+          <code>Button.style</code> on a line of its own embeds the style of a component, so a new
+          component starts with the look of another and changes what it needs:
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">note_card.adm</span>
+          </div>
+          <pre><code>component NoteCard {
+	type {}
+
+	view {
+		children()
+	}
+
+	style {
+		Card.style
+		width = 200(px)
+		radius = new Corners(2(px))
+	}
+}</code></pre>
+        </div>
+        <p>
+          What comes along is the other component's style block: its properties, the values the block
+          assigns, its states and its enter and exit. What that component's constructor assigns to
+          <code>style</code> does not.
+        </p>
+        <p>
+          The controller reaches the same object as <code>style</code>, for what changes while the
+          component lives:
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -913,25 +949,18 @@ Panel() {
           <code>bottom</code>, <code>centerX</code> and <code>centerY</code>. A distance is measured from
           the matching edge of the box the component is placed against; <code>left</code> and
           <code>right</code> both set stretch it across. An anchor can also name an edge of another
-          component, which it then follows when that component moves:
+          component, which it then follows when that component moves. <code>$x</code> is the style of
+          the component <code>x</code>, and <code>geom</code> in it is where layout put that
+          component:
         </p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">hint.adm</span>
           </div>
-          <pre><code>// Under `target`, starting at its left edge.
+          <pre><code>// Under the component placed before it, starting at its left edge.
 component Hint {
-	type {
-		@input
-		target ?component = none
-
-		def attached() {
-			let under = new AnchorLine(target, AnchorEdge.Bottom)
-			under.offset = 4(px)
-			style.anchors = Anchors{top: under, left: new AnchorLine(target, AnchorEdge.Left)}
-		}
-	}
+	type {}
 
 	view {
 		Text(text = "Saves the file")
@@ -942,18 +971,47 @@ component Hint {
 		Layout
 		position = Position.Absolute
 		layer = Layer.Tooltip
+		anchors = {top: $prev.geom.bottom + 4(px), left: $prev.geom.left}
 	}
 }
 
 view {
-	Button(label = "Save", ref = save)
-	Hint(target = save)
+	Button(label = "Save")
+	Hint()
 }</code></pre>
         </div>
         <figure class="shot">
           <img src="assets/components/hint.png" width="200" height="90" alt="A text placed under a button by an anchor" loading="lazy">
-          <figcaption><code>Hint</code> anchored to the bottom and the left edge of the button named <code>save</code>.</figcaption>
+          <figcaption><code>Hint</code> anchored to the bottom and the left edge of the button before it.</figcaption>
         </figure>
+        <p>
+          In a style block four names stand after <code>$</code> for the components around this one,
+          and in a component's own style block any other name is a <code>ref</code> of its view:
+        </p>
+        <table class="docs-table">
+          <thead><tr><th>Name</th><th>Whose style</th></tr></thead>
+          <tbody>
+            <tr><td><code>$parent</code></td><td>The component this one is a child of</td></tr>
+            <tr><td><code>$root</code></td><td>The top of its tree</td></tr>
+            <tr><td><code>$prev</code>, <code>$next</code></td><td>The siblings before and after it</td></tr>
+            <tr><td><code>$field</code></td><td>The child its view places with <code>ref = field</code>, with the properties of that component's style</td></tr>
+          </tbody>
+        </table>
+        <ul>
+          <li>The four names have what every style has: <code>geom</code>, with the lines
+            <code>left</code>, <code>top</code>, <code>right</code>, <code>bottom</code>,
+            <code>centerX</code>, <code>centerY</code> for anchors and the rectangles
+            <code>frame</code>, <code>bounds</code> and <code>content</code> for numbers.</li>
+          <li>A property assigned from another component is set again before each layout:
+            <code>width = $parent.geom.frame.width</code> is what the last layout gave the parent, a
+            line in <code>anchors</code> is followed in the same layout.</li>
+          <li>When the component is not there (no sibling on that side, a ref whose child is not in
+            the view), the assignment is not made and the property keeps its value.</li>
+          <li><code>on</code>, <code>enter</code> and <code>exit</code> cannot read
+            <code>$x</code>.</li>
+          <li>Outside a style block <code>$x</code> is short for <code>x.style</code> on any
+            component you hold.</li>
+        </ul>
         <p>
           <code>Popover</code>, <code>Menu</code> and <code>Tooltip</code> are built this way and also
           flip to the other side when there is no room; reach for them before writing anchors by hand.
@@ -1009,12 +1067,11 @@ view {
 	Layout
 	Decorated
 	Compositing
-	let palette = UI.theme().palette
 
-	background = new BackgroundFill(palette.surface)
+	background = new BackgroundFill(theme.palette.surface)
 	on = {
-		hover:    {background: new BackgroundFill(palette.surfaceRaised)},
-		pressed:  {background: new BackgroundFill(palette.surfaceSunken)},
+		hover:    {background: new BackgroundFill(theme.palette.surfaceRaised)},
+		pressed:  {background: new BackgroundFill(theme.palette.surfaceSunken)},
 		disabled: {opacity: 0.4},
 	}
 }</code></pre>
@@ -1088,13 +1145,12 @@ view {
           <pre><code>style MeterLook {
 	Box
 	Decorated
-	let palette = UI.theme().palette
 
 	width = 180(px)
 	height = 14(px)
-	radius = new Corners&lt;Extent&gt;(7(px))
-	background = new BackgroundFill(palette.surfaceSunken)
-	border = new Edges&lt;Border&gt;(Border{width: 1(px), paint: palette.border})
+	radius = new Corners(7(px))
+	background = new BackgroundFill(theme.palette.surfaceSunken)
+	border = new Edges(Border{width: 1(px), paint: theme.palette.border})
 }
 
 component Meter {
@@ -1215,9 +1271,9 @@ UI.theme().follow(UI.appearance())</code></pre>
           <code>UI.appearance()</code> is what the desktop reports (<code>scheme</code>,
           <code>accent</code>, <code>contrast</code>, <code>reduceMotion</code>, <code>textScale</code>,
           the fonts), and <code>UI.appearanceChange</code> is emitted when the user changes it. A
-          style block runs when its component is created, so the colours it reads are those of that
-          moment: a component that has to follow a change of theme while it is on screen reads the
-          palette in <code>render</code>, or sets the property again when the event arrives.
+          style block reads the theme as <code>theme</code>, and what it assigns from it is assigned
+          again when the theme changes, so a component on screen follows a change of scheme without
+          code of its own. The built-in components have their whole look in their style blocks.
         </p>
       </div>
 
