@@ -1677,7 +1677,82 @@ def onExpiry(evt Event&lt;string&gt;) {
       <div class="docs-sub" id="svc-vault">
         <h3><code>Vault</code></h3>
         <p>The application's encrypted key/value store: credentials, tokens, keys and settings kept between runs, in one file under the application's home folder, bound to the machine, the user and the application (no password; the file copied elsewhere does not open). Secrets go in and come out as <code>Secret&lt;T&gt;</code> (<code>put</code>/<code>get</code>), values come back plain (<code>store</code>/<code>load</code>); <code>remove</code>, <code>has</code>, <code>list</code>; permissions <code>adm.vault.read</code> and <code>adm.vault.write</code>.</p>
-        <p class="api-doc">Linux today (the machine identity is <code>/etc/machine-id</code>); <code>VaultConfig{path, memoryKiB = 65536, passes = 3}</code> chooses the file and the key derivation's cost. Keys the vault makes or takes in (<code>generateKey</code> of a <code>KeyKind</code>, <code>importKey</code>) never come out: <code>publicKey</code>, <code>sign</code>, <code>decrypt</code> (RSA-OAEP) and <code>agree</code> (X25519) run inside it under <code>adm.vault.keys</code>.</p>
+        <p>What the binding protects: the file read on another machine, by another user of this machine, or by another application. It does not protect against code running as this user on this machine, which can derive the same key. The machine identity is read on Linux today; on macOS and Windows the service does not start yet.</p>
+        <p>A name is not empty and made of <code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>.</code>, <code>_</code> and <code>-</code>, with dots separating its parts; an application and the libraries it uses share one name space. A value is of any type that crosses a process link (numbers, strings, arrays, maps, optionals, tuples, unions, structs, <code>@portable</code> types, types with <code>toWire</code>/<code>fromWire</code>) and is stored in the IPC wire encoding.</p>
+        <p><span class="api-tag api-planned">planned</span> The UI keeps what <a href="annotations.html"><code>@persist(key)</code></a> fields and <code>WindowConfig.persist</code> save here, as values under <code>ui.persist.&lt;key&gt;</code>.</p>
+        <p>A private key (<code>generateKey</code>, <code>importKey</code>) never comes out: the vault signs, decrypts and agrees with it behind <code>adm.vault.keys</code> and gives its public key. The service starts manually; <code>VaultConfig</code> (<code>path</code>, <code>memoryKiB</code> = 65536, <code>passes</code> = 3: the Argon2id cost of opening it) is applied before <code>start</code>. It declares no events.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def put&lt;T&gt;(name string, value Secret&lt;T&gt;) !none</code></div>
+            <p class="api-doc">Keeps <code>value</code> as the secret <code>name</code>, replacing what was there. Fails when the vault is not started, the name is not one, or the file cannot be written. Needs <code>adm.vault.write</code>.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def get&lt;T&gt;(name string) !?Secret&lt;T&gt;</code></div>
+            <p class="api-doc">The secret <code>name</code>, none when there is none. Fails when the vault is not started, the entry was stored as a value, or it does not decode as <code>T</code>. Needs <code>adm.vault.read</code>.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def store&lt;T&gt;(name string, value T) !none</code></div>
+            <p class="api-doc">Keeps <code>value</code> under <code>name</code>, replacing what was there. Fails as <code>put</code> does. Needs <code>adm.vault.write</code>.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def load&lt;T&gt;(name string) !?T</code></div>
+            <p class="api-doc">The value <code>name</code>, none when there is none. Fails when the vault is not started, the entry was stored as a secret, or it does not decode as <code>T</code>. Needs <code>adm.vault.read</code>.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def remove(name string) !none</code></div>
+            <p class="api-doc">Removes the entry <code>name</code>; nothing happens for a name that is not there. Fails when the vault is not started or the file cannot be written. Needs <code>adm.vault.write</code>.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def has(name string) !bool</code></div>
+            <p class="api-doc">Whether an entry called <code>name</code> is there. Fails when the vault is not started. Needs <code>adm.vault.read</code>.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def list(prefix string = &quot;&quot;) !string[]</code></div>
+            <p class="api-doc">The names that start with <code>prefix</code>, sorted; every name for <code>""</code>. Fails when the vault is not started. Needs <code>adm.vault.read</code>.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def generateKey(name string, kind KeyKind) !none</code></div>
+            <p class="api-doc">Makes a new key of <code>kind</code> (<code>Ed25519</code>, <code>EcdsaP256</code>, <code>EcdsaP384</code>, <code>Rsa2048</code>, <code>Rsa3072</code>, <code>X25519</code>) and keeps it as <code>name</code>, replacing what was there. Fails as <code>put</code> does. Needs <code>adm.vault.write</code>.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def importKey(name string, key PrivateKey) !none</code></div>
+            <p class="api-doc">Keeps <code>key</code> as <code>name</code>, replacing what was there. Fails as <code>put</code> does. Needs <code>adm.vault.write</code>.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def removeKey(name string) !none</code></div>
+            <p class="api-doc">Removes the key <code>name</code>; nothing happens for a name that is not there. Fails as <code>remove</code> does. Needs <code>adm.vault.write</code>.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def publicKey(name string) !PublicKey</code></div>
+            <p class="api-doc">The public half of the key <code>name</code>. Fails when the vault is not started or <code>name</code> is not a key. Needs <code>adm.vault.read</code>.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def sign(name string, message byte[], hash Hash = Hash.SHA256) !byte[]</code></div>
+            <p class="api-doc">Signs <code>message</code> with the key <code>name</code>: Ed25519 signs the message itself; ECDSA signs its <code>hash</code> digest and gives the ASN.1 signature; RSA signs the digest with PKCS#1 v1.5. Fails when the vault is not started, <code>name</code> is not a key, or the key's kind does not sign (X25519). Needs <code>adm.vault.keys</code>.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def decrypt(name string, ciphertext byte[], hash Hash = Hash.SHA256) !byte[]</code></div>
+            <p class="api-doc">Decrypts <code>ciphertext</code> with the RSA key <code>name</code> (OAEP over <code>hash</code>). Fails when the vault is not started, <code>name</code> is not a key, the key is not RSA, or the ciphertext does not open. Needs <code>adm.vault.keys</code>.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def agree(name string, peer PublicKey) !byte[]</code></div>
+            <p class="api-doc">The shared secret of the X25519 key <code>name</code> and <code>peer</code>. Fails when the vault is not started, <code>name</code> is not a key, or either key is not X25519. Needs <code>adm.vault.keys</code>.</p>
+
+          </li>
+        </ul>
       </div>
     </section>
 

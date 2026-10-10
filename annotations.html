@@ -265,6 +265,14 @@ type Remote {
         <code>Event&lt;StateChange&gt;</code>. An equal value emits nothing (objects, arrays and
         maps compare by identity), and neither do the values a component is built with.
       </p>
+      <h4><code>@persist(key)</code> <span class="api-tag api-planned">planned</span></h4>
+      <p>
+        On a field written in a component's <code>type { }</code>: the field's value is saved
+        under <code>key</code> when it changes and restored when the component is created
+        again, between runs too. The values are kept by the <code>Vault</code> service
+        (<code>store</code>/<code>load</code> under <code>ui.persist.&lt;key&gt;</code>). The
+        annotation is accepted today and saves nothing yet.
+      </p>
       <h4><code>@controller()</code></h4>
 <p>Marks a type as the controller of a UI component.</p>
     </section>
