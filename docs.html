@@ -3494,9 +3494,18 @@ Card(title = "Profile") {
           <code>List&lt;File&gt;(files)</code>, or leaves them to its arguments,
           <code>List(files)</code>; a parameter no argument settles takes its default or is a compile
           error. Each instance is compiled for its own type arguments. A <code>ref</code> on such a
-          call needs the type arguments written, a generic component declares its controller in its
-          own <code>type { }</code>, and a type parameter cannot be named in the component's inline
-          <code>style { }</code>.
+          call needs the type arguments written, and a type parameter cannot be named in the
+          component's inline <code>style { }</code>.
+        </p>
+        <p>
+          A component may name its controller as a type declared apart and marked
+          <code>@controller()</code>: <code>component Counter { ...; type Counting }</code>. The
+          component has that type's fields, inputs and methods as if they stood in its own
+          <code>type { }</code>, and inside the controller <code>self</code> is the component.
+          Several components may name one controller, each with its own state; the controller may be
+          a <code>partial type</code> split over files, and for a generic component it declares the
+          component's type parameters (<code>type Listed&lt;T&gt;</code>). <code>@state</code>,
+          <code>@emit</code> and <code>ref</code> need the inline <code>type { }</code>.
         </p>
         <p>
           A method of a component's <code>type { }</code> marked <code>@emit()</code> is an event of
@@ -3604,7 +3613,17 @@ def hide(c component) {
             listed properties on the style given (a <code>clone()</code>, when the component's own
             look must stay).</li>
           <li>A value may name what the module sees and the style's own <code>let</code>s.
-            Embedding a style does not bring its <code>enter</code> and <code>exit</code>.</li>
+            Embedding a style does not bring its <code>enter</code> and <code>exit</code>.
+            A style body may also assign <code>on</code>, the looks of states:
+            <code>on = {hover: {opacity: 0.8}, [hover, selected]: {...}, disabled: {opacity: 0.4}}</code>.
+            A state is <code>hover</code>, <code>pressed</code>, <code>focused</code>, <code>focusWithin</code>,
+            <code>focusVisible</code>, <code>disabled</code>, <code>dragging</code> or <code>dropTarget</code>, a
+            <code>@state</code> bool field of the component, or a case of one of its <code>@state</code> enum fields;
+            a list of states and an <code>on</code> inside an entry hold when all of them do. Entries that hold are
+            applied in the order written to a copy of the style the component is drawn with; a name that is no
+            state of the component is an error. Embedding a style does not bring its <code>on</code>.
+            A style embedded twice, or reached through two styles that both embed it, is one copy of its properties;
+            two different declarations of one property name are an error.</li>
           <li>A child a view no longer places, whose style has an <code>exit</code>, leaves
             <code>children</code> for its parent's <code>leaving</code> and stays drawn until the
             exit has played; <code>parent.finishLeaving(child)</code> lets go of it (the UI

@@ -204,6 +204,7 @@
         <a class="docs-nav-top" href="#graphics">Graphics &amp; UI</a>
         <ul class="docs-sub-list">
           <li><a class="docs-nav-sub" href="#std-ui">std.ui</a></li>
+          <li><a class="docs-nav-sub" href="#std-ui-icons">std.ui.icons</a></li>
           <li><a class="docs-nav-sub" href="#std-ui-styles">std.ui.styles</a></li>
           <li><a class="docs-nav-sub" href="#std-ui-components">std.ui.components</a></li>
           <li><a class="docs-nav-sub" href="#std-ui-renderer">std.ui.renderer</a></li>
@@ -681,7 +682,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>x25519</code>, <code>x448</code>, <code>ecdh</code></td><td>key agreement</td></tr>
           <tr><td><code>MLKEMPublicKey</code>, <code>MLKEMPrivateKey</code>, <code>generateMLKEMKey</code></td><td>ML-KEM (FIPS 203)</td></tr>
           <tr><td><code>bcrypt</code>, <code>bcryptVerify</code></td><td>password hashes</td></tr>
-          <tr><td><code>parsePKIXPublicKey</code>, <code>parsePKCS1PrivateKey</code>, <code>parsePKCS8PrivateKey</code>, …</td><td>key encodings</td></tr>
+          <tr><td><code>parsePKIXPublicKey</code>, <code>parsePKCS1PrivateKey</code>, <code>parsePKCS8PrivateKey</code>, <code>marshalPKCS8PrivateKey</code>, <code>marshalPKCS1PrivateKey</code>, …</td><td>key encodings (PKIX, PKCS #1, PKCS #8 both ways)</td></tr>
           <tr><td><code>constantTimeEqual</code></td><td>constant-time comparison</td></tr>
         </table>
       </div>
@@ -692,7 +693,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>SHAKE128</code>, <code>SHAKE256</code></td><td>extendable output</td></tr>
           <tr><td><code>CRC8</code> … <code>CRC64</code>, <code>Adler32</code></td><td>checksums</td></tr>
           <tr><td><code>HMAC</code>, <code>hmac</code></td><td>HMAC</td></tr>
-          <tr><td><code>hkdf</code>, <code>pbkdf2</code>, <code>concatKDF</code></td><td>key derivation</td></tr>
+          <tr><td><code>hkdf</code>, <code>pbkdf2</code>, <code>concatKDF</code>, <code>argon2id</code>, <code>argon2</code>, <code>Argon2Kind</code></td><td>key derivation (Argon2: RFC 9106, memory-hard)</td></tr>
           <tr><td><code>Hash</code></td><td>every digest by name</td></tr>
         </table>
       </div>
@@ -1308,11 +1309,19 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Display</code>, <code>Appearance</code>, <code>ColorScheme</code>, <code>Contrast</code></td><td>displays and system appearance (Linux)</td></tr>
         </table>
       </div>
+      <div class="docs-sub" id="std-ui-icons">
+        <h3><code>std.ui.icons</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>@icons</code></td><td>on a <code>partial type</code>: turns a folder of SVG files into an icon set while the program is built (<code>@icons("assets/icons") partial type AppIcons {}</code>); the type gets <code>set() !IconSet</code> for <code>UI.addIcons</code> and one name per file (<code>arrow-left.svg</code> is <code>ArrowLeft</code>)</td></tr>
+          <tr><td><code>fromSvg</code></td><td>an <code>IconSet</code> from SVG documents read at run time</td></tr>
+        </table>
+      </div>
       <div class="docs-sub" id="std-ui-styles">
         <h3><code>std.ui.styles</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Box</code>, <code>Layout</code>, <code>Tracks</code>, <code>Clipping</code></td><td>size, placement and arrangement</td></tr>
           <tr><td><code>Shape</code>, <code>Background</code>, <code>Borders</code>, <code>Outline</code>, <code>Shadows</code>, <code>Filters</code>, <code>Backdrop</code>, <code>Compositing</code>, <code>Effects</code>, <code>Transforms</code></td><td>painting and effects</td></tr>
+          <tr><td><code>Decorated</code>, <code>Control</code></td><td>umbrellas: everything a box is painted with (background, borders, outline, shadows on one shape); a control's paint, text, pointer behaviour and timing</td></tr>
           <tr><td><code>Foreground</code>, <code>Typography</code>, <code>Editable</code>, <code>TextRendering</code></td><td>text</td></tr>
           <tr><td><code>Interaction</code>, <code>Scrollbars</code>, <code>ImageContent</code>, <code>Motion</code></td><td>pointer, scrollbars, images, transitions</td></tr>
           <tr><td><code>Font</code>, <code>Fill</code>, <code>Sizing</code>, <code>Auto</code>, <code>Anchors</code>, <code>AnchorLine</code>, <code>AnchorEdge</code>, <code>LineStyle</code>, <code>Border</code>, <code>Paint</code>, <code>BackgroundFill</code>, <code>Ring</code>, <code>Shadow</code>, <code>Filter</code>, <code>Transform</code>, <code>Track</code>, <code>Cell</code>, <code>FontWeight</code>, <code>ParagraphLayout</code>, <code>Decoration</code>, <code>TextRun</code>, <code>Cursor</code>, <code>Scrollbar</code>, <code>Transition</code>, <code>Easing</code></td><td>style values</td></tr>

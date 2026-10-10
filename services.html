@@ -1676,8 +1676,8 @@ def onExpiry(evt Event&lt;string&gt;) {
       </div>
       <div class="docs-sub" id="svc-vault">
         <h3><code>Vault</code></h3>
-        <p>Encrypted storage for secrets.</p>
-        <p class="docs-placeholder">Planned - no public methods yet.</p>
+        <p>The application's encrypted key/value store: credentials, tokens, keys and settings kept between runs, in one file under the application's home folder, bound to the machine, the user and the application (no password; the file copied elsewhere does not open). Secrets go in and come out as <code>Secret&lt;T&gt;</code> (<code>put</code>/<code>get</code>), values come back plain (<code>store</code>/<code>load</code>); <code>remove</code>, <code>has</code>, <code>list</code>; permissions <code>adm.vault.read</code> and <code>adm.vault.write</code>.</p>
+        <p class="api-doc">Linux today (the machine identity is <code>/etc/machine-id</code>); <code>VaultConfig{path, memoryKiB = 65536, passes = 3}</code> chooses the file and the key derivation's cost. Keys the vault makes or takes in (<code>generateKey</code> of a <code>KeyKind</code>, <code>importKey</code>) never come out: <code>publicKey</code>, <code>sign</code>, <code>decrypt</code> (RSA-OAEP) and <code>agree</code> (X25519) run inside it under <code>adm.vault.keys</code>.</p>
       </div>
     </section>
 

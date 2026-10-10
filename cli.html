@@ -183,6 +183,7 @@
         <tr><td><code>--deps-only / --no-deps</code></td><td>Build only dependencies of the selected targets, or none of them.</td></tr>
         <tr><td><code>--no-cache</code></td><td>Disable IR caching.</td></tr>
         <tr><td><code>--perf</code></td><td>Show performance metrics.</td></tr>
+        <tr><td><code>--quiet</code></td><td>Do not show the build's stages. Without it a terminal gets a live view: one line per finished stage (sources, parse, resolve, types, ir, modules, native support, link) with what it processed, what the caches saved and its duration, a progress bar for the stage running, and <code>built &lt;path&gt;</code> with the total; a build of several units leaves one line per unit. A pipe or an IDE console gets the same lines printed as the stages finish.</td></tr>
       </table>
       <div class="code-window">
         <div class="code-titlebar">
@@ -290,6 +291,7 @@ adm fmt --check src/</code></pre>
         <tr><td><code>--hot</code></td><td>Rebuild whenever a source file changes and swap the changed function bodies into the running program, which keeps its state. Function literals count: a handler written inline takes its new body. A change that is more than function bodies (a type's fields, a module variable, a signature, a function literal added or removed) restarts the program and says why; a build error leaves it running. A component's view shows an edited argument, handler or structure on the next frame; an edited style does not show yet. The run ends when the program exits with 0 (its window was closed); a program that failed is waited on until a change rebuilds it. Linux.</td></tr>
         <tr><td><code>--path DIR</code></td><td>Build targets under the directory.</td></tr>
         <tr><td><code>--release / --debug</code></td><td>Optimization level, as for <code>build</code>.</td></tr>
+        <tr><td><code>--quiet</code></td><td>Do not show the build's stages before the program runs, as for <code>build</code>; the view closes before the program starts, which then owns the terminal.</td></tr>
         <tr><td><code>--backend, --os, --arch, --features, --no-cache</code></td><td>As for <code>build</code>.</td></tr>
       </table>
       <div class="code-window">
