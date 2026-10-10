@@ -798,3 +798,82 @@ code, pre, .code-window {
 .editor-name { font-weight: 600; }
 .editor-how { font-size: .9rem; color: var(--fg-muted, #666); }
 @media (max-width: 700px) { .editors-list { grid-template-columns: 1fr; } }
+
+/* Pictures of components (components.html) */
+
+.shot {
+  margin: 18px 0 22px;
+}
+
+.shot img,
+.component-shot img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.shot figcaption {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.component-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  margin: 16px 0 8px;
+}
+
+.component-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.component-shot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  padding: 16px;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+}
+
+.component-text {
+  padding: 14px 16px 16px;
+}
+
+.docs-content .component-text h4 {
+  margin: 0 0 6px;
+  font-size: 16px;
+}
+
+.docs-content .component-text p {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+
+.docs-content .component-text pre {
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.shot-pair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.shot-pair .shot {
+  margin: 18px 0 22px;
+}

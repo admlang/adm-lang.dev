@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Components - adm</title>
+<meta name="description" content="UI components in ADM: views, styles, controllers, inputs, states, events, scoped components, windows, and the built-in component set with a picture of each.">
+<link rel="icon" type="image/svg+xml" href="assets/adm.svg">
+<link rel="canonical" href="https://adm-lang.dev/components.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="adm">
+<meta property="og:title" content="adm - Components">
+<meta property="og:description" content="UI components in ADM: views, styles, controllers, inputs, states, events, scoped components, windows, and the built-in component set with a picture of each.">
+<meta property="og:url" content="https://adm-lang.dev/components.html">
+<meta property="og:image" content="https://adm-lang.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="adm - Components">
+<meta name="twitter:description" content="UI components in ADM: views, styles, controllers, inputs, states, events, scoped components, windows, and the built-in component set with a picture of each.">
+<meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/adm.svg" alt="ADM" class="brand-mark">
+      <span class="brand-name"><span class="brand-sub">programming language</span></span>
+    </a>
+    <nav class="nav">
+      <a href="docs.html" class="nav-active">Docs</a>
+      <a href="examples.html">Examples</a>
+      <a href="services.html">Services</a>
+      <a href="modules.html">Modules</a>
+      <a class="nav-icon" href="https://github.com/admlang" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs-layout">
+
+  <aside class="docs-sidebar">
+    <nav class="docs-nav" id="docs-nav">
+
+      <div class="docs-pages">
+        <span class="docs-pages-label">Docs</span>
+        <a class="docs-page-link" href="docs.html">Language reference</a>
+        <a class="docs-page-link" href="memory.html">Memory model</a>
+        <a class="docs-page-link" href="units.html">Units of measure</a>
+        <a class="docs-page-link" href="annotations.html">Annotations</a>
+        <a class="docs-page-link current" href="components.html">UI components</a>
+        <a class="docs-page-link" href="app-home.html">Application home &amp; migrations</a>
+        <a class="docs-page-link" href="policy.html">Policy &amp; permissions</a>
+        <a class="docs-page-link" href="plugins.html">Plugins</a>
+        <a class="docs-page-link" href="libraries.html">Libraries</a>
+        <a class="docs-page-link" href="cli.html">Command line</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#overview">Overview</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#views">Views</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#view-calls">Placing components</a></li>
+          <li><a class="docs-nav-sub" href="#view-flow">Control flow</a></li>
+          <li><a class="docs-nav-sub" href="#view-children">Children</a></li>
+          <li><a class="docs-nav-sub" href="#view-slots">Slots</a></li>
+          <li><a class="docs-nav-sub" href="#view-ref">Naming a child: ref</a></li>
+          <li><a class="docs-nav-sub" href="#view-runs">When a view runs</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#controller">Controllers</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#controller-type">Fields and methods</a></li>
+          <li><a class="docs-nav-sub" href="#inputs">Inputs</a></li>
+          <li><a class="docs-nav-sub" href="#state">States</a></li>
+          <li><a class="docs-nav-sub" href="#persist">Kept fields</a></li>
+          <li><a class="docs-nav-sub" href="#events">Events</a></li>
+          <li><a class="docs-nav-sub" href="#lifecycle">Built-in members</a></li>
+          <li><a class="docs-nav-sub" href="#controller-apart">Controllers apart, generics</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#styles">Styles</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#style-composition">Composing a style</a></li>
+          <li><a class="docs-nav-sub" href="#style-properties">Setting properties</a></li>
+          <li><a class="docs-nav-sub" href="#style-units">Sizes and units</a></li>
+          <li><a class="docs-nav-sub" href="#style-anchors">Position and anchors</a></li>
+          <li><a class="docs-nav-sub" href="#style-layers">Layers</a></li>
+          <li><a class="docs-nav-sub" href="#style-states">Looks of states</a></li>
+          <li><a class="docs-nav-sub" href="#style-motion">Enter and exit</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#drawing">Drawing</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#render">The render method</a></li>
+          <li><a class="docs-nav-sub" href="#render-context">The render context</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#themes">Themes and icons</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#theme">The theme</a></li>
+          <li><a class="docs-nav-sub" href="#icons">Icon sets</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#scoped">Scoped components</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#annotations">Annotations</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#windows">Windows</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#ui-service">Starting the UI</a></li>
+          <li><a class="docs-nav-sub" href="#window-config">Window parameters</a></li>
+          <li><a class="docs-nav-sub" href="#window">Windows while open</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#builtin">Built-in components</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#builtin-text">Text</a></li>
+          <li><a class="docs-nav-sub" href="#builtin-buttons">Buttons and choices</a></li>
+          <li><a class="docs-nav-sub" href="#builtin-fields">Fields</a></li>
+          <li><a class="docs-nav-sub" href="#builtin-layout">Layout</a></li>
+          <li><a class="docs-nav-sub" href="#builtin-navigation">Navigation</a></li>
+          <li><a class="docs-nav-sub" href="#builtin-overlays">Menus and overlays</a></li>
+          <li><a class="docs-nav-sub" href="#builtin-more">Without a picture</a></li>
+        </ul>
+      </div>
+
+    </nav>
+  </aside>
+
+  <main class="docs-content">
+
+        <section class="docs-section" id="overview">
+      <h2>Overview</h2>
+        <p>
+          A user interface in ADM is a tree of <strong>components</strong>. A component is three
+          pieces written in ADM itself: a <strong>view</strong> (what it is made of), a <strong>style</strong>
+          (how large it is, where its content goes, what it is painted with) and a controller
+          <strong>type</strong> (its fields, inputs and methods). The <a href="services.html#svc-ui"><code>UI</code>
+          service</a> opens windows, gives each a root component, and draws the tree.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">counter.adm</span>
+          </div>
+          <pre><code>use (
+	std.ui.components::*
+	std.ui.styles::*
+)
+
+component Counter {
+	type {
+		@state
+		count int = 0
+
+		def add() {
+			count = count + 1
+		}
+	}
+
+	view {
+		Button(label = "Add one", onClick = add)
+		Text(text = "Pressed {count} times")
+	}
+
+	style {
+		Box
+		Layout
+		arrange = Arrange.Row
+		gap = new Axes&lt;Extent&gt;(8(px))
+		align = Align{vertical: Alignment.Center}
+	}
+}</code></pre>
+        </div>
+        <figure class="shot">
+          <img src="assets/components/counter.png" width="300" height="60" alt="The &lt;code&gt;Counter&lt;/code&gt; component in a window." loading="lazy">
+          <figcaption>The <code>Counter</code> component in a window.</figcaption>
+        </figure>
+        <p>
+          The view names the controller's fields and methods directly: <code>count</code> in the text,
+          <code>add</code> as the button's handler. A view runs again on every frame that is drawn, and
+          an argument whose value changed is given to the child, so the text follows the count.
+          The three pieces can be written in place, as here, or declared apart and named
+          (<code>view CounterView</code>, <code>style Frame</code>, <code>type Counting</code>).
+          The examples below name a style <code>Frame</code> where the look does not matter: a
+          <code>Box</code> with <code>Layout</code> and nothing set.
+        </p>
+        <p>
+          The language rules behind this page are in the
+          <a href="docs.html#ui">language reference</a>; the components std ships are listed
+          <a href="#builtin">at the end</a> with a picture of each. The pictures on this page are drawn by
+          the components themselves, without a screen, by a small program in the site's
+          <code>tools/component-shots</code>.
+        </p>
+    </section>
+
+    <section class="docs-section" id="views">
+      <h2>Views</h2>
+        <p>
+          The view of a component says which components it is made of, in the order they are laid out.
+        </p>
+
+      <div class="docs-sub" id="view-calls">
+        <h3>Placing components</h3>
+        <p>
+          A component is placed by calling it. Arguments are passed by name; the one unnamed argument
+          sets the input the component marks as its value (<code>Text("Hello")</code>,
+          <code>Icon("search")</code>). A block after the call holds the component's children.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">calls.adm</span>
+          </div>
+          <pre><code>view {
+	Heading(text = "Sign in", level = 2)
+	Row(gap = 8(px)) {
+		Label(text = "Email")
+		TextField(placeholder = "you@example.com")
+	}
+	Button(label = "Continue", onClick = submit, enabled = !sending)
+}</code></pre>
+        </div>
+        <figure class="shot">
+          <img src="assets/components/label.png" width="360" height="60" alt="A &lt;code&gt;Row&lt;/code&gt; holding a &lt;code&gt;Label&lt;/code&gt; and a &lt;code&gt;TextField&lt;/code&gt;." loading="lazy">
+          <figcaption>A <code>Row</code> holding a <code>Label</code> and a <code>TextField</code>.</figcaption>
+        </figure>
+        <p>
+          Every component also takes the inputs all components have: <code>enabled</code>,
+          <code>tooltip</code>, <code>focusable</code>, <code>tabStop</code>, <code>autofocus</code>.
+          Two arguments belong to the call and are no inputs: <code>key = value</code> says which child
+          of a loop this is, and <code>ref = name</code> names the child (below).
+        </p>
+      </div>
+
+      <div class="docs-sub" id="view-flow">
+        <h3>Control flow</h3>
+        <p>
+          A view body is ordinary ADM: every statement works in it as it does in a function,
+          conditions, loops, etc. Components enter and leave the tree with the branch that places
+          them, and a loop keeps its children by position, or by <code>key</code> when the calls
+          give one.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">flow.adm</span>
+          </div>
+          <pre><code>view {
+	Button(label = "Log out", onClick = logOut) when user.signedIn
+
+	for let message in messages {
+		MessageRow(message, key = message.id)
+	} empty {
+		Text(text = "No messages")
+	}
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="docs-sub" id="view-children">
+        <h3>Children</h3>
+        <p>
+          <code>children()</code> as a statement of a view is where the caller's block goes. A component
+          whose view has no <code>children()</code> takes no block.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">children.adm</span>
+          </div>
+          <pre><code>component Section {
+	type {
+		@input
+		title string = ""
+	}
+
+	view {
+		Heading(text = title, level = 3)
+		children()
+		Divider()
+	}
+
+	style Frame
+}
+
+// elsewhere
+Section(title = "Account") {
+	Text(text = "Signed in as {user.name}")
+	Button(label = "Sign out", onClick = signOut)
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="docs-sub" id="view-slots">
+        <h3>Slots</h3>
+        <p>
+          A <strong>slot</strong> is an input typed <code>view</code>. The caller fills it with an
+          assignment inside the block; the component's view places it by calling it. A slot has a
+          fallback, or is optional and placed under <code>if !(name is none)</code>.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">card.adm</span>
+          </div>
+          <pre><code>component Card {
+	type {
+		@input
+		title string = ""
+
+		@input
+		header view = view { Heading(text = title, level = 3) }
+
+		@input
+		footer ?view = none
+	}
+
+	view {
+		header()
+		children()
+		if !(footer is none) {
+			footer()
+		}
+	}
+
+	style CardLook
+}
+
+Card(title = "Profile") {
+	footer = view {
+		Button(label = "Edit")
+	}
+	Text(text = "Ada Lovelace wrote the first program.")
+}</code></pre>
+        </div>
+        <figure class="shot">
+          <img src="assets/components/card.png" width="324" height="170" alt="&lt;code&gt;Card&lt;/code&gt; with its fallback header, the caller's text and a footer slot." loading="lazy">
+          <figcaption><code>Card</code> with its fallback header, the caller's text and a footer slot.</figcaption>
+        </figure>
+        <p>
+          <code>view { ... }</code> is an expression: its statements are a view's, written in the scope of
+          whoever writes it. A slot that needs a value is a function returning a view
+          (<code>row ?(def(Item) view) = none</code>, placed with <code>row(item)</code>).
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">filelist.adm</span>
+          </div>
+          <pre><code>component FileList {
+	type {
+		@input(value = true)
+		files string[] = []
+
+		// What draws one line, given the file's name.
+		@input
+		row ?(def(string) view) = none
+	}
+
+	view {
+		for let file in files {
+			if row is none {
+				Text(text = file)
+			} else {
+				row(file)
+			}
+		}
+	}
+
+	style Frame
+}
+
+FileList(["main.adm", "lib.adm", "notes.md"]) {
+	row = (name string) =&gt; Chip(label = name)
+}</code></pre>
+        </div>
+        <figure class="shot">
+          <img src="assets/components/filelist.png" width="200" height="130" alt="FileList drawing each file with the caller's row" loading="lazy">
+          <figcaption><code>FileList</code> with a <code>row</code> that draws each name as a <code>Chip</code>; without one it shows plain text.</figcaption>
+        </figure>
+        <p>
+          The caller fills such a slot with a function. A component call written where a view is
+          expected is the view of that call, so <code>(name string) =&gt; Chip(label = name)</code> is
+          enough.
+        </p>
+      </div>
+
+      <div class="docs-sub" id="view-ref">
+        <h3>Naming a child: ref</h3>
+        <p>
+          <code>ref = name</code> on a call names the component the call places and declares
+          <code>name</code> as a member of the component whose view holds the call. The member is a weak
+          optional of the child's type: set when the child is built, <code>none</code> while the child is
+          not in the view. No field is written for it.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">ref.adm</span>
+          </div>
+          <pre><code>component Login {
+	type {
+		def toEmail() {
+			email.focus() unless email is none
+		}
+	}
+
+	view {
+		Label(text = "Email")
+		TextField(ref = email, placeholder = "you@example.com")
+		Button(label = "Go to the field", onClick = toEmail)
+	}
+
+	style Frame
+}</code></pre>
+        </div>
+        <p>
+          A ref is given once per view and not inside a loop. It is also how a listener hears one
+          child's events (<code>@on(save.clicked)</code>) and how a <code>Label</code> or a
+          <code>Popover</code> is pointed at a component (<code>Label(target = email)</code>).
+        </p>
+      </div>
+
+      <div class="docs-sub" id="view-runs">
+        <h3>When a view runs</h3>
+        <p>
+          A view runs when its component is built and again on every frame that is drawn. On a run after
+          the first, each argument is compared with what was passed the last time and assigned to the
+          child's input when it differs; numbers, strings and enums compare by value, objects, arrays and
+          maps by identity. Literals and handlers are bound once, when the child is built.
+        </p>
+        <ul>
+          <li>A view body is cheap and has no effects: it is run often.</li>
+          <li>An argument that builds an array or an object on every run is a new value on every run.
+            Keep it in a field and pass the field.</li>
+          <li>Frames are drawn when something happened in the window (an event, a state that changed,
+            <code>redraw()</code>), not on a timer; a component that moves by itself asks for its next frame.</li>
+          <li><code>rerun()</code> on a component runs its view again now.</li>
+        </ul>
+      </div>
+
+    </section>
+
+    <section class="docs-section" id="controller">
+      <h2>Controllers</h2>
+        <p>
+          The controller <code>type</code> of a component holds what it knows and what it does.
+        </p>
+
+      <div class="docs-sub" id="controller-type">
+        <h3>Fields and methods</h3>
+        <p>
+          The controller is a regular <code>type</code>: fields, properties, methods, a constructor.
+          Inside it <code>self</code> is the component, so the members every component has are in reach:
+          <code>style</code>, <code>parent()</code>, <code>children</code>, <code>redraw()</code>,
+          <code>focus()</code>. <code>def new()</code> runs once the fields hold their defaults and the
+          inputs the call passed; it is where a component sets its own style.
+        </p>
+      </div>
+
+      <div class="docs-sub" id="inputs">
+        <h3>Inputs</h3>
+        <p>
+          <code>@input</code> marks a field the caller may pass. <code>@input(value = true)</code> is the one
+          the unnamed argument sets. An input the call does not pass keeps its default.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">inputs.adm</span>
+          </div>
+          <pre><code>type {
+	// Text("Hello") sets it.
+	@input(value = true)
+	text string = ""
+
+	@input
+	level int = 1
+
+	// A handler: a function, a method, or a function literal.
+	@input
+	onClick ?(def()) = none
+}</code></pre>
+        </div>
+        <p>
+          <code>@input(bind = true)</code> is an input the component itself may assign, as a checkbox
+          assigns <code>checked</code>. The assignment reaches what the caller passed when that is a field
+          marked <code>@bindable</code> (the field, or its whole struct or type) or a property with a
+          setter; anything else is a copy. A control given a bindable field needs no handler that copies
+          the value back:
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">bindable.adm</span>
+          </div>
+          <pre><code>@bindable
+type Settings {
+	wrap   bool  = true
+	volume float = 40.0
+}
+
+let settings = new Settings()
+
+view {
+	Switch(on = settings.wrap, label = "Wrap lines")
+	Slider(value = settings.volume)
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="docs-sub" id="state">
+        <h3>States</h3>
+        <p>
+          <code>@state</code> marks a field as a state of the component. An assignment that changes it
+          emits <code>UI.stateChange</code> with the component, the field's name, the new value and the
+          one it replaced, and a <code>bool</code> or enum state is a key of the style's <code>on</code>
+          (<a href="#style-states">below</a>). An equal value emits nothing, nor do the values a component
+          is built with.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">state.adm</span>
+          </div>
+          <pre><code>type {
+	@state
+	selected int = 0
+}
+
+// in any component or module: every change of a "selected" state of the tabs named mainTabs
+@on(UI.stateChange, ref("mainTabs").state("selected"))
+def tabChanged(evt Event&lt;StateChange&gt;) {
+	println("tab {evt.result.value}")
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="docs-sub" id="persist">
+        <h3>Kept fields</h3>
+        <p>
+          <code>@persist(key)</code> keeps a field between runs of the program. A component that is created
+          starts with the value kept under the key, before <code>new()</code> runs; an assignment that
+          changes the value keeps the new one. The values are in the application's
+          <a href="services.html#svc-vault"><code>Vault</code></a>, encrypted, named
+          <code>ui.persist.&lt;key&gt;</code>.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">persist.adm</span>
+          </div>
+          <pre><code>type {
+	@persist("sidebar.width")
+	sidebarWidth int = 240
+
+	@state
+	@persist("editor.tab")
+	tab ?string = none
+}</code></pre>
+        </div>
+        <ul>
+          <li>The key is a string literal of letters, digits, <code>.</code>, <code>_</code> and <code>-</code>,
+            and is the application's: every component that names it shares the value.</li>
+          <li>The type is one a vault value can be: numbers, strings, enums, arrays, maps, optionals,
+            tuples, structs.</li>
+          <li>A value changed in place is kept when the field is next assigned:
+            <code>panes = panes + [pane]</code>, not <code>panes.push(pane)</code>.</li>
+          <li>A constructor that assigns the field replaces the value that was restored.</li>
+        </ul>
+      </div>
+
+      <div class="docs-sub" id="events">
+        <h3>Events</h3>
+        <p>
+          A method marked <code>@emit()</code> is an event of the component: calling it runs the body and
+          then tells the listeners. A listener is a function or a method marked <code>@on</code> that
+          takes <code>ComponentEvent&lt;T&gt;</code> (<code>source</code>, <code>name</code>,
+          <code>result</code>), <code>T</code> being what the event method returns.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">events.adm</span>
+          </div>
+          <pre><code>component Rating {
+	type {
+		@state
+		stars int = 0
+
+		@emit()
+		def rated(stars int) int {
+			return stars
+		}
+
+		def three() {
+			stars = 3
+			rated(3)
+		}
+	}
+
+	view {
+		Button(label = "Three stars", onClick = three)
+	}
+
+	style Frame
+}
+
+@on(Rating.rated)                    // every Rating
+def onRated(evt ComponentEvent&lt;int&gt;) {
+	println("rated {evt.result}")
+}</code></pre>
+        </div>
+        <table class="docs-table">
+          <thead><tr><th>Listener</th><th>Hears</th></tr></thead>
+          <tbody>
+            <tr><td><code>@on(Button.clicked)</code></td><td>every button</td></tr>
+            <tr><td><code>@on(save.clicked)</code></td><td>the child the listener's own view named <code>save</code> with <code>ref</code></td></tr>
+            <tr><td><code>@on(Button.clicked, ref("save"))</code></td><td>the components a selector matches</td></tr>
+            <tr><td><code>@on(UI.click)</code> and the other events of the <a href="services.html#svc-ui"><code>UI</code> service</a></td><td>what happens in the windows: <code>click</code>, <code>mouseMove</code>, <code>mouseWheel</code>, <code>keyDown</code>, <code>keyUp</code>, <code>textInput</code>, <code>resize</code>, <code>closeRequested</code>, <code>stateChange</code>; the handler takes <code>Event&lt;T&gt;</code></td></tr>
+          </tbody>
+        </table>
+        <p>
+          The std components emit an event beside each handler input: <code>clicked</code> beside
+          <code>onClick</code>, <code>changed(value)</code> beside <code>onChange</code>,
+          <code>closed</code> beside <code>onClose</code>. A listening method runs for each live instance
+          of its type.
+        </p>
+      </div>
+
+      <div class="docs-sub" id="lifecycle">
+        <h3>Built-in members</h3>
+        <p>
+          A controller method with the name and parameters of one every component has replaces it for that
+          component.
+        </p>
+        <table class="docs-table">
+          <thead><tr><th>Member</th><th>What it is</th></tr></thead>
+          <tbody>
+            <tr><td><code>def new()</code></td><td>Runs when the component is built: fields hold their defaults, inputs what the call passed.</td></tr>
+            <tr><td><code>def attached()</code>, <code>def detached()</code></td><td>Run when the component enters the tree of a window and when it leaves it.</td></tr>
+            <tr><td><code>def render(ctx RenderContext)</code></td><td>Draws it. The default draws its shadows, background, borders and children. Runs when its inputs, style or place changed, or after <code>redraw()</code>.</td></tr>
+            <tr><td><code>def measure(limit Limit) Size&lt;Pixels&gt;</code></td><td>The size of its own content, for a component that draws text or a picture.</td></tr>
+            <tr><td><code>def pointer(e PointerEvent) bool</code>, <code>def key(e KeyEvent) bool</code></td><td>What a pointer and the keyboard do: offered to the component concerned, then to its ancestors until one returns true.</td></tr>
+            <tr><td><code>style</code></td><td>Its style object: <code>style.width = 300(px)</code>. <code>style.geom</code> is where layout put it.</td></tr>
+            <tr><td><code>parent()</code>, <code>children</code>, <code>next()</code>, <code>prev()</code></td><td>The tree around it.</td></tr>
+            <tr><td><code>closest&lt;C&gt;()</code>, <code>find&lt;C&gt;(ref = "")</code></td><td>The nearest ancestor, or a descendant, of a component type.</td></tr>
+            <tr><td><code>redraw()</code>, <code>rerun()</code>, <code>focus()</code>, <code>reveal()</code></td><td>Asks for a frame, runs the view again, takes the keyboard focus, scrolls itself into sight.</td></tr>
+            <tr><td><code>enabled</code>, <code>disabled</code></td><td><code>enabled</code> is an input; <code>disabled</code> also holds under a disabled ancestor.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="docs-sub" id="controller-apart">
+        <h3>Controllers declared apart, generic components</h3>
+        <p>
+          A component may name its controller as a type declared elsewhere and marked
+          <code>@controller()</code>. The component has that type's fields, inputs and methods as if they
+          stood in its own <code>type { }</code>. Several components may name one controller, each with
+          its own state.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">controller.adm</span>
+          </div>
+          <pre><code>@controller()
+type Counting {
+	@input
+	step int = 1
+
+	count int = 0
+
+	def add() {
+		count = count + step
+	}
+}
+
+component Stepper {
+	view {
+		Button(label = "Add", onClick = add)
+		Text(text = "{count}")
+	}
+	style Frame
+	type Counting
+}
+
+// placed as
+Stepper(step = 2)</code></pre>
+        </div>
+        <p>
+          A component takes type parameters as a type does: <code>component List&lt;T&gt; { ... }</code>, with
+          <code>T</code> in scope in its controller and its view, placed as <code>List&lt;File&gt;(files)</code>
+          or <code>List(files)</code>. A component declared <code>internal</code> is a part only its own
+          module places.
+        </p>
+      </div>
+
+    </section>
+
+    <section class="docs-section" id="styles">
+      <h2>Styles</h2>
+        <p>
+          The style of a component is its box: its size, how it places its content, and what it is painted with.
+        </p>
+
+      <div class="docs-sub" id="style-composition">
+        <h3>Composing a style</h3>
+        <p>
+          A style is a set of properties, and it is composed: a style declaration lists the styles it
+          embeds, and has the properties of all of them. Std's styles (<code>std.ui.styles</code>) are the
+          pieces; a component's style embeds the ones the component uses, and nothing else is stored or
+          looked at for it.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">styles.adm</span>
+          </div>
+          <pre><code>// A box that lays its children out.
+style Frame {
+	Box
+	Layout
+}
+
+// The same, painted: background, borders, outline, shadows.
+style CardLook {
+	Box
+	Layout
+	Decorated
+}</code></pre>
+        </div>
+        <table class="docs-table">
+          <thead><tr><th>Style</th><th>Properties</th></tr></thead>
+          <tbody>
+            <tr><td><code>Box</code></td><td>Every style embeds it: <code>width</code>, <code>height</code>, <code>minWidth</code> … <code>maxHeight</code>, <code>margin</code>, <code>padding</code>, <code>position</code>, <code>anchors</code>, <code>layer</code>, <code>visible</code>, <code>align</code>, <code>direction</code></td></tr>
+            <tr><td><code>Layout</code></td><td>How a container arranges its children: <code>arrange</code> (<code>Column</code>, <code>Row</code>, …), <code>gap</code>, <code>distribute</code>, <code>wrap</code>, <code>reverse</code></td></tr>
+            <tr><td><code>Tracks</code></td><td>A grid's <code>columns</code> and <code>rows</code></td></tr>
+            <tr><td><code>Background</code>, <code>Borders</code>, <code>Outline</code>, <code>Shadows</code></td><td>What a box is painted with; they share one <code>radius</code> (<code>Shape</code>)</td></tr>
+            <tr><td><code>Decorated</code></td><td><code>Background</code>, <code>Borders</code>, <code>Outline</code> and <code>Shadows</code> together</td></tr>
+            <tr><td><code>Typography</code>, <code>Foreground</code></td><td>Font, line setting and decoration; the colour of text and icons</td></tr>
+            <tr><td><code>Interaction</code></td><td>How it meets the pointer: <code>cursor</code> and what takes presses</td></tr>
+            <tr><td><code>Motion</code></td><td>How a change of look is timed: <code>transition</code>, and the <code>enter</code> and <code>exit</code> looks</td></tr>
+            <tr><td><code>Control</code></td><td>What a control is made of: <code>Decorated</code>, <code>Typography</code>, <code>Interaction</code> and <code>Motion</code></td></tr>
+            <tr><td><code>Compositing</code>, <code>Transforms</code></td><td><code>opacity</code> and blending; a drawn <code>transform</code> that moves nothing in the layout</td></tr>
+            <tr><td><code>Clipping</code>, <code>Filters</code>, <code>Backdrop</code>, <code>Effects</code></td><td>Cutting content to the shape; filters over the component and over what is behind it</td></tr>
+            <tr><td><code>Editable</code>, <code>Scrollbars</code>, <code>ImageContent</code></td><td>The caret, selection and placeholder of editable text; a scrolling component's bars; how a picture fits its box</td></tr>
+          </tbody>
+        </table>
+        <p>
+          A style embedded twice, or reached through two styles that both embed it, is one copy of its
+          properties. A style may declare properties of its own with
+          <code>@styleProperty let name Type = default</code>.
+        </p>
+      </div>
+
+      <div class="docs-sub" id="style-properties">
+        <h3>Setting properties</h3>
+        <p>
+          The style block is where a component's look is written: after the styles it embeds, each
+          line assigns a property. A <code>let</code> is a value of the body's own, read by the lines
+          after it.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">card_style.adm</span>
+          </div>
+          <pre><code>style CardLook {
+	Box
+	Layout
+	Decorated
+	let palette = UI.theme().palette
+
+	width = 300(px)
+	padding = new Edges&lt;Extent&gt;(12(px))
+	gap = new Axes&lt;Extent&gt;(8(px))
+	radius = new Corners&lt;Extent&gt;(8(px))
+	background = new BackgroundFill(palette.surface)
+	border = new Edges&lt;Border&gt;(Border{width: 1(px), paint: palette.border})
+}</code></pre>
+        </div>
+        <ul>
+          <li>A value may read a property set above it or one an embedded style declares:
+            <code>height = width</code>.</li>
+          <li>A literal without a type changes the fields it names and keeps the rest:
+            <code>margin = {left: 16(px)}</code>.</li>
+          <li>A property the style does not embed is a compile error: a style of <code>Box</code> and
+            <code>Layout</code> has no <code>background</code> to set.</li>
+          <li>The body runs once for each component, when its style is made.</li>
+          <li>A style that embeds another style of yours takes that style's properties and their
+            defaults, not the assignments its body makes.</li>
+        </ul>
+        <p>
+          The controller reaches the same object as <code>style</code>, for what depends on its inputs
+          or changes while the component lives:
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">controller_style.adm</span>
+          </div>
+          <pre><code>type {
+	@input
+	wide bool = false
+
+	def new() {
+		style.width = 480(px) when wide
+	}
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="docs-sub" id="style-units">
+        <h3>Sizes and units</h3>
+        <p>
+          A size, a gap, a padding or a radius is a number with a unit. <code>width</code> and
+          <code>height</code> also take <code>auto</code> and <code>fill</code>.
+        </p>
+        <table class="docs-table">
+          <thead><tr><th>Written</th><th>Is</th></tr></thead>
+          <tbody>
+            <tr><td><code>300(px)</code></td><td>Logical pixels: the same size on a standard and on a HiDPI display.</td></tr>
+            <tr><td><code>50(%)</code></td><td>A share of the parent's content box: of its width for <code>width</code>, margins and paddings, of its height for <code>height</code>.</td></tr>
+            <tr><td><code>100(vw)</code>, <code>100(vh)</code></td><td>Hundredths of the window's width and of its height.</td></tr>
+            <tr><td><code>2(em)</code></td><td>Multiples of the component's font size.</td></tr>
+            <tr><td><code>10(mm)</code>, <code>1(cm)</code></td><td>A physical length, from the display's density.</td></tr>
+            <tr><td><code>auto</code></td><td>The size of the content. The default of <code>width</code> and <code>height</code>.</td></tr>
+            <tr><td><code>fill</code></td><td>A share of the room left over in the parent; <code>fill * 2</code> takes twice the share of a plain <code>fill</code> beside it.</td></tr>
+          </tbody>
+        </table>
+        <p>
+          The units are ordinary <a href="units.html#ui-extents">units of measure</a>: the type of such a
+          value is <code>Extent</code>, and mixing two of them in one sum does not compile.
+          <code>minWidth</code>, <code>maxWidth</code>, <code>minHeight</code> and <code>maxHeight</code>
+          bound what layout may give.
+        </p>
+      </div>
+
+      <div class="docs-sub" id="style-anchors">
+        <h3>Position and anchors</h3>
+        <p>
+          A parent's layout places its children one after the other. <code>position</code> takes a
+          component out of that, and <code>anchors</code> say where its edges go.
+        </p>
+        <table class="docs-table">
+          <thead><tr><th><code>position</code></th><th>Placed</th></tr></thead>
+          <tbody>
+            <tr><td><code>Position.Normal</code></td><td>By the parent's layout, among its siblings. The default.</td></tr>
+            <tr><td><code>Position.Relative</code></td><td>Out of the layout, against the parent's box.</td></tr>
+            <tr><td><code>Position.Absolute</code></td><td>Out of the layout, against the window: (0, 0) is its top left.</td></tr>
+            <tr><td><code>Position.Sticky</code></td><td>Like <code>Normal</code>, then held at the edge of the scroll area once scrolled past it.</td></tr>
+          </tbody>
+        </table>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">stamp.adm</span>
+          </div>
+          <pre><code>// In the top right corner of what holds it.
+component Stamp {
+	type {}
+
+	view {
+		Badge(label = "new")
+	}
+
+	style {
+		Box
+		Layout
+		position = Position.Relative
+		anchors = Anchors{top: 6(px), right: 6(px)}
+		layer = Layer.Floating
+	}
+}
+
+Panel() {
+	Text(text = "Release notes")
+	Stamp()
+}</code></pre>
+        </div>
+        <figure class="shot">
+          <img src="assets/components/anchors.png" width="260" height="100" alt="A badge pinned to the corner of a panel" loading="lazy">
+          <figcaption><code>Stamp</code> pinned 6 pixels from the top and the right of the panel that holds it.</figcaption>
+        </figure>
+        <p>
+          <code>Anchors</code> has <code>left</code>, <code>top</code>, <code>right</code>,
+          <code>bottom</code>, <code>centerX</code> and <code>centerY</code>. A distance is measured from
+          the matching edge of the box the component is placed against; <code>left</code> and
+          <code>right</code> both set stretch it across. An anchor can also name an edge of another
+          component, which it then follows when that component moves:
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">hint.adm</span>
+          </div>
+          <pre><code>// Under `target`, starting at its left edge.
+component Hint {
+	type {
+		@input
+		target ?component = none
+
+		def attached() {
+			let under = new AnchorLine(target, AnchorEdge.Bottom)
+			under.offset = 4(px)
+			style.anchors = Anchors{top: under, left: new AnchorLine(target, AnchorEdge.Left)}
+		}
+	}
+
+	view {
+		Text(text = "Saves the file")
+	}
+
+	style {
+		Box
+		Layout
+		position = Position.Absolute
+		layer = Layer.Tooltip
+	}
+}
+
+view {
+	Button(label = "Save", ref = save)
+	Hint(target = save)
+}</code></pre>
+        </div>
+        <figure class="shot">
+          <img src="assets/components/hint.png" width="200" height="90" alt="A text placed under a button by an anchor" loading="lazy">
+          <figcaption><code>Hint</code> anchored to the bottom and the left edge of the button named <code>save</code>.</figcaption>
+        </figure>
+        <p>
+          <code>Popover</code>, <code>Menu</code> and <code>Tooltip</code> are built this way and also
+          flip to the other side when there is no room; reach for them before writing anchors by hand.
+        </p>
+      </div>
+
+      <div class="docs-sub" id="style-layers">
+        <h3>Layers</h3>
+        <p>
+          <code>layer</code> says what a component is drawn over. Layers are window-wide and fixed, from
+          the bottom up; inside one layer, the order in the tree decides. There is no numeric z-index.
+        </p>
+        <table class="docs-table">
+          <thead><tr><th><code>layer</code></th><th>For</th></tr></thead>
+          <tbody>
+            <tr><td><code>Layer.Background</code></td><td>Behind the content: wallpapers, backdrops.</td></tr>
+            <tr><td><code>Layer.Content</code></td><td>Where components draw unless they say otherwise.</td></tr>
+            <tr><td><code>Layer.Floating</code></td><td>Above the content: sticky headers, floating buttons.</td></tr>
+            <tr><td><code>Layer.Modal</code></td><td>Dialogs; a newer one is on top.</td></tr>
+            <tr><td><code>Layer.Popup</code></td><td>Menus and dropdowns, also over a dialog.</td></tr>
+            <tr><td><code>Layer.Tooltip</code></td><td>Tooltips.</td></tr>
+            <tr><td><code>Layer.Notification</code></td><td>Toasts.</td></tr>
+            <tr><td><code>Layer.Drag</code></td><td>What follows the pointer during a drag.</td></tr>
+            <tr><td><code>Layer.Debug</code></td><td>Inspector overlays.</td></tr>
+          </tbody>
+        </table>
+        <figure class="shot">
+          <img src="assets/components/layers-exploded.svg" width="760" height="850" alt="The layers of a window drawn apart, each with what is drawn in it, and the window they make together" loading="lazy">
+          <figcaption>The layers of a window drawn apart, bottom to top, with what a window typically has in each, and under them the window as it is shown once they are drawn one over the other.</figcaption>
+        </figure>
+        <p>
+          A component in a layer above <code>Content</code> is clipped by the window only, not by the
+          scroll views and panels it is written in. The layer does not move it: <code>position</code>
+          and <code>anchors</code> do.
+        </p>
+      </div>
+
+      <div class="docs-sub" id="style-states">
+        <h3>Looks of states</h3>
+        <p>
+          A style body may assign <code>on</code>: the looks of the component's states. Each entry lists
+          the properties that differ while the state holds. The entries that hold are applied, in the
+          order written, to a copy of the style the component is drawn with; the component's own style
+          is not written into.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">states.adm</span>
+          </div>
+          <pre><code>style CardLook {
+	Box
+	Layout
+	Decorated
+	Compositing
+	let palette = UI.theme().palette
+
+	background = new BackgroundFill(palette.surface)
+	on = {
+		hover:    {background: new BackgroundFill(palette.surfaceRaised)},
+		pressed:  {background: new BackgroundFill(palette.surfaceSunken)},
+		disabled: {opacity: 0.4},
+	}
+}</code></pre>
+        </div>
+        <table class="docs-table">
+          <thead><tr><th>State</th><th>Holds</th></tr></thead>
+          <tbody>
+            <tr><td><code>hover</code>, <code>pressed</code></td><td>while the pointer is over the component, and while a button is held down on it</td></tr>
+            <tr><td><code>focused</code>, <code>focusWithin</code>, <code>focusVisible</code></td><td>while it has the keyboard focus, while something in it has, and while the focus should show (it came from the keyboard)</td></tr>
+            <tr><td><code>disabled</code></td><td>while it or an ancestor is not <code>enabled</code></td></tr>
+            <tr><td><code>dragging</code>, <code>dropTarget</code></td><td>while it is being dragged, and while something is dragged over it</td></tr>
+            <tr><td>a <code>@state</code> bool field</td><td>while the field is true: <code>selected</code>, <code>open</code>, <code>checked</code></td></tr>
+            <tr><td>a case of a <code>@state</code> enum field</td><td>while the field holds that case</td></tr>
+          </tbody>
+        </table>
+        <figure class="shot">
+          <img src="assets/components/togglebutton.png" width="220" height="60" alt="&lt;code&gt;ToggleButton&lt;/code&gt;: its &lt;code&gt;@state&lt;/code&gt; field &lt;code&gt;on&lt;/code&gt; is a key of its style's &lt;code&gt;on&lt;/code&gt;." loading="lazy">
+          <figcaption><code>ToggleButton</code>: its <code>@state</code> field <code>on</code> is a key of its style's <code>on</code>.</figcaption>
+        </figure>
+        <p>
+          A key may list several states, <code>[hover, selected]: {...}</code>, and an entry may hold an
+          <code>on</code> of its own; both hold when all their states do. A name that is no state of the
+          component is a compile error, and so is a property the style does not embed
+          (<code>opacity</code> needs <code>Compositing</code>).
+        </p>
+      </div>
+
+      <div class="docs-sub" id="style-motion">
+        <h3>Enter and exit</h3>
+        <p>
+          A style that embeds <code>Motion</code> may assign <code>enter</code> and <code>exit</code>: the
+          look a component appears from and the look it leaves to. The component travels between that look
+          and its own over its <code>transition</code>. A child a view no longer places stays drawn until
+          its exit has played.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">fade.adm</span>
+          </div>
+          <pre><code>style Fade {
+	Box
+	Compositing
+	Transforms
+	Motion
+	enter = {opacity: 0.0, transform: {translate: {y: 8(px)}}}
+	exit = {opacity: 0.0}
+	transition = Transition{duration: 150ms}
+}</code></pre>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="docs-section" id="drawing">
+      <h2>Drawing</h2>
+      <p>
+        A component is drawn by its <code>render</code> method. The one every component has draws
+        the std passes in order: the shadows that fall outside it, its background, its borders, its
+        children, the shadows inside it. A component that draws something of its own declares
+        <code>render</code> and calls the passes it wants around its own drawing.
+      </p>
+
+      <div class="docs-sub" id="render">
+        <h3>The render method</h3>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">meter.adm</span>
+          </div>
+          <pre><code>style MeterLook {
+	Box
+	Decorated
+	let palette = UI.theme().palette
+
+	width = 180(px)
+	height = 14(px)
+	radius = new Corners&lt;Extent&gt;(7(px))
+	background = new BackgroundFill(palette.surfaceSunken)
+	border = new Edges&lt;Border&gt;(Border{width: 1(px), paint: palette.border})
+}
+
+component Meter {
+	type {
+		@input(value = true)
+		value float = 0.0
+
+		def render(ctx RenderContext) {
+			ctx.background()
+			ctx.borders()
+			let frame = ctx.geometry.frame
+			let (wide, high) = (float(frame.width), float(frame.height))
+			ctx.draw.fill(Rect{left: 0.0, top: 0.0, right: wide * value, bottom: high}, high / 2.0, UI.theme().palette.accent)
+		}
+	}
+
+	view {}
+
+	style MeterLook
+}
+
+Meter(0.6)</code></pre>
+        </div>
+        <figure class="shot">
+          <img src="assets/components/meter.png" width="204" height="38" alt="A bar filled to sixty percent" loading="lazy">
+          <figcaption><code>Meter(0.6)</code>: the background and the border are the style's, drawn by the passes; the bar is drawn by <code>render</code>.</figcaption>
+        </figure>
+        <p>
+          <code>render</code> runs when the component's inputs, style or place changed, or after
+          <code>redraw()</code>; it does not run on every frame. Something that moves by itself asks
+          for its next frame from inside <code>render</code>.
+        </p>
+      </div>
+
+      <div class="docs-sub" id="render-context">
+        <h3>The render context</h3>
+        <table class="docs-table">
+          <thead><tr><th><code>RenderContext</code></th><th>What it is</th></tr></thead>
+          <tbody>
+            <tr><td><code>outerShadows()</code></td><td>Draws the shadows that fall outside the component.</td></tr>
+            <tr><td><code>background()</code></td><td>Draws its background, in its shape.</td></tr>
+            <tr><td><code>borders()</code></td><td>Draws its borders.</td></tr>
+            <tr><td><code>childNodes()</code></td><td>Draws its children. Leave it out and they are not drawn.</td></tr>
+            <tr><td><code>innerShadows()</code></td><td>Draws the shadows inside it, over the children.</td></tr>
+            <tr><td><code>draw</code></td><td>The canvas, in the component's own coordinates: (0, 0) is the top left of its border box.</td></tr>
+            <tr><td><code>style</code></td><td>The style it is drawn with, after the looks of the states that hold.</td></tr>
+            <tr><td><code>geometry</code></td><td>Where layout put it: <code>frame</code> (the border box in the window), <code>content</code> (the box inside border and padding), <code>baseline</code>.</td></tr>
+            <tr><td><code>damage</code></td><td>The part that needs drawing; drawing outside it is wasted, not wrong.</td></tr>
+            <tr><td><code>scale</code>, <code>direction</code></td><td>Device pixels per logical pixel; the reading direction it was laid out in.</td></tr>
+          </tbody>
+        </table>
+        <p>
+          A pass does nothing when the style lacks what it draws: <code>background()</code> on a style
+          without <code>Background</code> draws nothing. The order of the calls is the order things are
+          painted in, so a component can draw under its children, over them, or between two passes.
+        </p>
+        <p>
+          <code>ctx.draw</code> is a <a href="modules.html#std-gfx-canvas"><code>std.gfx.canvas</code></a>
+          draw context: <code>fill</code> and <code>stroke</code> of rectangles, circles, lines and
+          paths, <code>drawImage</code>, <code>fillText</code>, <code>clip</code>, <code>save</code> and
+          <code>restore</code>. A paint is a colour, a gradient or a pattern.
+        </p>
+        <p>
+          For a drawing that is not a component of its own, the <a href="#c-canvas"><code>Canvas</code></a>
+          component takes the function: <code>Canvas(draw = drawChart)</code>.
+        </p>
+      </div>
+    </section>
+
+    <section class="docs-section" id="themes">
+      <h2>Themes and icons</h2>
+      <p>
+        The colours, fonts and measures of the std components come from the theme, and an
+        application's own components take theirs from the same place, so that both change together.
+      </p>
+
+      <div class="docs-sub" id="theme">
+        <h3>The theme</h3>
+        <p>
+          <code>UI.theme()</code> is the application's <code>Theme</code>. It starts from what the
+          desktop asks for (light or dark, the accent colour, the contrast, the font and its size) and
+          follows it while the program runs.
+        </p>
+        <table class="docs-table">
+          <thead><tr><th><code>Theme</code></th><th>Holds</th></tr></thead>
+          <tbody>
+            <tr><td><code>palette</code></td><td>The colours: <code>window</code>, <code>surface</code>, <code>surfaceRaised</code>, <code>surfaceSunken</code>, <code>overlay</code>; <code>foreground</code>, <code>foregroundMuted</code>, <code>foregroundDisabled</code>; <code>border</code>, <code>borderStrong</code>, <code>divider</code>; <code>accent</code>, <code>onAccent</code>, <code>hover</code>, <code>pressed</code>; <code>focus</code>, <code>selection</code>; <code>link</code>; <code>danger</code>, <code>warning</code>, <code>success</code>, <code>info</code>; <code>scrim</code>, <code>shadow</code>.</td></tr>
+            <tr><td><code>fonts</code></td><td><code>body</code>, <code>label</code>, <code>caption</code>, <code>title</code>, <code>headings</code>, <code>code</code>.</td></tr>
+            <tr><td><code>metrics</code></td><td><code>unit</code> (4 px, the step spacing is counted in), <code>radius</code>, <code>borderWidth</code>, <code>focusWidth</code>, <code>controlHeight</code>, <code>iconSize</code>, <code>touchTarget</code>, <code>density</code>.</td></tr>
+            <tr><td><code>motion</code>, <code>elevation</code></td><td>The durations and curves of transitions; the shadows by height.</td></tr>
+            <tr><td><code>color(name)</code>, <code>run(name)</code></td><td>Colours and text looks outside the fixed set, by dotted name: <code>"syntax.keyword"</code>, <code>"editor.lineNumber"</code>. A name not found is looked up without its last part.</td></tr>
+          </tbody>
+        </table>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">scheme.adm</span>
+          </div>
+          <pre><code>// Dark, whatever the desktop says.
+let look = UI.appearance()
+look.scheme = ColorScheme.Dark
+UI.theme().follow(look)
+
+// Back to the desktop's.
+UI.theme().follow(UI.appearance())</code></pre>
+        </div>
+        <div class="shot-pair">
+          <figure class="shot">
+          <img src="assets/components/card.png" width="324" height="170" alt="The card in the light theme" loading="lazy">
+          <figcaption>Light.</figcaption>
+          </figure>
+          <figure class="shot">
+          <img src="assets/components/card-dark.png" width="324" height="170" alt="The card in the dark theme" loading="lazy">
+          <figcaption>Dark: the same <code>CardLook</code>, which takes its colours from the palette.</figcaption>
+          </figure>
+        </div>
+        <p>
+          <code>UI.appearance()</code> is what the desktop reports (<code>scheme</code>,
+          <code>accent</code>, <code>contrast</code>, <code>reduceMotion</code>, <code>textScale</code>,
+          the fonts), and <code>UI.appearanceChange</code> is emitted when the user changes it. A
+          style block runs when its component is created, so the colours it reads are those of that
+          moment: a component that has to follow a change of theme while it is on screen reads the
+          palette in <code>render</code>, or sets the property again when the event arrives.
+        </p>
+      </div>
+
+      <div class="docs-sub" id="icons">
+        <h3>Icon sets</h3>
+        <p>
+          An icon is named: <code>Icon("search")</code>, <code>Button(label = "Add", icon = "plus")</code>,
+          <code>TextField(leading = "search")</code>. Std brings a small set for its own components
+          (<code>search</code>, <code>check</code>, <code>close</code>, <code>plus</code>,
+          <code>minus</code>, <code>menu</code>, <code>chevron-down</code> among them). An application adds its own from a
+          folder of SVG files:
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">icons.adm</span>
+          </div>
+          <pre><code>use std.ui.icons::(icons)
+
+// Bakes every .svg of the folder into the program.
+@icons("assets/icons")
+partial type AppIcons {}
+
+// once, after UI.start()
+let app = new AppIcons()
+UI.addIcons(try app.set())
+
+// then, anywhere
+Icon("icons/arrow-left")
+Button(label = "Back", icon = app.ArrowLeft)</code></pre>
+        </div>
+        <figure class="shot">
+          <img src="assets/components/icon.png" width="280" height="48" alt="Seven of std's icons" loading="lazy">
+          <figcaption>Std's icons, drawn in the text colour.</figcaption>
+        </figure>
+        <ul>
+          <li>The set is named after the folder, or by <code>name = "..."</code>; an icon is
+            <code>set/file</code>, and the type gets one read-only name per file
+            (<code>arrow-left.svg</code> is <code>ArrowLeft</code>).</li>
+          <li>Icons are drawn in the colour of the text around them. <code>tinted = false</code> keeps
+            the files' own colours.</li>
+          <li>A set added later is looked in first, so an application can replace one of std's icons
+            by naming its own alike.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="docs-section" id="scoped">
+      <h2>Scoped components</h2>
+        <p>
+          A component marked <code>@scoped</code> is neither laid out nor drawn: its children are placed as
+          if they were its parent's. It is there for what it does to them (a context, a behaviour, their keys). It
+          names no style and declares no <code>render</code>. It still has a controller, hears the
+          pointer and the keys of what it holds, and is found with <code>closest&lt;C&gt;()</code>.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">scope.adm</span>
+          </div>
+          <pre><code>// Hears the keys of what it holds.
+@scoped
+component KeyLog {
+	type {
+		def key(e KeyEvent) bool {
+			return false when !e.down
+			println("key {e.key}")
+			return false
+		}
+	}
+
+	view {
+		children()
+	}
+}
+
+Row(gap = 8(px)) {
+	KeyLog() {
+		Button(label = "One")       // laid out as children of the row
+		Button(label = "Two")
+	}
+	Button(label = "Three")
+}</code></pre>
+        </div>
+        <figure class="shot">
+          <img src="assets/components/row.png" width="300" height="60" alt="Three buttons in one row: a scope around two of them changes nothing in the layout." loading="lazy">
+          <figcaption>Three buttons in one row: a scope around two of them changes nothing in the layout.</figcaption>
+        </figure>
+        <p>
+          Std's scopes: <code>FocusScope</code> (remembers which component in it had the focus;
+          <code>trap = true</code> keeps Tab inside), <code>Tooltip</code> (content shown beside what it
+          holds), <code>Draggable</code> and <code>DropTarget</code> (drag and drop).
+        </p>
+    </section>
+
+    <section class="docs-section" id="annotations">
+      <h2>Annotations</h2>
+        <p>
+          The annotations of the component system, in one place. Each is described in the section it links to.
+        </p>
+        <table class="docs-table">
+          <thead><tr><th>Annotation</th><th>On</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><a href="#inputs"><code>@input</code></a></td><td>a controller field</td><td>The caller may pass it by name.</td></tr>
+            <tr><td><a href="#inputs"><code>@input(value = true)</code></a></td><td>a controller field</td><td>The unnamed argument of a call sets it. One per component.</td></tr>
+            <tr><td><a href="#inputs"><code>@input(bind = true)</code></a></td><td>a controller field</td><td>The component may assign it, and the assignment reaches a <code>@bindable</code> place the caller passed.</td></tr>
+            <tr><td><a href="#inputs"><code>@bindable</code></a></td><td>a field, a struct, a type</td><td>A bound input it is passed to may assign it.</td></tr>
+            <tr><td><a href="#state"><code>@state</code></a></td><td>a controller field</td><td>A change emits <code>UI.stateChange</code>; a bool or enum state is a key of the style's <code>on</code>.</td></tr>
+            <tr><td><a href="#persist"><code>@persist(key)</code></a></td><td>a controller field</td><td>Kept between runs under the key, restored when the component is created.</td></tr>
+            <tr><td><a href="#events"><code>@emit()</code></a></td><td>a controller method</td><td>The method is an event of the component.</td></tr>
+            <tr><td><a href="#events"><code>@on(Component.event, matcher)</code></a></td><td>a function or a method</td><td>Listens to a component event; the matcher is a ref or a selector.</td></tr>
+            <tr><td><a href="#events"><code>@on(UI.event, filter)</code></a></td><td>a function or a method</td><td>Listens to an event of the <code>UI</code> service.</td></tr>
+            <tr><td><a href="#controller-apart"><code>@controller()</code></a></td><td>a type</td><td>The type is a controller components name as theirs.</td></tr>
+            <tr><td><a href="#scoped"><code>@scoped</code></a></td><td>a component</td><td>Not laid out and not drawn; its children are placed as its parent's.</td></tr>
+            <tr><td><a href="#style-composition"><code>@styleProperty</code></a></td><td>a <code>let</code> of a style</td><td>Declares a property of the style; <code>inherit = true</code> makes an unset one take the parent's.</td></tr>
+            <tr><td><code>@childProperty</code></td><td>a <code>let</code> of a style</td><td>A property a child sets for its container (<code>alignSelf</code>, a grid cell's span).</td></tr>
+          </tbody>
+        </table>
+        <p>
+          Call arguments that are no annotations but belong here: <a href="#view-ref"><code>ref = name</code></a> and <code>key = value</code> on a component call, and <a href="#view-children"><code>children()</code></a> in a view.
+        </p>
+    </section>
+
+    <section class="docs-section" id="windows">
+      <h2>Windows</h2>
+        <p>
+          A window shows one component, its root, laid out in the window's size.
+        </p>
+
+      <div class="docs-sub" id="ui-service">
+        <h3>Starting the UI</h3>
+        <p>
+          The <a href="services.html#svc-ui"><code>UI</code> service</a> owns the windows. An application
+          configures it, starts it, and calls <code>run</code> with the component that stands for its
+          window; <code>run</code> returns when no window is open any more.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">main.adm</span>
+          </div>
+          <pre><code>application Notes {
+	use (
+		std.math.geom::Size
+		std.ui::(UI, UIConfig)
+		std.ui.renderer
+		std.units::Pixels
+		notes::Page
+	)
+
+	async def new(args string[]) !int {
+		try UI.config(UIConfig{rendererName: "opengl"})
+		try await UI.start()
+
+		let window = new renderer.WindowConfig("Notes", 900, 640)
+		window.minSize = new Size&lt;Pixels&gt;(480(px), 320(px))
+		window.persist = "main"
+
+		try await UI.run(Page(), window)
+		return 0
+	}
+}</code></pre>
+        </div>
+        <table class="docs-table">
+          <thead><tr><th><code>UIConfig</code> field</th><th>Default</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>rendererName</code></td><td><code>""</code></td><td>The renderer by name: <code>"opengl"</code>. Used when <code>renderer</code> is none.</td></tr>
+            <tr><td><code>renderer</code></td><td>none</td><td>A renderer object in place of a name.</td></tr>
+            <tr><td><code>host</code></td><td>none</td><td>What provides the windows, the input, the clipboard and the tray; none: the platform's (SDL3 on Linux, macOS and Windows).</td></tr>
+            <tr><td><code>defaultWindow</code></td><td><code>new WindowConfig()</code></td><td>What <code>run(root)</code> and <code>openDefaultWindow(root)</code> open.</td></tr>
+            <tr><td><code>exitOnLastWindowClose</code></td><td><code>true</code></td><td>Ask the application to end when the last window closes.</td></tr>
+            <tr><td><code>showFPS</code></td><td><code>false</code></td><td>Show the frame rate in the window's title.</td></tr>
+            <tr><td><code>forceRedraw</code></td><td><code>false</code></td><td>Draw every frame. Off, a window is drawn only after something happened in it.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="docs-sub" id="window-config">
+        <h3>Window parameters</h3>
+        <p>
+          <code>new WindowConfig(title = "ADM", width = 800, height = 600)</code> makes the description of a
+          window; its fields say the rest. Sizes and places are logical pixels.
+        </p>
+        <table class="docs-table">
+          <thead><tr><th>Field</th><th>Default</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>title</code></td><td><code>"ADM"</code></td><td>The title in the title bar and the taskbar.</td></tr>
+            <tr><td><code>size</code></td><td>800 by 600</td><td>The size of what the window shows.</td></tr>
+            <tr><td><code>minSize</code></td><td>none</td><td>The smallest the user can make it.</td></tr>
+            <tr><td><code>position</code></td><td>none</td><td>Where its top left corner goes; none: the desktop places it. <code>placeOn(display, align, margin)</code> sets it against the edges of a display's work area.</td></tr>
+            <tr><td><code>state</code></td><td><code>WindowState.Normal</code></td><td>How it opens: <code>Normal</code>, <code>Minimized</code>, <code>Maximized</code>, <code>Fullscreen</code>.</td></tr>
+            <tr><td><code>resizable</code></td><td><code>true</code></td><td>Whether the user can resize it.</td></tr>
+            <tr><td><code>decorated</code></td><td><code>true</code></td><td>False: no title bar and no frame. The root component draws its own and marks what drags the window with <code>WindowDrag</code>.</td></tr>
+            <tr><td><code>icon</code></td><td>none</td><td>The window's icon, an <code>image.Image</code>.</td></tr>
+            <tr><td><code>transparent</code></td><td><code>false</code></td><td>No background of its own: where its components draw nothing, what is behind the window shows.</td></tr>
+            <tr><td><code>clickThrough</code></td><td><code>ClickThrough.None</code></td><td>Where a press goes to what is behind the window: <code>None</code>, <code>Empty</code> (where it shows nothing; needs <code>transparent</code>), <code>All</code> (an overlay, a notice).</td></tr>
+            <tr><td><code>alwaysOnTop</code></td><td><code>false</code></td><td>Stays above the other windows.</td></tr>
+            <tr><td><code>kind</code></td><td><code>WindowKind.Normal</code></td><td><code>Normal</code>, <code>Dialog</code> or <code>Utility</code>; what that looks like is the desktop's.</td></tr>
+            <tr><td><code>owner</code></td><td>none</td><td>The window it belongs to and stays above.</td></tr>
+            <tr><td><code>vsync</code></td><td><code>true</code></td><td>Frames in step with the display.</td></tr>
+            <tr><td><code>persist</code></td><td><code>""</code></td><td>A name to keep its place under: the window opens with the size, position and state it had when it was last open, on a display that still shows that place. Kept where <a href="#persist"><code>@persist</code></a> fields are.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="docs-sub" id="window">
+        <h3>Windows while they are open</h3>
+        <p>
+          <code>UI.openWindow(root, config)</code> opens a further window and gives back its
+          <code>Window</code>; one <code>run</code> serves them all. A window's properties are read and
+          set: what is set reaches the desktop on the loop's next pass.
+        </p>
+        <table class="docs-table">
+          <thead><tr><th><code>Window</code></th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code>visible</code></td><td>False: not on screen and not in the taskbar, still open with its components mounted. How a window goes to the tray.</td></tr>
+            <tr><td><code>state</code></td><td>Normal, minimized, maximized or fullscreen, as the desktop reports it; <code>UI.windowStateChanged</code> is emitted when it changes.</td></tr>
+            <tr><td><code>bounds</code></td><td>Where it is and how large what it shows is. Set it to move or resize the window.</td></tr>
+            <tr><td><code>active</code></td><td>Whether the keyboard goes to it.</td></tr>
+          </tbody>
+        </table>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">windows.adm</span>
+          </div>
+          <pre><code>let palette = new renderer.WindowConfig("Palette", 240, 400)
+palette.kind = WindowKind.Utility
+palette.alwaysOnTop = true
+let tools = try UI.openWindow(Palette(), palette)
+
+// Closing the main window hides it instead: the application lives on in the tray.
+@on(UI.closeRequested)
+def keep(evt Event&lt;CloseRequest&gt;) {
+	evt.result.cancel()
+	evt.result.window.visible = false
+}</code></pre>
+        </div>
+        <p>
+          Also on the service: <code>closeWindow</code>, <code>raiseWindow</code>, <code>setWindowTitle</code>,
+          <code>setWindowIcon</code>, <code>showTray(icon, tooltip, menu)</code> and <code>hideTray()</code>,
+          <code>displays()</code>, <code>appearance()</code> and <code>theme()</code>,
+          <code>addIcons(set)</code>, <code>redraw()</code>, <code>stop()</code>. The full list with every
+          event is on the <a href="services.html#svc-ui">services page</a>.
+        </p>
+      </div>
+
+    </section>
+
+    <section class="docs-section" id="builtin">
+      <h2>Built-in components</h2>
+        <p>
+          The components of <a href="modules.html#std-ui-components"><code>std.ui.components</code></a>, drawn
+          in the light theme. Each takes the inputs every component has (<code>enabled</code>,
+          <code>tooltip</code>, …) beside its own, and a control that holds a value takes it as a bound
+          input: give it a <code>@bindable</code> field, or a handler (<code>onChange</code>).
+        </p>
+
+      <div class="docs-sub" id="builtin-text">
+        <h3>Text</h3>
+        <div class="component-gallery">
+          <div class="component-card" id="c-text">
+            <div class="component-shot"><img src="assets/components/text.png" width="420" height="72" alt="Text" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Text</code></h4>
+              <p>A run of text: as large as its words, wrapping in the width it is given. <code>runs</code> style ranges of it apart.</p>
+              <pre><code>Text("Hello {name}")</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-heading">
+            <div class="component-shot"><img src="assets/components/heading.png" width="300" height="150" alt="Heading" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Heading</code></h4>
+              <p>A title over what follows; level 1 is the largest, 6 the smallest.</p>
+              <pre><code>Heading(text = "Install", level = 2)</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-label">
+            <div class="component-shot"><img src="assets/components/label.png" width="360" height="60" alt="Label" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Label</code></h4>
+              <p>The name of a control. A press on it focuses the control it names: <code>target</code>, or the component after it.</p>
+              <pre><code>Label("Email")</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-link">
+            <div class="component-shot"><img src="assets/components/link.png" width="200" height="46" alt="Link" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Link</code></h4>
+              <p>Text that goes somewhere when pressed, in the theme's link colour.</p>
+              <pre><code>Link(label = "Open the docs", onClick = openDocs)</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-icon">
+            <div class="component-shot"><img src="assets/components/icon.png" width="280" height="48" alt="Icon" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Icon</code></h4>
+              <p>An icon by name from std's set or the application's (<code>UI.addIcons</code>), in the text colour.</p>
+              <pre><code>Icon("search")</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-badge">
+            <div class="component-shot"><img src="assets/components/badge.png" width="140" height="48" alt="Badge" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Badge</code></h4>
+              <p>A short note on something, in a pill: a count, a state.</p>
+              <pre><code>Badge(label = "3")</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-chip">
+            <div class="component-shot"><img src="assets/components/chip.png" width="200" height="52" alt="Chip" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Chip</code></h4>
+              <p>A small labelled token: a tag, a filter. With <code>onRemove</code> it has a cross.</p>
+              <pre><code>Chip(label = "rust", onRemove = drop)</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-avatar">
+            <div class="component-shot"><img src="assets/components/avatar.png" width="120" height="60" alt="Avatar" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Avatar</code></h4>
+              <p>Who something belongs to, in a circle: initials, or a picture with <code>source</code>.</p>
+              <pre><code>Avatar(name = "Ada Lovelace")</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="docs-sub" id="builtin-buttons">
+        <h3>Buttons and choices</h3>
+        <div class="component-gallery">
+          <div class="component-card" id="c-button">
+            <div class="component-shot"><img src="assets/components/button.png" width="360" height="60" alt="Button" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Button</code></h4>
+              <p>Runs something when pressed with the pointer, Space or Enter. Takes an <code>icon</code> and a <code>trailing</code> icon.</p>
+              <pre><code>Button(label = "Save", onClick = save)</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-togglebutton">
+            <div class="component-shot"><img src="assets/components/togglebutton.png" width="220" height="60" alt="ToggleButton" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>ToggleButton</code></h4>
+              <p>A button that stays down; on, it is filled with the accent.</p>
+              <pre><code>ToggleButton(on = bold, label = "Bold")</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-splitbutton">
+            <div class="component-shot"><img src="assets/components/splitbutton.png" width="160" height="60" alt="SplitButton" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>SplitButton</code></h4>
+              <p>A button with more ways to do the same thing behind an arrow: the lines in its block.</p>
+              <pre><code>SplitButton(label = "Run", onClick = run) { MenuItem(label = "Debug") }</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-checkbox">
+            <div class="component-shot"><img src="assets/components/checkbox.png" width="300" height="80" alt="Checkbox" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Checkbox</code></h4>
+              <p>A box that is checked or not, with a label after it.</p>
+              <pre><code>Checkbox(checked = agreed, label = "I agree")</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-radio">
+            <div class="component-shot"><img src="assets/components/radio.png" width="200" height="110" alt="Radio" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Radio</code></h4>
+              <p>One choice among several; the caller unselects the others by what it passes them.</p>
+              <pre><code>Radio(selected = size == "small", label = "Small", onChange = pickSmall)</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-switch">
+            <div class="component-shot"><img src="assets/components/switch.png" width="260" height="84" alt="Switch" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Switch</code></h4>
+              <p>Something that is on or off and takes effect at once.</p>
+              <pre><code>Switch(on = wrap, label = "Wrap lines")</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-slider">
+            <div class="component-shot"><img src="assets/components/slider.png" width="280" height="52" alt="Slider" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Slider</code></h4>
+              <p>A value picked by dragging a thumb along a track; the arrows move it a <code>step</code>.</p>
+              <pre><code>Slider(value = volume, min = 0.0, max = 100.0)</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-dropdown">
+            <div class="component-shot"><img src="assets/components/dropdown.png" width="200" height="60" alt="Dropdown" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Dropdown</code></h4>
+              <p>One choice out of a list that opens under a button.</p>
+              <pre><code>Dropdown(options = ["Small", "Medium", "Large"], selected = size)</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="docs-sub" id="builtin-fields">
+        <h3>Fields</h3>
+        <div class="component-gallery">
+          <div class="component-card" id="c-textfield">
+            <div class="component-shot"><img src="assets/components/textfield.png" width="420" height="60" alt="TextField" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>TextField</code></h4>
+              <p>One line of text: caret, selection, clipboard, a placeholder, icons at its ends; <code>kind</code> (<code>TextKind</code>) makes it a password, an email or a number field.</p>
+              <pre><code>TextField(value = name, placeholder = "Name", leading = "search")</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-textarea">
+            <div class="component-shot"><img src="assets/components/textarea.png" width="320" height="110" alt="TextArea" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>TextArea</code></h4>
+              <p>Several lines of text, scrolling when they are taller than its <code>rows</code>.</p>
+              <pre><code>TextArea(value = notes, rows = 3)</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-searchfield">
+            <div class="component-shot"><img src="assets/components/searchfield.png" width="260" height="60" alt="SearchField" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>SearchField</code></h4>
+              <p>A text field with a magnifier and a cross that empties it; Enter runs <code>onSubmit</code>.</p>
+              <pre><code>SearchField(value = query, onSubmit = search)</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-numberfield">
+            <div class="component-shot"><img src="assets/components/numberfield.png" width="260" height="60" alt="NumberField" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>NumberField</code></h4>
+              <p>A number between limits, stepped by the arrows in the field and by Up and Down.</p>
+              <pre><code>NumberField(value = count, min = 0.0, max = 10.0)</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-combobox">
+            <div class="component-shot"><img src="assets/components/combobox.png" width="240" height="60" alt="ComboBox" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>ComboBox</code></h4>
+              <p>A text field with a list of the options that hold what is typed; text that is no option is allowed.</p>
+              <pre><code>ComboBox(value = city, options = cities, placeholder = "City")</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="docs-sub" id="builtin-layout">
+        <h3>Layout</h3>
+        <div class="component-gallery">
+          <div class="component-card" id="c-row">
+            <div class="component-shot"><img src="assets/components/row.png" width="300" height="60" alt="Row" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Row</code></h4>
+              <p>Places its children along the reading direction.</p>
+              <pre><code>Row(gap = 8(px)) { ... }</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-column">
+            <div class="component-shot"><img src="assets/components/column.png" width="140" height="140" alt="Column" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Column</code></h4>
+              <p>Places its children top to bottom.</p>
+              <pre><code>Column(gap = 8(px)) { ... }</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-grid">
+            <div class="component-shot"><img src="assets/components/grid.png" width="320" height="100" alt="Grid" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Grid</code></h4>
+              <p>Equal columns, or as many columns of a width as fit (<code>fit = 240(px)</code>).</p>
+              <pre><code>Grid(columns = 3, gap = 6(px)) { ... }</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-panel">
+            <div class="component-shot"><img src="assets/components/panel.png" width="380" height="72" alt="Panel" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Panel</code></h4>
+              <p>A container with the theme's surface as its background: what other components sit on.</p>
+              <pre><code>Panel() { ... }</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-divider">
+            <div class="component-shot"><img src="assets/components/divider.png" width="280" height="86" alt="Divider" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Divider</code></h4>
+              <p>A thin line between two parts; <code>vertical = true</code> stands between the parts of a row. <code>Spacer()</code> is empty room that takes what is left over.</p>
+              <pre><code>Divider()</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-scrollview">
+            <div class="component-shot"><img src="assets/components/scrollview.png" width="300" height="130" alt="ScrollView" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>ScrollView</code></h4>
+              <p>Shows content larger than itself and scrolls it with the wheel, the keys or its bars.</p>
+              <pre><code>ScrollView() { ... }</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-splitpane">
+            <div class="component-shot"><img src="assets/components/splitpane.png" width="420" height="120" alt="SplitPane" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>SplitPane</code></h4>
+              <p>Panes that share the room by <code>sizes</code>, with dividers to drag; <code>stacked = true</code> puts them one above the other.</p>
+              <pre><code>SplitPane(sizes = [1.0, 2.0]) { Files(); Editor() }</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-canvas">
+            <div class="component-shot"><img src="assets/components/canvas.png" width="180" height="130" alt="Canvas" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Canvas</code></h4>
+              <p>A surface a function draws on; <code>animated = true</code> draws it on every frame.</p>
+              <pre><code>Canvas(draw = drawChart)</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="docs-sub" id="builtin-navigation">
+        <h3>Navigation</h3>
+        <div class="component-gallery">
+          <div class="component-card" id="c-tabstrip">
+            <div class="component-shot"><img src="assets/components/tabstrip.png" width="360" height="56" alt="TabStrip" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>TabStrip</code></h4>
+              <p>A strip of titles of which one is current; with <code>onClose</code> each has a cross.</p>
+              <pre><code>TabStrip(tabs = ["main.adm", "lib.adm"], current = tab)</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-tabs">
+            <div class="component-shot"><img src="assets/components/tabs.png" width="360" height="120" alt="Tabs" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Tabs</code></h4>
+              <p>Pages of which one shows, under a strip of their titles.</p>
+              <pre><code>Tabs(current = page) { Tab(title = "main.adm") { ... } }</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-breadcrumbs">
+            <div class="component-shot"><img src="assets/components/breadcrumbs.png" width="320" height="48" alt="Breadcrumbs" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Breadcrumbs</code></h4>
+              <p>Where one is, as steps; a press on an earlier step picks it.</p>
+              <pre><code>Breadcrumbs(items = ["adm", "std", "ui"], onSelect = open)</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-accordion">
+            <div class="component-shot"><img src="assets/components/accordion.png" width="360" height="150" alt="Accordion" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Accordion</code></h4>
+              <p>Titled sections of which one is open at a time; an <code>AccordionItem</code> also works alone.</p>
+              <pre><code>Accordion() { AccordionItem(title = "General") { ... } }</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-toolbar">
+            <div class="component-shot"><img src="assets/components/toolbar.png" width="420" height="64" alt="Toolbar" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Toolbar</code></h4>
+              <p>A row of controls along the top of a window, over a line.</p>
+              <pre><code>Toolbar() { Button("Run"); Spacer(); SearchField() }</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-statusbar">
+            <div class="component-shot"><img src="assets/components/statusbar.png" width="420" height="52" alt="StatusBar" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>StatusBar</code></h4>
+              <p>A strip of short notes along the bottom of a window.</p>
+              <pre><code>StatusBar() { Text("Ln 12, Col 4"); Spacer(); Text("UTF-8") }</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-menubar">
+            <div class="component-shot"><img src="assets/components/menubar.png" width="300" height="52" alt="MenuBar" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>MenuBar</code></h4>
+              <p>The titles of its menus in a row; a press opens one, Left and Right move to the next.</p>
+              <pre><code>MenuBar() { Menu(title = "File") { ... } }</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="docs-sub" id="builtin-overlays">
+        <h3>Menus and overlays</h3>
+        <div class="component-gallery">
+          <div class="component-card" id="c-menu">
+            <div class="component-shot"><img src="assets/components/menu.png" width="280" height="160" alt="Menu" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Menu</code></h4>
+              <p>Lines to pick from, hanging beside its parent or <code>attach</code>: <code>MenuItem</code> (label, icon, shortcut), <code>MenuSeparator</code>, <code>SubMenu</code>. <code>ContextMenu</code> opens on the secondary button.</p>
+              <pre><code>Menu(open = shown) { MenuItem(label = "Rename", shortcut = "F2") }</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-popover">
+            <div class="component-shot"><img src="assets/components/popover.png" width="340" height="130" alt="Popover" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Popover</code></h4>
+              <p>Content that hangs beside a component, over the page; it flips or shifts when there is no room.</p>
+              <pre><code>Popover(open = more) { ... }</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-dialog">
+            <div class="component-shot"><img src="assets/components/dialog.png" width="440" height="240" alt="Dialog" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Dialog</code></h4>
+              <p>Asks something before going on: the page behind it is dimmed and takes no press, Tab stays inside, Escape closes it.</p>
+              <pre><code>Dialog(open = asking, title = "Rename") { ... }</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-toast">
+            <div class="component-shot"><img src="assets/components/toast.png" width="360" height="120" alt="Toast" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Toast</code></h4>
+              <p>A notice in the window's corner that goes by itself, or when pressed.</p>
+              <pre><code>Toast(text = "Saved.", open = saved)</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-progressbar">
+            <div class="component-shot"><img src="assets/components/progressbar.png" width="280" height="40" alt="ProgressBar" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>ProgressBar</code></h4>
+              <p>How far along something is, 0 to 1; without a value, work of unknown length.</p>
+              <pre><code>ProgressBar(value = done)</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-spinner">
+            <div class="component-shot"><img src="assets/components/spinner.png" width="60" height="48" alt="Spinner" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Spinner</code></h4>
+              <p>Work in progress with no known length, in little room.</p>
+              <pre><code>Spinner()</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="docs-sub" id="builtin-more">
+        <h3>Without a picture</h3>
+        <table class="docs-table">
+          <thead><tr><th>Component</th><th>What it is</th></tr></thead>
+          <tbody>
+            <tr><td><code>Pressable</code></td><td>Makes what is inside it something to press, with the pointer or, focused, Space or Enter.</td></tr>
+            <tr><td><code>Image</code></td><td>A picture; <code>fit</code> says how it fills a box of another shape.</td></tr>
+            <tr><td><code>Layered</code></td><td>Puts its children on top of each other, the last on top.</td></tr>
+            <tr><td><code>Tooltip</code>, <code>HoverCard</code></td><td>Content shown beside what the pointer rests on; a hover card can be entered and used. For plain text every component has <code>tooltip = "..."</code>.</td></tr>
+            <tr><td><code>ContextMenu</code>, <code>SubMenu</code>, <code>MenuItem</code>, <code>MenuSeparator</code></td><td>The parts of menus.</td></tr>
+            <tr><td><code>Draggable</code>, <code>DropTarget</code></td><td>Drag and drop between components of a window.</td></tr>
+            <tr><td><code>FocusScope</code></td><td>Remembers the focus of a part of a window; <code>trap = true</code> keeps Tab inside.</td></tr>
+            <tr><td><code>WindowDrag</code></td><td>The part of a window without a title bar that drags the window.</td></tr>
+            <tr><td><code>Spacer</code></td><td>Empty room that takes what is left over in a row or a column.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>adm programming language</span>
+    <span class="footer-muted">Statically typed &middot; multi-paradigm</span>
+  </div>
+</footer>
+
+<script src="docs.js"></script>
+<script src="highlight.js"></script>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "f0b264e327ed4ca4b04c4182c930c88c"}'></script><!-- End Cloudflare Web Analytics -->
+</body>
+</html>

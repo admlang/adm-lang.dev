@@ -52,6 +52,7 @@
         <a class="docs-page-link" href="memory.html">Memory model</a>
         <a class="docs-page-link" href="units.html">Units of measure</a>
         <a class="docs-page-link" href="annotations.html">Annotations</a>
+        <a class="docs-page-link" href="components.html">UI components</a>
         <a class="docs-page-link" href="app-home.html">Application home &amp; migrations</a>
         <a class="docs-page-link" href="policy.html">Policy &amp; permissions</a>
         <a class="docs-page-link" href="plugins.html">Plugins</a>
@@ -851,7 +852,7 @@ adm get acme:imaging@^1.4 --accept adm.storage.*</code></pre>
         </div>
         <pre><code data-hl="off" class="nohighlight">adm lsp [--log-protocol]</code></pre>
       </div>
-      <p>Starts the language server on stdio (go to definition, references, hover, workspace symbols, diagnostics); <code>--log-protocol</code> traces every request to stderr.</p>
+      <p>Starts the language server on stdio (go to definition, references, hover, workspace symbols, diagnostics); <code>--log-protocol</code> traces every request to stderr. The server runs on at most 8 processors and limits its heap to a quarter of the machine's memory (at least 4 GiB); <code>GOMAXPROCS</code>, <code>GOGC</code> and <code>GOMEMLIMIT</code> override.</p>
       <h3 id="mcp"><code>adm mcp</code></h3>
       <div class="code-window">
         <div class="code-titlebar">
@@ -1108,7 +1109,7 @@ adm lint --list</code></pre>
         <tr><td><code>ADM_SYSROOT_&lt;OS&gt;_&lt;ARCH&gt;</code></td><td>Sysroot for a target. Unset: <code>adm build</code> links a Linux program against the baseline sysroot shipped in <code>lib/sysroots/</code> (glibc 2.35) when it holds every library the program links, so the program runs on systems from that glibc on; when a library is missing there it links against the build machine's files and says so. <code>adm run</code> and <code>adm test</code> link against the build machine's files; another platform needs the variable. A path: that sysroot, for every command. <code>host</code>: the build machine's files.</td></tr>
         <tr><td><code>ADM_SIGNING_KEY</code></td><td>Base64 Ed25519 publisher private key used for signing, instead of the key file <code>adm app init</code> wrote.</td></tr>
         <tr><td><code>ADM_DIST_REPO</code></td><td>GitHub <code>owner/name</code> whose releases <code>adm version</code> and <code>adm update</code> read (default <code>admlang/adm</code>).</td></tr>
-        <tr><td><code>ADM_LLVM_WORKERS</code></td><td>Worker processes a cold build compiles modules in (default: one per core, at most 8, bounded by free memory); <code>0</code> or <code>1</code> compiles in-process.</td></tr>
+        <tr><td><code>ADM_LLVM_WORKERS</code></td><td>Processes a cold build compiles modules in, the compiler itself counted (n-1 worker processes start; default: one per core, at most 8, bounded by free memory); <code>0</code> or <code>1</code> compiles in-process.</td></tr>
         <tr><td><code>ADM_NO_INCREMENTAL</code></td><td><code>1</code> keys the cache on the whole program instead of reusing unchanged modules.</td></tr>
         <tr><td><code>ADM_NO_SHAKE</code></td><td><code>1</code> compiles the whole program instead of dropping unreachable functions.</td></tr>
         <tr><td><code>ADM_FULL_LOAD</code></td><td><code>1</code> loads every file of each standard library module a program reaches, instead of only the files it names. The IR cache and the lint result cache keep such runs apart.</td></tr>

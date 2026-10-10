@@ -12,6 +12,7 @@ list sits at the top of it and each page's own sections follow:
 | `docs.html` — Language reference | hand-written |
 | `memory.html` — Memory model | generated from `docs/ADM Memory Model.md` by `tools/website_docs_pages.py` |
 | `annotations.html` — Annotations | hand-written; keep in step with the `meta def`s in `internal/prelude` and `std` |
+| `components.html` — UI components | hand-written; its pictures (`assets/components/*.png`; `layers-exploded.svg` is written by `tools/component-shots/layers_svg.py`) are drawn by `tools/component-shots/shots.adm`, which also declares the page's example components so that they compile: `adm run tools/component-shots/shots.adm -- assets/components` from the site's folder after a component's look changes |
 | `app-home.html` — Application home & migrations | hand-written; source design in `docs/requirements/app-home.md` |
 | `policy.html` — Policy & permissions | hand-written; source design in `docs/requirements/policy.md` |
 | `plugins.html` — Plugins | hand-written; source design in `docs/requirements/plugins.md` |

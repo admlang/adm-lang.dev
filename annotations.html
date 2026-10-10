@@ -52,6 +52,7 @@
         <a class="docs-page-link" href="memory.html">Memory model</a>
         <a class="docs-page-link" href="units.html">Units of measure</a>
         <a class="docs-page-link current" href="annotations.html">Annotations</a>
+        <a class="docs-page-link" href="components.html">UI components</a>
         <a class="docs-page-link" href="app-home.html">Application home &amp; migrations</a>
         <a class="docs-page-link" href="policy.html">Policy &amp; permissions</a>
         <a class="docs-page-link" href="plugins.html">Plugins</a>
@@ -265,14 +266,35 @@ type Remote {
         <code>Event&lt;StateChange&gt;</code>. An equal value emits nothing (objects, arrays and
         maps compare by identity), and neither do the values a component is built with.
       </p>
-      <h4><code>@persist(key)</code> <span class="api-tag api-planned">planned</span></h4>
+      <h4><code>@persist(key)</code></h4>
       <p>
-        On a field written in a component's <code>type { }</code>: the field's value is saved
-        under <code>key</code> when it changes and restored when the component is created
-        again, between runs too. The values are kept by the <code>Vault</code> service
-        (<code>store</code>/<code>load</code> under <code>ui.persist.&lt;key&gt;</code>). The
-        annotation is accepted today and saves nothing yet.
+        On a field of a component's controller, its <code>type { }</code> or the
+        <code>@controller()</code> type it names: the field's value is kept between runs. A component that is created starts with the value kept under
+        <code>key</code> (before <code>new()</code>; the field's default when nothing is
+        kept, and what the call passes when the field is an input it passes). An assignment
+        that changes the value keeps the new one: it is written half a second after the last
+        change, when a window closes and when the UI stops. The values are in the
+        <a href="services.html#svc-vault"><code>Vault</code></a> service, named
+        <code>ui.persist.&lt;key&gt;</code>, so they are encrypted on disk.
       </p>
+      <p>
+        The key is a string written in place, made of letters, digits, <code>.</code>,
+        <code>_</code> and <code>-</code>, and is the application's: two components that name
+        the same key share the value. The field's type is one a vault value can be (numbers,
+        strings, enums, arrays, maps, optionals, tuples, structs). A kept value that no longer
+        reads as the field's type is dropped and the default used. A field changed in place
+        (<code>items.push(x)</code>) is kept when it is next assigned. With <code>@state</code>
+        on the same field, the change is emitted as well.
+      </p>
+<pre><code>component Shell {
+	style ShellLook
+	view { ... }
+
+	type {
+		@persist("sidebar.width")
+		sidebarWidth int = 240
+	}
+}</code></pre>
       <h4><code>@controller()</code></h4>
 <p>Marks a type as the controller of a UI component.</p>
     </section>

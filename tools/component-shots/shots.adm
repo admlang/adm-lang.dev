@@ -1,0 +1,891 @@
+// Draws the pictures of the components page (`components.html`): each std component in a
+// small window of its own, drawn without a screen and written as a PNG.
+//
+//	adm run tools/component-shots/shots.adm -- assets/components
+module shots {
+	use (
+		std.formats.image
+		std.gfx.canvas
+		std.math.geom::(Axes, Corners, Edges, Point, Rect, Size)
+		std.ui::(Display, KeyEvent, MenuEntry, RenderContext, TextKind, UI, WindowState)
+		std.ui.components::*
+		std.ui.renderer as r
+		std.ui.renderer::(PlatformEvent, PlatformEventKind)
+		std.ui.styles::*
+		std.units::(Extent, Pixels)
+	)
+
+	// Device pixels per logical pixel of the pictures.
+	const density = 2.0
+
+	// A host and a renderer with no screen. A window is as large as it was asked to be
+	// and named by its title; the last frame committed for it is its picture.
+	type Booth {
+		names  map<uint, string>
+		sizes  map<uint, Size>
+		shots  map<uint, canvas.Canvas>
+		opened int
+		polls  int
+
+		def attach(host r.Host) !none {
+			return none
+		}
+
+		def openWindow(cfg r.WindowConfig) !r.Window {
+			opened++
+			let id = uint(opened)
+			names = names.set(id, cfg.title)
+			sizes = sizes.set(id, cfg.size)
+			return new r.Window(id)
+		}
+
+		def closeWindow(win r.Window) !none {
+			return none
+		}
+
+		def setWindowTitle(win r.Window, title string) !none {
+			return none
+		}
+
+		def setWindowIcon(win r.Window, icon image.Image) !none {
+			return none
+		}
+
+		def setWindowVisible(win r.Window, visible bool) !none {
+			return none
+		}
+
+		def setWindowState(win r.Window, state WindowState) !none {
+			return none
+		}
+
+		def setCursor(win r.Window, cursor Cursor) !none {
+			return none
+		}
+
+		def windowBounds(win r.Window) !Rect<Pixels> {
+			let size = sizes[win.id()]
+			return Rect<Pixels>{left: 0(px), top: 0(px), right: size.width * 1(px), bottom: size.height * 1(px)}
+		}
+
+		def setWindowBounds(win r.Window, bounds Rect<Pixels>) !none {
+			return none
+		}
+
+		def raiseWindow(win r.Window) !none {
+			return none
+		}
+
+		// Nothing happens in the windows: they are given the frames that settle them, a
+		// pointer move in their corner (which owes them more), and are then closed.
+		def poll() !PlatformEvent[] {
+			polls++
+			let kind = PlatformEventKind.Close
+			kind = PlatformEventKind.MouseMove when polls == 4
+			return [] when polls != 4 && polls < 12
+			let all PlatformEvent[]
+			for let id = 1; id <= opened; id++ {
+				all.push(PlatformEvent{kind: kind, window: uint(id)})
+			}
+			return all
+		}
+
+		def wait(limit duration) !none {
+			return none
+		}
+
+		def wake() {}
+
+		def displays() !Display[] {
+			return [Display{primary: true}]
+		}
+
+		def clipboardText() !string {
+			return ""
+		}
+
+		def setClipboardText(text string) !none {
+			return none
+		}
+
+		def startTextInput(win r.Window, kind TextKind) !none {
+			return none
+		}
+
+		def stopTextInput(win r.Window) !none {
+			return none
+		}
+
+		def setTextInputCaret(win r.Window, caret Rect<Pixels>) !none {
+			return none
+		}
+
+		def setWindowDragTest(win r.Window, test ?(def(Point<Pixels>) bool)) !none {
+			return none
+		}
+
+		def setWindowShape(win r.Window, width int, height int, pixels byte[]) !none {
+			return none
+		}
+
+		def showTray(icon image.Image, tooltip string, menu MenuEntry[]) !none {
+			return none
+		}
+
+		def hideTray() !none {
+			return none
+		}
+
+		def nextFrame(win r.Window) !r.Frame {
+			let size = sizes[win.id()]
+			return r.Frame{ctx: new canvas.DrawContext(new Size(size.width * density, size.height * density))}
+		}
+
+		def commit(win r.Window, frame r.Frame) !none {
+			let size = sizes[win.id()]
+			let shot = new canvas.Canvas(int(size.width * density), int(size.height * density))
+			shot.apply(frame.ctx)
+			shots = shots.set(win.id(), shot)
+			return none
+		}
+
+		def read(win r.Window, left int, top int, width int, height int) !byte[] {
+			fail "booth: frames are not read back"
+		}
+
+		def release(win r.Window) !none {
+			return none
+		}
+
+		// The picture of each window as a PNG, by the window's name.
+		def pictures() !map<string, byte[]> {
+			let out map<string, byte[]>
+			for let (id, shot) in shots {
+				let picture = new image.Image(shot.width, shot.height)
+				let raw = picture.raw()
+				for let i = 0; i < shot.pixels.len(); i++ {
+					raw[i] = shot.pixels[i]
+				}
+				out = out.set(names[id], try new image.PNG().encode(picture))
+			}
+			return out
+		}
+	}
+
+	style Frame {
+		Box
+		Layout
+	}
+
+	// A box of a size of its own for what needs room: panes, pages, a scrolling list.
+	component Room {
+		type {
+			@input
+			wide float = 300.0
+
+			@input
+			high float = 100.0
+
+			def new() {
+				style.width = wide * 1(px)
+				style.height = high * 1(px)
+			}
+		}
+
+		view {
+			children()
+		}
+
+		style Frame
+	}
+
+	// What a `Canvas` draws in its picture: three bars on a sunken ground.
+	def drawBars(ctx RenderContext) {
+		let frame = ctx.geometry.frame
+		let (wide, high) = (float(frame.width), float(frame.height))
+		let palette = UI.theme().palette
+		ctx.draw.fill(Rect{left: 0.0, top: 0.0, right: wide, bottom: high}, 6.0, palette.surfaceSunken)
+		ctx.draw.fill(Rect{left: 20.0, top: 56.0, right: 50.0, bottom: high - 12.0}, 3.0, palette.accent)
+		ctx.draw.fill(Rect{left: 62.0, top: 24.0, right: 92.0, bottom: high - 12.0}, 3.0, palette.accent)
+		ctx.draw.fill(Rect{left: 104.0, top: 40.0, right: 134.0, bottom: high - 12.0}, 3.0, palette.accent)
+	}
+
+	// The components the page's examples declare, written here so that they are compiled
+	// and two of them drawn.
+
+	// A component with a state of its own: the view shows it, the button changes it.
+	component Counter {
+		type {
+			@state
+			count int = 0
+
+			def add() {
+				count = count + 1
+			}
+		}
+
+		view {
+			Button(label = "Add one", onClick = add)
+			Text(text = "Pressed {count} times")
+		}
+
+		style {
+			Box
+			Layout
+			arrange = Arrange.Row
+			gap = new Axes<Extent>(8(px))
+			align = Align{vertical: Alignment.Center}
+		}
+	}
+
+	// A style composed of std's: a box that lays its children out and is painted, with
+	// another background under the pointer.
+	style CardLook {
+		Box
+		Layout
+		Decorated
+		Compositing
+		let palette = UI.theme().palette
+
+		width = 300(px)
+		padding = new Edges<Extent>(12(px))
+		gap = new Axes<Extent>(8(px))
+		radius = new Corners<Extent>(8(px))
+		background = new BackgroundFill(palette.surface)
+		border = new Edges<Border>(Border{width: 1(px), paint: palette.border})
+		on = {
+			hover:    {background: new BackgroundFill(palette.surfaceRaised)},
+			pressed:  {background: new BackgroundFill(palette.surfaceSunken)},
+			disabled: {opacity: 0.4},
+		}
+	}
+
+	// A component with slots: a header with a fallback, an optional footer, and the
+	// caller's block between them.
+	component Card {
+		type {
+			@input
+			title string = ""
+
+			@input
+			header view = view { Heading(text = title, level = 3) }
+
+			@input
+			footer ?view = none
+
+		}
+
+		view {
+			header()
+			children()
+			if !(footer is none) {
+				footer()
+			}
+		}
+
+		style CardLook
+	}
+
+	// A controller declared apart, and a component that names it.
+	@controller()
+	type Counting {
+		@input
+		step int = 1
+
+		count int = 0
+
+		def add() {
+			count = count + step
+		}
+	}
+
+	component Stepper {
+		view {
+			Button(label = "Add", onClick = add)
+			Text(text = "{count}")
+		}
+
+		style Frame
+
+		type Counting
+	}
+
+	// A slot that takes a value: a function from a file's name to the view of its line.
+	component FileList {
+		type {
+			@input(value = true)
+			files string[] = []
+
+			@input
+			row ?(def(string) view) = none
+		}
+
+		view {
+			for let file in files {
+				if row is none {
+					Text(text = file)
+				} else {
+					row(file)
+				}
+			}
+		}
+
+		style Frame
+	}
+
+	// A component that draws itself: std's passes for its background and border, then a
+	// bar of its own over them.
+	style MeterLook {
+		Box
+		Decorated
+		let palette = UI.theme().palette
+
+		width = 180(px)
+		height = 14(px)
+		radius = new Corners<Extent>(7(px))
+		background = new BackgroundFill(palette.surfaceSunken)
+		border = new Edges<Border>(Border{width: 1(px), paint: palette.border})
+	}
+
+	component Meter {
+		type {
+			@input(value = true)
+			value float = 0.0
+
+			def render(ctx RenderContext) {
+				ctx.background()
+				ctx.borders()
+				let frame = ctx.geometry.frame
+				let (wide, high) = (float(frame.width), float(frame.height))
+				ctx.draw.fill(Rect{left: 0.0, top: 0.0, right: wide * value, bottom: high}, high / 2.0, UI.theme().palette.accent)
+			}
+		}
+
+		view {}
+
+		style MeterLook
+	}
+
+	// Pinned to a corner of what holds it, out of the layout and above the content.
+	component Stamp {
+		type {}
+
+		view {
+			Badge(label = "new")
+		}
+
+		style {
+			Box
+			Layout
+			position = Position.Relative
+			anchors = Anchors{top: 6(px), right: 6(px)}
+			layer = Layer.Floating
+		}
+	}
+
+	// Placed against another component: under its bottom edge, from its left edge.
+	component Hint {
+		type {
+			@input
+			target ?component = none
+
+			def attached() {
+				let under = new AnchorLine(target, AnchorEdge.Bottom)
+				under.offset = 4(px)
+				style.anchors = Anchors{top: under, left: new AnchorLine(target, AnchorEdge.Left)}
+			}
+		}
+
+		view {
+			Text(text = "Saves the file")
+		}
+
+		style {
+			Box
+			Layout
+			position = Position.Absolute
+			layer = Layer.Tooltip
+		}
+	}
+
+	// A look to appear from and to leave to, and how long the travel takes.
+	style Fade {
+		Box
+		Compositing
+		Transforms
+		Motion
+		enter = {opacity: 0.0, transform: {translate: {y: 8(px)}}}
+		exit = {opacity: 0.0}
+		transition = Transition{duration: 150ms}
+	}
+
+	component Fading {
+		type {}
+
+		view {}
+
+		style Fade
+	}
+
+	// A scope: it hears the keys of what it holds and has no box of its own.
+	@scoped
+	component KeyLog {
+		type {
+			def key(e KeyEvent) bool {
+				return false when !e.down
+				println("key {e.key}")
+				return false
+			}
+		}
+
+		view {
+			children()
+		}
+	}
+
+	// A `ref` names a child for the controller.
+	component Login {
+		type {
+			def toEmail() {
+				email.focus() unless email is none
+			}
+		}
+
+		view {
+			KeyLog() {
+				Label(text = "Email")
+				TextField(ref = email, placeholder = "you@example.com")
+				Button(label = "Go to the field", onClick = toEmail)
+			}
+		}
+
+		style Frame
+	}
+
+	// An event of a component, and a listener of it.
+	component Rating {
+		type {
+			@state
+			stars int = 0
+
+			@emit()
+			def rated(stars int) int {
+				return stars
+			}
+
+			def three() {
+				stars = 3
+				rated(3)
+			}
+		}
+
+		view {
+			Button(label = "Three stars", onClick = three)
+		}
+
+		style Frame
+	}
+
+	@on(Rating.rated)
+	def onRated(evt ComponentEvent<int>) {
+		println("rated {evt.result}")
+	}
+
+	// Values the controls write straight into.
+	@bindable
+	type Settings {
+		wrap   bool  = true
+		volume float = 40.0
+	}
+
+	let settings = new Settings()
+
+	component SettingsPage {
+		type {}
+
+		view {
+			Switch(on = settings.wrap, label = "Wrap lines")
+			Slider(value = settings.volume)
+			Login()
+			Rating()
+			Stepper(step = 2)
+			Fading()
+		}
+
+		style Frame
+	}
+
+	// The content of one picture, by name.
+	component Shot {
+		type {
+			@input(value = true)
+			of string = ""
+
+			def new() {
+				style.width = fill
+				style.height = fill
+				style.padding = new Edges<Extent>(12(px))
+				style.gap = new Axes<Extent>(8(px))
+			}
+		}
+
+		view {
+			match of {
+				case "text":
+					Text(text = "Text is as large as its words and wraps in the width it is given, like this sentence does.")
+				case "heading":
+					Heading(text = "Level 1", level = 1)
+					Heading(text = "Level 2", level = 2)
+					Heading(text = "Level 3", level = 3)
+				case "label":
+					Row(gap = 8(px)) {
+						Label(text = "Email")
+						TextField(placeholder = "you@example.com")
+					}
+				case "link":
+					Link(label = "Open the docs")
+				case "button":
+					Row(gap = 8(px)) {
+						Button(label = "Save")
+						Button(label = "Add", icon = "plus")
+						Button(label = "Disabled", enabled = false)
+					}
+				case "togglebutton":
+					Row(gap = 8(px)) {
+						ToggleButton(on = true, label = "Bold")
+						ToggleButton(on = false, label = "Italic")
+					}
+				case "splitbutton":
+					SplitButton(label = "Run") {
+						MenuItem(label = "Debug")
+						MenuItem(label = "Profile")
+					}
+				case "checkbox":
+					Checkbox(checked = true, label = "I agree")
+					Checkbox(checked = false, label = "Send me the newsletter")
+				case "radio":
+					Radio(selected = false, label = "Small")
+					Radio(selected = true, label = "Medium")
+					Radio(selected = false, label = "Large")
+				case "switch":
+					Switch(on = true, label = "Wrap lines")
+					Switch(on = false, label = "Show line numbers")
+				case "slider":
+					Slider(value = 40.0, step = 5.0)
+				case "progressbar":
+					ProgressBar(value = 0.6)
+				case "spinner":
+					Spinner()
+				case "badge":
+					Row(gap = 8(px)) {
+						Badge(label = "3")
+						Badge(label = "new")
+					}
+				case "chip":
+					Row(gap = 8(px)) {
+						Chip(label = "rust")
+						Chip(label = "adm", onRemove = def () {})
+					}
+				case "avatar":
+					Row(gap = 8(px)) {
+						Avatar(name = "Ada Lovelace")
+						Avatar(name = "Grace Hopper")
+					}
+				case "icon":
+					Row(gap = 12(px)) {
+						Icon("search")
+						Icon("check")
+						Icon("close")
+						Icon("plus")
+						Icon("minus")
+						Icon("menu")
+						Icon("chevron-down")
+					}
+				case "divider":
+					Text(text = "Above the line")
+					Divider()
+					Text(text = "Under the line")
+				case "textfield":
+					Row(gap = 8(px)) {
+						TextField(placeholder = "Name", leading = "search")
+						TextField(value = "secret", kind = TextKind.Password)
+					}
+				case "textarea":
+					TextArea(value = "Enter starts a line.\nUp and Down move between lines,\nthe wheel scrolls.", rows = 3)
+				case "searchfield":
+					SearchField(value = "components")
+				case "numberfield":
+					NumberField(value = 4.0, min = 0.0, max = 10.0)
+				case "combobox":
+					ComboBox(value = "Ber", options = ["Amsterdam", "Athens", "Berlin", "Bern", "Oslo"], placeholder = "City")
+				case "dropdown":
+					Dropdown(options = ["Small", "Medium", "Large"], selected = 1)
+				case "tabstrip":
+					TabStrip(tabs = ["main.adm", "lib.adm", "notes.md"], current = 0)
+				case "tabs":
+					Room(wide = 336.0, high = 96.0) {
+						Tabs(current = 0) {
+							Tab(title = "main.adm") {
+								Text(text = "The first page, shown while its tab is current.")
+							}
+							Tab(title = "notes") {
+								Text(text = "The second page.")
+							}
+						}
+					}
+				case "breadcrumbs":
+					Breadcrumbs(items = ["adm", "std", "ui", "components"])
+				case "toolbar":
+					Toolbar() {
+						Button(label = "Run")
+						Button(label = "Stop")
+						Spacer()
+						Link(label = "Open the docs")
+					}
+				case "statusbar":
+					StatusBar() {
+						Text(text = "Ln 12, Col 4")
+						Spacer()
+						Text(text = "UTF-8")
+					}
+				case "menubar":
+					MenuBar() {
+						Menu(title = "File") {
+							MenuItem(label = "Open")
+						}
+						Menu(title = "Edit") {
+							MenuItem(label = "Undo")
+						}
+						Menu(title = "View") {
+							MenuItem(label = "Zoom in")
+						}
+					}
+				case "menu":
+					// A menu hangs beside its parent: the column is as large as the button.
+					Column() {
+						Button(label = "File")
+						Menu(open = true) {
+							MenuItem(label = "Rename", shortcut = "F2")
+							MenuItem(label = "Duplicate", icon = "plus", shortcut = "Ctrl+D")
+							MenuSeparator()
+							MenuItem(label = "Delete", icon = "close", shortcut = "Del")
+						}
+					}
+				case "popover":
+					Column() {
+						Button(label = "More")
+						Popover(open = true) {
+							Text(text = "A popover hangs beside its target.")
+							Text(text = "Escape or a press outside closes it.")
+						}
+					}
+				case "dialog":
+					Text(text = "The page behind the dialog is dimmed and takes no press.")
+					Dialog(open = true, title = "Rename") {
+						Text(text = "It sits in the middle of the window until it is closed.")
+						footer = view {
+							Button(label = "Cancel")
+							Button(label = "Rename")
+						}
+					}
+				case "toast":
+					Text(text = "A toast shows in the window's corner.")
+					Toast(text = "Saved.", open = true)
+				case "accordion":
+					Room(wide = 336.0, high = 126.0) {
+						Accordion() {
+							AccordionItem(title = "General", open = true) {
+								Text(text = "Opening a section closes the other.")
+							}
+							AccordionItem(title = "Advanced") {
+								Text(text = "Hidden until its title is pressed.")
+							}
+						}
+					}
+				case "splitpane":
+					Room(wide = 396.0, high = 96.0) {
+						SplitPane(sizes = [1.0, 2.0]) {
+							Text(text = "Files")
+							Text(text = "Drag the line between the panes.")
+						}
+					}
+				case "grid":
+					Grid(columns = 3, gap = 6(px)) {
+						Button(label = "One")
+						Button(label = "Two")
+						Button(label = "Three")
+						Button(label = "Four")
+						Button(label = "Five")
+					}
+				case "row":
+					Row(gap = 8(px)) {
+						Button(label = "One")
+						Button(label = "Two")
+						Button(label = "Three")
+					}
+				case "column":
+					Column(gap = 8(px)) {
+						Button(label = "One")
+						Button(label = "Two")
+						Button(label = "Three")
+					}
+				case "panel":
+					Panel() {
+						Text(text = "A panel is the surface other components sit on.")
+					}
+				case "scrollview":
+					Room(wide = 276.0, high = 106.0) {
+						ScrollView() {
+							Column(gap = 6(px)) {
+								Button(label = "One")
+								Button(label = "Two")
+								Button(label = "Three")
+								Button(label = "Four")
+								Button(label = "Five")
+								Button(label = "Six")
+							}
+						}
+					}
+				case "canvas":
+					Room(wide = 156.0, high = 106.0) {
+						Canvas(draw = drawBars)
+					}
+				case "counter":
+					Counter()
+				case "card":
+					Card(title = "Profile") {
+						footer = view {
+							Button(label = "Edit")
+						}
+						Text(text = "Ada Lovelace wrote the first program.")
+					}
+				case "filelist":
+					FileList(["main.adm", "lib.adm", "notes.md"]) {
+						row = (name string) => Chip(label = name)
+					}
+				case "meter":
+					Meter(0.6)
+				case "anchors":
+					Room(wide = 236.0, high = 76.0) {
+						Panel() {
+							Text(text = "Release notes")
+							Stamp()
+						}
+					}
+				case "hint":
+					Button(label = "Save", ref = save)
+					Hint(target = save)
+				case "settings":
+					SettingsPage()
+				default:
+					Text(text = "No picture is named \"{of}\".")
+			}
+		}
+
+		style Frame
+	}
+
+	// A picture's name and the size of its window, in logical pixels.
+	struct Wanted {
+		name string
+		wide float
+		high float
+	}
+
+	def wanted() Wanted[] {
+		return [
+			Wanted{name: "text", wide: 420.0, high: 72.0},
+			Wanted{name: "heading", wide: 300.0, high: 150.0},
+			Wanted{name: "label", wide: 360.0, high: 60.0},
+			Wanted{name: "link", wide: 200.0, high: 46.0},
+			Wanted{name: "button", wide: 360.0, high: 60.0},
+			Wanted{name: "togglebutton", wide: 220.0, high: 60.0},
+			Wanted{name: "splitbutton", wide: 160.0, high: 60.0},
+			Wanted{name: "checkbox", wide: 300.0, high: 80.0},
+			Wanted{name: "radio", wide: 200.0, high: 110.0},
+			Wanted{name: "switch", wide: 260.0, high: 84.0},
+			Wanted{name: "slider", wide: 280.0, high: 52.0},
+			Wanted{name: "progressbar", wide: 280.0, high: 40.0},
+			Wanted{name: "spinner", wide: 60.0, high: 48.0},
+			Wanted{name: "badge", wide: 140.0, high: 48.0},
+			Wanted{name: "chip", wide: 200.0, high: 52.0},
+			Wanted{name: "avatar", wide: 120.0, high: 60.0},
+			Wanted{name: "icon", wide: 280.0, high: 48.0},
+			Wanted{name: "divider", wide: 280.0, high: 86.0},
+			Wanted{name: "textfield", wide: 420.0, high: 60.0},
+			Wanted{name: "textarea", wide: 320.0, high: 110.0},
+			Wanted{name: "searchfield", wide: 260.0, high: 60.0},
+			Wanted{name: "numberfield", wide: 260.0, high: 60.0},
+			Wanted{name: "combobox", wide: 240.0, high: 60.0},
+			Wanted{name: "dropdown", wide: 200.0, high: 60.0},
+			Wanted{name: "tabstrip", wide: 360.0, high: 56.0},
+			Wanted{name: "tabs", wide: 360.0, high: 120.0},
+			Wanted{name: "breadcrumbs", wide: 320.0, high: 48.0},
+			Wanted{name: "toolbar", wide: 420.0, high: 64.0},
+			Wanted{name: "statusbar", wide: 420.0, high: 52.0},
+			Wanted{name: "menubar", wide: 300.0, high: 52.0},
+			Wanted{name: "menu", wide: 280.0, high: 160.0},
+			Wanted{name: "popover", wide: 340.0, high: 130.0},
+			Wanted{name: "dialog", wide: 440.0, high: 240.0},
+			Wanted{name: "toast", wide: 360.0, high: 120.0},
+			Wanted{name: "accordion", wide: 360.0, high: 150.0},
+			Wanted{name: "splitpane", wide: 420.0, high: 120.0},
+			Wanted{name: "grid", wide: 320.0, high: 100.0},
+			Wanted{name: "row", wide: 300.0, high: 60.0},
+			Wanted{name: "column", wide: 140.0, high: 140.0},
+			Wanted{name: "panel", wide: 380.0, high: 72.0},
+			Wanted{name: "scrollview", wide: 300.0, high: 130.0},
+			Wanted{name: "canvas", wide: 180.0, high: 130.0},
+			Wanted{name: "counter", wide: 300.0, high: 60.0},
+			Wanted{name: "card", wide: 324.0, high: 170.0},
+			Wanted{name: "filelist", wide: 200.0, high: 130.0},
+			Wanted{name: "meter", wide: 204.0, high: 38.0},
+			Wanted{name: "anchors", wide: 260.0, high: 100.0},
+			Wanted{name: "hint", wide: 200.0, high: 90.0},
+		]
+	}
+}
+
+application ComponentShots {
+	use (
+		std.os
+		std.ui::(ColorScheme, UI, UIConfig)
+		std.ui.renderer
+		shots::(Booth, Shot, Wanted, wanted)
+	)
+
+	// Draws every picture and writes `<name>.png` into the folder named by the first
+	// argument. Fails when the UI cannot start or a file cannot be written.
+	async def new(args string[]) !int {
+		fail "usage: shots <folder>" when args.len() == 0
+		let folder = args[args.len() - 1]
+		try await draw(folder, ColorScheme.Light, "", [])
+		// A few of them again in the dark theme, as `<name>-dark.png`.
+		try await draw(folder, ColorScheme.Dark, "-dark", ["button", "checkbox", "textfield", "menu", "card"])
+		return 0
+	}
+
+	// Draws the pictures named in `only`, all of them when it is empty, in the theme of
+	// `scheme`, and writes each as `<name><suffix>.png`.
+	async def draw(folder string, scheme ColorScheme, suffix string, only string[]) !none {
+		let booth = new Booth()
+		try UI.config(UIConfig{renderer: booth, host: booth})
+		try await UI.start()
+		let look = UI.appearance()
+		look.scheme = scheme
+		UI.theme().follow(look)
+		let list Wanted[] = []
+		for let shot in wanted() {
+			list.push(shot) when only.len() == 0 || only.includes(shot.name)
+		}
+		for let i = 1; i < list.len(); i++ {
+			let _ = try UI.openWindow(Shot(list[i].name), new renderer.WindowConfig(list[i].name, list[i].wide, list[i].high))
+		}
+		try await UI.run(Shot(list[0].name), new renderer.WindowConfig(list[0].name, list[0].wide, list[0].high))
+		try await UI.stop()
+		for let (name, data) in try booth.pictures() {
+			try os.writeFile("{folder}/{name}{suffix}.png", data)
+		}
+		return none
+	}
+}
