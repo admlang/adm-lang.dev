@@ -2236,6 +2236,12 @@ match width {
           unlike structurally typed languages such as TypeScript, there's no "anything goes" path
           around it.
         </p>
+        <p>
+          A value of a union goes where another union is expected when that union takes each of its
+          members. What is left of an <code>A | B | C</code> once <code>is A</code> was ruled out is a
+          <code>B | C</code>, and it is still returned, assigned and passed as the union it came from.
+          An optional or an errorable is unwrapped first.
+        </p>
 
         <p>
           A member that is errorable or optional is written in parentheses,

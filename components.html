@@ -1113,7 +1113,19 @@ view {
           A style that embeds <code>Motion</code> may assign <code>enter</code> and <code>exit</code>: the
           look a component appears from and the look it leaves to. The component travels between that look
           and its own over its <code>transition</code>. A child a view no longer places stays drawn until
-          its exit has played.
+          its exit has played, and so does a component whose style's <code>visible</code> turns false.
+          While it goes it is under no pointer and has no focus. What travels is <code>opacity</code> and
+          <code>transform</code>; a distance may be a share of the component's own size
+          (<code>translate: {x: -100(%)}</code> slides it in from its width away).
+        </p>
+        <p>
+          The components that come over the page have both: <code>Popover</code>, <code>Menu</code>,
+          <code>ContextMenu</code>, <code>HoverCard</code> and <code>Dialog</code> fade in a little smaller
+          than they are, a <code>Toast</code> rises into place, a <code>Drawer</code> slides from its
+          edge, and the veil behind a dialog or a drawer fades with it. Their times and curve are the
+          theme's (<code>theme.motion</code>); a style that embeds one of theirs changes them by
+          assigning <code>transition</code>, <code>enter</code> or <code>exit</code> again. When the desktop
+          asks for reduced motion the moves happen at once and the fades stay.
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -1248,7 +1260,7 @@ Meter(0.6)</code></pre>
             <tr><td><code>palette</code></td><td>The colours: <code>window</code>, <code>surface</code>, <code>surfaceRaised</code>, <code>surfaceSunken</code>, <code>overlay</code>; <code>foreground</code>, <code>foregroundMuted</code>, <code>foregroundDisabled</code>; <code>border</code>, <code>borderStrong</code>, <code>divider</code>; <code>accent</code>, <code>onAccent</code>, <code>hover</code>, <code>pressed</code>; <code>focus</code>, <code>selection</code>; <code>link</code>; <code>danger</code>, <code>warning</code>, <code>success</code>, <code>info</code>; <code>scrim</code>, <code>shadow</code>.</td></tr>
             <tr><td><code>fonts</code></td><td><code>body</code>, <code>label</code>, <code>caption</code>, <code>title</code>, <code>headings</code>, <code>code</code>.</td></tr>
             <tr><td><code>metrics</code></td><td><code>unit</code> (4 px, the step spacing is counted in), <code>radius</code>, <code>borderWidth</code>, <code>focusWidth</code>, <code>controlHeight</code>, <code>iconSize</code>, <code>touchTarget</code>, <code>density</code>.</td></tr>
-            <tr><td><code>motion</code>, <code>elevation</code></td><td>The durations and curves of transitions; the shadows by height.</td></tr>
+            <tr><td><code>motion</code>, <code>elevation</code></td><td>The durations and curves of transitions: <code>motion.fast</code> (120 ms, a menu or a popover), <code>normal</code> (200 ms, a dialog or a notice), <code>slow</code> (280 ms, a drawer), and the curves <code>enter</code> (<code>Ease.Out</code>), <code>exit</code> (<code>Ease.In</code>), <code>move</code> (<code>Ease.InOut</code>). The shadows by height.</td></tr>
             <tr><td><code>color(name)</code>, <code>run(name)</code></td><td>Colours and text looks outside the fixed set, by dotted name: <code>"syntax.keyword"</code>, <code>"editor.lineNumber"</code>. A name not found is looked up without its last part.</td></tr>
           </tbody>
         </table>
