@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modules - adm</title>
+<meta name="description" content="ADM standard library module reference.">
+<link rel="icon" type="image/svg+xml" href="assets/adm.svg">
+<link rel="canonical" href="https://adm-lang.dev/modules.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="adm">
+<meta property="og:title" content="adm standard library">
+<meta property="og:description" content="Reference for the ADM standard library modules under the std namespace.">
+<meta property="og:url" content="https://adm-lang.dev/modules.html">
+<meta property="og:image" content="https://adm-lang.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="adm standard library">
+<meta name="twitter:description" content="Reference for the ADM standard library modules under the std namespace.">
+<meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/adm.svg" alt="ADM" class="brand-mark">
+      <span class="brand-name"><span class="brand-sub">programming language</span></span>
+    </a>
+    <nav class="nav">
+      <a href="docs.html">Docs</a>
+      <a href="examples.html">Examples</a>
+      <a href="services.html">Services</a>
+      <a href="modules.html" class="nav-active">Modules</a>
+      <a class="nav-icon" href="https://github.com/admlang" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+        </svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs-layout">
+
+  <aside class="docs-sidebar">
+    <nav class="docs-nav" id="docs-nav">
+
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#overview">Overview</a></div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#core">Core</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#std-strings">std.strings</a></li>
+          <li><a class="docs-nav-sub" href="#std-text-unicode">std.text.unicode</a></li>
+          <li><a class="docs-nav-sub" href="#std-text-precis">std.text.precis</a></li>
+          <li><a class="docs-nav-sub" href="#std-text-jinja">std.text.templates.jinja</a></li>
+          <li><a class="docs-nav-sub" href="#std-adm-lexer">std.adm.lexer</a></li>
+          <li><a class="docs-nav-sub" href="#std-adm-syntax">std.adm.syntax</a></li>
+          <li><a class="docs-nav-sub" href="#std-adm-symbols">std.adm.symbols</a></li>
+          <li><a class="docs-nav-sub" href="#std-glob">std.glob</a></li>
+          <li><a class="docs-nav-sub" href="#std-bytes">std.bytes</a></li>
+          <li><a class="docs-nav-sub" href="#std-math">std.math</a></li>
+          <li><a class="docs-nav-sub" href="#std-math-geom">std.math.geom</a></li>
+          <li><a class="docs-nav-sub" href="#std-math-bezier">std.math.bezier</a></li>
+          <li><a class="docs-nav-sub" href="#std-math-easing">std.math.easing</a></li>
+          <li><a class="docs-nav-sub" href="#std-math-processing">std.math.processing</a></li>
+          <li><a class="docs-nav-sub" href="#std-math-ecc">std.math.ecc</a></li>
+          <li><a class="docs-nav-sub" href="#std-math-linalg">std.math.linalg</a></li>
+          <li><a class="docs-nav-sub" href="#std-math-stats">std.math.stats</a></li>
+          <li><a class="docs-nav-sub" href="#std-units">std.units</a></li>
+          <li><a class="docs-nav-sub" href="#std-time">std.time</a></li>
+          <li><a class="docs-nav-sub" href="#std-errors">std.errors</a></li>
+          <li><a class="docs-nav-sub" href="#std-collections">std.data.collections</a></li>
+          <li><a class="docs-nav-sub" href="#std-db">std.data.db</a></li>
+          <li><a class="docs-nav-sub" href="#std-semver">std.data.semver</a></li>
+          <li><a class="docs-nav-sub" href="#std-i18n">std.i18n</a></li>
+          <li><a class="docs-nav-sub" href="#std-validations">std.validations</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#system">System</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#std-os">std.os</a></li>
+          <li><a class="docs-nav-sub" href="#std-io">std.io</a></li>
+          <li><a class="docs-nav-sub" href="#std-fs">std.fs</a></li>
+          <li><a class="docs-nav-sub" href="#std-mem">std.mem</a></li>
+          <li><a class="docs-nav-sub" href="#std-sync">std.sync</a></li>
+          <li><a class="docs-nav-sub" href="#std-services">std.services</a></li>
+          <li><a class="docs-nav-sub" href="#std-proto">std.proto</a></li>
+          <li><a class="docs-nav-sub" href="#std-jsonrpc">std.proto.jsonrpc</a></li>
+          <li><a class="docs-nav-sub" href="#std-msgpackrpc">std.proto.msgpackrpc</a></li>
+          <li><a class="docs-nav-sub" href="#std-auth-jose">std.proto.auth.jose</a></li>
+          <li><a class="docs-nav-sub" href="#std-auth-oauth2">std.proto.auth.oauth2</a></li>
+          <li><a class="docs-nav-sub" href="#std-auth-openid">std.proto.auth.openid</a></li>
+          <li><a class="docs-nav-sub" href="#std-auth-saml">std.proto.auth.saml</a></li>
+          <li><a class="docs-nav-sub" href="#std-auth-otp">std.proto.auth.otp</a></li>
+          <li><a class="docs-nav-sub" href="#std-auth-webauthn">std.proto.auth.webauthn</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#data">Data</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#std-encoding">std.data.encoding</a></li>
+          <li><a class="docs-nav-sub" href="#std-codepages">std.data.encoding.codepages</a></li>
+          <li><a class="docs-nav-sub" href="#std-shiftjis">std.data.encoding.shiftjis</a></li>
+          <li><a class="docs-nav-sub" href="#std-compress">std.data.compress</a></li>
+          <li><a class="docs-nav-sub" href="#std-crypto">std.crypto</a></li>
+          <li><a class="docs-nav-sub" href="#std-hash">std.crypto.hash</a></li>
+          <li><a class="docs-nav-sub" href="#std-cipher">std.crypto.cipher</a></li>
+          <li><a class="docs-nav-sub" href="#std-x509">std.crypto.x509</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#formats-group">Formats</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#std-formats">std.formats</a></li>
+          <li><a class="docs-nav-sub" href="#std-image">std.formats.image</a></li>
+          <li><a class="docs-nav-sub" href="#std-audio">std.formats.audio</a></li>
+          <li><a class="docs-nav-sub" href="#std-video">std.formats.video</a></li>
+          <li><a class="docs-nav-sub" href="#std-archive">std.formats.archive</a></li>
+          <li><a class="docs-nav-sub" href="#std-docs">std.formats.docs</a></li>
+          <li><a class="docs-nav-sub" href="#std-mail-format">std.formats.mail</a></li>
+          <li><a class="docs-nav-sub" href="#std-fonts">std.formats.fonts</a></li>
+          <li><a class="docs-nav-sub" href="#std-playlist">std.formats.playlist</a></li>
+          <li><a class="docs-nav-sub" href="#std-calendar">std.formats.calendar</a></li>
+          <li><a class="docs-nav-sub" href="#std-contacts">std.formats.contacts</a></li>
+          <li><a class="docs-nav-sub" href="#std-formats-data">std.formats.data</a></li>
+          <li><a class="docs-nav-sub" href="#std-formats-sheets">std.formats.sheets</a></li>
+          <li><a class="docs-nav-sub" href="#std-formats-mmdb">std.formats.data.mmdb</a></li>
+          <li><a class="docs-nav-sub" href="#std-formats-ai">std.formats.ai</a></li>
+          <li><a class="docs-nav-sub" href="#std-barcodes">std.barcodes</a></li>
+          <li><a class="docs-nav-sub" href="#std-barcodes-qr">std.barcodes.qr</a></li>
+          <li><a class="docs-nav-sub" href="#std-barcodes-datamatrix">std.barcodes.datamatrix</a></li>
+          <li><a class="docs-nav-sub" href="#std-barcodes-aztec">std.barcodes.aztec</a></li>
+          <li><a class="docs-nav-sub" href="#std-barcodes-pdf417">std.barcodes.pdf417</a></li>
+          <li><a class="docs-nav-sub" href="#std-barcodes-linear">std.barcodes.linear</a></li>
+          <li><a class="docs-nav-sub" href="#formats-planned">Planned</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#net-group">Networking</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#std-net">std.net</a></li>
+          <li><a class="docs-nav-sub" href="#std-tcp">std.net.tcp</a></li>
+          <li><a class="docs-nav-sub" href="#std-tls">std.net.tls</a></li>
+          <li><a class="docs-nav-sub" href="#std-proxy">std.net.proxy</a></li>
+          <li><a class="docs-nav-sub" href="#std-quic">std.net.quic</a></li>
+          <li><a class="docs-nav-sub" href="#std-stun">std.net.stun</a></li>
+          <li><a class="docs-nav-sub" href="#std-sdp">std.net.sdp</a></li>
+          <li><a class="docs-nav-sub" href="#std-rtp">std.net.rtp</a></li>
+          <li><a class="docs-nav-sub" href="#std-sctp">std.net.sctp</a></li>
+          <li><a class="docs-nav-sub" href="#std-webrtc">std.net.webrtc</a></li>
+          <li><a class="docs-nav-sub" href="#std-http">std.net.http</a></li>
+          <li><a class="docs-nav-sub" href="#std-http2">std.net.http.http2</a></li>
+          <li><a class="docs-nav-sub" href="#std-http3">std.net.http.http3</a></li>
+          <li><a class="docs-nav-sub" href="#std-grpc">std.net.grpc</a></li>
+          <li><a class="docs-nav-sub" href="#std-websocket">std.net.http.websocket</a></li>
+          <li><a class="docs-nav-sub" href="#std-httptest">std.net.http.httptest</a></li>
+          <li><a class="docs-nav-sub" href="#std-webdav">std.net.http.webdav</a></li>
+          <li><a class="docs-nav-sub" href="#std-dns">std.net.dns</a></li>
+          <li><a class="docs-nav-sub" href="#std-dns-secure">std.net.dns.secure</a></li>
+          <li><a class="docs-nav-sub" href="#std-dnssec">std.net.dns.dnssec</a></li>
+          <li><a class="docs-nav-sub" href="#std-mdns">std.net.dns.mdns</a></li>
+          <li><a class="docs-nav-sub" href="#std-url">std.net.url</a></li>
+          <li><a class="docs-nav-sub" href="#std-multipart">std.net.multipart</a></li>
+          <li><a class="docs-nav-sub" href="#std-ssh">std.net.ssh</a></li>
+          <li><a class="docs-nav-sub" href="#std-sftp">std.net.sftp</a></li>
+          <li><a class="docs-nav-sub" href="#std-ftp">std.net.ftp</a></li>
+          <li><a class="docs-nav-sub" href="#std-mail">std.net.mail</a></li>
+          <li><a class="docs-nav-sub" href="#std-ldap">std.net.ldap</a></li>
+          <li><a class="docs-nav-sub" href="#std-snmp">std.net.snmp</a></li>
+          <li><a class="docs-nav-sub" href="#std-mqtt">std.net.mqtt</a></li>
+          <li><a class="docs-nav-sub" href="#std-ntp">std.net.ntp</a></li>
+          <li><a class="docs-nav-sub" href="#std-syslog">std.net.syslog</a></li>
+          <li><a class="docs-nav-sub" href="#std-irc">std.net.irc</a></li>
+          <li><a class="docs-nav-sub" href="#std-telnet">std.net.telnet</a></li>
+          <li><a class="docs-nav-sub" href="#std-sasl">std.net.sasl</a></li>
+          <li><a class="docs-nav-sub" href="#net-planned">Planned</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#media">Media &amp; Devices</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#std-media-player">std.media.player</a></li>
+          <li><a class="docs-nav-sub" href="#std-media-call">std.media.call</a></li>
+          <li><a class="docs-nav-sub" href="#std-media-dsp">std.media.dsp</a></li>
+          <li><a class="docs-nav-sub" href="#std-media-synth">std.media.synth</a></li>
+          <li><a class="docs-nav-sub" href="#std-devices">std.devices</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#ai-group">AI</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#std-ai-llm">std.ai.llm</a></li>
+          <li><a class="docs-nav-sub" href="#std-ai-tensor">std.ai.tensor</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#graphics">Graphics &amp; UI</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#std-ui">std.ui</a></li>
+          <li><a class="docs-nav-sub" href="#std-ui-icons">std.ui.icons</a></li>
+          <li><a class="docs-nav-sub" href="#std-ui-styles">std.ui.styles</a></li>
+          <li><a class="docs-nav-sub" href="#std-ui-components">std.ui.components</a></li>
+          <li><a class="docs-nav-sub" href="#std-ui-renderer">std.ui.renderer</a></li>
+          <li><a class="docs-nav-sub" href="#std-gfx">std.gfx</a></li>
+          <li><a class="docs-nav-sub" href="#std-gfx-color">std.gfx.color</a></li>
+          <li><a class="docs-nav-sub" href="#std-gfx-canvas">std.gfx.canvas</a></li>
+          <li><a class="docs-nav-sub" href="#std-gfx-render">std.gfx.render</a></li>
+          <li><a class="docs-nav-sub" href="#std-gfx-processing">std.gfx.processing</a></li>
+          <li><a class="docs-nav-sub" href="#std-simd">std.simd</a></li>
+          <li><a class="docs-nav-sub" href="#std-gpu">std.gpu</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#tooling">Tooling</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#std-testing">std.testing</a></li>
+          <li><a class="docs-nav-sub" href="#std-reflection">std.reflection</a></li>
+          <li><a class="docs-nav-sub" href="#std-ide">std.ide</a></li>
+          <li><a class="docs-nav-sub" href="#std-cli">std.cli</a></li>
+          <li><a class="docs-nav-sub" href="#std-cli-terminal">std.cli.terminal</a></li>
+          <li><a class="docs-nav-sub" href="#std-cli-prompts">std.cli.prompts</a></li>
+          <li><a class="docs-nav-sub" href="#std-metrics">std.metrics</a></li>
+        </ul>
+      </div>
+
+    </nav>
+  </aside>
+
+  <main class="docs-content">
+
+    <section class="docs-section" id="overview">
+      <h2>Standard Library</h2>
+      <p>
+        The standard library ships with the compiler under the <code>std</code> namespace. Import any
+        of it with <a href="docs.html#use-imports"><code>use</code></a>:
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">imports.adm</span>
+        </div>
+        <pre><code>use std.strings
+use std.net.http
+use std.data.encoding::(json)</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="core">
+      <h2>Core</h2>
+      <div class="docs-sub" id="std-strings">
+        <h3><code>std.strings</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>format</code></td><td>C-style formatting (<code>%d</code>, <code>%s</code>, <code>%x</code>, …)</td></tr>
+          <tr><td><code>Scanner</code></td><td>cursor over text for hand-written parsers</td></tr>
+          <tr><td><code>similarity</code>, <code>SimilarityAlgorithm</code></td><td>Levenshtein, Dice, Hamming, Jaro and Jaro-Winkler similarity</td></tr>
+        </table>
+        <p class="exports-note">Most string operations are methods on <code>string</code> in the prelude.</p>
+      </div>
+      <div class="docs-sub" id="std-text-unicode">
+        <h3><code>std.text.unicode</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>category</code>, <code>Category</code>, <code>combiningClass</code>, <code>script</code></td><td>Unicode 18 character properties</td></tr>
+          <tr><td><code>displayWidth</code></td><td>the columns a character or a text takes in fixed-pitch layout: 2 for East Asian wide characters, 0 for combining marks; in a text an emoji made of several characters counts once</td></tr>
+          <tr><td><code>normalize</code>, <code>NormalForm</code>, <code>decompose</code>, <code>compose</code></td><td>normalization (NFC, NFD, NFKC, NFKD)</td></tr>
+          <tr><td><code>mirror</code>, <code>isDefaultIgnorable</code>, <code>isExtendedPictographic</code></td><td>bidi mirroring, ignorables, emoji</td></tr>
+          <tr><td><code>lineBreaks</code>, <code>LineBreak</code></td><td>line break opportunities (UAX #14)</td></tr>
+          <tr><td><code>toLower</code>, <code>toUpper</code>, <code>toTitle</code>, <code>caseFold</code></td><td>Unicode case mapping and folding, full mappings, final sigma</td></tr>
+          <tr><td><code>isCased</code>, <code>isCaseIgnorable</code>, <code>isNoncharacter</code>, <code>codePoints</code></td><td>casing properties, noncharacters, a text as code points</td></tr>
+          <tr><td><code>decompositionType</code>, <code>joiningType</code>, <code>hangulSyllableType</code></td><td>decomposition tags, cursive joining, Hangul syllable types</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-text-precis">
+        <h3><code>std.text.precis</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>enforce</code>, <code>prepare</code>, <code>compare</code>, <code>Profile</code></td><td>PRECIS (RFC 8264): usernames, opaque strings (passwords) and nicknames (RFC 8265, RFC 8266)</td></tr>
+          <tr><td><code>derivedProperty</code>, <code>allowed</code>, <code>StringClass</code>, <code>bidiRule</code></td><td>the derived property of a code point, the string classes, the Bidi Rule</td></tr>
+          <tr><td><code>PrecisError</code></td><td>errors</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-text-jinja">
+        <h3><code>std.text.templates.jinja</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>parse</code>, <code>Template</code>, <code>Options</code></td><td>Jinja2 templates</td></tr>
+          <tr><td><code>Safe</code></td><td>text marked safe from autoescape</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-adm-lexer">
+        <h3><code>std.adm.lexer</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>tokenize</code></td><td>every token of ADM source, ending with <code>EOF</code>; comments optional, white space on request</td></tr>
+          <tr><td><code>Lexer</code></td><td><code>next()</code> one token at a time</td></tr>
+          <tr><td><code>Token</code></td><td>kind, character offsets <code>start</code>/<code>end</code>, text (identifiers in NFC)</td></tr>
+          <tr><td><code>TokenKind</code></td><td>token classes; the value of a punctuation, operator or keyword member is its spelling</td></tr>
+          <tr><td><code>isLiteral</code>, <code>isPunctuation</code>, <code>isOperator</code>, <code>isKeyword</code></td><td>classify a kind</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-adm-syntax">
+        <h3><code>std.adm.syntax</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>parse</code></td><td>the lossless syntax tree of ADM source; never fails, diagnostics for what the grammar refused</td></tr>
+          <tr><td><code>SyntaxTree</code>, <code>SyntaxNode</code></td><td>navigation by offset, children, siblings, ancestors; <code>edit()</code> reparses one block and shares the rest; <code>dump()</code></td></tr>
+          <tr><td><code>Green</code>, <code>greenTokens</code></td><td>the immutable, position-free elements with their trivia</td></tr>
+          <tr><td><code>SyntaxKind</code>, <code>TriviaKind</code>, <code>Trivia</code>, <code>Diagnostic</code></td><td>kinds, trivia pieces and parse diagnostics</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-adm-symbols">
+        <h3><code>std.adm.symbols</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>analyze</code>, <code>FileSymbols</code></td><td>the declarations, scopes and imports of a file; what a name means at an offset</td></tr>
+          <tr><td><code>Symbol</code>, <code>SymbolKind</code></td><td>a declaration: kind, qualified path, name span, doc comment, annotations, members, stable id</td></tr>
+          <tr><td><code>Scope</code>, <code>ScopeKind</code></td><td>the scope tree with lookup by offset</td></tr>
+          <tr><td><code>Workspace</code></td><td>many files: a module's parts, resolution through parts and imports, ids kept across edits</td></tr>
+          <tr><td><code>Navigator</code></td><td>definition, completions, type of an expression, signature, usages and rename edits from declared types; struct literal keys, named arguments and loop variables resolved</td></tr>
+          <tr><td><code>Doc</code>, <code>DocExample</code>, <code>DocTag</code>, <code>parseDoc</code>, <code>groupTags</code>, <code>tagLabel</code></td><td>a doc comment taken apart: description, <code>example</code> fences, trailing <code>@tags</code></td></tr>
+          <tr><td><code>Hover</code></td><td>what an editor shows for a symbol: signature, module, value type, parsed doc</td></tr>
+          <tr><td><code>TypeRef</code></td><td>a type as written: its node, its file, and the type arguments its type parameters stand for through a member chain</td></tr>
+          <tr><td><code>docText</code>, <code>trailingDocText</code></td><td>the doc comment rule</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-glob">
+        <h3><code>std.glob</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>glob</code>, <code>Glob</code></td><td>shell-style patterns (<code>*</code>, <code>?</code>)</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-bytes">
+        <h3><code>std.bytes</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Buffer</code></td><td>growable byte buffer, read and written</td></tr>
+          <tr><td><code>Reader</code></td><td>reader over a byte array</td></tr>
+          <tr><td><code>BinaryReader</code></td><td>typed reads in either byte order, varints</td></tr>
+          <tr><td><code>Bitstream</code></td><td>bit-level reader</td></tr>
+          <tr><td><code>RecordReader</code>, <code>RewindableReader</code></td><td>record and rewindable readers</td></tr>
+          <tr><td><code>Endian</code>, <code>Whence</code></td><td>byte order, seek origin</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-math">
+        <h3><code>std.math</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>sqrt</code>, <code>sin</code>, <code>cos</code>, <code>atan2</code>, <code>ln</code>, <code>log2</code>, <code>log10</code>, …</td><td>numeric functions</td></tr>
+          <tr><td><code>approx</code></td><td>float comparison with a tolerance</td></tr>
+          <tr><td><code>erf</code>, <code>erfc</code></td><td>error function and its complement</td></tr>
+          <tr><td><code>Decimal</code>, <code>parseDecimal</code>, <code>RoundingMode</code></td><td>exact decimal numbers</td></tr>
+        </table>
+        <p class="exports-note">Other operations are methods on the numeric types; exponentiation is <code>**</code>.</p>
+      </div>
+      <div class="docs-sub" id="std-math-geom">
+        <h3><code>std.math.geom</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Point</code>, <code>Vec2</code>, <code>Vec3</code>, <code>Size</code>, <code>Rect</code>, <code>Rectangle</code></td><td>points, vectors, sizes, rectangles</td></tr>
+          <tr><td><code>Circle</code>, <code>Line</code>, <code>Ray</code>, <code>Polygon</code></td><td>shapes</td></tr>
+          <tr><td><code>Edges</code>, <code>Corners</code>, <code>Axes</code></td><td>per-side, per-corner and per-axis values</td></tr>
+          <tr><td><code>Transform2D</code></td><td>2D affine transform</td></tr>
+          <tr><td><code>Path</code>, <code>FillRule</code>, <code>StrokeStyle</code>, <code>LineCap</code>, <code>LineJoin</code></td><td>paths: build, stroke, dash, measure, trim, morph, boolean operations</td></tr>
+          <tr><td><code>BezierPath</code>, <code>QuadraticBezier</code>, <code>CubicBezier</code></td><td>curves</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-math-bezier">
+        <h3><code>std.math.bezier</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>linear</code>, <code>quadratic</code>, <code>cubic</code></td><td>Bézier curve evaluation and derivatives</td></tr>
+          <tr><td><code>cubicParameter</code></td><td>solver behind CSS <code>cubic-bezier</code></td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-math-easing">
+        <h3><code>std.math.easing</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Easing</code></td><td>easing function type</td></tr>
+          <tr><td><code>easeInQuad</code> … <code>easeInOutBounce</code></td><td>the easings.net curves</td></tr>
+          <tr><td><code>cubicBezier</code>, <code>steps</code></td><td>CSS timing functions</td></tr>
+          <tr><td><code>spring</code></td><td>damped spring</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-math-processing">
+        <h3><code>std.math.processing</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>fft</code>, <code>ifft</code>, <code>rfft</code>, <code>irfft</code></td><td>Fourier transforms</td></tr>
+          <tr><td><code>dct</code>, <code>idct</code></td><td>cosine transforms (DCT-II/III)</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-math-ecc">
+        <h3><code>std.math.ecc</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Field</code>, <code>BinaryField</code>, <code>PrimeField</code></td><td>finite fields: GF(2^m), GF(p)</td></tr>
+          <tr><td><code>ReedSolomon</code></td><td>Reed-Solomon: <code>encode</code>, <code>correct</code> with errors and erasures</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-math-linalg">
+        <h3><code>std.math.linalg</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>solve</code>, <code>leastSquares</code>, <code>inverse</code>, <code>pseudoInverse</code>, <code>determinant</code></td><td>linear systems on <code>matrix&lt;float&gt;</code></td></tr>
+          <tr><td><code>lu</code>, <code>cholesky</code>, <code>qr</code>, <code>svd</code>, <code>eigen</code>, <code>eigenSymmetric</code></td><td>decompositions (<code>LU</code>, <code>Cholesky</code>, <code>QR</code>, <code>SVD</code>, <code>Eigen</code>, <code>SymmetricEigen</code>)</td></tr>
+          <tr><td><code>norm</code>, <code>Norm</code>, <code>rank</code>, <code>condition</code>, <code>trace</code></td><td>measures of a matrix</td></tr>
+          <tr><td><code>zeros</code>, <code>identity</code>, <code>diagonal</code></td><td>builders</td></tr>
+          <tr><td><code>LinalgError</code>, <code>LinalgErrorKind</code></td><td>why an operation failed: shape, singular, no convergence</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-math-stats">
+        <h3><code>std.math.stats</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>mean</code>, <code>median</code>, <code>quantile</code>, <code>mode</code>, <code>variance</code>, <code>deviation</code>, <code>skewness</code>, <code>kurtosis</code>, <code>sum</code>, <code>min</code>, <code>max</code></td><td>descriptive statistics of a <code>float[]</code></td></tr>
+          <tr><td><code>covariance</code>, <code>correlation</code>, <code>rankCorrelation</code>, <code>linearRegression</code>, <code>Regression</code></td><td>two samples</td></tr>
+          <tr><td><code>covarianceMatrix</code>, <code>correlationMatrix</code></td><td>many variables in a matrix</td></tr>
+          <tr><td><code>zscores</code>, <code>ranks</code>, <code>histogram</code>, <code>Histogram</code></td><td>transforms and counts</td></tr>
+          <tr><td><code>Normal</code>, <code>Summary</code></td><td>the normal distribution; running statistics of a stream</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-units">
+        <h3><code>std.units</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Length</code>, <code>Mass</code>, <code>Time</code>, <code>Temperature</code>, <code>Angle</code>, <code>DataSize</code>, …</td><td>base dimensions</td></tr>
+          <tr><td><code>Speed</code>, <code>Force</code>, <code>Energy</code>, <code>Voltage</code>, <code>DataRate</code>, …</td><td>derived dimensions</td></tr>
+          <tr><td><code>Pixels</code>, <code>Percent</code>, <code>ViewportHeight</code>, <code>ViewportWidth</code>, <code>FontRelative</code>, <code>Extent</code></td><td>layout dimensions (<a href="units.html#ui-extents">UI extents</a>)</td></tr>
+          <tr><td><code>parseUnit</code></td><td>quantity from text</td></tr>
+          <tr><td><code>quantity</code></td><td>quantity from a number</td></tr>
+        </table>
+        <p class="exports-note">Used by <a href="units.html">quantity literals</a>; the <a href="units.html#catalogue">catalogue</a> lists every unit.</p>
+      </div>
+      <div class="docs-sub" id="std-time">
+        <h3><code>std.time</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Time</code></td><td>point in time on the wall and monotonic clocks</td></tr>
+          <tr><td><code>now</code>, <code>since</code>, <code>sleep</code></td><td>clock</td></tr>
+          <tr><td><code>parse</code>, <code>parseDuration</code></td><td>RFC 3339 times, durations</td></tr>
+          <tr><td><code>Month</code>, <code>Weekday</code></td><td>calendar fields</td></tr>
+          <tr><td><code>Date</code>, <code>TimeOfDay</code>, <code>DateTime</code>, <code>parseDate</code>, <code>parseDateTime</code></td><td>civil dates and times without a zone</td></tr>
+          <tr><td><code>Cron</code>, <code>parseCron</code></td><td>cron expressions</td></tr>
+          <tr><td><code>formatHTTPDate</code>, <code>parseHTTPDate</code></td><td>HTTP dates</td></tr>
+          <tr><td><code>formatMailDate</code>, <code>parseMailDate</code></td><td>RFC 5322 mail dates</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-errors">
+        <h3><code>std.errors</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>StackTrace</code>, <code>StackFrame</code>, <code>Location</code></td><td>stack traces</td></tr>
+          <tr><td><code>printStackTrace</code></td><td>prints the current stack</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-collections">
+        <h3><code>std.data.collections</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>List</code>, <code>LinkedList</code>, <code>DoublyLinkedList</code>, <code>Deque</code>, <code>Queue</code>, <code>Stack</code>, <code>RingBuffer</code></td><td>sequences</td></tr>
+          <tr><td><code>HashMap</code>, <code>SortedMap</code>, <code>OrderedMap</code>, <code>MultiMap</code>, <code>LRUCache</code></td><td>maps</td></tr>
+          <tr><td><code>Set</code>, <code>HashSet</code>, <code>SortedSet</code>, <code>OrderedSet</code>, <code>MultiSet</code>, <code>DisjointSet</code></td><td>sets</td></tr>
+          <tr><td><code>Heap</code>, <code>MinHeap</code>, <code>MaxHeap</code>, <code>PriorityQueue</code></td><td>heaps</td></tr>
+          <tr><td><code>BinaryTree</code>, <code>BinarySearchTree</code>, <code>AVLTree</code>, <code>RedBlackTree</code>, <code>BTree</code>, <code>BPlusTree</code>, <code>Trie</code>, <code>RadixTree</code></td><td>trees</td></tr>
+          <tr><td><code>Graph</code>, <code>DirectedGraph</code>, <code>WeightedGraph</code></td><td>graphs</td></tr>
+          <tr><td><code>BitArray</code>, <code>BitSet</code>, <code>BloomFilter</code></td><td>bits</td></tr>
+          <tr><td><code>SparseArray</code>, <code>SparseSet</code>, <code>SparseMatrix</code></td><td>sparse storage</td></tr>
+          <tr><td><code>sort</code>, <code>Comparable</code>, <code>SortMethod</code></td><td><code>std.data.collections.sort</code></td></tr>
+          <tr><td><code>search</code>, <code>SearchMethod</code></td><td><code>std.data.collections.search</code></td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-db">
+        <h3><code>std.data.db</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>connect</code>, <code>drivers</code></td><td>open a SQL database by URL with the driver linked for its scheme; drivers are the libraries <code>adm.database.sqlite</code>, <code>adm.database.postgres</code>, <code>adm.database.mysql</code></td></tr>
+          <tr><td><code>Connection</code>, <code>Transaction</code>, <code>Queryable</code></td><td><code>exec</code>, <code>query</code>, <code>prepare</code> with positional or named arguments; <code>beginTx</code>, <code>commitTx</code>, <code>rollbackTx</code></td></tr>
+          <tr><td><code>pool</code>, <code>Pool</code></td><td>a connection shared between tasks: up to <code>limit</code> real connections, one lent per statement, result, transaction or prepared statement</td></tr>
+          <tr><td><code>Statement</code>, <code>Rows</code>, <code>Column</code>, <code>Result</code></td><td>prepared statements; rows read one at a time with typed readers</td></tr>
+          <tr><td><code>read</code>, <code>readAll</code>, <code>values</code>, <code>@column</code>, <code>Stored</code></td><td>rows to objects and objects to arguments</td></tr>
+          <tr><td><code>positional</code>, <code>placeholders</code>, <code>Placeholder</code></td><td><code>:name</code> placeholders rewritten for a database that binds by position</td></tr>
+          <tr><td><code>@connection</code>, <code>sqlExec</code>, <code>sqlOne</code>, <code>sqlOptional</code>, <code>sqlAll</code>, <code>sqlRow</code>, <code>sqlOptionalRow</code>, <code>sqlRows</code>, <code>sqlCell</code>, <code>sqlOptionalCell</code>, <code>sqlBound</code>, <code>sqlDefault</code>, <code>sqlNamed</code>, <code>provide</code></td><td>what a <code>sql def</code> compiles to, and where one without a <code>@connection</code> finds its connection</td></tr>
+          <tr><td><code>Driver</code>, <code>@driver</code>, <code>Isolation</code></td><td>what a driver library implements and registers</td></tr>
+          <tr><td><code>DbError</code>, <code>ErrorKind</code>, <code>errorOf</code></td><td>failures with their kind, SQLSTATE and the database's error number</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-semver">
+        <h3><code>std.data.semver</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Semver</code></td><td>semantic version; precedence and <code>satisfies(range)</code></td></tr>
+          <tr><td><code>parse</code>, <code>compare</code></td><td>parsing and comparison</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-i18n">
+        <h3><code>std.i18n</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Locale</code>, <code>parseLocale</code>, <code>negotiate</code>, <code>parseAcceptLanguage</code></td><td>locales (BCP 47) and negotiation</td></tr>
+          <tr><td><code>Language</code>, <code>Region</code>, <code>Script</code>, <code>Currency</code></td><td>display names and data from CLDR</td></tr>
+          <tr><td><code>NumberFormat</code>, <code>NumberOptions</code></td><td>numbers, percentages, currencies, units, compact notation</td></tr>
+          <tr><td><code>DateTimeFormat</code>, <code>DateTimeOptions</code></td><td>ECMA-402 date and time formatting, every calendar</td></tr>
+          <tr><td><code>TimeZone</code>, <code>ZonedDateTime</code>, <code>parseTimeZone</code>, <code>systemTimeZone</code></td><td>time zones from the tz database</td></tr>
+          <tr><td><code>Calendar</code>, <code>CalendarDate</code></td><td>Gregorian, Hebrew, Islamic, Chinese, Japanese and other calendars</td></tr>
+          <tr><td><code>pluralCategory</code>, <code>pluralRange</code>, <code>PluralCategory</code></td><td>plural rules</td></tr>
+          <tr><td><code>SpellOut</code></td><td>numbers in words</td></tr>
+          <tr><td><code>@translate</code> <span class="api-tag api-planned">planned</span></td><td>translated text on a field; no catalog is read yet</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-validations">
+        <h3><code>std.validations</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>isEmail</code>, <code>isURL</code>, <code>isIP</code>, <code>isUUID</code>, <code>isJSON</code>, <code>isXML</code>, <code>isBase64</code>, <code>isUTF8</code>, …</td><td>text checks</td></tr>
+          <tr><td><code>luhnCheck</code></td><td>card number checksum</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section class="docs-section" id="system">
+      <h2>System</h2>
+      <div class="docs-sub" id="std-os">
+        <h3><code>std.os</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>File</code></td><td>open file</td></tr>
+          <tr><td><code>readFile</code>, <code>writeFile</code>, <code>open</code>, <code>stat</code>, <code>readDir</code>, <code>exists</code>, <code>remove</code>, <code>rename</code>, <code>mkdir</code>, <code>rmdir</code>, <code>chmod</code>, <code>touch</code></td><td>file operations</td></tr>
+          <tr><td><code>join</code>, <code>dir</code>, <code>base</code>, <code>extension</code>, <code>split</code>, <code>clean</code>, <code>isAbs</code></td><td>paths</td></tr>
+          <tr><td><code>run</code>, <code>output</code></td><td>start a program (needs <code>adm.runtime.spawn</code>)</td></tr>
+          <tr><td><code>mapFile</code>, <code>Mapping</code></td><td>memory-mapped files</td></tr>
+          <tr><td><code>File.sync</code>, <code>File.lock</code>, <code>File.unlock</code></td><td>push writes to the device, advisory whole-file locks</td></tr>
+          <tr><td><code>symlink</code>, <code>freeSpace</code>, <code>totalSpace</code>, <code>unixMode</code>, <code>fromUnixMode</code></td><td>links, disk space, Unix mode bits</td></tr>
+          <tr><td><code>watch</code>, <code>Watcher</code>, <code>Change</code>, <code>ChangeKind</code></td><td>changes to files and directories</td></tr>
+          <tr><td><code>appHome</code></td><td>the application's own folder</td></tr>
+          <tr><td><code>homeDir</code>, <code>resolve</code></td><td>the user's home folder; the absolute, shortest form of a path, where <code>~</code> is that folder and a relative path starts at the working directory</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-io">
+        <h3><code>std.io</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Reader</code>, <code>Writer</code>, <code>Closer</code>, <code>Aborter</code></td><td>stream interfaces, and their combinations</td></tr>
+          <tr><td><code>readFull</code>, <code>readAll</code>, <code>copy</code></td><td>stream helpers</td></tr>
+        </table>
+        <p class="exports-note">Interfaces only; the types that own the data implement them.</p>
+      </div>
+      <div class="docs-sub" id="std-fs">
+        <h3><code>std.fs</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>FileStore</code></td><td>file tree interface</td></tr>
+          <tr><td><code>DiskStore</code></td><td>the disk, optionally confined to a folder</td></tr>
+          <tr><td><code>MemoryStore</code></td><td>file tree in memory</td></tr>
+          <tr><td><code>copy</code></td><td>file or tree between any two stores</td></tr>
+          <tr><td><code>FileEntry</code>, <code>FileKind</code></td><td>listing entries</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-mem">
+        <h3><code>std.mem</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>copy</code>, <code>move</code>, <code>set</code>, <code>zero</code>, <code>copyN</code>, <code>moveN</code>, <code>setN</code>, <code>set32</code></td><td>raw memory</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-sync">
+        <h3><code>std.sync</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Mutex</code>, <code>ReadWriteLock</code></td><td>locks a task may hold across calls that wait</td></tr>
+          <tr><td><code>Semaphore</code></td><td>a number of permits, to bound how many tasks run something at once</td></tr>
+          <tr><td><code>WaitGroup</code>, <code>Once</code></td><td>wait for work to end; run a function one time</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-services">
+        <h3><code>std.services</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Application</code>, <code>ServiceStatus</code>, <code>StartMode</code>, <code>RestartMode</code>, <code>Lifecycle</code>, <code>Dependencies</code>, <code>ServiceInfo</code>, <code>ServiceStatusChange</code></td><td>the application service and the types every service shares</td></tr>
+          <tr><td><code>Storage</code>, <code>Config</code>, <code>Logging</code>, <code>Cache</code>, <code>Scheduler</code>, <code>Runtime</code>, <code>Network</code>, <code>Diagnostics</code>, <code>Policy</code>, <code>Notifications</code>, <code>Clipboard</code>, …</td><td>builtin services, each in its own module <code>std.services.&lt;name&gt;</code> (<code>use std.services.cache::(Cache)</code>)</td></tr>
+        </table>
+        <p class="exports-note">Every method and annotation: <a href="services.html">services reference</a>.</p>
+      </div>
+      <div class="docs-sub" id="std-proto">
+        <h3><code>std.proto</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>DBusConnection</code>, <code>dbusConnect</code></td><td>D-Bus session bus client (Linux)</td></tr>
+          <tr><td><code>DBusMessage</code>, <code>DBusWriter</code>, <code>DBusReader</code></td><td>D-Bus wire format</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-jsonrpc">
+        <h3><code>std.proto.jsonrpc</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Peer</code>, <code>Framing</code></td><td>JSON-RPC 2.0 over a byte stream, both directions</td></tr>
+          <tr><td><code>Dispatcher</code></td><td>server methods, also an HTTP handler</td></tr>
+          <tr><td><code>HttpClient</code></td><td>calls over HTTP POST</td></tr>
+          <tr><td><code>Request</code>, <code>Handler</code>, <code>Call</code>, <code>Reply</code></td><td>requests, handlers, batches</td></tr>
+          <tr><td><code>RPCError</code>, <code>ErrorCode</code>, <code>errorOf</code>, <code>kindOf</code></td><td>error objects</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-msgpackrpc">
+        <h3><code>std.proto.msgpackrpc</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Peer</code></td><td>MessagePack-RPC over a byte stream, both directions</td></tr>
+          <tr><td><code>Request</code>, <code>Handler</code></td><td>requests and handlers</td></tr>
+          <tr><td><code>RPCError</code>, <code>ErrorCode</code>, <code>errorOf</code></td><td>error objects</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-auth-jose">
+        <h3><code>std.proto.auth.jose</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Jws</code>, <code>sign</code>, <code>parseJws</code></td><td>JSON Web Signature, compact and JSON</td></tr>
+          <tr><td><code>Jwe</code>, <code>encrypt</code>, <code>parseJwe</code></td><td>JSON Web Encryption, one or several recipients</td></tr>
+          <tr><td><code>Jwk</code>, <code>JwkSet</code>, <code>parseKey</code>, <code>parseKeySet</code>, <code>generateKey</code></td><td>JSON Web Keys</td></tr>
+          <tr><td><code>RemoteKeySet</code></td><td>key set fetched from a <code>jwks_uri</code>, with rotation</td></tr>
+          <tr><td><code>Claims</code>, <code>Validation</code>, <code>verifyJwt</code>, <code>parseClaims</code></td><td>JWT with RFC 8725 checks</td></tr>
+          <tr><td><code>SignatureAlgorithm</code>, <code>KeyAlgorithm</code>, <code>ContentEncryption</code></td><td>every JOSE algorithm</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-auth-oauth2">
+        <h3><code>std.proto.auth.oauth2</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code>, <code>Token</code>, <code>AuthorizationRequest</code>, <code>DeviceAuthorization</code></td><td>OAuth 2 client: code with PKCE, client credentials, refresh, device flow, token exchange, DPoP</td></tr>
+          <tr><td><code>AuthorizationServer</code>, <code>ClientStore</code>, <code>GrantStore</code></td><td>authorization server</td></tr>
+          <tr><td><code>ResourceServer</code>, <code>AccessToken</code>, <code>Introspection</code></td><td>resource server: JWT and introspected tokens</td></tr>
+          <tr><td><code>ServerMetadata</code>, <code>discover</code>, <code>ClientRegistration</code></td><td>metadata discovery, dynamic client registration</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-auth-openid">
+        <h3><code>std.proto.auth.openid</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>RelyingParty</code>, <code>connect</code>, <code>Login</code>, <code>IdClaims</code></td><td>OpenID Connect relying party</td></tr>
+          <tr><td><code>Provider</code>, <code>UserStore</code></td><td>OpenID Connect provider</td></tr>
+          <tr><td><code>ProviderMetadata</code>, <code>discover</code></td><td>provider discovery</td></tr>
+          <tr><td><code>LogoutEvent</code></td><td>RP-initiated, front- and back-channel logout</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-auth-saml">
+        <h3><code>std.proto.auth.saml</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>ServiceProvider</code>, <code>LoginOptions</code>, <code>Assertion</code>, <code>Logout</code></td><td>SAML 2.0 service provider: Web SSO and Single Logout</td></tr>
+          <tr><td><code>IdentityProvider</code>, <code>PendingLogin</code>, <code>Decision</code>, <code>ServiceProviderStore</code>, <code>MemoryServiceProviderStore</code></td><td>identity provider</td></tr>
+          <tr><td><code>EntityDescriptor</code>, <code>IdpDescriptor</code>, <code>SpDescriptor</code>, <code>KeyDescriptor</code>, <code>Endpoint</code>, <code>parseMetadata</code>, <code>parseMetadataSet</code>, <code>writeMetadataSet</code></td><td>metadata, signed or not</td></tr>
+          <tr><td><code>Binding</code></td><td>Redirect, POST, Artifact and SOAP bindings</td></tr>
+          <tr><td><code>NameId</code>, <code>NameIdFormat</code>, <code>Attribute</code>, <code>Attributes</code></td><td>name identifiers and attributes</td></tr>
+          <tr><td><code>SamlError</code>, <code>SamlErrorKind</code>, <code>StatusCode</code></td><td>errors and status codes</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-auth-otp">
+        <h3><code>std.proto.auth.otp</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>HOTP</code>, <code>TOTP</code></td><td>one-time passwords, RFC 4226 and RFC 6238</td></tr>
+          <tr><td><code>KeyURI</code>, <code>parseKeyURI</code></td><td><code>otpauth://</code> URIs for authenticator apps</td></tr>
+          <tr><td><code>generateSecret</code>, <code>parseSecret</code></td><td>Base32 secrets</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-auth-webauthn">
+        <h3><code>std.proto.auth.webauthn</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>RelyingParty</code>, <code>RegistrationOptions</code>, <code>AuthenticationOptions</code>, <code>Credential</code></td><td>WebAuthn relying party: registration and sign-in</td></tr>
+          <tr><td><code>verifyAttestation</code>, <code>AttestationResult</code></td><td>attestation: packed, TPM, Android key, SafetyNet, FIDO U2F, Apple, compound</td></tr>
+          <tr><td><code>Client</code>, <code>parseRegistrationOptions</code>, <code>parseAuthenticationOptions</code></td><td>the browser's part, for native apps</td></tr>
+          <tr><td><code>SecurityKey</code>, <code>HIDTransport</code>, <code>securityKeys</code></td><td>FIDO2 security keys over USB: CTAP 2.2 and U2F, PIN, credential management, large blobs, fingerprints</td></tr>
+          <tr><td><code>SoftDevice</code>, <code>SoftAuthenticator</code></td><td>authenticators in software</td></tr>
+          <tr><td><code>COSEKey</code>, <code>parseCOSEKey</code>, <code>AuthenticatorData</code></td><td>COSE keys, authenticator data</td></tr>
+        </table>
+        <p class="exports-note">Extensions: credProps, prf, largeBlob, credProtect, credBlob, minPinLength, appid, appidExclude. USB on Linux only for now.</p>
+      </div>
+    </section>
+
+    <section class="docs-section" id="data">
+      <h2>Data</h2>
+      <div class="docs-sub" id="std-encoding">
+        <h3><code>std.data.encoding</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>JSON</code>, <code>json</code></td><td>JSON</td></tr>
+          <tr><td><code>XMLNode</code>, <code>XMLWriter</code>, <code>XML</code></td><td>XML objects (<code>encode</code>, <code>decode</code>, <code>@xml</code>), tree, writer and well-formedness check</td></tr>
+          <tr><td><code>YAML</code></td><td>YAML</td></tr>
+          <tr><td><code>TOML</code></td><td>TOML</td></tr>
+          <tr><td><code>JSON.parse</code></td><td>JSON into maps, arrays and scalars</td></tr>
+          <tr><td><code>CBOR</code>, <code>CBORValue</code>, <code>CBORReader</code>, <code>cbor</code></td><td>CBOR (RFC 8949), deterministic encoding</td></tr>
+          <tr><td><code>MsgPack</code>, <code>MsgPackValue</code>, <code>MsgPackReader</code>, <code>msgpack</code></td><td>MessagePack, ext types and timestamps</td></tr>
+          <tr><td><code>Protobuf</code>, <code>ProtoMessage</code>, <code>ProtoReader</code>, <code>ProtoWriter</code>, <code>protoField</code></td><td>Protocol Buffers wire format, with or without a schema</td></tr>
+          <tr><td><code>ProtoSchema</code>, <code>ProtoFile</code></td><td><code>.proto</code> files: messages, enums and services</td></tr>
+          <tr><td><code>CSV</code>, <code>CSVReader</code>, <code>CSVWriter</code>, <code>csv</code></td><td>CSV, any separator: whole texts or streams, rows bound to objects by header, separator detection</td></tr>
+          <tr><td><code>XMLSignature</code>, <code>signXML</code>, <code>parseXMLSignature</code>, <code>canonicalize</code></td><td>XML signatures and canonical XML</td></tr>
+          <tr><td><code>encryptXML</code>, <code>decryptXML</code></td><td>XML encryption</td></tr>
+          <tr><td><code>Base64</code>, <code>Base32</code>, <code>Base83</code>, <code>hexencode</code>, <code>hexdecode</code></td><td>Base64, Base32, Base83, hex</td></tr>
+          <tr><td><code>QuotedPrintable</code></td><td>quoted-printable</td></tr>
+          <tr><td><code>htmlEncode</code>, <code>htmlDecode</code></td><td>HTML character references</td></tr>
+          <tr><td><code>PEMBlock</code>, <code>pemDecode</code></td><td>PEM</td></tr>
+          <tr><td><code>ASN1Element</code>, <code>asn1Parse</code>, <code>berParse</code>, <code>OID</code></td><td>ASN.1 DER and BER</td></tr>
+          <tr><td><code>Layout</code></td><td>fixed binary layouts from struct declarations</td></tr>
+          <tr><td><code>Binary</code></td><td>typed self-describing binary stream</td></tr>
+          <tr><td><code>putVarint</code>, <code>varint</code></td><td>varints</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-codepages">
+        <h3><code>std.data.encoding.codepages</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>CodePage</code></td><td>CP437, Windows-1252, Latin-1</td></tr>
+          <tr><td><code>decode</code>, <code>encode</code>, <code>forCharset</code></td><td>conversion, lookup by charset name</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-shiftjis">
+        <h3><code>std.data.encoding.shiftjis</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>encode</code>, <code>decode</code></td><td>Shift JIS (JIS X 0208)</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-compress">
+        <h3><code>std.data.compress</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>flate</code></td><td>DEFLATE <code>Reader</code>/<code>Writer</code></td></tr>
+          <tr><td><code>gzip</code>, <code>zlib</code></td><td>gzip and zlib</td></tr>
+          <tr><td><code>lzw</code></td><td>LZW</td></tr>
+          <tr><td><code>bzip2</code></td><td>bzip2</td></tr>
+          <tr><td><code>lzma</code></td><td>LZMA and LZMA2</td></tr>
+          <tr><td><code>xz</code></td><td>xz, with the delta and x86 filters</td></tr>
+          <tr><td><code>brotli</code></td><td>Brotli, reading only</td></tr>
+          <tr><td><code>lz4</code></td><td>LZ4 blocks and frames</td></tr>
+          <tr><td><code>snappy</code></td><td>Snappy blocks and framed streams</td></tr>
+          <tr><td><code>zstd</code></td><td>Zstandard, reading and writing, with dictionaries</td></tr>
+          <tr><td><code>ppm</code></td><td>PPMd variant H, reading only (7z and RAR streams)</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-crypto">
+        <h3><code>std.crypto</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>rand</code>, <code>randRange</code>, <code>randOf</code></td><td>random numbers</td></tr>
+          <tr><td><code>UUID</code>, <code>UUIDVersion</code>, <code>parseUUID</code>, <code>uuidNamespaceDNS</code>, <code>uuidNamespaceURL</code>, <code>uuidNamespaceOID</code>, <code>uuidNamespaceX500</code></td><td>UUIDs (RFC 9562): random V4, time-ordered V7, name-based V5 and V3</td></tr>
+          <tr><td><code>RSAPublicKey</code>, <code>RSAPrivateKey</code>, <code>generateRSAKey</code>, <code>RSAPadding</code></td><td>RSA signatures and encryption (OAEP, PKCS #1 v1.5)</td></tr>
+          <tr><td><code>ECDSAPublicKey</code>, <code>ECDSAPrivateKey</code>, <code>generateECDSAKey</code></td><td>ECDSA, P-224 to P-521</td></tr>
+          <tr><td><code>Ed25519PublicKey</code>, <code>Ed25519PrivateKey</code></td><td>Ed25519</td></tr>
+          <tr><td><code>Ed448PublicKey</code>, <code>Ed448PrivateKey</code>, <code>generateEd448Key</code></td><td>Ed448 and Ed448ph</td></tr>
+          <tr><td><code>x25519</code>, <code>x448</code>, <code>ecdh</code></td><td>key agreement</td></tr>
+          <tr><td><code>MLKEMPublicKey</code>, <code>MLKEMPrivateKey</code>, <code>generateMLKEMKey</code></td><td>ML-KEM (FIPS 203)</td></tr>
+          <tr><td><code>bcrypt</code>, <code>bcryptVerify</code></td><td>password hashes</td></tr>
+          <tr><td><code>parsePKIXPublicKey</code>, <code>parsePKCS1PrivateKey</code>, <code>parsePKCS8PrivateKey</code>, <code>marshalPKCS8PrivateKey</code>, <code>marshalPKCS1PrivateKey</code>, …</td><td>key encodings (PKIX, PKCS #1, PKCS #8 both ways)</td></tr>
+          <tr><td><code>constantTimeEqual</code></td><td>constant-time comparison</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-hash">
+        <h3><code>std.crypto.hash</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>MD5</code>, <code>SHA1</code>, <code>SHA256</code>, <code>SHA512</code>, <code>SHA3256</code>, <code>Keccak256</code>, <code>BLAKE2b512</code>, <code>RIPEMD160</code>, …</td><td>hashes (<code>Hasher</code>)</td></tr>
+          <tr><td><code>SHAKE128</code>, <code>SHAKE256</code></td><td>extendable output</td></tr>
+          <tr><td><code>CRC8</code> … <code>CRC64</code>, <code>Adler32</code></td><td>checksums</td></tr>
+          <tr><td><code>HMAC</code>, <code>hmac</code></td><td>HMAC</td></tr>
+          <tr><td><code>hkdf</code>, <code>pbkdf2</code>, <code>concatKDF</code>, <code>argon2id</code>, <code>argon2</code>, <code>Argon2Kind</code></td><td>key derivation (Argon2: RFC 9106, memory-hard)</td></tr>
+          <tr><td><code>Hash</code></td><td>every digest by name</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-cipher">
+        <h3><code>std.crypto.cipher</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>AES</code>, <code>Blowfish</code>, <code>DES</code>, <code>TripleDES</code></td><td>block ciphers (<code>Block</code>)</td></tr>
+          <tr><td><code>CBC</code>, <code>CFB</code>, <code>CTR</code></td><td>modes</td></tr>
+          <tr><td><code>GCM</code>, <code>ChaCha20Poly1305</code>, <code>XChaCha20Poly1305</code>, <code>SIV</code>, <code>CBCHMAC</code></td><td>authenticated encryption (<code>AEAD</code>)</td></tr>
+          <tr><td><code>wrapKey</code>, <code>unwrapKey</code></td><td>AES key wrap (RFC 3394, RFC 5649)</td></tr>
+          <tr><td><code>cmac</code></td><td>CMAC</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-x509">
+        <h3><code>std.crypto.x509</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Certificate</code>, <code>parseCertificate</code>, <code>parseCertificatesPEM</code></td><td>X.509 certificates</td></tr>
+          <tr><td><code>CertPool</code>, <code>systemCertPool</code></td><td>trusted roots</td></tr>
+          <tr><td><code>VerifyOptions</code></td><td>chain verification</td></tr>
+          <tr><td><code>Name</code></td><td>distinguished names</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section class="docs-section" id="formats-group">
+      <h2>Formats</h2>
+      <div class="docs-sub" id="std-formats">
+        <h3><code>std.formats</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>FileFormat</code>, <code>SignatureMatcher</code></td><td>format detection by content</td></tr>
+          <tr><td><code>MediaType</code>, <code>parseMediaType</code></td><td>MIME types</td></tr>
+          <tr><td><code>typeByExtension</code>, <code>extensionsByType</code></td><td>extension table</td></tr>
+          <tr><td><code>detectContentType</code></td><td>content sniffing</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-image">
+        <h3><code>std.formats.image</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Image</code>, <code>load</code>, <code>info</code></td><td>image, implements <code>gfx.Raster</code></td></tr>
+          <tr><td><code>ImageSequence</code>, <code>ImageFrame</code></td><td>animations: frames, delays, loops</td></tr>
+          <tr><td><code>PNG</code>, <code>APNG</code>, <code>GIF</code>, <code>JPEG</code>, <code>WEBP</code>, <code>BMP</code>, <code>TIFF</code>, <code>PSD</code>, <code>TGA</code>, <code>PCX</code>, <code>XPM</code>, <code>ICO</code>, <code>CUR</code>, <code>ANI</code></td><td>codecs</td></tr>
+          <tr><td><code>SVG.decode</code>, <code>SVG.picture</code></td><td>SVG and SVGZ rendering, SMIL animation at a given time</td></tr>
+          <tr><td><code>SVG.encode</code></td><td>canvas pictures as SVG</td></tr>
+          <tr><td><code>SVG.parsePath</code>, <code>SVG.pathData</code></td><td>SVG path data</td></tr>
+          <tr><td><code>exif.Tag</code>, <code>exif.IFD</code>, <code>exif.ImageTag</code>, <code>exif.PhotoTag</code>, <code>exif.GPSInfoTag</code></td><td>EXIF tags</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-audio">
+        <h3><code>std.formats.audio</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>AudioStream</code>, <code>open</code>, <code>load</code>, <code>save</code>, <code>write</code>, <code>info</code>, <code>AudioInfo</code></td><td>decoded audio, seekable</td></tr>
+          <tr><td><code>WAV</code>, <code>AIFF</code>, <code>AU</code>, <code>FLAC</code>, <code>MP3</code>, <code>Vorbis</code>, <code>Opus</code>, <code>AAC</code>, <code>M4A</code>, <code>WMA</code></td><td>codecs, read and write</td></tr>
+          <tr><td><code>AC3</code>, <code>EAC3</code>, <code>AMR</code>, <code>AMRWB</code></td><td>codecs, read only</td></tr>
+          <tr><td><code>AudioFormat</code>, <code>AudioDecoder</code>, <code>AudioEncoder</code>, <code>AudioCodec</code>, <code>@codec</code></td><td>codec interfaces, registering a format</td></tr>
+          <tr><td><code>AudioTags</code>, <code>tags</code></td><td>tags and covers for every format</td></tr>
+          <tr><td><code>ID3Tags</code>, <code>OpusTags</code>, <code>M4aMetadata</code>, <code>FlacMetadata</code>, <code>FlacPicture</code>, <code>WAVCue</code>, <code>AIFFMarker</code>, <code>AIFFComment</code></td><td>format-specific metadata</td></tr>
+          <tr><td><code>OpusEncoder</code></td><td>Opus one packet at a time (2.5 to 60 ms, discontinuous transmission), for live connections; <code>config()</code> is the header a container stores</td></tr>
+          <tr><td><code>Converter</code></td><td>sample rate and channel conversion</td></tr>
+          <tr><td><code>Midi</code>, <code>MidiTrack</code></td><td>MIDI files</td></tr>
+          <tr><td><code>SoundFont</code></td><td>SoundFont banks</td></tr>
+          <tr><td><code>PCM</code></td><td>raw samples</td></tr>
+        </table>
+        <p class="exports-note">AAC decodes AAC-LC and HE-AAC (SBR, parametric stereo) up to 7.1; the encoder writes AAC-LC.</p>
+      </div>
+      <div class="docs-sub" id="std-video">
+        <h3><code>std.formats.video</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Video</code>, <code>open</code></td><td>video file: tracks, frames, sound</td></tr>
+          <tr><td><code>VideoFrame</code>, <code>toImage</code>, <code>draw</code>, <code>fittedSize</code></td><td>decoded picture</td></tr>
+          <tr><td><code>fromPacked</code>, <code>PackedLayout</code></td><td>packed 4:2:2 camera bytes (YUYV, UYVY) to a picture</td></tr>
+          <tr><td><code>VideoInfo</code>, <code>Track</code>, <code>Packet</code>, <code>FrameRate</code>, <code>VideoStream</code></td><td>tracks and packets</td></tr>
+          <tr><td><code>Container</code>, <code>ContainerFormat</code>, <code>VideoDecoder</code>, <code>ContainerCodec</code>, <code>@codec</code>, <code>@decoder</code></td><td>container and decoder interfaces, registering a format</td></tr>
+          <tr><td><code>MP4</code>, <code>MKV</code>, <code>AVI</code>, <code>FLV</code>, <code>OGV</code>, <code>MPEG</code>, <code>TS</code>, <code>ASF</code>, <code>MXF</code>, <code>ElementaryStream</code></td><td>containers</td></tr>
+          <tr><td><code>H264</code>, <code>HEVC</code>, <code>AV1</code>, <code>VP9</code>, <code>Mpeg2</code>, <code>Mpeg4Part2</code>, <code>Msmpeg4v2</code>, <code>VP8</code>, <code>Theora</code>, <code>MJPEG</code></td><td>decoders</td></tr>
+          <tr><td><code>VideoEncoder</code>, <code>VP8Encoder</code>, <code>H264Encoder</code></td><td>encoding pictures to packets at a bitrate (VP8, H.264 Constrained Baseline: key frames on request, temporal layers)</td></tr>
+          <tr><td><code>WebMWriter</code>, <code>save</code>, <code>write</code></td><td>writing WebM: packets of VP8, VP9, AV1, Vorbis and Opus tracks, or pictures and sound encoded as VP8 and Opus</td></tr>
+          <tr><td><code>VideoHardware</code>, <code>HardwareDecoder</code>, <code>GpuPicture</code>, <code>download</code></td><td>GPU decoding (NVDEC, VA-API), frames kept on the GPU</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-archive">
+        <h3><code>std.formats.archive</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Archive</code>, <code>ArchiveWriter</code>, <code>load</code></td><td>archive by signature</td></tr>
+          <tr><td><code>extractAll</code>, <code>extractEntry</code></td><td>extraction</td></tr>
+          <tr><td><code>Zip</code>, <code>Tar</code>, <code>SevenZip</code></td><td>archives</td></tr>
+          <tr><td><code>Gz</code>, <code>Bz2</code>, <code>Xz</code>, <code>Tgz</code>, <code>Tbz2</code>, <code>TarXz</code>, <code>Zst</code>, <code>TarZst</code></td><td>compressed files and tarballs</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-docs">
+        <h3><code>std.formats.docs</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Document</code>, <code>Block</code>, <code>Inline</code>, <code>load</code></td><td>document model</td></tr>
+          <tr><td><code>Markdown</code>, <code>PlainText</code>, <code>Rtf</code>, <code>Html</code>, <code>Pdf</code>, <code>Docx</code>, <code>Odt</code>, <code>Epub</code></td><td>codecs; <code>PlainText.marks</code> (<code>PlainTextMarks</code>) says what its layout writes around styled text</td></tr>
+          <tr><td><code>PdfFile</code>, <code>PdfObject</code></td><td>PDF objects</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-mail-format">
+        <h3><code>std.formats.mail</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Message</code></td><td>internet message, built or parsed</td></tr>
+          <tr><td><code>Part</code>, <code>Header</code></td><td>MIME parts, headers</td></tr>
+          <tr><td><code>Address</code>, <code>parseAddress</code>, <code>parseAddressList</code></td><td>addresses</td></tr>
+          <tr><td><code>Maildir</code></td><td>Maildir folders</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-fonts">
+        <h3><code>std.formats.fonts</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Font</code>, <code>Face</code>, <code>load</code>, <code>info</code></td><td>fonts and faces</td></tr>
+          <tr><td><code>TTF</code>, <code>OTF</code>, <code>WOFF</code>, <code>WOFF2</code>, <code>EOT</code>, <code>FON</code></td><td>codecs</td></tr>
+          <tr><td><code>Outline</code>, <code>FontMetrics</code>, <code>Bitmap</code></td><td>glyphs and metrics</td></tr>
+          <tr><td><code>shape</code>, <code>features</code>, <code>ShapedRun</code>, <code>ShapedGlyph</code>, <code>ShapeOptions</code>, <code>TextDirection</code></td><td>OpenType shaping</td></tr>
+          <tr><td><code>Hinting</code>, <code>Baselines</code>, <code>Axis</code></td><td>hinted outlines (TrueType, CFF), baselines</td></tr>
+          <tr><td><code>VariableFace</code>, <code>VariationAxis</code>, <code>OpenTypeFace</code></td><td>variable fonts, OpenType tables</td></tr>
+          <tr><td><code>sfnt.Sfnt</code>, <code>sfnt.Cmap</code>, <code>sfnt.Head</code>, <code>sfnt.Hhea</code>, <code>sfnt.Names</code>, <code>sfnt.Os2</code>, <code>sfnt.Post</code></td><td>the SFNT container and its tables</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-playlist">
+        <h3><code>std.formats.playlist</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>PlaylistEntry</code>, <code>load</code>, <code>save</code></td><td>playlists</td></tr>
+          <tr><td><code>M3U</code>, <code>PLS</code></td><td>codecs</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-calendar">
+        <h3><code>std.formats.calendar</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Calendar</code>, <code>load</code>, <code>save</code></td><td>calendars, occurrences with overrides</td></tr>
+          <tr><td><code>CalendarEntry</code>, <code>EntryKind</code>, <code>Alarm</code>, <code>Attachment</code></td><td>events, to-dos, journal entries</td></tr>
+          <tr><td><code>RecurrenceRule</code>, <code>Occurrence</code></td><td>repeating entries</td></tr>
+          <tr><td><code>TimeZone</code>, <code>Observance</code>, <code>FreeBusy</code></td><td>time zones, free/busy</td></tr>
+          <tr><td><code>ICalendar</code>, <code>VCalendar</code>, <code>XCal</code></td><td>codecs</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-contacts">
+        <h3><code>std.formats.contacts</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Contact</code>, <code>load</code>, <code>save</code></td><td>contacts</td></tr>
+          <tr><td><code>PersonName</code>, <code>Address</code>, <code>Organization</code>, <code>ContactDate</code></td><td>contact fields</td></tr>
+          <tr><td><code>VCard</code>, <code>XCard</code>, <code>LDIF</code>, <code>ContactsCSV</code></td><td>codecs</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-formats-data">
+        <h3><code>std.formats.data</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>INI</code>, <code>INIFile</code>, <code>INISection</code>, <code>INIEntry</code>, <code>ini</code></td><td>INI files: sections, comments, typed getters, objects bound by field</td></tr>
+          <tr><td><code>DotEnv</code>, <code>dotenv</code></td><td><code>.env</code> files: variables with quotes and <code>${NAME}</code> expansion, loading into the environment</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-formats-mmdb">
+        <h3><code>std.formats.data.mmdb</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>open</code>, <code>Database</code>, <code>Metadata</code></td><td>MaxMind DB files (GeoIP2, GeoLite2, DB-IP, IPinfo)</td></tr>
+          <tr><td><code>Record</code></td><td>the data stored for an IP address and its network</td></tr>
+          <tr><td><code>Location</code>, <code>Place</code></td><td>continent, country, subdivisions, city, coordinates, time zone</td></tr>
+          <tr><td><code>AutonomousSystem</code></td><td>AS number and organization</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-formats-ai">
+        <h3><code>std.formats.ai</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>ModelFile</code>, <code>load</code>, <code>info</code></td><td>model file: metadata and tensors</td></tr>
+          <tr><td><code>Gguf</code>, <code>Safetensors</code></td><td>codecs, read and write</td></tr>
+          <tr><td><code>TensorType</code>, <code>TensorInfo</code></td><td>tensor types (every ggml quantized type)</td></tr>
+          <tr><td><code>dequantize</code>, <code>blockSize</code>, <code>blockBytes</code></td><td>quantized blocks to floats</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-barcodes">
+        <h3><code>std.barcodes</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Symbology</code>, <code>Symbol</code>, <code>Barcode</code></td><td>symbol grid or bars, decoded result</td></tr>
+          <tr><td><code>encode</code>, <code>decode</code></td><td>any symbology; every barcode in an image</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-barcodes-qr">
+        <h3><code>std.barcodes.qr</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>encode</code>, <code>decode</code>, <code>Level</code></td><td>QR Code and Micro QR</td></tr>
+          <tr><td><code>sequence</code></td><td>structured append</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-barcodes-datamatrix">
+        <h3><code>std.barcodes.datamatrix</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>encode</code>, <code>decode</code>, <code>Shape</code></td><td>Data Matrix ECC 200, square and rectangular</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-barcodes-aztec">
+        <h3><code>std.barcodes.aztec</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>encode</code>, <code>decode</code>, <code>Format</code></td><td>Aztec compact and full-range</td></tr>
+          <tr><td><code>rune</code></td><td>Aztec runes</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-barcodes-pdf417">
+        <h3><code>std.barcodes.pdf417</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>encode</code>, <code>decode</code></td><td>PDF417, compact PDF417, MicroPDF417</td></tr>
+          <tr><td><code>sequence</code></td><td>Macro PDF417</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-barcodes-linear">
+        <h3><code>std.barcodes.linear</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>encode</code>, <code>decode</code></td><td>EAN-13/8, UPC-A/E with add-ons, Code 128, Code 39, Code 93, ITF, Codabar</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-formats-sheets">
+        <h3><code>std.formats.sheets</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Workbook</code>, <code>Sheet</code>, <code>Cell</code>, <code>CellKind</code>, <code>Range</code></td><td>spreadsheets: sheets of typed cells with formulas and number formats</td></tr>
+          <tr><td><code>load</code>, <code>save</code></td><td>read and write by signature or extension</td></tr>
+          <tr><td><code>Workbook.calculate</code>, <code>Workbook.evaluate</code></td><td>formula evaluation: operators, references across sheets, about 110 functions</td></tr>
+          <tr><td><code>document</code></td><td>a workbook as a <code>docs.Document</code> of tables</td></tr>
+          <tr><td><code>Xlsx</code>, <code>Ods</code>, <code>Csv</code></td><td>codecs</td></tr>
+          <tr><td><code>reference</code>, <code>parseReference</code>, <code>parseRange</code>, <code>columnName</code></td><td><code>B2</code> and <code>A1:C3</code> references</td></tr>
+          <tr><td><code>serialOf</code>, <code>timeOf</code></td><td>spreadsheet day numbers and <code>time.Time</code></td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="formats-planned">
+        <h3>Planned</h3>
+        <p class="docs-placeholder"><code>std.formats.slides</code> and the container formats of <code>std.formats.data</code>.</p>
+      </div>
+    </section>
+
+    <section class="docs-section" id="net-group">
+      <h2>Networking</h2>
+      <div class="docs-sub" id="std-net">
+        <h3><code>std.net</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Socket</code>, <code>Address</code>, <code>Connection</code>, <code>Stream</code></td><td>sockets and connections</td></tr>
+          <tr><td><code>DatagramTransport</code></td><td>whole datagrams to and from one peer</td></tr>
+          <tr><td><code>Listener</code>, <code>Server</code>, <code>StreamServer</code>, <code>DatagramServer</code></td><td>server interfaces</td></tr>
+          <tr><td><code>NetError</code>, <code>ErrorCode</code></td><td>typed failures</td></tr>
+          <tr><td><code>resolve</code>, <code>NetInterface</code></td><td>name resolution, interfaces</td></tr>
+          <tr><td><code>parseIPText</code>, <code>ipText</code></td><td>IP address text to bytes and back</td></tr>
+          <tr><td><code>writeAll</code>, <code>readFull</code></td><td>every byte to, or a full buffer from, any stream</td></tr>
+          <tr><td><code>RemoteFiles</code></td><td>remote file access (FTP, SFTP, WebDAV)</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-tcp">
+        <h3><code>std.net.tcp</code>, <code>std.net.udp</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code>, <code>Server</code></td><td>TCP and UDP clients and servers</td></tr>
+          <tr><td><code>dial</code>, <code>Peer</code></td><td>UDP socket bound to one peer, a datagram transport</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-tls">
+        <h3><code>std.net.tls</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Conn</code>, <code>dial</code>, <code>client</code>, <code>server</code></td><td>TLS 1.3 and 1.2 connection, over a socket or any stream</td></tr>
+          <tr><td><code>HandshakeCarrier</code></td><td>TLS 1.3 handshake without records, for QUIC</td></tr>
+          <tr><td><code>Config</code></td><td>certificates, names, versions</td></tr>
+          <tr><td><code>DTLSConn</code>, <code>dtlsDial</code>, <code>dtlsClient</code>, <code>dtlsServer</code></td><td>DTLS 1.3 and 1.2 over any datagram transport</td></tr>
+          <tr><td><code>DTLSListener</code>, <code>dtlsListen</code></td><td>DTLS server on a UDP socket, stateless cookies</td></tr>
+          <tr><td><code>DTLSConfig</code>, <code>SRTPProfile</code>, <code>SRTPKeys</code></td><td>DTLS settings, DTLS-SRTP profiles and keys, connection IDs</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-quic">
+        <h3><code>std.net.quic</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>dial</code>, <code>listen</code>, <code>Listener</code></td><td>QUIC client and server (RFC 9000, 9001, 9002)</td></tr>
+          <tr><td><code>Connection</code>, <code>Stream</code></td><td>bidirectional and one-way streams, datagrams, key update</td></tr>
+          <tr><td><code>Config</code></td><td>TLS settings, limits, idle timeout, keep-alive, Retry</td></tr>
+          <tr><td><code>TransportError</code>, <code>TransportCode</code>, <code>ApplicationError</code>, <code>ClosedError</code></td><td>errors</td></tr>
+          <tr><td><code>appendVarint</code>, <code>varintLength</code>, <code>parseVarint</code></td><td>variable-length integers</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-stun">
+        <h3><code>std.net.stun</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>dial</code>, <code>client</code>, <code>Client</code>, <code>ClientConfig</code></td><td>STUN and TURN client (RFC 8489, RFC 8656): <code>binding</code>, <code>allocate</code></td></tr>
+          <tr><td><code>Allocation</code>, <code>RelayedPeer</code>, <code>AllocateOptions</code>, <code>Relayed</code></td><td>a relayed address on a TURN server: permissions, channels, UDP and TCP relays (RFC 6062)</td></tr>
+          <tr><td><code>Server</code></td><td>STUN and TURN server over UDP, TCP, TLS and DTLS</td></tr>
+          <tr><td><code>Message</code>, <code>parseMessage</code>, <code>isMessage</code>, <code>Method</code>, <code>AttributeType</code>, <code>Integrity</code></td><td>the message codec, integrity and fingerprint</td></tr>
+          <tr><td><code>longTermKey</code>, <code>shortTermKey</code>, <code>restCredentials</code></td><td>credentials: long-term (MD5, SHA-256), short-term, shared secret</td></tr>
+          <tr><td><code>parseURI</code>, <code>resolveURI</code>, <code>ServerURI</code>, <code>Transport</code></td><td><code>stun:</code>, <code>stuns:</code>, <code>turn:</code> and <code>turns:</code> URIs</td></tr>
+          <tr><td><code>StunError</code>, <code>ErrorCode</code></td><td>errors, with the server's error code</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-sdp">
+        <h3><code>std.net.sdp</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>parse</code>, <code>SessionDescription</code>, <code>MediaDescription</code>, <code>Attribute</code></td><td>SDP session descriptions (RFC 8866), read and written</td></tr>
+          <tr><td><code>RtpMap</code>, <code>FormatParameters</code>, <code>RtcpFeedback</code>, <code>Extension</code>, <code>SourceAttribute</code>, <code>SourceGroup</code>, <code>Rid</code>, <code>Simulcast</code>, <code>Msid</code></td><td>the media attributes WebRTC uses</td></tr>
+          <tr><td><code>Group</code>, <code>Fingerprint</code>, <code>TransportParameters</code>, <code>Setup</code>, <code>Direction</code></td><td>BUNDLE groups, certificate fingerprints, ICE and DTLS parameters, directions</td></tr>
+          <tr><td><code>Candidate</code>, <code>parseCandidate</code>, <code>candidateText</code>, <code>CandidateType</code></td><td>ICE candidates, in a description or trickled</td></tr>
+          <tr><td><code>SdpError</code></td><td>errors, with the line</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-rtp">
+        <h3><code>std.net.rtp</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Packet</code>, <code>parsePacket</code>, <code>isRtcp</code></td><td>RTP packets (RFC 3550) read without copying and written into a buffer, header extensions (RFC 8285)</td></tr>
+          <tr><td><code>parseRtcp</code>, <code>Compound</code>, <code>SenderReport</code>, <code>ReceiverReport</code>, <code>ReceptionReport</code>, <code>SourceDescription</code>, <code>Bye</code></td><td>RTCP reports</td></tr>
+          <tr><td><code>Nack</code>, <code>Pli</code>, <code>Fir</code>, <code>Remb</code>, <code>TransportFeedback</code></td><td>RTCP feedback (RFC 4585, RFC 5104, REMB, transport-wide congestion control)</td></tr>
+          <tr><td><code>Packetizer</code>, <code>depacketize</code>, <code>PayloadFormat</code>, <code>startsFrame</code>, <code>startsKeyframe</code>, <code>temporalLayer</code></td><td>payload formats: Opus, VP8 (with temporal layers), VP9, H.264, AV1</td></tr>
+          <tr><td><code>retransmission</code>, <code>original</code>, <code>FecSender</code>, <code>FecReceiver</code></td><td>retransmission packets (RFC 4588) and FlexFEC repair packets (RFC 8627)</td></tr>
+          <tr><td><code>redBlock</code>, <code>redundant</code>, <code>redundantCount</code>, <code>writeRedundant</code>, <code>ulpAsFlex</code></td><td>redundant data (RFC 2198): the primary block, the blocks sound carries again, ULPFEC repair blocks (RFC 5109)</td></tr>
+          <tr><td><code>JitterBuffer</code>, <code>Frame</code></td><td>packets in any order, frames out in order</td></tr>
+          <tr><td><code>srtp</code>, <code>SrtpSession</code></td><td>SRTP and SRTCP (RFC 3711, RFC 7714), keyed from DTLS-SRTP, packets protected in place</td></tr>
+          <tr><td><code>RtpError</code></td><td>errors</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-sctp">
+        <h3><code>std.net.sctp</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>connect</code>, <code>accept</code>, <code>Association</code>, <code>AssociationState</code>, <code>Options</code></td><td>SCTP associations (RFC 9260) in user space over any datagram transport, as WebRTC runs them over DTLS</td></tr>
+          <tr><td><code>Stream</code>, <code>Message</code>, <code>PayloadProtocol</code></td><td>streams of whole messages, ordered or not, reliable or given up after a number of sends or a lifetime, with stream reset</td></tr>
+          <tr><td><code>SctpError</code></td><td>errors</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-webrtc">
+        <h3><code>std.net.webrtc</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>PeerConnection</code>, <code>Configuration</code>, <code>IceServer</code>, <code>IceTransportPolicy</code></td><td>a connection to a browser or another program through NATs (ICE, DTLS, SCTP), set up by offer and answer</td></tr>
+          <tr><td><code>LocalTrack</code>, <code>RemoteTrack</code>, <code>TrackKind</code>, <code>Stats</code>, <code>SendStats</code>, <code>ReceiveStats</code></td><td>audio and video tracks: encoded frames (Opus, VP8, VP9, H.264, AV1) written and read whole; simulcast layers (<code>addSimulcast</code>, <code>rid</code>); <code>skip</code> for sound left out</td></tr>
+          <tr><td><code>SessionDescription</code>, <code>SdpType</code>, <code>IceCandidate</code></td><td>what signalling carries: descriptions and candidates</td></tr>
+          <tr><td><code>DataChannel</code>, <code>DataChannelOptions</code>, <code>DataMessage</code></td><td>data channels: text and binary messages, ordered or not, reliable or given up after a count or a time</td></tr>
+          <tr><td><code>PeerConnectionState</code>, <code>SignalingState</code>, <code>IceConnectionState</code>, <code>IceGatheringState</code>, <code>DataChannelState</code></td><td>states</td></tr>
+          <tr><td><code>WhipClient</code>, <code>WhepClient</code>, <code>WhipServer</code>, <code>WhepServer</code></td><td>publishing to and playing from a server with one HTTP request (WHIP, WHEP)</td></tr>
+          <tr><td><code>WebRtcError</code></td><td>errors</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-proxy">
+        <h3><code>std.net.proxy</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Dialer</code>, <code>connect</code></td><td>tunnels through SOCKS4, SOCKS4a, SOCKS5, HTTP and HTTPS proxies; chains</td></tr>
+          <tr><td><code>Binding</code>, <code>Association</code></td><td>SOCKS <code>BIND</code> and SOCKS5 UDP relay</td></tr>
+          <tr><td><code>SocksServer</code>, <code>Request</code>, <code>Command</code></td><td>SOCKS4, SOCKS4a and SOCKS5 server</td></tr>
+          <tr><td><code>relay</code></td><td>copies both ways between two streams</td></tr>
+          <tr><td><code>ProxyError</code>, <code>ErrorKind</code></td><td>errors</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-http">
+        <h3><code>std.net.http</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code>, <code>get</code>, <code>post</code>, <code>postJSON</code></td><td>client</td></tr>
+          <tr><td><code>Server</code>, <code>ServeMux</code>, <code>Context</code>, <code>Handler</code>, <code>Middleware</code></td><td>server</td></tr>
+          <tr><td><code>Request</code>, <code>Response</code>, <code>Header</code>, <code>Cookie</code>, <code>CookieJar</code></td><td>messages</td></tr>
+          <tr><td><code>FileServer</code>, <code>serveFile</code></td><td>static files</td></tr>
+          <tr><td><code>Transport</code></td><td>connection pool, HTTP/1.1, HTTP/2 and HTTP/3</td></tr>
+          <tr><td><code>HTTP3Mode</code></td><td>when the client uses HTTP/3: <code>Off</code>, <code>Advertised</code> (Alt-Svc), <code>Always</code></td></tr>
+          <tr><td><code>Proxy</code>, <code>EnvironmentProxy</code>, <code>StaticProxy</code></td><td>HTTP, HTTPS and SOCKS proxies for the client, from the environment or one URL</td></tr>
+          <tr><td><code>ForwardProxy</code></td><td>handler that serves as an HTTP proxy (<code>CONNECT</code> tunnels, forwarded requests)</td></tr>
+          <tr><td><code>CrossOriginProtection</code></td><td>cross-origin request protection</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-http2">
+        <h3><code>std.net.http.http2</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Conn</code>, <code>Stream</code>, <code>Framer</code></td><td>HTTP/2</td></tr>
+          <tr><td><code>Encoder</code>, <code>Decoder</code></td><td>HPACK</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-http3">
+        <h3><code>std.net.http.http3</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Conn</code>, <code>Stream</code>, <code>Settings</code></td><td>HTTP/3 over QUIC</td></tr>
+          <tr><td><code>Encoder</code>, <code>Decoder</code>, <code>Table</code></td><td>QPACK</td></tr>
+          <tr><td><code>Http3Error</code>, <code>ErrorCode</code></td><td>errors</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-grpc">
+        <h3><code>std.net.grpc</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code>, <code>ClientStream</code>, <code>CallOptions</code></td><td>gRPC client: unary and streaming calls</td></tr>
+          <tr><td><code>Server</code>, <code>ServerCall</code>, <code>UnaryHandler</code>, <code>StreamHandler</code></td><td>gRPC server</td></tr>
+          <tr><td><code>Status</code>, <code>Code</code>, <code>Metadata</code></td><td>status codes and metadata</td></tr>
+          <tr><td><code>Codec</code>, <code>Compression</code></td><td>message codecs, compression</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-websocket">
+        <h3><code>std.net.http.websocket</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Conn</code>, <code>dial</code>, <code>Upgrader</code></td><td>WebSocket</td></tr>
+          <tr><td><code>ReconnectingConn</code>, <code>Hub</code></td><td>reconnects, broadcast</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-httptest">
+        <h3><code>std.net.http.httptest</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Server</code>, <code>ResponseRecorder</code>, <code>newRequest</code></td><td>HTTP test kit</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-webdav">
+        <h3><code>std.net.http.webdav</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code>, <code>Server</code></td><td>WebDAV, over any <code>std.fs</code> store</td></tr>
+          <tr><td><code>caldav.Client</code>, <code>caldav.Calendars</code>, <code>caldav.CalendarObject</code></td><td>CalDAV client and server</td></tr>
+          <tr><td><code>carddav.Client</code>, <code>carddav.AddressBooks</code>, <code>carddav.AddressObject</code></td><td>CardDAV client and server</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-dns">
+        <h3><code>std.net.dns</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code>, <code>lookup</code>, <code>lookupHost</code>, <code>lookupMX</code>, …</td><td>resolver</td></tr>
+          <tr><td><code>serviceTargets</code></td><td>the <code>host:port</code> of a service's SRV targets, in order</td></tr>
+          <tr><td><code>Server</code>, <code>Zone</code>, <code>Mux</code>, <code>Forwarder</code>, <code>Secondary</code></td><td>server</td></tr>
+          <tr><td><code>Message</code>, <code>Record</code></td><td>wire format</td></tr>
+          <tr><td><code>Update</code>, <code>TSIGKey</code></td><td>dynamic updates, TSIG</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-dns-secure">
+        <h3><code>std.net.dns.secure</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>TLSTransport</code>, <code>HTTPSTransport</code></td><td>DNS over TLS and HTTPS</td></tr>
+          <tr><td><code>TLSServer</code>, <code>HTTPHandler</code></td><td>the server side</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-dnssec">
+        <h3><code>std.net.dns.dnssec</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Validator</code>, <code>verify</code>, <code>TrustAnchors</code></td><td>validation</td></tr>
+          <tr><td><code>signZone</code>, <code>generateKey</code></td><td>zone signing</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-mdns">
+        <h3><code>std.net.dns.mdns</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>query</code>, <code>browse</code>, <code>Service</code></td><td>multicast DNS, service discovery</td></tr>
+          <tr><td><code>Responder</code></td><td>announces services</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-url">
+        <h3><code>std.net.url</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>URL</code>, <code>parse</code></td><td>URLs</td></tr>
+          <tr><td><code>Values</code>, <code>parseQuery</code></td><td>query strings</td></tr>
+          <tr><td><code>Template</code></td><td>RFC 6570 templates</td></tr>
+          <tr><td><code>Pattern</code></td><td>URL patterns</td></tr>
+          <tr><td><code>urlEncode</code>, <code>pathEscape</code>, <code>queryEscape</code></td><td>escaping</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-multipart">
+        <h3><code>std.net.multipart</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Reader</code>, <code>Writer</code>, <code>Form</code>, <code>Part</code></td><td>multipart bodies</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-ssh">
+        <h3><code>std.net.ssh</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code>, <code>Server</code>, <code>Session</code></td><td>SSH</td></tr>
+          <tr><td><code>Process</code>, <code>Channel</code></td><td>commands, shells, subsystems</td></tr>
+          <tr><td><code>PrivateKey</code>, <code>PublicKey</code>, <code>generateKey</code>, <code>loadKey</code></td><td>keys</td></tr>
+          <tr><td><code>Certificate</code></td><td>OpenSSH certificates</td></tr>
+          <tr><td><code>Agent</code>, <code>KnownHosts</code></td><td>agent, known hosts</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-sftp">
+        <h3><code>std.net.sftp</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code>, <code>Server</code></td><td>SFTP</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-ftp">
+        <h3><code>std.net.ftp</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code>, <code>Server</code></td><td>FTP and FTPS</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-mail">
+        <h3><code>std.net.mail</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>mail.Client</code></td><td>mail account: send, list, fetch, watch</td></tr>
+          <tr><td><code>smtp.Client</code>, <code>smtp.Server</code></td><td>SMTP</td></tr>
+          <tr><td><code>imap.Client</code>, <code>imap.Server</code>, <code>imap.Search</code></td><td>IMAP</td></tr>
+          <tr><td><code>pop3.Client</code>, <code>pop3.Server</code></td><td>POP3</td></tr>
+          <tr><td><code>imap.MaildirAccount</code>, <code>pop3.MaildirDrop</code>, <code>smtp.MaildirHandler</code></td><td>Maildir storage</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-ldap">
+        <h3><code>std.net.ldap</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code>, <code>Server</code></td><td>LDAPv3</td></tr>
+          <tr><td><code>Entry</code>, <code>DN</code>, <code>Filter</code></td><td>entries, names, filters</td></tr>
+          <tr><td><code>MemoryDirectory</code></td><td>directory in memory</td></tr>
+          <tr><td><code>parseLDIF</code></td><td>LDIF</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-snmp">
+        <h3><code>std.net.snmp</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code>, <code>Server</code>, <code>TrapReceiver</code></td><td>SNMP v1, v2c, v3</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-mqtt">
+        <h3><code>std.net.mqtt</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code>, <code>Server</code>, <code>Message</code></td><td>MQTT 3.1.1 and 5.0</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-ntp">
+        <h3><code>std.net.ntp</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code></td><td>NTP and SNTP queries</td></tr>
+          <tr><td><code>Clock</code></td><td>clock following several servers</td></tr>
+          <tr><td><code>Server</code></td><td>NTP server</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-syslog">
+        <h3><code>std.net.syslog</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code>, <code>Server</code>, <code>Message</code></td><td>syslog, RFC 5424 and RFC 3164</td></tr>
+          <tr><td><code>Encoder</code></td><td>log encoder for the <code>Logging</code> service</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-irc">
+        <h3><code>std.net.irc</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code>, <code>Server</code>, <code>Message</code></td><td>IRC with IRCv3</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-telnet">
+        <h3><code>std.net.telnet</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code>, <code>Server</code>, <code>Session</code></td><td>Telnet</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-sasl">
+        <h3><code>std.net.sasl</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>ScramClient</code>, <code>ScramServer</code>, <code>ScramCredentials</code></td><td>SCRAM authentication</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="net-planned">
+        <h3>Planned</h3>
+        <p class="docs-placeholder"><code>std.net.jmap</code>.</p>
+      </div>
+    </section>
+
+    <section class="docs-section" id="media">
+      <h2>Media &amp; Devices</h2>
+      <div class="docs-sub" id="std-media-player">
+        <h3><code>std.media.player</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>MediaPlayer</code></td><td>plays audio and video</td></tr>
+          <tr><td><code>Playlist</code>, <code>Track</code></td><td>what it plays</td></tr>
+          <tr><td><code>AudioSink</code>, <code>Visualizer</code>, <code>LevelBarsVisualizer</code></td><td>output, visualizers</td></tr>
+        </table>
+        <p class="exports-note">See the <a href="examples.html#media-player">example</a>.</p>
+      </div>
+      <div class="docs-sub" id="std-media-call">
+        <h3><code>std.media.call</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>localAudio</code>, <code>localVideo</code></td><td>a microphone or sound stream, a camera or video stream, as WebRTC tracks (Opus; VP8 or H.264)</td></tr>
+          <tr><td><code>play</code></td><td>a remote sound track through a speaker</td></tr>
+          <tr><td><code>frames</code>, <code>RemoteVideo</code></td><td>the decoded pictures of a remote track</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-media-dsp">
+        <h3><code>std.media.dsp</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Biquad</code>, <code>Equalizer</code>, <code>EqBand</code>, <code>EqPreset</code></td><td>filters, equalizers</td></tr>
+          <tr><td><code>Compressor</code>, <code>Limiter</code>, <code>Gain</code>, <code>Balance</code>, <code>StereoWidth</code></td><td>dynamics, levels</td></tr>
+          <tr><td><code>Reverb</code>, <code>Delay</code>, <code>Chorus</code></td><td>effects</td></tr>
+          <tr><td><code>Spectrum</code>, <code>LevelMeter</code></td><td>analysis</td></tr>
+          <tr><td><code>AudioEffect</code>, <code>AudioProcessor</code>, <code>EffectSwitch</code></td><td>effect interfaces, bypass switch</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-media-synth">
+        <h3><code>std.media.synth</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Synth</code></td><td>synthesizer: built-in waveforms or a SoundFont, MIDI playback</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-devices">
+        <h3><code>std.devices</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Camera</code>, <code>cameras</code>, <code>openCamera</code></td><td>cameras (V4L2)</td></tr>
+          <tr><td><code>Speaker</code>, <code>speakers</code>, <code>defaultSpeaker</code>, <code>openSpeaker</code></td><td>sound output</td></tr>
+          <tr><td><code>Microphone</code>, <code>microphones</code>, <code>defaultMicrophone</code>, <code>openMicrophone</code></td><td>sound input</td></tr>
+          <tr><td><code>HidDevice</code>, <code>hidDevices</code>, <code>openHid</code></td><td>raw HID devices: input, output and feature reports, report descriptors</td></tr>
+        </table>
+        <p class="exports-note">Linux only for now.</p>
+      </div>
+    </section>
+
+    <section class="docs-section" id="ai-group">
+      <h2>AI</h2>
+      <div class="docs-sub" id="std-ai-llm">
+        <h3><code>std.ai.llm</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>LanguageModel</code>, <code>load</code></td><td>language model from a GGUF file, on the CPU</td></tr>
+          <tr><td><code>Session</code></td><td>conversation: sampling, generation, chat</td></tr>
+          <tr><td><code>Message</code>, <code>Role</code>, <code>Reasoning</code></td><td>chat messages, thinking</td></tr>
+          <tr><td><code>ChatFormat</code>, <code>detectChatFormat</code></td><td>chat formats of model families</td></tr>
+          <tr><td><code>Tokenizer</code></td><td>BPE and SentencePiece tokenizers</td></tr>
+          <tr><td><code>Stats</code></td><td>prompt and generation speed</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-ai-tensor">
+        <h3><code>std.ai.tensor</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Weights</code>, <code>loadWeights</code></td><td>quantized weights, SIMD matrix-vector multiply</td></tr>
+          <tr><td><code>rmsNorm</code>, <code>layerNorm</code>, <code>softmax</code>, <code>silu</code>, <code>gelu</code>, <code>rope</code></td><td>transformer operations</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section class="docs-section" id="graphics">
+      <h2>Graphics &amp; UI</h2>
+      <div class="docs-sub" id="std-ui">
+        <h3><code>std.ui</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>UI</code>, <code>UIConfig</code></td><td>UI service</td></tr>
+          <tr><td><code>ComponentRenderer</code>, <code>RenderContext</code>, <code>RenderPasses</code>, <code>Geometry</code>, <code>TextKind</code>, <code>WindowState</code>, <code>WindowKind</code>, <code>CloseRequest</code>, <code>MenuEntry</code>, <code>PointerEvent</code>, <code>PointerPhase</code>, <code>Modifiers</code>, <code>Limit</code>, <code>TextInputClient</code>, <code>TextRange</code>, <code>StateChange</code>, <code>@action</code>, <code>Viewport</code>, <code>Theme</code>, <code>Palette</code></td><td>component drawing, resolved layout, state events, actions</td></tr>
+          <tr><td><code>Theme</code>, <code>themeOf</code></td><td>the values styles read as <code>theme</code>; <code>themeOf(component)</code> is the theme that component's style reads: the nearest one provided, else <code>UI.theme()</code></td></tr>
+          <tr><td><code>DragData</code>, <code>DropEffect</code></td><td>what is dragged: a value of the application's own, text, file paths, other forms by MIME type; what a drop would do (none, copy, move, link)</td></tr>
+          <tr><td><code>StyleNode</code>, <code>StyleClass</code>, <code>BoxStyle</code>, <code>FontStyle</code>, <code>Selector</code></td><td>style model</td></tr>
+          <tr><td><code>IconSet</code></td><td>named icons an application adds with <code>UI.addIcons</code>; components take an icon by name (<code>Button(icon = "plus")</code>)</td></tr>
+          <tr><td><code>ClickEvent</code>, <code>KeyEvent</code>, <code>MouseMoveEvent</code>, <code>TextInputEvent</code>, …</td><td>events; <code>target</code> is the component under the pointer, the window's root when no other is</td></tr>
+          <tr><td><code>Key</code>, <code>KeyCode</code>, <code>typesCharacter</code></td><td>the key of a <code>KeyEvent</code> by its meaning in the layout (<code>Key.A</code>, <code>Key.Enter</code>, <code>Key.F5</code>); whether a key types a character</td></tr>
+          <tr><td><code>Display</code>, <code>Appearance</code>, <code>ColorScheme</code>, <code>Contrast</code></td><td>displays and system appearance (Linux)</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-ui-icons">
+        <h3><code>std.ui.icons</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>@icons</code></td><td>on a <code>partial type</code>: turns a folder of SVG files into an icon set while the program is built (<code>@icons("assets/icons") partial type AppIcons {}</code>); the type gets <code>set() !IconSet</code> for <code>UI.addIcons</code> and one name per file (<code>arrow-left.svg</code> is <code>ArrowLeft</code>)</td></tr>
+          <tr><td><code>fromSvg</code></td><td>an <code>IconSet</code> from SVG documents read at run time</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-ui-styles">
+        <h3><code>std.ui.styles</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Box</code>, <code>Layout</code>, <code>Tracks</code>, <code>Clipping</code></td><td>size, placement and arrangement</td></tr>
+          <tr><td><code>Shape</code>, <code>Background</code>, <code>Borders</code>, <code>Outline</code>, <code>Shadows</code>, <code>Filters</code>, <code>Backdrop</code>, <code>Compositing</code>, <code>Effects</code>, <code>Transforms</code></td><td>painting and effects</td></tr>
+          <tr><td><code>Decorated</code>, <code>Control</code></td><td>umbrellas: everything a box is painted with (background, borders, outline, shadows on one shape); a control's paint, text, pointer behaviour and timing</td></tr>
+          <tr><td><code>Foreground</code>, <code>Typography</code>, <code>Editable</code>, <code>TextRendering</code></td><td>text</td></tr>
+          <tr><td><code>Interaction</code>, <code>Scrollbars</code>, <code>ImageContent</code>, <code>Motion</code></td><td>pointer, scrollbars, images, transitions</td></tr>
+          <tr><td><code>Font</code>, <code>Fill</code>, <code>Sizing</code>, <code>Auto</code>, <code>Anchors</code>, <code>AnchorLine</code>, <code>AnchorEdge</code>, <code>LineStyle</code>, <code>Border</code>, <code>Paint</code>, <code>BackgroundFill</code>, <code>Ring</code>, <code>Shadow</code>, <code>Filter</code>, <code>Transform</code>, <code>Track</code>, <code>Cell</code>, <code>FontWeight</code>, <code>ParagraphLayout</code>, <code>Decoration</code>, <code>TextRun</code>, <code>Cursor</code>, <code>Scrollbar</code>, <code>Transition</code>, <code>Easing</code></td><td>style values</td></tr>
+          <tr><td><code>Align</code>, <code>Alignment</code>, <code>Direction</code>, <code>Arrange</code>, <code>Distribute</code>, <code>Position</code>, <code>Layer</code></td><td>alignment, direction, arrangement and positioning</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-ui-components">
+        <h3><code>std.ui.components</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Row</code>, <code>Column</code>, <code>HBox</code>, <code>VBox</code>, <code>Grid</code>, <code>Layered</code>, <code>Panel</code>, <code>ScrollView</code>, <code>SplitPane</code>, <code>Spacer</code>, <code>Divider</code>, <code>WindowDrag</code></td><td>layout: rows, columns, grids, stacked layers, scrolling, panes a divider resizes, the bar an undecorated window is moved by</td></tr>
+          <tr><td><code>TabMove</code></td><td>a tab of a <code>TabStrip</code> dragged from one place to another (<code>onMove</code>, event <code>moved</code>); <code>onClose</code> gives each tab a cross</td></tr>
+          <tr><td><code>FocusScope</code></td><td>remembers which component in it had the keyboard focus and gives it back when Tab returns; <code>trap</code> keeps Tab inside</td></tr>
+          <tr><td><code>List</code>, <code>RowItem</code>, <code>Source</code>, <code>SourceChange</code>, <code>SourceChangeKind</code>, <code>SelectionMode</code>, <code>ListStyle</code>, <code>ListRowStyle</code></td><td>a virtualised list <code>List&lt;T, I = int&gt;</code> over an array or a <code>Source&lt;T&gt;</code> (<code>count()</code>, <code>at(i)</code>, <code>changes()</code>): <code>id</code>, <code>selected</code>, <code>selection</code>, <code>rowHeight</code>, <code>rowRenderer</code> (takes a <code>RowItem&lt;T&gt;</code>), <code>onChange</code>, <code>onOpen</code>, events <code>changed</code> and <code>opened</code>, <code>reveal(id)</code>, <code>current()</code></td></tr>
+          <tr><td><code>Form</code>, <code>Field</code></td><td>a form (<code>onSubmit</code>, <code>submit()</code>, <code>invalid()</code>, event <code>submitted</code>) and one of its values with a name and an <code>error</code> shown under the control; the form submits only while no field has one</td></tr>
+          <tr><td><code>Themed</code></td><td>gives what it holds a theme of its own (<code>theme</code>): their styles read it where they name <code>theme</code></td></tr>
+          <tr><td><code>Provide&lt;V&gt;</code></td><td>gives what it holds a value they find with <code>context&lt;V&gt;()</code></td></tr>
+          <tr><td><code>Draggable</code>, <code>DropTarget</code></td><td>something dragged inside a window, with a preview that follows the pointer; a place it, or files and text dragged in from another application, are dropped on</td></tr>
+          <tr><td><code>Text</code>, <code>Heading</code>, <code>Label</code>, <code>Link</code>, <code>Image</code>, <code>Icon</code>, <code>Badge</code>, <code>Chip</code>, <code>Avatar</code></td><td>text, pictures, icons by name, short notes and tokens</td></tr>
+          <tr><td><code>Canvas</code></td><td>a box the application draws in itself</td></tr>
+          <tr><td><code>Button</code>, <code>ToggleButton</code>, <code>SplitButton</code>, <code>Pressable</code></td><td>buttons; anything made pressable</td></tr>
+          <tr><td><code>Checkbox</code>, <code>Radio</code>, <code>Switch</code>, <code>Slider</code>, <code>Dropdown</code>, <code>ComboBox</code></td><td>choices</td></tr>
+          <tr><td><code>TextField</code>, <code>TextArea</code>, <code>SearchField</code>, <code>NumberField</code></td><td>text and number entry</td></tr>
+          <tr><td><code>MenuBar</code>, <code>Menu</code>, <code>MenuItem</code>, <code>SubMenu</code>, <code>MenuSeparator</code>, <code>ContextMenu</code></td><td>menus</td></tr>
+          <tr><td><code>Tabs</code>, <code>Tab</code>, <code>TabStrip</code>, <code>Breadcrumbs</code>, <code>Accordion</code>, <code>AccordionItem</code>, <code>Toolbar</code>, <code>StatusBar</code></td><td>pages, sections, bars</td></tr>
+          <tr><td><code>Popover</code>, <code>Dialog</code>, <code>HoverCard</code>, <code>Tooltip</code>, <code>Toast</code>, <code>Side</code></td><td>content that floats over the window; the side it opens on</td></tr>
+          <tr><td><code>ProgressBar</code>, <code>Spinner</code></td><td>progress</td></tr>
+          <tr><td><code>ButtonStyle</code>, <code>ToggleButtonStyle</code>, <code>TextStyle</code>, <code>TextFieldStyle</code>, <code>MenuItemStyle</code>, <code>PanelStyle</code>, <code>RowStyle</code>, <code>ColumnStyle</code>, <code>GridStyle</code>, <code>ScrollViewStyle</code>, <code>DialogStyle</code>, <code>PopoverStyle</code>, <code>DropdownStyle</code>, <code>MenuBarStyle</code>, <code>AccordionItemStyle</code>, <code>PressableStyle</code>, <code>ControlStyle</code>, <code>BarStyle</code>, <code>FigureStyle</code>, <code>BoxStyle</code></td><td>the components' styles</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-ui-renderer">
+        <h3><code>std.ui.renderer</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Host</code>, <code>GLSurface</code></td><td>what a window system provides: windows, events, text input, clipboard, displays, tray; OpenGL surfaces</td></tr>
+          <tr><td><code>Renderer</code>, <code>getRenderer</code></td><td>renderer interface</td></tr>
+          <tr><td><code>Window</code>, <code>WindowConfig</code>, <code>PlatformEvent</code>, <code>Frame</code></td><td>windows, low-level events, frames</td></tr>
+          <tr><td><code>opengl</code>, <code>cpu</code></td><td>renderers</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-gfx">
+        <h3><code>std.gfx</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Raster</code></td><td>pixel surface shared by images and canvases</td></tr>
+          <tr><td><code>Mask</code>, <code>RectangleMask</code>, <code>CircleMask</code>, <code>PathMask</code></td><td>masks</td></tr>
+          <tr><td><code>RowMask</code>, <code>coverageRow</code>, <code>coverageBounds</code>, <code>luminanceCoverage</code></td><td>masks a row at a time, and where they cover</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-gfx-color">
+        <h3><code>std.gfx.color</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Color</code>, <code>parse</code></td><td>colors, CSS syntax</td></tr>
+          <tr><td><code>RGB</code>, <code>HSL</code>, <code>CMYK</code>, <code>YCbCr</code>, <code>Gray</code>, …</td><td>color models</td></tr>
+          <tr><td><code>Palette</code>, <code>BlendMode</code></td><td>palettes, blending</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-gfx-canvas">
+        <h3><code>std.gfx.canvas</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Canvas</code></td><td>CPU drawing surface, implements <code>gfx.Raster</code></td></tr>
+          <tr><td><code>Painter</code>, <code>DrawContext</code>, <code>Picture</code>, <code>record</code></td><td>drawing interface, recording, replay, picking, SVG and PDF export; <code>drawAtlas</code> for sprites, mesh warps</td></tr>
+          <tr><td><code>Paint</code>, <code>LinearGradient</code>, <code>RadialGradient</code>, <code>ConicGradient</code>, <code>Pattern</code>, <code>Noise</code>, <code>MeshGradient</code>, <code>linear</code>, <code>radial</code>, <code>noise</code></td><td>colors, gradients (OKLab, linear light, sRGB), image and picture patterns, noise, mesh gradients</td></tr>
+          <tr><td><code>ColorStop</code>, <code>Spread</code>, <code>ColorSpace</code></td><td>gradient stops, spread and interpolation space</td></tr>
+          <tr><td><code>ShaderPaint</code></td><td>paint from a <code>@fragment</code> shader, on the GPU or the CPU</td></tr>
+          <tr><td><code>DrawState</code>, <code>Composite</code>, <code>Sampling</code>, <code>ClipRegion</code></td><td>transform, clip, alpha, Porter-Duff operators, blend, sampling</td></tr>
+          <tr><td><code>Border</code>, <code>LineStyle</code></td><td>CSS borders: width, paint and style per side, rounded corners</td></tr>
+          <tr><td><code>Effect</code>, <code>DropShadow</code>, <code>InnerShadow</code>, <code>OuterGlow</code>, <code>InnerGlow</code>, <code>Blur</code>, <code>Outline</code>, <code>ColorAdjust</code>, <code>ColorMatrix</code></td><td>group effects</td></tr>
+          <tr><td><code>Layers</code>, <code>Layer</code>, <code>LayerGroup</code>, <code>LayerItem</code></td><td>layer stacks with masks, clipping layers and folders</td></tr>
+          <tr><td><code>TextStyle</code>, <code>TextAlign</code>, <code>TextBaseline</code>, <code>TextOrientation</code>, <code>TextMetrics</code>, <code>GlyphBox</code></td><td>shaped, hinted text, horizontal or vertical</td></tr>
+          <tr><td><code>Paragraph</code>, <code>TextSpan</code>, <code>TextLine</code></td><td>wrapped, aligned paragraphs of styled spans</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-gfx-render">
+        <h3><code>std.gfx.render</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>DrawCommand</code>, <code>CommandKind</code></td><td>render commands a recording keeps for GPU renderers (clears, blits, video)</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-gfx-processing">
+        <h3><code>std.gfx.processing</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Pipeline</code></td><td>chained image operations</td></tr>
+          <tr><td><code>filters</code></td><td>blur, sharpen, grayscale, contrast, …</td></tr>
+          <tr><td><code>transform</code></td><td>resize, crop, fit, seam carving</td></tr>
+          <tr><td><code>analysis</code></td><td>saliency, histogram, dominant color, perceptual hashes and similarity, local features, BlurHash</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-simd">
+        <h3><code>std.simd</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>load16</code>, <code>store16</code>, <code>add</code>, <code>mul</code>, <code>min</code>, <code>max</code>, <code>shuffle</code>, <code>blend</code>, <code>sum</code>, …</td><td>operations on <a href="docs.html#vectors">vector types</a></td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-gpu">
+        <h3><code>std.gpu</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>DeviceBuffer</code>, <code>upload</code></td><td>GPU memory kept between <a href="docs.html#functions"><code>cuda def</code></a> launches</td></tr>
+          <tr><td><code>available</code>, <code>deviceName</code></td><td>device info</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section class="docs-section" id="tooling">
+      <h2>Tooling</h2>
+      <div class="docs-sub" id="std-testing">
+        <h3><code>std.testing</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>@test</code>, <code>@benchmark</code>, <code>@fuzz</code>, <code>@skip</code>, <code>@only</code>, <code>@timeout</code>, <code>@parallel</code>, <code>@golden</code></td><td>annotations for <a href="docs.html#testing">check suites</a></td></tr>
+          <tr><td><code>beforeAll</code>, <code>beforeEach</code>, <code>afterEach</code>, <code>afterAll</code></td><td>lifecycle hooks of a suite</td></tr>
+          <tr><td><code>expect</code>, <code>expectEqual</code>, <code>expectTrue</code>, <code>expectError</code>, …</td><td>assertions</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-reflection">
+        <h3><code>std.reflection</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>attrs</code>, <code>decls</code>, <code>fields</code>, <code>methods</code>, <code>invoke</code></td><td>discovery and calls, behind <a href="docs.html#attributes">attributes</a></td></tr>
+          <tr><td><code>Field</code></td><td>one field of a value: its name, kind, type and annotations (<code>attr</code>, <code>hasAttr</code>), the doc comment of an annotated field (<code>doc</code>), typed reads and writes, and <code>set</code>, which stores a boxed value of any kind the field holds</td></tr>
+          <tr><td><code>typeName</code>, <code>kindOf</code></td><td>runtime type info</td></tr>
+          <tr><td><code>MetaContext</code>, …</td><td>meta contexts</td></tr>
+          <tr><td><code>instantiate</code>, <code>field</code>, <code>elements</code>, <code>arrayOf</code>, <code>mapOf</code>, <code>defaultOf</code></td><td><code>defaultOf</code> computes the default a parameter of an annotated function is declared with; building and reading values by descriptor; <code>arrayOf</code> makes an array of a described element type from boxed values, <code>mapOf</code> a <code>map&lt;string, V&gt;</code> of a described value type</td></tr>
+          <tr><td><code>TypeDescriptor</code>, <code>TypeKind</code></td><td>a type as spelled in a signature or field: <code>kind</code>, <code>typeName</code>, the <code>optional</code>/<code>errorable</code>/<code>future</code> flags, an array's or map's <code>element</code> and <code>key</code>, a tuple's <code>elements</code></td></tr>
+          <tr><td><code>EmbeddedFile</code></td><td>a file an annotation builds into the program</td></tr>
+          <tr><td><code>BuildMetaContext&lt;T&gt;</code></td><td>context of an <a href="annotations.html#writing">annotation that runs during the build</a></td></tr>
+          <tr><td><code>SourceEditor</code>, <code>SourceField</code>, <code>SourceAnnotation</code></td><td>the fields a build-time annotation of a type reads, and the members and declarations it adds</td></tr>
+        </table>
+        <p><code>std.reflection.buildhost</code> (<code>run</code>, <code>runType</code>) is the build machine's side of those annotations; the compiler's helper programs call it.</p>
+      </div>
+      <div class="docs-sub" id="std-ide">
+        <h3><code>std.ide</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>@ide</code>, <code>IDE</code></td><td>service panels for a connected IDE</td></tr>
+          <tr><td><code>IdeTable</code>, <code>IdeKind</code></td><td>panel kinds</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-cli">
+        <h3><code>std.cli</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>parseArgs</code>, <code>Args</code></td><td>the command line, read by asking: <code>has</code>, <code>flag</code>, <code>count</code>, <code>value</code> (string, int, float, duration, an enum member), <code>values</code>, then <code>unknown</code> and <code>rest</code>, or <code>end</code>, which gives the positionals and refuses a name nobody asked for with a "did you mean" (<code>hide</code> keeps a name out of those)</td></tr>
+          <tr><td><code>@flag</code></td><td>annotation: fills a module variable or constant from the command line; on a field or a parameter, a flag of a command (<a href="annotations.html">annotations</a>)</td></tr>
+          <tr><td><code>@command</code>, <code>@arg</code></td><td>annotations: a function, method or type as a command or a group of commands; a field or parameter as a positional argument</td></tr>
+          <tr><td><code>run</code></td><td>runs the command the command line names and returns the exit status; <code>--help</code> and <code>help</code> at every level; <code>completion bash|zsh|fish|powershell</code> writes the shell's completion script (<code>eval "$(tool completion bash)"</code>), which completes commands, flags and enum values; a program with <code>@flag</code> variables and no commands writes it for <code>--completion &lt;shell&gt;</code></td></tr>
+          <tr><td><code>complete</code></td><td>gives completion the candidates for a value only the program knows: a flag or argument by name (<code>"profile"</code>, <code>"remote add name"</code>), or the words of a command added by a call</td></tr>
+          <tr><td><code>addCommand</code></td><td>adds a command by a call: a path (<code>"cache clear"</code>), a description and a function that reads the <code>Args</code> left for it</td></tr>
+          <tr><td><code>help</code>, <code>helpTemplate</code>, <code>helpMarkdown</code></td><td>the help screen <code>--help</code> prints for the <code>@flag</code> variables; a Jinja template that draws it instead of the built-in layout; descriptions read as Markdown</td></tr>
+          <tr><td><code>UsageError</code>, <code>UsageKind</code></td><td>what is wrong with a command line</td></tr>
+        </table>
+
+      </div>
+      <div class="docs-sub" id="std-cli-terminal">
+        <h3><code>std.cli.terminal</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>isTTY</code>, <code>size</code>, <code>colors</code></td><td>whether a standard stream is a terminal, its <code>Size</code> in cells, how many colors it shows (<code>ColorDepth</code>)</td></tr>
+          <tr><td><code>failure</code>, <code>warning</code>, <code>success</code>, <code>info</code>, <code>heading</code>, <code>emphasis</code>, <code>dim</code>, <code>link</code>, <code>code</code>, <code>prompt</code></td><td>style text for a theme role; plain text when the stream shows no colors</td></tr>
+          <tr><td><code>role</code>, <code>color</code></td><td>the style function of an application's own role; one-off color and attributes</td></tr>
+          <tr><td><code>Color</code>, <code>Ansi</code>, <code>parseColor</code>, <code>TextStyle</code></td><td>palette, indexed and RGB colors, degraded to what the terminal shows; colors and attributes of a role</td></tr>
+          <tr><td><code>Theme</code>, <code>theme</code>, <code>defaultTheme</code>, <code>darkTheme</code>, <code>lightTheme</code>, <code>autoTheme</code>, <code>parseTheme</code>, <code>loadTheme</code></td><td>role styles, the current theme, shipped themes, themes from TOML</td></tr>
+          <tr><td><code>input</code>, <code>password</code></td><td>read a line; read a line from the terminal without echo, as a <code>Secret&lt;string&gt;</code></td></tr>
+          <tr><td><code>readKey</code>, <code>Key</code>, <code>KeyCode</code></td><td>one key press, with an optional wait</td></tr>
+          <tr><td><code>keyReleases</code>, <code>KeyAction</code></td><td>keys reported as they go down, repeat and come up (<code>Key.action</code>), on terminals with the kitty keyboard protocol</td></tr>
+          <tr><td><code>drawImage</code>, <code>imageProtocol</code>, <code>ImageProtocol</code></td><td>a <code>std.formats.image</code> <code>Image</code> drawn at the cursor, fitted into a number of cells, on terminals with the kitty graphics protocol or iTerm2 inline images; false on the others</td></tr>
+          <tr><td><code>supports</code>, <code>Feature</code></td><td>asks the terminal whether it knows a protocol: extended keys, synchronized output, bracketed paste, the mouse, mouse moves</td></tr>
+          <tr><td><code>readEvent</code>, <code>Event</code>, <code>EventKind</code></td><td>a key press, a resize of the terminal window, pasted text or a mouse report</td></tr>
+          <tr><td><code>bracketedPaste</code>, <code>mouse</code>, <code>Mouse</code>, <code>MouseButton</code>, <code>MouseAction</code></td><td>pastes as one event; mouse presses, releases, drags and the wheel</td></tr>
+          <tr><td><code>extendedKeys</code>, <code>synchronizedOutput</code>, <code>mouseMoves</code></td><td>unambiguous keys (kitty keyboard protocol), a redraw shown at once, pointer moves with no button held</td></tr>
+          <tr><td><code>copy</code>, <code>clipboard</code></td><td>text to and from the system clipboard through the terminal (OSC 52)</td></tr>
+          <tr><td><code>render</code></td><td>a <code>std.formats.docs</code> <code>Document</code> (Markdown, HTML, …) laid out for the terminal: wrapped text, lists, boxed tables, with the theme's styles and clickable links</td></tr>
+          <tr><td><code>raw</code>, <code>alternateScreen</code>, <code>showCursor</code></td><td>terminal modes, switched on and off; put back however the program ends</td></tr>
+          <tr><td><code>moveTo</code>, <code>clear</code>, <code>clearLine</code></td><td>cursor and screen control</td></tr>
+        </table>
+        <p class="exports-note">Colors follow <code>NO_COLOR</code>, <code>FORCE_COLOR</code>, <code>CLICOLOR_FORCE</code>, <code>TERM</code> and <code>COLORTERM</code>.</p>
+      </div>
+      <div class="docs-sub" id="std-cli-prompts">
+        <h3><code>std.cli.prompts</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>ask</code></td><td>a line of text, with a fallback and a validation that keeps the question open</td></tr>
+          <tr><td><code>text</code></td><td>text of several lines: Enter starts a line, Ctrl+D ends the text</td></tr>
+          <tr><td><code>secret</code>, <code>date</code>, <code>file</code></td><td>a line shown as dots; a date; a file picked by walking folders, optionally only files of given extensions, dot files on request</td></tr>
+          <tr><td><code>confirm</code></td><td>a yes-or-no question</td></tr>
+          <tr><td><code>choose</code>, <code>chooseMany</code></td><td>one or several choices from a list the arrow keys move in and typing narrows</td></tr>
+          <tr><td><code>spinner</code>, <code>Spinner</code></td><td>a turning mark beside a label while work runs: <code>label</code>, <code>log</code> (a line written above it), <code>done</code>, <code>failed</code></td></tr>
+          <tr><td><code>progress</code>, <code>Progress</code></td><td>a bar that fills as steps are reported: <code>advance</code>, <code>update</code>, <code>log</code>, <code>done</code>, <code>failed</code></td></tr>
+          <tr><td><code>Cancelled</code></td><td>the error a question fails with on Escape or Ctrl+C</td></tr>
+        </table>
+        <p>Questions are asked key by key on a terminal; with input or output redirected each answer is read as a line.</p>
+      </div>
+      <div class="docs-sub" id="std-metrics">
+        <h3><code>std.metrics</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Counter</code>, <code>Gauge</code>, <code>Histogram</code>, <code>Toggle</code></td><td>metrics (<code>Metric</code>)</td></tr>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>adm programming language</span>
+    <span class="footer-muted">Statically typed &middot; multi-paradigm</span>
+  </div>
+</footer>
+
+<script src="docs.js"></script>
+<script src="highlight.js"></script>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "f0b264e327ed4ca4b04c4182c930c88c"}'></script><!-- End Cloudflare Web Analytics -->
+</body>
+</html>

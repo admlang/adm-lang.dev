@@ -142,6 +142,7 @@
   <tr><td><code>adm.notifications.show</code></td><td>Show desktop notifications</td><td>none: ruled on as a whole</td></tr>
   <tr><td><code>adm.clipboard.read</code>, <code>adm.clipboard.write</code></td><td>Read the text on the clipboard; put text on it or empty it</td><td>none</td></tr>
   <tr><td><code>adm.runtime.spawn</code></td><td>Run other programs; granting it means trusting the package completely</td><td>none</td></tr>
+  <tr><td><code>adm.runtime.plugins</code></td><td>Load plugins: code of other publishers that runs inside this program</td><td>none</td></tr>
   <tr><td><code>adm.devices.list</code></td><td>See which devices are connected</td><td>none</td></tr>
   <tr><td><code>adm.devices.camera</code>, <code>adm.devices.microphone</code></td><td>Capture video from a camera; record sound from a microphone</td><td>none</td></tr>
 </table>
@@ -169,11 +170,12 @@ module acme.imaging {
 
 <h3 id="chains">The whole call chain</h3>
 <p>The subject of every decision is a <em>package</em>: the application, or one installed library or plugin. Every package on the call stack must hold the permission, not only the one that made the gated call.</p>
+<p>A plugin loaded at run time is such a package, named after the plugin. What it holds is not in <code>adm.lock</code>, since the build never saw it: it is what its package records, cut to <code>[plugins] permissions</code> of the host's <code>adm.toml</code> and agreed by the user once, kept in <code>policy.toml</code> under the plugin's name (<a href="plugins.html#permissions">Plugins</a>).</p>
 <p>The reason is the confused deputy. Your application uses library B, which connects to the network; both are granted. Library C, which was never granted network access, calls B's function that connects. With only the direct caller checked, B would connect on C's behalf. With the whole chain checked, C is on the stack and the call is refused. The runtime keeps a per-task stack of packages; a push and a pop at each package boundary, nothing per ordinary call.</p>
 <p>The standard library is never a subject of its own: a chain that passes through <code>std.os.open</code> is attributed to the package that called it. Observers are gated with the commit they watch: <code>@on(Storage.open)</code> in a package without <code>adm.storage.read</code> is refused at build, because the event would otherwise hand that package every call's arguments.</p>
 
 <h3 id="audit">The audit</h3>
-<p>Nobody writes the permission list by hand, and a hand-written list would be wrong. <code>adm audit</code> walks the code a package can reach, lists every gated function it can call with the chain that gets there, and then names the files that bind C. Calls through interfaces and function values count every implementation they could reach.</p>
+<p>Nobody writes the permission list by hand, and a hand-written list would be wrong. <code>adm audit</code> walks the code a package can reach, lists every gated function it can call with the chain that gets there, and then names the files that bind C. Calls through interfaces and function values count every implementation they could reach, and a component placed in a view counts for everything it runs: its controller's methods, its view and its style, so a program with a <code>TextField</code> holds the clipboard permissions its Control+C and Control+V need.</p>
 <div class="code-window">
   <div class="code-titlebar">
     <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -400,6 +402,7 @@ sandbox = true</code></pre>
   <tr><th>Files</th><th></th></tr>
   <tr><td><code>adm.toml [requires] permissions</code></td><td>A package narrowing what it wants to be granted</td></tr>
   <tr><td><code>adm.toml [policy] sandbox</code></td><td>Compile the sandbox in</td></tr>
+  <tr><td><code>adm.toml [plugins] permissions</code></td><td>The most a plugin loaded at run time may be given; <code>allow_unsigned</code> and <code>trusted</code> beside it say whose plugins load (<a href="plugins.html#trust">Plugins</a>)</td></tr>
   <tr><td><code>adm.toml [policy] build_read</code></td><td>Paths outside the project that an annotation running during the build may read (it reads the project's own files without asking); relative to <code>adm.toml</code>, <code>**</code> globs</td></tr>
   <tr><td><code>adm.lock</code></td><td>The grants accepted per installed package (<code>permissions=</code>) and whether its C bindings were accepted (<code>foreign=yes</code>)</td></tr>
   <tr><td><code>&lt;app home&gt;/policy.toml</code></td><td>The user's rules, read at startup</td></tr>

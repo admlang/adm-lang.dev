@@ -675,6 +675,7 @@ def onRated(evt ComponentEvent&lt;int&gt;) {
             <tr><td><code>parent()</code>, <code>children</code>, <code>next()</code>, <code>prev()</code></td><td>The tree around it.</td></tr>
             <tr><td><code>closest&lt;C&gt;()</code>, <code>find&lt;C&gt;(ref = "")</code></td><td>The nearest ancestor, or a descendant, of a component type.</td></tr>
             <tr><td><code>redraw()</code>, <code>rerun()</code>, <code>focus()</code>, <code>reveal()</code></td><td>Asks for a frame, runs the view again, takes the keyboard focus, scrolls itself into sight.</td></tr>
+            <tr><td><code>setChildren(given)</code></td><td>Makes the components of <code>given</code> what its view places with <code>children()</code>: for a component made in code that is to hold others, as a window's chrome holds the window's root.</td></tr>
             <tr><td><code>enabled</code>, <code>disabled</code></td><td><code>enabled</code> is an input; <code>disabled</code> also holds under a disabled ancestor.</td></tr>
           </tbody>
         </table>
@@ -1059,7 +1060,10 @@ view {
           A style body may assign <code>on</code>: the looks of the component's states. Each entry lists
           the properties that differ while the state holds. The entries that hold are applied, in the
           order written, to a copy of the style the component is drawn with; the component's own style
-          is not written into.
+          is not written into. Reading <code>style.opacity</code> in the component (in <code>render</code>,
+          a handler or the view) gives the value of that copy while a state holds, so what a
+          <code>render</code> draws with <code>style.foreground</code> follows the states; an assignment
+          to <code>style.opacity</code> sets the component's own style.
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -1486,6 +1490,8 @@ Row(gap = 8(px)) {
             <tr><td><code>state</code></td><td><code>WindowState.Normal</code></td><td>How it opens: <code>Normal</code>, <code>Minimized</code>, <code>Maximized</code>, <code>Fullscreen</code>.</td></tr>
             <tr><td><code>resizable</code></td><td><code>true</code></td><td>Whether the user can resize it.</td></tr>
             <tr><td><code>decorated</code></td><td><code>true</code></td><td>False: no title bar and no frame. The root component draws its own and marks what drags the window with <code>WindowDrag</code>.</td></tr>
+            <tr><td><code>chrome</code></td><td>none</td><td>The component that draws the window's frame: <code>config.chrome = WindowChrome(title = "Notes")</code>. With one the window opens without the desktop's frame and the component holds the window's root as its children; any component whose view calls <code>children()</code> will do, in any shape.</td></tr>
+            <tr><td><code>name</code></td><td><code>""</code></td><td>A name of your own to find the window by: <code>UI.window(name = "main")</code>. Not the title, which the user sees.</td></tr>
             <tr><td><code>icon</code></td><td>none</td><td>The window's icon, an <code>image.Image</code>.</td></tr>
             <tr><td><code>transparent</code></td><td><code>false</code></td><td>No background of its own: where its components draw nothing, what is behind the window shows.</td></tr>
             <tr><td><code>clickThrough</code></td><td><code>ClickThrough.None</code></td><td>Where a press goes to what is behind the window: <code>None</code>, <code>Empty</code> (where it shows nothing; needs <code>transparent</code>), <code>All</code> (an overlay, a notice).</td></tr>
@@ -1532,6 +1538,7 @@ def keep(evt Event&lt;CloseRequest&gt;) {
 }</code></pre>
         </div>
         <p>
+          A component finds the window it is in with <code>context&lt;Window&gt;()</code>; <code>window.state</code> and <code>window.visible</code> are assigned to minimize, maximize or hide it, and <code>window.close()</code> asks to close it as the user does (a <code>UI.closeRequested</code> handler may cancel). <code>UI.window(title = "Notes")</code> or <code>UI.window(name = "main")</code> finds an open window.
           Also on the service: <code>closeWindow</code>, <code>raiseWindow</code>, <code>setWindowTitle</code>,
           <code>setWindowIcon</code>, <code>showTray(icon, tooltip, menu)</code> and <code>hideTray()</code>,
           <code>displays()</code>, <code>appearance()</code> and <code>theme()</code>,
@@ -1896,12 +1903,26 @@ def keep(evt Event&lt;CloseRequest&gt;) {
               <pre><code>Dialog(open = asking, title = "Rename") { ... }</code></pre>
             </div>
           </div>
+          <div class="component-card" id="c-drawer">
+            <div class="component-shot"><img src="assets/components/drawer.png" width="440" height="200" alt="Drawer" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Drawer</code></h4>
+              <p>A panel along an edge of the window, over the page, which is dimmed while it shows; Escape or a press beside it closes it. From the bottom it is a sheet.</p>
+              <pre><code>Drawer(open = navigating, title = "Places") { ... }
+Drawer(open = sharing, side = Side.Below) { ... }</code></pre>
+            </div>
+          </div>
           <div class="component-card" id="c-toast">
             <div class="component-shot"><img src="assets/components/toast.png" width="360" height="120" alt="Toast" loading="lazy"></div>
             <div class="component-text">
               <h4><code>Toast</code></h4>
-              <p>A notice in the window's corner that goes by itself, or when pressed.</p>
-              <pre><code>Toast(text = "Saved.", open = saved)</code></pre>
+              <p>A notice in the window's corner that goes by itself, or when pressed; <code>kind</code> gives it a light shade of the theme's colour for it, <code>action</code> a button. A <code>ToastHost</code> around the page gives everything under it a <code>Toasts</code>: <code>context&lt;Toasts&gt;()</code> finds it, <code>show</code> adds a notice, and several stand one above another; those past the host's <code>limit</code> are counted above the stack, and a press on the count shows them. No window hosts one by itself, and an application may provide its own <code>Toasts</code>.</p>
+              <pre><code>Toast(text = "Saved.", open = saved)
+
+ToastHost() { Workbench() }
+// in a component under it
+let toasts = context&lt;Toasts&gt;()
+toasts.show("Deleted", action = "Undo", onAction = restore) unless toasts is none</code></pre>
             </div>
           </div>
           <div class="component-card" id="c-progressbar">
@@ -1935,10 +1956,14 @@ def keep(evt Event&lt;CloseRequest&gt;) {
             <tr><td><code>ContextMenu</code>, <code>SubMenu</code>, <code>MenuItem</code>, <code>MenuSeparator</code></td><td>The parts of menus.</td></tr>
             <tr><td><code>Draggable</code>, <code>DropTarget</code></td><td>Drag and drop between components of a window.</td></tr>
             <tr><td><code>FocusScope</code></td><td>Remembers the focus of a part of a window; <code>trap = true</code> keeps Tab inside.</td></tr>
+            <tr><td><code>List</code></td><td>Many items one under another, mounting only the rows that show: <code>List(files, id = (f File) =&gt; f.path, selected = picked) { rowRenderer = (it RowItem&lt;File&gt;) =&gt; FileRow(it.content) }</code>. An item is its own identity, as a map key is (<code>selected</code> then holds items); <code>id</code> gives another, such as one field. Items are an array or a <code>Source</code> (<code>List(source = files)</code>); rows have one height (<code>rowHeight</code>) or are measured; a click, Shift, the command key and the arrow keys select, Enter or a double click opens.</td></tr>
+            <tr><td><code>Tree</code></td><td>Nodes that hold other nodes, one row each, on a <code>List</code>: <code>Tree(roots, expand = (n Folder) =&gt; n.children, expanded = open) { rowRenderer = (it RowItem&lt;Folder&gt;) =&gt; FolderRow(it.content) }</code>. A node's children are asked for with <code>expand</code> when it first opens; a node shows an arrow when it has children; <code>leaf</code> says so without reading them, for a tree that is costly to read. Nodes are told apart as a list's items are (the node itself, or what <code>id</code> returns); <code>expanded</code> and <code>selected</code> hold those identities. A press on the arrow opens or closes a node; Right opens it or goes to its first child, Left closes it or goes to its parent; <code>it.depth</code> and <code>it.expanded</code> tell the row where it is.</td></tr>
+            <tr><td><code>DataGrid</code></td><td>Rows in columns under a line of headers, on a <code>List</code>: <code>DataGrid(files, columns = [new GridColumn&lt;File&gt;("Name", cell = (it RowItem&lt;File&gt;) =&gt; Text(it.content.name), order = byName), new GridColumn&lt;File&gt;("Size", width = 80(px))])</code>. A cell is what its column's <code>cell</code> draws, or the row as text. A press on the header of a column with an <code>order</code> sorts by it, a second the other way round, a third as given (<code>sortBy</code>, <code>descending</code>, <code>onSort</code>); over a <code>Source</code> the grid only tells <code>onSort</code>. The end of a header is dragged for another width, or double-clicked to fit what the column holds; widths are kept between runs under <code>persist</code>. A text too long for its column ends in an ellipsis. Rows are selected and opened as a list's.</td></tr>
             <tr><td><code>Form</code>, <code>Field</code></td><td>A form that runs <code>onSubmit</code> only while no field has an error: <code>Form(onSubmit = save) { Field("Email", error = emailError()) { TextField(email) } }</code>.</td></tr>
             <tr><td><code>Themed</code></td><td>Gives what it holds a theme of its own: <code>Themed(theme = dark) { ... }</code>.</td></tr>
             <tr><td><code>Provide</code></td><td>Gives what it holds a value they find with <code>context&lt;V&gt;()</code>: <code>Provide(document) { ... }</code>.</td></tr>
             <tr><td><code>WindowDrag</code></td><td>The part of a window without a title bar that drags the window.</td></tr>
+            <tr><td><code>WindowChrome</code></td><td>The frame of a window drawn by the application: a border, a header with a title that moves the window, and buttons that minimize, maximize or restore, and close it: <code>config.chrome = WindowChrome(title = "Notes")</code>. <code>minimize</code>, <code>maximize</code> and <code>close</code> say which buttons it has; <code>header</code> is a slot between the title and the buttons.</td></tr>
             <tr><td><code>Spacer</code></td><td>Empty room that takes what is left over in a row or a column.</td></tr>
           </tbody>
         </table>

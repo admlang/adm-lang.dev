@@ -1384,6 +1384,14 @@ Network.lab.conditions.unreachable = "*"         // offline</code></pre>
 
           </li>
           <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def loadPlugin(path string) ?Plugin</code></div>
+            <p class="api-doc">Reads the metadata of the plugin package at the path: its name, version, publisher and what it publishes. No code of the plugin is loaded or run. A package whose signature or checksums do not verify is returned without exports, and every call on it fails with the reason. Returns none when the path is not a readable plugin package. See <a href="plugins.html#loading">Plugins</a>.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def loadPlugins(folder string) Plugin[]</code></div>
+            <p class="api-doc">Reads the metadata of every plugin package (<code>*.admplugin</code>) in the folder, in file name order, loading no code. A file that is not a readable package is left out; a folder that cannot be listed gives an empty list.</p>
+          </li>
+          <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def run(command string, input string = "") !ProcessResult</code></div>
             <p class="api-doc">Runs a command through the system shell with <code>input</code> as its standard input and returns what it printed and its exit code (128 + signal when killed, 127 when the shell could not start it). Needs <code>adm.runtime.spawn</code>. <code>std.os.run</code> and <code>std.os.output</code> wrap it.</p>
             <p class="api-doc">Fails when the policy denies it or the process could not be started, which the OS sandbox causes; a command that exited with an error is reported through the code.</p>
@@ -1724,6 +1732,10 @@ Storage.lab.conditions.corruptReads = 0.01</code></pre>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def closeWindow(win r.Window) !none</code></div>
             <p class="api-doc">Closes the window.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def window(title string = &quot;&quot;, name string = &quot;&quot;) ?r.Window</code></div>
+            <p class="api-doc">The open window with that title, or that was opened with that `WindowConfig.name`; with both, the one that has both. The first opened when several fit; none when none does.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def raiseWindow(win r.Window) !none</code></div>

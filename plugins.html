@@ -79,6 +79,18 @@
       <div class="docs-nav-group">
         <a class="docs-nav-top" href="#loading">Loading</a>
       </div>
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#trust">Trust</a>
+      </div>
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#permissions">Permissions</a>
+      </div>
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#types">Types that cross</a>
+      </div>
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#registering">Plugins that register</a>
+      </div>
 
     </nav>
   </aside>
@@ -108,13 +120,17 @@ plugin ImageTools {
 	export (
 		acme.imaging.filters              // every non-internal symbol of the module
 		acme.imaging::(Image, decode)     // a subset
+		ImageTools::(about)               // a function of the plugin block
 	)
+
+	def about() string { ... }
 
 	def new() !none { ... }              // optional lifecycle
 	def dispose() { ... }
 }</code></pre>
       </div>
-      <p>The compiler checks the list: every module named is one the plugin uses, every symbol exists and is not <code>internal</code>, and the signatures of exported symbols only mention types that are exported too, so a host never sees a type it cannot name. <code>@manifest(version = ...)</code> sets the plugin's version; without it the version is <code>0.1</code>. Exported modules must sit under the plugin's own name prefix, the same ownership rule libraries follow; see <a href="libraries.html#what-ships">Libraries → What ships</a>.</p>
+      <p>The compiler checks the list: every module named is one the plugin uses, every symbol exists and is not <code>internal</code>, and the signatures of exported symbols only mention types that are exported too, so a host never sees a type it cannot name. <code>@manifest(version = ...)</code> sets the plugin's version; without it the version is <code>0.1</code>.</p>
+      <p>A plugin's module names stay inside it. What it publishes is one flat set of names (<code>Image</code>, <code>about</code>, <code>blur</code>, <code>decode</code>), so the same name exported from two modules is a compile error. A function declared in the plugin block is exported only when the list names it, with the plugin's own name as the selector. A plugin exports no service: naming one is an error, and a whole-module export leaves the module's services out.</p>
     </section>
 
     <section class="docs-section" id="building">
@@ -127,7 +143,11 @@ plugin ImageTools {
         </div>
         <pre><code>manifest.json                  name, version, exports, entry symbol,
                                compiler and runtime it was built with
-meta/exports.json              every exported symbol: kind, signature, doc
+meta/checksums.json            the SHA-256 of every other part
+meta/signed.json               signed packages: the exact bytes the publisher signed
+meta/exports.json              every published name: kind, canonical signature,
+                               a type's fields and methods, doc
+meta/layouts.json              how each type a host can meet is laid out
 linux-amd64/libImageTools.so   the native object, uncompressed, mappable
 linux-arm64/libImageTools.so   one directory per platform requested
 files/...                      what the [package] files rules of adm.toml select
@@ -138,7 +158,7 @@ files/...                      what the [package] files rules of adm.toml select
 
     <section class="docs-section" id="inspecting">
       <h2>Inspecting a package</h2>
-      <p><code>adm doc --plugin ImageTools.admplugin</code> prints the manifest and the export index without loading any code: the modules, the symbols with their signatures and doc comments, the platforms inside, and the compiler and runtime versions it was built against. Tooling reads the same entries, so what the IDE shows for a plugin is exactly what it exports.</p>
+      <p><code>adm doc --plugin ImageTools.admplugin</code> prints the manifest and the export index without loading any code: the published names with their signatures and doc comments, the fields and methods of each exported type, the platforms inside, the permissions its code reaches, and the compiler and runtime versions it was built against. Tooling reads the same entries, so what the IDE shows for a plugin is exactly what it exports. A signature is written in one canonical spelling, without parameter names or defaults (<code>def(byte[]) !Image</code>): a std type keeps its module (<code>std.io.Writer</code>), every other type is its bare name. A generic function or type is not published: it has no code until something instantiates it, and naming one in an <code>export</code> selector is a compile error.</p>
     </section>
 
     <section class="docs-section" id="runtime">
@@ -149,7 +169,63 @@ files/...                      what the [package] files rules of adm.toml select
 
     <section class="docs-section" id="loading">
       <h2>Loading</h2>
-      <p>The host side is the part still being built: a <code>std.plugins</code> module that opens a package, checks its runtime version and type layouts against the host, loads the platform's object and hands back the exported symbols, plus the plugin's <code>new(host)</code> receiving the host services. Until it lands, packages can be built, inspected and shipped, and a host written against the exported API can be linked to a plugin's object directly.</p>
+      <p>A host reads plugin packages through the <code>Runtime</code> service and asks one for a value of an interface it declares itself. Host and plugin share no library: the published names and canonical signatures above are what the two sides are matched by.</p>
+<pre><code>interface Effect {
+	def process(samples float[], rate int)
+}
+
+for let (_, found) in Runtime.loadPlugins("./plugins") {
+	effects.push(try found.create&lt;Effect&gt;()) when found.creates&lt;Effect&gt;()
+}</code></pre>
+      <p><code>Runtime.loadPlugins(folder)</code> reads every <code>.admplugin</code> of a folder and <code>Runtime.loadPlugin(path)</code> one file; both read the metadata only. The <code>Plugin</code> they return holds the name, version, publisher, export list and the permissions the plugin's code reaches (recorded in the package at build), and four calls: <code>creates&lt;T&gt;()</code> answers from the metadata whether the plugin provides <code>T</code>; <code>create&lt;T&gt;()</code> returns a new object of the first exported type that has every method of <code>T</code>, or one object whose methods are the plugin's exported functions; <code>createAll&lt;T&gt;()</code> returns one per match; <code>init()</code> loads the code and runs the plugin's <code>new()</code> without creating anything. The plugin is loaded on first use, once, and stays for the life of the program.</p>
+      <p>A program that loads plugins is built with <code>adm build --runtime shared</code>, and a plugin must be built with the same adm as its host; both are checked when the plugin is loaded, and the error says which. On Linux the plugin's code is loaded straight from the package, without writing a file. Services are shared: a plugin that calls <code>Storage</code> or <code>Network</code> reaches the host's instance, and a service only the plugin has is started when the plugin is loaded. When a plugin's <code>new()</code> fails, the host's error carries its message.</p>
+    </section>
+
+    <section class="docs-section" id="trust">
+      <h2>Trust</h2>
+      <p>Nothing of a package is used before it verifies. A package built with a publisher key is signed: the publisher's signature covers its name, version, exports, permissions and the checksum of every part, and a host checks it, then each part against its checksum before using it, the code last. On Linux the code that runs is the bytes that were checked, loaded from memory. A package that fails is still listed, with its name, and every call on it fails with the reason.</p>
+      <p>Which plugins a program loads is its own decision, written in its <code>adm.toml</code>:</p>
+<pre><code data-hl="off" class="nohighlight">[plugins]
+allow_unsigned = true                # default false: an unsigned package does not load
+trusted = ["self", "admpub_..."]     # default: any publisher whose signature verifies
+permissions = ["adm.storage.read"]   # the most any plugin may be given</code></pre>
+      <p><code>self</code> is the application's own publisher, for a product that loads only its own plugins. <code>Plugin.signed</code> says the signature verified and <code>Plugin.publisher</code> who signed.</p>
+    </section>
+
+    <section class="docs-section" id="permissions">
+      <h2>Permissions</h2>
+      <p>To the <a href="policy.html">policy</a> a plugin is a package of its own, named after the plugin: whatever its code does, called through an export, through an interface or through a registry, needs the plugin to hold the permission. <code>Plugin.permissions</code> lists what its code reaches before anything is loaded. When it is loaded, each of those permissions that the host's <code>[plugins] permissions</code> list covers is put to the user once (through the program's resolver, else a desktop notification); an <em>Always</em> answer is kept in <code>policy.toml</code> under the plugin's name, for the publisher that signed it. A permission outside the list is refused without a question: the plugin still loads, and its calls under it fail with <code>PolicyDenied</code>.</p>
+      <p>The list is the host's own choice and not a part of what the host's code uses: a host that never touches the clipboard may let its plugins use it. A program needs the permission <code>adm.runtime.plugins</code> to load a plugin at all; an application holds it by calling <code>create</code> or <code>init</code>, a library is granted it at install.</p>
+    </section>
+
+    <section class="docs-section" id="types">
+      <h2>Types that cross</h2>
+      <p>A signature names a type that is not the standard library's by its bare name, so a host's <code>Image</code> and a plugin's <code>Image</code> match by name. They are one type only when they are laid out alike: the package records the layout of every type a host can meet (<code>struct{width int; height int}</code>, an interface's methods in order), the host compares it with its own, and a plugin whose type differs is refused with both layouts in the error. Standard library types are the same on both sides, since both are built with one adm.</p>
+      <p>A struct is a shape too. <code>found.create&lt;PluginDetails&gt;()</code> returns a copy of a value the plugin exports whose type has the fields of the host's struct, in the same order; the names of the two types need not match:</p>
+<pre><code>// in the plugin
+struct Details {
+	title string
+	level int
+}
+
+let details = Details{title: "Echo", level: 3}
+
+// in the host
+struct PluginDetails {
+	title string
+	level int
+}
+
+let about = try found.create&lt;PluginDetails&gt;()</code></pre>
+    </section>
+
+    <section class="docs-section" id="registering">
+      <h2>Plugins that register</h2>
+      <p>A plugin that adds a codec or a database driver exports nothing a host asks for: its annotated types (a playlist format's <code>@codec("LST")</code>, a database driver's <code>@driver("mydb")</code>) join the program's when the host calls <code>init()</code>, and the standard library's registries find them on their next use, as <code>reflection.attrs</code> does. A registered codec runs as the plugin, with the plugin's permissions.</p>
+<pre><code>for let (_, found) in Runtime.loadPlugins("./formats") {
+	try found.init()
+}
+let entries = try playlist.load("songs.lst")   // read by the plugin's codec</code></pre>
     </section>
   </main>
 

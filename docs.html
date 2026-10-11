@@ -518,6 +518,7 @@ application MainApp {
           Every value the manifest can set has a matching compiler constant: <code>__app_name__</code>,
           <code>__app_id__</code>, <code>__app_version__</code>, <code>__publisher_id__</code>,
           <code>__publisher_pubkey__</code>,
+          <code>__plugin_policy__</code> (the <code>[plugins]</code> table: whose plugins load and what they may be given),
           plus the three update fields above. There's also an <code>__build_id__</code> constant that's
           always set and changes on every build - don't use it as a stable identity.
         </p>
@@ -3608,7 +3609,7 @@ Card(title = "Profile") {
         <p>
           Every component has the members of the prelude's <code>Component&lt;T&gt;</code>: inputs such as
           <code>enabled</code>, the tree (<code>childNodes</code>, <code>parent()</code>) and the lifecycle
-          (<code>attached()</code>, <code>detached()</code>, <code>render(ctx)</code>, <code>rerun()</code> which runs its view again, <code>unmount()</code> which lets go of the children its view placed once it has left the tree). A controller method
+          (<code>attached()</code>, <code>detached()</code>, <code>render(ctx)</code>, <code>rerun()</code> which runs its view again, <code>unmount()</code> which lets go of the children its view placed once it has left the tree, <code>setChildren(given)</code> which makes the components of <code>given</code> what the view places with <code>children()</code>, for a component made in code that holds others). A controller method
           with the same name and parameters replaces one of them for that component. A value typed
           <code>component</code> holds any component, and a call such as <code>c.render(ctx)</code> runs the
           method of the component it holds. <code>c is Scroller</code> tests whether that component's
@@ -3689,7 +3690,10 @@ def hide(c component) {
             <code>@state</code> bool field of the component, or a case of one of its <code>@state</code> enum fields;
             a list of states and an <code>on</code> inside an entry hold when all of them do. Entries that hold are
             applied in the order written to a copy of the style the component is drawn with; a name that is no
-            state of the component is an error. Embedding a style does not bring its <code>on</code>.
+            state of the component is an error. A component's <code>style</code> is its resolved style: a property
+            read through it (<code>style.opacity</code>, <code>$ref.opacity</code>) comes from that copy while a state
+            holds, and an assignment is to the style itself. A style that embeds styles with an <code>on</code> has
+            their entries, applied before its own.
             A style embedded twice, or reached through two styles that both embed it, is one copy of its properties;
             two different declarations of one property name are an error.</li>
           <li>A child a view no longer places, whose style has an <code>exit</code>, leaves

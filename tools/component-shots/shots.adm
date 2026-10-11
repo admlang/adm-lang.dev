@@ -520,6 +520,92 @@ module shots {
 		style Frame
 	}
 
+	// A node of the tree's picture: a place and the places in it.
+	type Place {
+		name   string  = ""
+		inside Place[] = []
+
+		def new(name string, inside Place[] = []) {
+			self.name = name
+			self.inside = inside
+		}
+	}
+
+	let places = [
+		new Place("Europe", [new Place("France", [new Place("Paris"), new Place("Lyon")]), new Place("Norway")]),
+		new Place("Asia", [new Place("Japan")]),
+		new Place("Antarctica"),
+	]
+
+	def placeName(place Place) string {
+		return place.name
+	}
+
+	def placesIn(place Place) Place[] {
+		return place.inside
+	}
+
+	// A row of the grid's picture.
+	type City {
+		name    string = ""
+		country string = ""
+		people  int    = 0
+
+		def new(name string, country string, people int) {
+			self.name = name
+			self.country = country
+			self.people = people
+		}
+	}
+
+	let cities = [
+		new City("Paris", "France", 2100000), new City("Oslo", "Norway", 710000),
+		new City("Tokyo", "Japan", 14000000), new City("Santiago de Compostela", "Spain", 98000),
+	]
+
+	def cityName(city City) string {
+		return city.name
+	}
+
+	def byCityName(a City, b City) int {
+		return a.name.compare(b.name)
+	}
+
+	def numbered(count int) string[] {
+		let all string[]
+		for let i = 1; i <= count; i++ {
+			all.push("Row {i}")
+		}
+		return all
+	}
+
+	let manyRows = numbered(1000)
+
+	// Asks the `Toasts` above it for five notices, once it is drawn.
+	component Announcing {
+		type {
+			asked bool = false
+
+			def render(ctx RenderContext) {
+				return when asked
+				asked = true
+				let toasts = context<Toasts>()
+				return when toasts is none
+				toasts.show("Saved.", kind = ToastKind.Success, lasts = 0s)
+				toasts.show("The disk is nearly full.", kind = ToastKind.Warning, lasts = 0s)
+				toasts.show("Deleted.", lasts = 0s, action = "Undo")
+				toasts.show("The file could not be written.", kind = ToastKind.Danger, lasts = 0s)
+				toasts.show("Another one.", lasts = 0s)
+			}
+		}
+
+		view {
+			Text(text = "Five notices were asked for; three show.")
+		}
+
+		style Frame
+	}
+
 	// The content of one picture, by name.
 	component Shot {
 		type {
@@ -696,6 +782,45 @@ module shots {
 				case "toast":
 					Text(text = "A toast shows in the window's corner.")
 					Toast(text = "Saved.", open = true)
+				case "toasts":
+					Text(text = "Notices stand one above another.")
+					Toast(text = "Saved.", kind = ToastKind.Success, open = true)
+					Toast(text = "Deleted.", action = "Undo", open = true)
+					Toast(text = "The file could not be written.", kind = ToastKind.Danger, open = true)
+				case "list":
+					List(manyRows, selected = ["Row 2"], rowHeight = 24(px))
+				case "tree":
+					Tree(places, id = placeName, expand = placesIn, expanded = ["Europe", "France"], selected = ["Paris"], rowHeight = 24(px)) {
+						rowRenderer = (it RowItem<Place>) => Text(text = it.content.name)
+					}
+				case "datagrid":
+					DataGrid(cities, id = cityName, selected = ["Oslo"], sortBy = "City", rowHeight = 24(px), columns = [
+						new GridColumn<City>("City", cell = (it RowItem<City>) => Text(text = it.content.name), width = 110(px), order = byCityName),
+						new GridColumn<City>("Country", cell = (it RowItem<City>) => Text(text = it.content.country)),
+						new GridColumn<City>("People", cell = (it RowItem<City>) => Text(text = "{it.content.people}"), width = 100(px)),
+					])
+				case "datagrid-fixed":
+					DataGrid(cities, id = cityName, selected = ["Oslo"], rowHeight = 24(px), columns = [
+						new GridColumn<City>("City", cell = (it RowItem<City>) => Text(text = it.content.name), width = 110(px), order = byCityName),
+						new GridColumn<City>("Country", cell = (it RowItem<City>) => Text(text = it.content.country), width = 140(px)),
+						new GridColumn<City>("People", cell = (it RowItem<City>) => Text(text = "{it.content.people}"), width = 100(px)),
+					])
+				case "toasthost":
+					ToastHost() {
+						Announcing()
+					}
+				case "windowchrome":
+					WindowChrome(title = "Notes", icon = "menu") {
+						Panel() {
+							Text(text = "The window's root is under the header.")
+						}
+					}
+				case "drawer":
+					Text(text = "The page behind the drawer is dimmed and takes no press.")
+					Drawer(open = true, title = "Places", extent = 180(px)) {
+						Text(text = "Home")
+						Text(text = "Documents")
+					}
 				case "accordion":
 					Room(wide = 336.0, high = 126.0) {
 						Accordion() {
@@ -833,6 +958,14 @@ module shots {
 			Wanted{name: "popover", wide: 340.0, high: 130.0},
 			Wanted{name: "dialog", wide: 440.0, high: 240.0},
 			Wanted{name: "toast", wide: 360.0, high: 120.0},
+			Wanted{name: "toasts", wide: 360.0, high: 220.0},
+			Wanted{name: "list", wide: 300.0, high: 150.0},
+			Wanted{name: "tree", wide: 300.0, high: 190.0},
+			Wanted{name: "datagrid", wide: 420.0, high: 160.0},
+			Wanted{name: "drawer", wide: 440.0, high: 200.0},
+			Wanted{name: "windowchrome", wide: 420.0, high: 150.0},
+			Wanted{name: "datagrid-fixed", wide: 584.0, high: 160.0},
+			Wanted{name: "toasthost", wide: 360.0, high: 300.0},
 			Wanted{name: "accordion", wide: 360.0, high: 150.0},
 			Wanted{name: "splitpane", wide: 420.0, high: 120.0},
 			Wanted{name: "grid", wide: 320.0, high: 100.0},
