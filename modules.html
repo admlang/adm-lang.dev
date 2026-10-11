@@ -55,6 +55,9 @@
           <li><a class="docs-nav-sub" href="#std-text-unicode">std.text.unicode</a></li>
           <li><a class="docs-nav-sub" href="#std-text-precis">std.text.precis</a></li>
           <li><a class="docs-nav-sub" href="#std-text-jinja">std.text.templates.jinja</a></li>
+          <li><a class="docs-nav-sub" href="#std-adm-lexer">std.adm.lexer</a></li>
+          <li><a class="docs-nav-sub" href="#std-adm-syntax">std.adm.syntax</a></li>
+          <li><a class="docs-nav-sub" href="#std-adm-symbols">std.adm.symbols</a></li>
           <li><a class="docs-nav-sub" href="#std-glob">std.glob</a></li>
           <li><a class="docs-nav-sub" href="#std-bytes">std.bytes</a></li>
           <li><a class="docs-nav-sub" href="#std-math">std.math</a></li>
@@ -290,6 +293,36 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>parse</code>, <code>Template</code>, <code>Options</code></td><td>Jinja2 templates</td></tr>
           <tr><td><code>Safe</code></td><td>text marked safe from autoescape</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-adm-lexer">
+        <h3><code>std.adm.lexer</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>tokenize</code></td><td>every token of ADM source, ending with <code>EOF</code>; comments optional, white space on request</td></tr>
+          <tr><td><code>Lexer</code></td><td><code>next()</code> one token at a time</td></tr>
+          <tr><td><code>Token</code></td><td>kind, character offsets <code>start</code>/<code>end</code>, text (identifiers in NFC)</td></tr>
+          <tr><td><code>TokenKind</code></td><td>token classes; the value of a punctuation, operator or keyword member is its spelling</td></tr>
+          <tr><td><code>isLiteral</code>, <code>isPunctuation</code>, <code>isOperator</code>, <code>isKeyword</code></td><td>classify a kind</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-adm-syntax">
+        <h3><code>std.adm.syntax</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>parse</code></td><td>the lossless syntax tree of ADM source; never fails, diagnostics for what the grammar refused</td></tr>
+          <tr><td><code>SyntaxTree</code>, <code>SyntaxNode</code></td><td>navigation by offset, children, siblings, ancestors; <code>edit()</code> reparses one block and shares the rest; <code>dump()</code></td></tr>
+          <tr><td><code>Green</code>, <code>greenTokens</code></td><td>the immutable, position-free elements with their trivia</td></tr>
+          <tr><td><code>SyntaxKind</code>, <code>TriviaKind</code>, <code>Trivia</code>, <code>Diagnostic</code></td><td>kinds, trivia pieces and parse diagnostics</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-adm-symbols">
+        <h3><code>std.adm.symbols</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>analyze</code>, <code>FileSymbols</code></td><td>the declarations, scopes and imports of a file; what a name means at an offset</td></tr>
+          <tr><td><code>Symbol</code>, <code>SymbolKind</code></td><td>a declaration: kind, qualified path, name span, doc comment, annotations, members, stable id</td></tr>
+          <tr><td><code>Scope</code>, <code>ScopeKind</code></td><td>the scope tree with lookup by offset</td></tr>
+          <tr><td><code>Workspace</code></td><td>many files: a module's parts, resolution through parts and imports, ids kept across edits</td></tr>
+          <tr><td><code>Navigator</code></td><td>definition, completions, type of an expression, signature and usages from declared types</td></tr>
+          <tr><td><code>docText</code>, <code>trailingDocText</code></td><td>the doc comment rule</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-glob">
@@ -1302,6 +1335,7 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>UI</code>, <code>UIConfig</code></td><td>UI service</td></tr>
           <tr><td><code>ComponentRenderer</code>, <code>RenderContext</code>, <code>RenderPasses</code>, <code>Geometry</code>, <code>TextKind</code>, <code>WindowState</code>, <code>WindowKind</code>, <code>CloseRequest</code>, <code>MenuEntry</code>, <code>PointerEvent</code>, <code>PointerPhase</code>, <code>Modifiers</code>, <code>Limit</code>, <code>TextInputClient</code>, <code>TextRange</code>, <code>StateChange</code>, <code>@action</code>, <code>Viewport</code>, <code>Theme</code>, <code>Palette</code></td><td>component drawing, resolved layout, state events, actions</td></tr>
+          <tr><td><code>Theme</code>, <code>themeOf</code></td><td>the values styles read as <code>theme</code>; <code>themeOf(component)</code> is the theme that component's style reads: the nearest one provided, else <code>UI.theme()</code></td></tr>
           <tr><td><code>DragData</code>, <code>DropEffect</code></td><td>what is dragged: a value of the application's own, text, file paths, other forms by MIME type; what a drop would do (none, copy, move, link)</td></tr>
           <tr><td><code>StyleNode</code>, <code>StyleClass</code>, <code>BoxStyle</code>, <code>FontStyle</code>, <code>Selector</code></td><td>style model</td></tr>
           <tr><td><code>IconSet</code></td><td>named icons an application adds with <code>UI.addIcons</code>; components take an icon by name (<code>Button(icon = "plus")</code>)</td></tr>
@@ -1335,6 +1369,9 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Row</code>, <code>Column</code>, <code>HBox</code>, <code>VBox</code>, <code>Grid</code>, <code>Layered</code>, <code>Panel</code>, <code>ScrollView</code>, <code>SplitPane</code>, <code>Spacer</code>, <code>Divider</code>, <code>WindowDrag</code></td><td>layout: rows, columns, grids, stacked layers, scrolling, panes a divider resizes, the bar an undecorated window is moved by</td></tr>
           <tr><td><code>TabMove</code></td><td>a tab of a <code>TabStrip</code> dragged from one place to another (<code>onMove</code>, event <code>moved</code>); <code>onClose</code> gives each tab a cross</td></tr>
           <tr><td><code>FocusScope</code></td><td>remembers which component in it had the keyboard focus and gives it back when Tab returns; <code>trap</code> keeps Tab inside</td></tr>
+          <tr><td><code>Form</code>, <code>Field</code></td><td>a form (<code>onSubmit</code>, <code>submit()</code>, <code>invalid()</code>, event <code>submitted</code>) and one of its values with a name and an <code>error</code> shown under the control; the form submits only while no field has one</td></tr>
+          <tr><td><code>Themed</code></td><td>gives what it holds a theme of its own (<code>theme</code>): their styles read it where they name <code>theme</code></td></tr>
+          <tr><td><code>Provide&lt;V&gt;</code></td><td>gives what it holds a value they find with <code>context&lt;V&gt;()</code></td></tr>
           <tr><td><code>Draggable</code>, <code>DropTarget</code></td><td>something dragged inside a window, with a preview that follows the pointer; a place it, or files and text dragged in from another application, are dropped on</td></tr>
           <tr><td><code>Text</code>, <code>Heading</code>, <code>Label</code>, <code>Link</code>, <code>Image</code>, <code>Icon</code>, <code>Badge</code>, <code>Chip</code>, <code>Avatar</code></td><td>text, pictures, icons by name, short notes and tokens</td></tr>
           <tr><td><code>Canvas</code></td><td>a box the application draws in itself</td></tr>

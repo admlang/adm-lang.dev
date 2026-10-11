@@ -1089,6 +1089,31 @@ let t (int, int) = (1, 2)</code></pre>
           to make a tuple.
         </p>
 
+        <p>
+          <strong>Elements</strong> are read by position, counted from zero, with <code>.0</code>,
+          <code>.1</code> and so on. Each has its own type, positions chain through nested tuples, and
+          an element takes whatever its type takes, a method call or a call of a function it holds:
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">elements.adm</span>
+          </div>
+          <pre><code>let name = ingredients.0          // "Sugar"
+let grams = ingredients.1 * 2     // 50
+
+let nested = ((1, 2), ("a", [10, 20, 30]))
+let last = nested.1.1[2]          // 30
+
+let fns = (twice, 5)
+let ten = fns.0(fns.1)            // calls twice(5)</code></pre>
+        </div>
+        <p>
+          The position is written right after the value, with no space before the dot; anywhere else
+          <code>.5</code> is a float. A position the tuple does not have is a compile error, and so is
+          assigning to an element: a tuple keeps its values, make a new one to change them.
+        </p>
+
         <p><strong>Destructuring</strong> pulls a tuple's values out positionally with <code>let</code>:</p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -1507,7 +1532,9 @@ partial type User&lt;T&gt; {
           is <code>partial</code>, so the rest of it can live in another file, as long as every fragment
           repeats the <code>&lt;T&gt;</code> generic parameter list. <code>use</code> inside a type is
           scoped to that type only, and a type body can also nest its own <code>struct</code>,
-          <code>enum</code>, or <code>union</code> declarations.
+          <code>enum</code>, or <code>union</code> declarations. A <code>const</code> in a type body
+          belongs to the type, not to an instance: its methods read it by name, other code through
+          the type, <code>Limits.Most</code>.
         </p>
         <p>
           <code>internal type Cache { ... }</code> hides the whole type outside its module - the usual
@@ -1519,6 +1546,14 @@ partial type User&lt;T&gt; {
           and it reads <code>none</code> once the target has been released. Use it for back references so
           parent and child form no reference cycle - see
           <a href="memory.html#weak-references">Memory model → Weak references</a>.
+        </p>
+        <p>
+          A field marked <code>@persist(key)</code> is kept between runs of the program:
+          <code>@persist("editor.fontSize") fontSize int = 12</code>. An object that is made starts with
+          the value kept under the key, before <code>new()</code> runs, and an assignment that changes
+          the field keeps the new value. It works on a field of a type, a service or a component, not of
+          a struct; the rules are under
+          <a href="annotations.html"><code>@persist</code></a>.
         </p>
         <p>
           A constructor with one parameter marked <code>@implicit</code> makes the type accept that
@@ -3232,6 +3267,13 @@ def log(evt Event&lt;string&gt;) {
         <a href="services.html#events">Services → Events and observers</a>.
       </p>
       <p>
+        When the program ends, the started services stop, each before the services it names as hard
+        dependencies, so a <code>stop()</code> can still use them; services with no such relation stop
+        in the reverse of the order they were registered in. A service's
+        <a href="annotations.html"><code>@persist(key)</code></a> fields take their kept values when the
+        program starts, before any service's <code>start()</code> runs.
+      </p>
+      <p>
         Services can't be constructed with <code>new</code> and can't declare their own
         <code>new</code>/<code>dispose</code> - the manager owns that lifecycle entirely.
         <code>@commit()</code> methods are implicitly <code>atomic</code>; <code>@query()</code> and
@@ -3517,8 +3559,11 @@ Card(title = "Profile") {
           <code>List&lt;File&gt;(files)</code>, or leaves them to its arguments,
           <code>List(files)</code>; a parameter no argument settles takes its default or is a compile
           error. Each instance is compiled for its own type arguments. A <code>ref</code> on such a
-          call needs the type arguments written, and a type parameter cannot be named in the
-          component's inline <code>style { }</code>.
+          call declares its member with the instance the call makes
+          (<code>List(files, ref = list)</code> gives a <code>?List&lt;File&gt;</code>). The
+          component's inline <code>style { }</code> reads <code>self</code>, the refs and the type
+          parameters in its values; only a <code>let</code> of that style cannot be typed with a
+          type parameter.
         </p>
         <p>
           A component may name its controller as a type declared apart and marked
@@ -3632,9 +3677,9 @@ def hide(c component) {
         </div>
         <ul>
           <li><code>style.enter</code> and <code>style.exit</code> are functions,
-            <code>?def(look style)</code>, none in a style that writes none: calling one assigns the
-            listed properties on the style given (a <code>clone()</code>, when the component's own
-            look must stay).</li>
+            <code>?def(look style, owner component)</code>, none in a style that writes none: calling
+            one assigns the listed properties on the style given (a <code>clone()</code>, when the
+            component's own look must stay) for the component given.</li>
           <li>A value may name what the module sees and the style's own <code>let</code>s.
             Embedding a style does not bring its <code>enter</code> and <code>exit</code>.
             A style body may also assign <code>on</code>, the looks of states:

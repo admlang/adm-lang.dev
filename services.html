@@ -236,6 +236,71 @@ def onExpiry(evt Event&lt;string&gt;) {
           <code>new</code>; all of them stop at shutdown.
         </p>
       </div>
+      <div class="docs-sub" id="labs">
+        <h3>Service labs</h3>
+        <p>
+          Every service has a <code>lab</code>: a test bench that sets the conditions its
+          <code>@commit</code> and <code>@query</code> calls meet, so you can watch your program
+          under a slow, failing or absent service without touching the service or your code.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">lab.adm</span>
+          </div>
+          <pre><code>Storage.lab.delay(150ms)                            // every call waits first
+Storage.lab.delay(20ms, method = "read", jitter = 30ms)
+Storage.lab.refuse("disk full", method = "write")   // fails before it runs
+Storage.lab.refuse("flaky", rate = 0.2)             // one call in five
+Storage.lab.refuse("busy", times = 3)               // the next three calls
+Network.lab.offline()                               // every call that can fail does
+Network.lab.online()
+Storage.lab.calls("write")                          // calls made so far
+Storage.lab.reset()</code></pre>
+        </div>
+        <p>
+          A delay holds the calling task before the method runs. A refusal ends the call with an
+          error holding your message; it needs a method that can fail (<code>!T</code>), and one
+          that cannot is only delayed. <code>rate</code> draws from the lab's own sequence, the same
+          on every run, so a test that refuses one call in five refuses the same calls each time.
+          Conditions stay until <code>reset</code>, each service has its own lab, and a call that
+          needs a permission is refused it before a lab holds it. A lab meets calls of the service:
+          code that reaches a file or a socket without calling the service is not affected.
+        </p>
+        <p>
+          What only the service itself can simulate, a disk that is 85% full or a corrupt read, is a
+          struct of <strong>conditions</strong> the service declares and names in its own lab. The
+          fields are typed, so a wrong name or value is a compile error; their defaults mean
+          nothing is simulated, and <code>reset</code> puts them back.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">conditions.adm</span>
+          </div>
+          <pre><code>struct DepotConditions {
+    // Storing fails once the depot is this full; 0 turns it off.
+    fullAt float = 0.0
+}
+
+service Depot {
+    lab = new ServiceLab&lt;DepotConditions&gt;()
+
+    @commit()
+    def put(share float) !float {
+        fail "no space left" when lab.conditions.fullAt &gt; 0.0 &amp;&amp; used + share &gt;= lab.conditions.fullAt
+        ...
+    }
+}
+
+// in a test
+Depot.lab.conditions.fullAt = 0.6</code></pre>
+        </div>
+        <p>
+          Labs are for development and tests. A <code>--release</code> build has none: its services
+          run no lab check, and setting a condition there stops the program with a message.
+        </p>
+      </div>
       <p>
         Services also ship <a href="#annotations">annotations</a> - <code>@cache</code>,
         <code>@metric</code>, <code>@measureTime</code> and friends - that wrap a declaration instead
@@ -328,7 +393,7 @@ def onExpiry(evt Event&lt;string&gt;) {
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def shutdown(code int = 0) !none</code></div>
-            <p class="api-doc">Requests graceful application shutdown: <code>shutdownRequested</code> is emitted, so observers can finish their work, then the running services are stopped, last started first, and the process exits with the code. An interrupt (Ctrl-C) or terminate signal requests it with code 128 + the signal's number; a second such signal ends the process at once.</p>
+            <p class="api-doc">Requests graceful application shutdown: <code>shutdownRequested</code> is emitted, so observers can finish their work, then the running services are stopped, each before the services it names as hard dependencies, and the process exits with the code. An interrupt (Ctrl-C) or terminate signal requests it with code 128 + the signal's number; a second such signal ends the process at once.</p>
 
           </li>
           <li class="api-item">
@@ -351,6 +416,38 @@ def onExpiry(evt Event&lt;string&gt;) {
       <div class="docs-sub" id="svc-cache">
         <h3><code>Cache</code></h3>
         <p>Fast in-memory cache with TTL, idle expiration, glob selectors, and size limits.</p>
+        <p><strong>Lab conditions</strong> (<code>Cache.lab.conditions</code>, see <a href="#labs">Service labs</a>). The defaults change nothing.</p>
+        <table class="docs-table">
+          <tr>
+            <td><code>clockSpeed float</code></td>
+            <td>How fast time passes for expiry: at <code>60.0</code> a <code>ttl</code> of a minute runs out in a second, at <code>0.0</code> nothing expires.</td>
+          </tr>
+          <tr>
+            <td><code>maxEntries ?int</code></td>
+            <td>The most entries the cache holds, whatever <code>CacheConfig</code> allows; the least recently used are evicted at once.</td>
+          </tr>
+          <tr>
+            <td><code>maxMemory ?int</code></td>
+            <td>The most memory the cache holds, in bytes, in the same way.</td>
+          </tr>
+          <tr>
+            <td><code>missRate float</code></td>
+            <td>The share of value reads that find nothing though the key is there; <code>1.0</code> is a cache that never answers.</td>
+          </tr>
+          <tr>
+            <td><code>dropWrites bool</code></td>
+            <td><code>set</code> stores nothing.</td>
+          </tr>
+        </table>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">cache_lab.adm</span>
+          </div>
+          <pre><code>Cache.lab.conditions.clockSpeed = 3600.0   // an hour a second
+Cache.lab.conditions.maxEntries = 2        // full: evicts down to two
+Cache.lab.conditions.missRate = 0.25       // one read in four misses</code></pre>
+        </div>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">atomic def set(key string, value any, ttl ?duration = none, idle ?duration = none)</code></div>
@@ -830,6 +927,55 @@ def onExpiry(evt Event&lt;string&gt;) {
       <div class="docs-sub" id="svc-network">
         <h3><code>Network</code></h3>
         <p>Sockets, addressing, name resolution, and socket options.</p>
+        <p><strong>Lab conditions</strong> (<code>Network.lab.conditions</code>, see <a href="#labs">Service labs</a>). The defaults change nothing.</p>
+        <table class="docs-table">
+          <tr>
+            <td><code>unreachable string</code></td>
+            <td>Endpoints that cannot be reached, as a glob (<code>"*.example.com:443"</code>, <code>"*"</code> for no network): connecting fails with <code>EHOSTUNREACH</code>.</td>
+          </tr>
+          <tr>
+            <td><code>refused string</code></td>
+            <td>Endpoints nobody listens on, as a glob: <code>ECONNREFUSED</code>.</td>
+          </tr>
+          <tr>
+            <td><code>unresolved string</code></td>
+            <td>Host names that do not resolve, as a glob.</td>
+          </tr>
+          <tr>
+            <td><code>hosts map&lt;string, string[]&gt;</code></td>
+            <td>The addresses of host names, asked before any resolver: send the program to a server of the test's own.</td>
+          </tr>
+          <tr>
+            <td><code>bytesPerSecond int</code></td>
+            <td>How fast reads and writes move data.</td>
+          </tr>
+          <tr>
+            <td><code>chunk int</code></td>
+            <td>The most bytes one <code>read</code> or <code>write</code> moves.</td>
+          </tr>
+          <tr>
+            <td><code>breaksAfter ?int64</code></td>
+            <td>The bytes that still pass before the connections break with <code>ECONNRESET</code>.</td>
+          </tr>
+          <tr>
+            <td><code>datagramLoss float</code></td>
+            <td>The share of datagrams sent that never arrive.</td>
+          </tr>
+          <tr>
+            <td><code>silent bool</code></td>
+            <td>Nothing arrives: a read waits its timeout out and fails with <code>ETIMEDOUT</code>.</td>
+          </tr>
+        </table>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">network_lab.adm</span>
+          </div>
+          <pre><code>Network.lab.conditions.hosts = map&lt;string, string[]&gt;{"api.example.com": ["127.0.0.1"]}
+Network.lab.conditions.bytesPerSecond = 32000    // a slow mobile link
+Network.lab.conditions.breaksAfter = 4096        // drops mid-download
+Network.lab.conditions.unreachable = "*"         // offline</code></pre>
+        </div>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def socket(domain net.SocketDomain, typ net.SocketType) !net.Socket</code></div>
@@ -1318,6 +1464,43 @@ def onExpiry(evt Event&lt;string&gt;) {
       <div class="docs-sub" id="svc-storage">
         <h3><code>Storage</code></h3>
         <p>Files, directories, memory maps, and device control. A <code>Path</code> argument takes a plain string; the policy checks it before the method runs.</p>
+        <p><strong>Lab conditions</strong> (<code>Storage.lab.conditions</code>, see <a href="#labs">Service labs</a>). The defaults change nothing.</p>
+        <table class="docs-table">
+          <tr>
+            <td><code>readOnly bool</code></td>
+            <td>Every change fails as on a read-only file system (<code>EROFS</code>).</td>
+          </tr>
+          <tr>
+            <td><code>freeSpace ?int64</code></td>
+            <td>The bytes the disk still has: writes use them up and fail with <code>ENOSPC</code> when one does not fit; <code>freeSpace</code> answers this number.</td>
+          </tr>
+          <tr>
+            <td><code>chunk int</code></td>
+            <td>The most bytes one <code>read</code> or <code>write</code> moves.</td>
+          </tr>
+          <tr>
+            <td><code>corruptReads float</code></td>
+            <td>The share of reads that come back with one bit flipped.</td>
+          </tr>
+          <tr>
+            <td><code>missing string</code></td>
+            <td>Paths that look absent, as a glob over the whole path: <code>ENOENT</code>, and <code>exists</code> says no.</td>
+          </tr>
+          <tr>
+            <td><code>bytesPerSecond int</code></td>
+            <td>How fast reads and writes move data.</td>
+          </tr>
+        </table>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">storage_lab.adm</span>
+          </div>
+          <pre><code>Storage.lab.conditions.freeSpace = 4096             // the disk fills up
+Storage.lab.conditions.readOnly = true
+Storage.lab.conditions.missing = "*/settings.json"  // first run again
+Storage.lab.conditions.corruptReads = 0.01</code></pre>
+        </div>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def open(path Path, mode string) !int</code></div>
@@ -1532,7 +1715,7 @@ def onExpiry(evt Event&lt;string&gt;) {
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def openWindow&lt;T: component&gt;(root T, cfg r.WindowConfig) !r.Window</code></div>
-            <p class="api-doc">Opens a window that shows root: the component that stands for the window. Call it again for each further window; run serves them all. With <code>cfg.persist = "main"</code> the window opens with the size, place and state (maximized, fullscreen) it had when it was last open, on a display that still shows that place, and keeps them as the user changes them; the name is a key of the <code>@persist</code> store (<a href="#svc-vault"><code>Vault</code></a>, <code>ui.persist.&lt;name&gt;</code>).</p>
+            <p class="api-doc">Opens a window that shows root: the component that stands for the window. Call it again for each further window; run serves them all. With <code>cfg.persist = "main"</code> the window opens with the size, place and state (maximized, fullscreen) it had when it was last open, on a display that still shows that place, and keeps them as the user changes them; the name is a key of the <code>@persist</code> store (<a href="#svc-vault"><code>Vault</code></a>, <code>persist.&lt;name&gt;</code>).</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def openDefaultWindow&lt;T: component&gt;(root T) !r.Window</code></div>
@@ -1596,6 +1779,11 @@ def onExpiry(evt Event&lt;string&gt;) {
             <p class="api-doc">It is one object, kept in step with <code>appearanceChange</code>.</p>
           </li>
           <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setTheme(theme Theme)</code></div>
+            <p class="api-doc">Makes `theme` the one styles read when no component above theirs provides another (`Themed`, a window opened with a theme): `theme()` returns it from now on, and every style takes again what its body assigns from the theme on the next frame.</p>
+            <p class="api-doc">A theme given this way is the program's: it keeps its values when the platform's look changes.</p>
+          </li>
+          <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def display(win r.Window) !Display</code></div>
             <p class="api-doc">The display the window is on: the one holding most of it.</p>
             <p class="api-doc">Fails when the service is not running or the window is unknown.</p>
@@ -1607,6 +1795,10 @@ def onExpiry(evt Event&lt;string&gt;) {
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def appearanceChange(appearance Appearance) Appearance</code></div>
             <p class="api-doc">Emitted when a look setting changes, such as the user switching to dark mode.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def themeChange(theme Theme) Theme</code></div>
+            <p class="api-doc">Emitted when `setTheme` gave styles another theme.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def addIcons(set IconSet)</code></div>
@@ -1679,8 +1871,8 @@ def onExpiry(evt Event&lt;string&gt;) {
         <p>The application's encrypted key/value store: credentials, tokens, keys and settings kept between runs, in one file under the application's home folder, bound to the machine, the user and the application (no password; the file copied elsewhere does not open). Secrets go in and come out as <code>Secret&lt;T&gt;</code> (<code>put</code>/<code>get</code>), values come back plain (<code>store</code>/<code>load</code>); <code>remove</code>, <code>has</code>, <code>list</code>; permissions <code>adm.vault.read</code> and <code>adm.vault.write</code>.</p>
         <p>What the binding protects: the file read on another machine, by another user of this machine, or by another application. It does not protect against code running as this user on this machine, which can derive the same key. The machine identity is read on Linux today; on macOS and Windows the service does not start yet.</p>
         <p>A name is not empty and made of <code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>.</code>, <code>_</code> and <code>-</code>, with dots separating its parts; an application and the libraries it uses share one name space. A value is of any type that crosses a process link (numbers, strings, arrays, maps, optionals, tuples, unions, structs, <code>@portable</code> types, types with <code>toWire</code>/<code>fromWire</code>) and is stored in the IPC wire encoding.</p>
-        <p>The UI keeps what <a href="annotations.html"><code>@persist(key)</code></a> fields and <code>WindowConfig.persist</code> save here, as values under <code>ui.persist.&lt;key&gt;</code>. It opens the vault itself the first time a value is restored or kept, so an application that sets <code>VaultConfig</code> does it before its first window opens.</p>
-        <p>A private key (<code>generateKey</code>, <code>importKey</code>) never comes out: the vault signs, decrypts and agrees with it behind <code>adm.vault.keys</code> and gives its public key. The service starts manually; <code>VaultConfig</code> (<code>path</code>, <code>memoryKiB</code> = 65536, <code>passes</code> = 3: the Argon2id cost of opening it) is applied before <code>start</code>. It declares no events.</p>
+        <p><a href="annotations.html"><code>@persist(key)</code></a> fields (of types, services and components) and <code>WindowConfig.persist</code> keep their values here, under <code>persist.&lt;key&gt;</code>. The vault is opened the first time such a value is restored or kept, or when the program starts if a service has a kept field. An application sets <code>VaultConfig</code> when it likes: given after the vault opened, the settings are applied to the open file.</p>
+        <p>A private key (<code>generateKey</code>, <code>importKey</code>) never comes out: the vault signs, decrypts and agrees with it behind <code>adm.vault.keys</code> and gives its public key. The service starts manually; <code>VaultConfig</code> (<code>path</code>, <code>memoryKiB</code> = 65536, <code>passes</code> = 3: the Argon2id cost of opening it) is what the vault starts with when <code>config</code> is called before <code>start</code>. Called on a started vault, <code>config</code> applies the settings to the open file where they differ from it: another cost wraps the vault's key again with a new salt (one key derivation at the new cost, every entry kept), another path moves the file there (an empty path is the default one; a file already at the new path is an error). Equal settings write nothing, and a change that fails leaves the vault as it was. It declares no events.</p>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def put&lt;T&gt;(name string, value Secret&lt;T&gt;) !none</code></div>

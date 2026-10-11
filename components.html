@@ -486,8 +486,10 @@ FileList(["main.adm", "lib.adm", "notes.md"]) {
       <div class="docs-sub" id="inputs">
         <h3>Inputs</h3>
         <p>
-          <code>@input</code> marks a field the caller may pass. <code>@input(value = true)</code> is the one
-          the unnamed argument sets. An input the call does not pass keeps its default.
+          <code>@input</code> marks a field the caller may pass; a field without it is no argument of a
+          call. <code>@input(value = true)</code> is the one the unnamed argument sets. An input the call
+          does not pass keeps its default, and one declared without a default is passed by every
+          call (a compile error names it otherwise).
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -568,7 +570,9 @@ def tabChanged(evt Event&lt;StateChange&gt;) {
           starts with the value kept under the key, before <code>new()</code> runs; an assignment that
           changes the value keeps the new one. The values are in the application's
           <a href="services.html#svc-vault"><code>Vault</code></a>, encrypted, named
-          <code>ui.persist.&lt;key&gt;</code>.
+          <code>persist.&lt;key&gt;</code>. The annotation is not the components' alone: it works the same on a
+          field of any <code>type</code> or <code>service</code>
+          (<a href="annotations.html"><code>@persist</code></a>).
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -715,8 +719,8 @@ Stepper(step = 2)</code></pre>
         </div>
         <p>
           A component takes type parameters as a type does: <code>component List&lt;T&gt; { ... }</code>, with
-          <code>T</code> in scope in its controller and its view, placed as <code>List&lt;File&gt;(files)</code>
-          or <code>List(files)</code>. A component declared <code>internal</code> is a part only its own
+          <code>T</code> in scope in its controller, its view and the values of its style, placed as
+          <code>List&lt;File&gt;(files)</code> or <code>List(files)</code>. A component declared <code>internal</code> is a part only its own
           module places.
         </p>
       </div>
@@ -1007,8 +1011,8 @@ view {
             line in <code>anchors</code> is followed in the same layout.</li>
           <li>When the component is not there (no sibling on that side, a ref whose child is not in
             the view), the assignment is not made and the property keeps its value.</li>
-          <li><code>on</code>, <code>enter</code> and <code>exit</code> cannot read
-            <code>$x</code>.</li>
+          <li><code>on</code>, <code>enter</code> and <code>exit</code> read <code>$x</code> and
+            <code>self</code> too, when the look is made: <code>on = {hover: {background: self.tint}}</code>.</li>
           <li>Outside a style block <code>$x</code> is short for <code>x.style</code> on any
             component you hold.</li>
         </ul>
@@ -1275,6 +1279,14 @@ UI.theme().follow(UI.appearance())</code></pre>
           again when the theme changes, so a component on screen follows a change of scheme without
           code of its own. The built-in components have their whole look in their style blocks.
         </p>
+        <p>
+          <code>UI.setTheme(theme)</code> gives the program another theme (one loaded from a file,
+          a copy with its accent changed); it keeps its values when the desktop's look changes.
+          A part of a window takes a theme of its own with
+          <code>Themed(theme = dark) { ... }</code>, and a window with
+          <code>WindowConfig.theme</code>: the styles under it read that theme where they name
+          <code>theme</code>.
+        </p>
       </div>
 
       <div class="docs-sub" id="icons">
@@ -1365,7 +1377,14 @@ Row(gap = 8(px)) {
         <p>
           Std's scopes: <code>FocusScope</code> (remembers which component in it had the focus;
           <code>trap = true</code> keeps Tab inside), <code>Tooltip</code> (content shown beside what it
-          holds), <code>Draggable</code> and <code>DropTarget</code> (drag and drop).
+          holds), <code>Draggable</code> and <code>DropTarget</code> (drag and drop),
+          <code>Themed</code> (a theme for what it holds) and <code>Provide</code>.
+        </p>
+        <p>
+          A component shares a value with those under it: <code>provide&lt;Document&gt;(document)</code>
+          in the provider (its <code>attached()</code>, or <code>Provide(document) { ... }</code> in a
+          view), <code>context&lt;Document&gt;()</code> in any component below, which gets the nearest
+          one or <code>none</code>. One value per type.
         </p>
     </section>
 
@@ -1382,7 +1401,7 @@ Row(gap = 8(px)) {
             <tr><td><a href="#inputs"><code>@input(bind = true)</code></a></td><td>a controller field</td><td>The component may assign it, and the assignment reaches a <code>@bindable</code> place the caller passed.</td></tr>
             <tr><td><a href="#inputs"><code>@bindable</code></a></td><td>a field, a struct, a type</td><td>A bound input it is passed to may assign it.</td></tr>
             <tr><td><a href="#state"><code>@state</code></a></td><td>a controller field</td><td>A change emits <code>UI.stateChange</code>; a bool or enum state is a key of the style's <code>on</code>.</td></tr>
-            <tr><td><a href="#persist"><code>@persist(key)</code></a></td><td>a controller field</td><td>Kept between runs under the key, restored when the component is created.</td></tr>
+            <tr><td><a href="#persist"><code>@persist(key)</code></a></td><td>a controller field (and a field of any type or service)</td><td>Kept between runs under the key, restored when the component is created.</td></tr>
             <tr><td><a href="#events"><code>@emit()</code></a></td><td>a controller method</td><td>The method is an event of the component.</td></tr>
             <tr><td><a href="#events"><code>@on(Component.event, matcher)</code></a></td><td>a function or a method</td><td>Listens to a component event; the matcher is a ref or a selector.</td></tr>
             <tr><td><a href="#events"><code>@on(UI.event, filter)</code></a></td><td>a function or a method</td><td>Listens to an event of the <code>UI</code> service.</td></tr>
@@ -1916,6 +1935,9 @@ def keep(evt Event&lt;CloseRequest&gt;) {
             <tr><td><code>ContextMenu</code>, <code>SubMenu</code>, <code>MenuItem</code>, <code>MenuSeparator</code></td><td>The parts of menus.</td></tr>
             <tr><td><code>Draggable</code>, <code>DropTarget</code></td><td>Drag and drop between components of a window.</td></tr>
             <tr><td><code>FocusScope</code></td><td>Remembers the focus of a part of a window; <code>trap = true</code> keeps Tab inside.</td></tr>
+            <tr><td><code>Form</code>, <code>Field</code></td><td>A form that runs <code>onSubmit</code> only while no field has an error: <code>Form(onSubmit = save) { Field("Email", error = emailError()) { TextField(email) } }</code>.</td></tr>
+            <tr><td><code>Themed</code></td><td>Gives what it holds a theme of its own: <code>Themed(theme = dark) { ... }</code>.</td></tr>
+            <tr><td><code>Provide</code></td><td>Gives what it holds a value they find with <code>context&lt;V&gt;()</code>: <code>Provide(document) { ... }</code>.</td></tr>
             <tr><td><code>WindowDrag</code></td><td>The part of a window without a title bar that drags the window.</td></tr>
             <tr><td><code>Spacer</code></td><td>Empty room that takes what is left over in a row or a column.</td></tr>
           </tbody>

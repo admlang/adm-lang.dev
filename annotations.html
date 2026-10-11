@@ -268,25 +268,71 @@ type Remote {
       </p>
       <h4><code>@persist(key)</code></h4>
       <p>
-        On a field of a component's controller, its <code>type { }</code> or the
-        <code>@controller()</code> type it names: the field's value is kept between runs. A component that is created starts with the value kept under
-        <code>key</code> (before <code>new()</code>; the field's default when nothing is
-        kept, and what the call passes when the field is an input it passes). An assignment
-        that changes the value keeps the new one: it is written half a second after the last
-        change, when a window closes and when the UI stops. The values are in the
+        On a field of a <code>type</code>, a <code>service</code> or a component's controller
+        (its <code>type { }</code> or the <code>@controller()</code> type it names): the
+        field's value is kept between runs of the program. An object that is made starts with
+        the value kept under <code>key</code>, before <code>new()</code> runs, however it is
+        made (<code>new</code>, a literal, the default of another object's field). A field the
+        construction gives a value (a named argument, a member of the literal, an input a
+        component's call passes) starts with that value, and a constructor that assigns the
+        field replaces the kept value for that object. An assignment that changes the value
+        keeps the new one: it is written half a second after the last change and when the
+        program ends. The values are in the
         <a href="services.html#svc-vault"><code>Vault</code></a> service, named
-        <code>ui.persist.&lt;key&gt;</code>, so they are encrypted on disk.
+        <code>persist.&lt;key&gt;</code>, so they are encrypted on disk.
       </p>
       <p>
-        The key is a string written in place, made of letters, digits, <code>.</code>,
-        <code>_</code> and <code>-</code>, and is the application's: two components that name
-        the same key share the value. The field's type is one a vault value can be (numbers,
-        strings, enums, arrays, maps, optionals, tuples, structs). A kept value that no longer
-        reads as the field's type is dropped and the default used. A field changed in place
-        (<code>items.push(x)</code>) is kept when it is next assigned. With <code>@state</code>
-        on the same field, the change is emitted as well.
+        The key is a string written in place, 1 to 244 letters <code>a-z</code> and
+        <code>A-Z</code>, digits, <code>.</code>, <code>_</code> and <code>-</code>, and is the
+        application's: every object of the type, and every type, service or component that
+        names the same key, shares the value. Fields that share a key have one type: two
+        <code>@persist</code> fields of a program that name a key with different types are a
+        compile error at both. Each object gets a value of its own, so an
+        array changed in place in one object changes no other. The field's type is one a vault
+        value can be (numbers, strings, enums, arrays, maps, optionals, tuples, structs,
+        <code>@portable</code> types) and names no type parameter of its type. A kept entry
+        that does not read as the field's type (another version of the program kept it) is
+        ignored: the field starts with its default, and the entry stays as it is until the
+        program next keeps a value under the key. A field
+        changed in place (<code>items.push(x)</code>) is kept when it is next assigned, and
+        what a constructor assigns to its own fields is not kept. On a component's field,
+        <code>@state</code> on the same field emits the change as well.
       </p>
-<pre><code>component Shell {
+      <p>
+        A service's kept fields take their values when the program starts, before the
+        <code>start()</code> of any service runs, except for the services the vault itself
+        needs (<code>Vault</code>, <code>Application</code>, <code>Policy</code>,
+        <code>Runtime</code>), which cannot have one. Not allowed, each a compile error: a
+        field of a struct (declare a <code>type</code>) or of a datatype, several fields
+        declared together, a key that is not such a literal.
+      </p>
+      <p>
+        The vault opens the first time a kept field is read or assigned (about a fifth of a
+        second at its default cost); when it cannot open, nothing is kept or restored and
+        nothing fails. A program with a kept field holds <code>adm.vault.read</code> and
+        <code>adm.vault.write</code> for it, which <code>adm audit</code> lists; a program
+        without one does not load the vault.
+      </p>
+<pre><code>type EditorSettings {
+	@persist("editor.fontSize")
+	fontSize int = 12
+
+	@persist("editor.recent")
+	recent string[] = []
+}
+
+service Prefs {
+	// ...
+	@persist("prefs.theme")
+	theme string = "light"
+
+	@commit()
+	def pick(name string) {
+		theme = name
+	}
+}
+
+component Shell {
 	style ShellLook
 	view { ... }
 
