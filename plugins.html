@@ -170,13 +170,19 @@ files/...                      what the [package] files rules of adm.toml select
     <section class="docs-section" id="loading">
       <h2>Loading</h2>
       <p>A host reads plugin packages through the <code>Runtime</code> service and asks one for a value of an interface it declares itself. Host and plugin share no library: the published names and canonical signatures above are what the two sides are matched by.</p>
-<pre><code>interface Effect {
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">host.adm</span>
+        </div>
+        <pre><code>interface Effect {
 	def process(samples float[], rate int)
 }
 
 for let (_, found) in Runtime.loadPlugins("./plugins") {
 	effects.push(try found.create&lt;Effect&gt;()) when found.creates&lt;Effect&gt;()
 }</code></pre>
+      </div>
       <p><code>Runtime.loadPlugins(folder)</code> reads every <code>.admplugin</code> of a folder and <code>Runtime.loadPlugin(path)</code> one file; both read the metadata only. The <code>Plugin</code> they return holds the name, version, publisher, export list and the permissions the plugin's code reaches (recorded in the package at build), and four calls: <code>creates&lt;T&gt;()</code> answers from the metadata whether the plugin provides <code>T</code>; <code>create&lt;T&gt;()</code> returns a new object of the first exported type that has every method of <code>T</code>, or one object whose methods are the plugin's exported functions; <code>createAll&lt;T&gt;()</code> returns one per match; <code>init()</code> loads the code and runs the plugin's <code>new()</code> without creating anything. The plugin is loaded on first use, once, and stays for the life of the program.</p>
       <p>A program that loads plugins is built with <code>adm build --runtime shared</code>, and a plugin must be built with the same adm as its host; both are checked when the plugin is loaded, and the error says which. On Linux the plugin's code is loaded straight from the package, without writing a file. Services are shared: a plugin that calls <code>Storage</code> or <code>Network</code> reaches the host's instance, and a service only the plugin has is started when the plugin is loaded. When a plugin's <code>new()</code> fails, the host's error carries its message.</p>
     </section>
@@ -185,10 +191,16 @@ for let (_, found) in Runtime.loadPlugins("./plugins") {
       <h2>Trust</h2>
       <p>Nothing of a package is used before it verifies. A package built with a publisher key is signed: the publisher's signature covers its name, version, exports, permissions and the checksum of every part, and a host checks it, then each part against its checksum before using it, the code last. On Linux the code that runs is the bytes that were checked, loaded from memory. A package that fails is still listed, with its name, and every call on it fails with the reason.</p>
       <p>Which plugins a program loads is its own decision, written in its <code>adm.toml</code>:</p>
-<pre><code data-hl="off" class="nohighlight">[plugins]
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">adm.toml</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">[plugins]
 allow_unsigned = true                # default false: an unsigned package does not load
 trusted = ["self", "admpub_..."]     # default: any publisher whose signature verifies
 permissions = ["adm.storage.read"]   # the most any plugin may be given</code></pre>
+      </div>
       <p><code>self</code> is the application's own publisher, for a product that loads only its own plugins. <code>Plugin.signed</code> says the signature verified and <code>Plugin.publisher</code> who signed.</p>
     </section>
 
@@ -202,7 +214,12 @@ permissions = ["adm.storage.read"]   # the most any plugin may be given</code></
       <h2>Types that cross</h2>
       <p>A signature names a type that is not the standard library's by its bare name, so a host's <code>Image</code> and a plugin's <code>Image</code> match by name. They are one type only when they are laid out alike: the package records the layout of every type a host can meet (<code>struct{width int; height int}</code>, an interface's methods in order), the host compares it with its own, and a plugin whose type differs is refused with both layouts in the error. Standard library types are the same on both sides, since both are built with one adm.</p>
       <p>A struct is a shape too. <code>found.create&lt;PluginDetails&gt;()</code> returns a copy of a value the plugin exports whose type has the fields of the host's struct, in the same order; the names of the two types need not match:</p>
-<pre><code>// in the plugin
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">plugin and host</span>
+        </div>
+        <pre><code>// in the plugin
 struct Details {
 	title string
 	level int
@@ -217,15 +234,22 @@ struct PluginDetails {
 }
 
 let about = try found.create&lt;PluginDetails&gt;()</code></pre>
+      </div>
     </section>
 
     <section class="docs-section" id="registering">
       <h2>Plugins that register</h2>
       <p>A plugin that adds a codec or a database driver exports nothing a host asks for: its annotated types (a playlist format's <code>@codec("LST")</code>, a database driver's <code>@driver("mydb")</code>) join the program's when the host calls <code>init()</code>, and the standard library's registries find them on their next use, as <code>reflection.attrs</code> does. A registered codec runs as the plugin, with the plugin's permissions.</p>
-<pre><code>for let (_, found) in Runtime.loadPlugins("./formats") {
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">host.adm</span>
+        </div>
+        <pre><code>for let (_, found) in Runtime.loadPlugins("./formats") {
 	try found.init()
 }
 let entries = try playlist.load("songs.lst")   // read by the plugin's codec</code></pre>
+      </div>
     </section>
   </main>
 

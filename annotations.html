@@ -138,7 +138,12 @@
 <p>On a variable or constant: fills it from the environment variable <code>name</code>, or the default when unset.</p>
       <h4><code>@command(name = &quot;&quot;, description = &quot;&quot;, aliases = &quot;&quot;, hidden = false)</code></h4>
 <p>From <code>std.cli</code> (<code>use std.cli::(command)</code>). On a function: the function is a command of the program, named after it in kebab case. A parameter without a default is a positional argument, taken in order; one with a default, and any <code>bool</code>, is a flag named after it; a variadic last parameter takes the words that are left. The doc comment is the command's help and its <code>@param</code> lines the help of the parameters. On a type: the type is a group; its <code>@command</code> methods and fields are its subcommands and its <code>@flag</code> fields the flags they share, read as plain fields by the methods. A type with <code>@flag</code> and <code>@arg</code> fields and a <code>run() !none</code> method is a command itself. A field's doc comment is its help. A type whose fields are <code>@flag</code>s and <code>@arg</code>s is a set of flags and arguments any command takes, through a parameter of that type or a <code>@flag</code> field of it; such a type may hold another in a <code>@flag</code> field. A flag may be written before the word that names its command. A parameter's default may be any expression, the parameters before it included; it is computed when the flag is left out, and shown in the command's help. <code>cli.run()</code> follows the command line to the command meant, fills its flags and arguments, calls it and returns the exit status; <code>--help</code>, or <code>help</code> before a command, shows help at any level, and <code>completion bash|zsh|fish|powershell</code> writes the completion script for the shell.</p>
-<pre><code>// Start the server.
+<div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">commands.adm</span>
+  </div>
+  <pre><code>// Start the server.
 // @param port Port to listen on.
 @command
 def serve(@flag(short = "p") port int = 8080, config ?os.File = none) !none { ... }
@@ -153,6 +158,7 @@ type Remote {
 	@command
 	def add(name string, address url.URL) !none { ... }   // tool remote add origin https://...
 }</code></pre>
+</div>
       <h4><code>@arg(name = &quot;&quot;, description = &quot;&quot;, placeholder = &quot;&quot;)</code></h4>
 <p>From <code>std.cli</code>. On a field of a <code>@command</code> type, or on a parameter of a <code>@command</code> function or method that has a default: a positional argument. An array field takes the words that are left.</p>
       <h4><code>@flag(name = &quot;&quot;, short = &quot;&quot;, description = &quot;&quot;, hidden = false, env = &quot;&quot;, required = false, count = false, mode = &quot;r&quot;, placeholder = &quot;&quot;, group = &quot;&quot;, excludes = &quot;&quot;, requires = &quot;&quot;)</code></h4>
@@ -313,7 +319,12 @@ type Remote {
         <code>adm.vault.write</code> for it, which <code>adm audit</code> lists; a program
         without one does not load the vault.
       </p>
-<pre><code>type EditorSettings {
+<div class="code-window">
+  <div class="code-titlebar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="code-filename">settings.adm</span>
+  </div>
+  <pre><code>type EditorSettings {
 	@persist("editor.fontSize")
 	fontSize int = 12
 
@@ -341,6 +352,7 @@ component Shell {
 		sidebarWidth int = 240
 	}
 }</code></pre>
+</div>
       <h4><code>@controller()</code></h4>
 <p>Marks a type as the controller of a UI component.</p>
     </section>
