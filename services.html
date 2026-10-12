@@ -1929,6 +1929,11 @@ Network.lab.conditions.unreachable = "*"         // offline</code></pre>
             <p class="api-doc">Fails when the policy denies it or the process could not be started, which the OS sandbox causes; a command that exited with an error is reported through the code.</p>
           </li>
           <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def start(program string, args string[] = [], env map&lt;string, string&gt; = {}, dir string = "", errors bool = false) !os.Process</code></div>
+            <p class="api-doc">Starts a program and returns while it runs. <code>program</code> is a path, or a name looked up in <code>PATH</code>; <code>args</code> follow it as written, with no shell in between. <code>env</code> adds to or replaces variables of this program's environment for the started one, and <code>dir</code> is its working directory. The result's <code>input</code> and <code>output</code> pipes are the program's standard input and output; its standard error is this program's, or the pipe <code>errors</code> when <code>errors</code> is true. <code>wait()</code> returns the exit code (128 + signal when a signal ended it), <code>wait(timeout)</code> none while it still runs, <code>terminate()</code> asks it to stop and <code>kill()</code> stops it. Needs <code>adm.runtime.spawn</code>.</p>
+            <p class="api-doc">Fails when the policy denies it or the program could not be started: no such program, no right to run it, no such folder.</p>
+          </li>
+          <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setEnv(key string, value string) !none</code></div>
             <p class="api-doc">Sets value of the specified environment variable for the current process.</p>
 

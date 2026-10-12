@@ -859,9 +859,62 @@ adm get acme:imaging@^1.4 --accept adm.storage.*</code></pre>
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="code-filename">usage</span>
         </div>
-        <pre><code data-hl="off" class="nohighlight">adm mcp [--root DIR] [--log-protocol]</code></pre>
+        <pre><code data-hl="off" class="nohighlight">adm mcp [--root DIR] [--log-protocol]
+adm mcp install [TOOL...|all]</code></pre>
       </div>
-      <p>Starts a Model Context Protocol server on stdio exposing the compiler's resolver and type checker as agent tools: <code>adm_doc</code>, <code>adm_symbol</code>, <code>adm_explore</code>, <code>adm_check</code>, <code>adm_test</code>.</p>
+      <p>Starts a Model Context Protocol server on stdio exposing the compiler's resolver and type checker as agent tools. A tool call that names no roots analyzes <code>--root</code>; without it, the folders the client has open, else the current directory. <code>--log-protocol</code> traces every message to stderr.</p>
+      <table class="docs-table">
+        <tr><th>Tool</th><th>What it answers</th></tr>
+        <tr><td><code>adm_doc</code></td><td>A module's exports with signatures and doc comments, a symbol search across modules, or the module inventory.</td></tr>
+        <tr><td><code>adm_symbol</code></td><td>A symbol by name: module, kind, signature, doc comment, <code>file:line</code> and source. Finds methods; a name may be qualified (<code>Buffer.read</code>, <code>std.io.Buffer</code>).</td></tr>
+        <tr><td><code>adm_explore</code></td><td>A question in plain words: the source of the symbols it names. Names (<code>Buffer</code>, <code>readFull</code>) come first; a lower-case word resolves only to members of the types named.</td></tr>
+        <tr><td><code>adm_references</code></td><td>Every use of a symbol: calls, reads, writes, type mentions, per declaration of the name.</td></tr>
+        <tr><td><code>adm_members</code></td><td>What a type has: methods, fields, properties, constants, enum values, each with its signature or type. Built-in types (<code>string</code>, <code>array</code>, <code>map</code>) answer with the prelude's methods.</td></tr>
+        <tr><td><code>adm_implementations</code></td><td>The types that implement an interface, or the interfaces a type satisfies.</td></tr>
+        <tr><td><code>adm_type_at</code></td><td>What the identifier at a file, line and column is: an inferred type, the overload a call resolved to, its module and doc comment.</td></tr>
+        <tr><td><code>adm_rename</code></td><td>Renames one declaration and every use the type checker resolved to it; lists the sites, writes them with <code>apply</code>, then checks again and reports errors the rename introduced.</td></tr>
+        <tr><td><code>adm_graph</code></td><td>The import tree, the chain of imports that loads a module (<code>why</code>), import cycles, the locked libraries, the services.</td></tr>
+        <tr><td><code>adm_audit</code></td><td>The permissions the code can reach with the calls that reach them, and the files binding foreign code.</td></tr>
+        <tr><td><code>adm_spec</code></td><td>The language specification, idioms guide and memory model: contents, a section by heading or number, or the sections that mention given words.</td></tr>
+        <tr><td><code>adm_check</code></td><td>Type-check: diagnostics as <code>file:line:col</code>.</td></tr>
+        <tr><td><code>adm_lint</code></td><td>What <code>adm lint</code> finds, each with its fix.</td></tr>
+        <tr><td><code>adm_fmt</code></td><td>Formats files in place; <code>check</code> shows the diff and writes nothing.</td></tr>
+        <tr><td><code>adm_fix</code></td><td>Rewrites for code written for an older adm, as a diff; <code>apply</code> writes them.</td></tr>
+      </table>
+      <p>The twelve tools that change nothing are marked read-only, so a client can run them without asking; <code>adm_fmt</code>, <code>adm_fix</code> and <code>adm_rename</code> write source files. No tool builds or runs the project's code, check suites included: those are run with <code>adm test</code> in a terminal. A file that is edited, added or removed is seen by the next call. Tool calls run side by side: a long type check does not hold up a lookup, a client can cancel a call, and a call that asks for progress is told every few seconds that it is still running. <code>adm_check</code>, <code>adm_references</code> and <code>adm_lint</code> also return their answer as structured data. The three language documents are offered as resources too (<code>adm://docs/language-specification</code>, <code>adm://docs/idioms</code>, <code>adm://docs/memory-model</code>). The server speaks the protocol revisions <code>2024-11-05</code> to <code>2025-11-25</code>.</p>
+      <h4 id="mcp-install"><code>adm mcp install</code></h4>
+      <p>Registers the server with the AI coding tools on the machine, so an agent can look up ADM symbols, read module documentation, check code and run suites in any project. Without arguments it lists the tools it found and what each one has:</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">$ adm mcp install
+claude     Claude Code              not registered for every project
+                                    ✓ this project: adm mcp --root . (/work/app/.mcp.json)
+codex      Codex                    ✓ registered
+vscode     VS Code (Copilot chat)   not registered for every project
+zed        Zed (agent panel)        not registered for every project
+not found: copilot, cursor, gemini, opencode, windsurf
+
+$ adm mcp install claude zed     # the named tools
+$ adm mcp install all            # every tool found</code></pre>
+      </div>
+      <p>The first line of a tool is its user-wide registration, the one that applies in every project. A second line appears when the project in the current directory registers the server in its own files (<code>.mcp.json</code>, <code>.cursor/mcp.json</code>, <code>.vscode/mcp.json</code>, <code>.gemini/settings.json</code>, <code>opencode.json</code>); those are only read, never written. <code>registered as: ...</code> means the tool starts another command line than the one this adm would write, for instance after the binary moved; installing again replaces it.</p>
+      <p>With names, the server is written to each tool's user-wide settings as the full path of the running <code>adm</code> followed by <code>mcp</code>, with no <code>--root</code>, so it analyzes whichever project the tool has open. Restart a running tool afterwards.</p>
+      <table class="docs-table">
+        <tr><th>Name</th><th>Tool</th><th>Where the server is registered</th></tr>
+        <tr><td><code>claude</code></td><td>Claude Code</td><td>User scope, through <code>claude mcp add --scope user</code>.</td></tr>
+        <tr><td><code>codex</code></td><td>Codex</td><td><code>~/.codex/config.toml</code>, through <code>codex mcp add</code>.</td></tr>
+        <tr><td><code>copilot</code></td><td>GitHub Copilot CLI</td><td><code>~/.copilot/mcp-config.json</code> (<code>$COPILOT_HOME</code> moves it).</td></tr>
+        <tr><td><code>cursor</code></td><td>Cursor</td><td><code>~/.cursor/mcp.json</code>.</td></tr>
+        <tr><td><code>gemini</code></td><td>Gemini CLI</td><td><code>~/.gemini/settings.json</code>.</td></tr>
+        <tr><td><code>opencode</code></td><td>opencode</td><td><code>~/.config/opencode/opencode.json</code>, or <code>opencode.jsonc</code> when that is the file in use.</td></tr>
+        <tr><td><code>vscode</code></td><td>VS Code (Copilot chat)</td><td><code>mcp.json</code> of the user profile (<code>~/.config/Code/User</code> on Linux).</td></tr>
+        <tr><td><code>windsurf</code></td><td>Windsurf</td><td><code>~/.config/devin/mcp_config.json</code>; <code>~/.codeium/windsurf/mcp_config.json</code> when only that older folder exists.</td></tr>
+        <tr><td><code>zed</code></td><td>Zed (agent panel)</td><td><code>context_servers</code> in <code>~/.config/zed/settings.json</code>.</td></tr>
+      </table>
+      <p>A tool counts as found when its program is on <code>PATH</code> or its settings folder exists. Settings files are edited in place: one entry is set, and comments, key order and formatting stay as they were. A file that does not parse is reported and left untouched. Naming a tool that is not installed, or an unknown name, is an error; with several tools, one failing does not stop the others.</p>
       <h3 id="env"><code>adm env</code></h3>
       <div class="code-window">
         <div class="code-titlebar">

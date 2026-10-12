@@ -91,6 +91,7 @@
           <li><a class="docs-nav-sub" href="#std-proto">std.proto</a></li>
           <li><a class="docs-nav-sub" href="#std-jsonrpc">std.proto.jsonrpc</a></li>
           <li><a class="docs-nav-sub" href="#std-msgpackrpc">std.proto.msgpackrpc</a></li>
+          <li><a class="docs-nav-sub" href="#std-mcp">std.proto.mcp</a></li>
           <li><a class="docs-nav-sub" href="#std-journald">std.proto.journald</a></li>
           <li><a class="docs-nav-sub" href="#std-auth-jose">std.proto.auth.jose</a></li>
           <li><a class="docs-nav-sub" href="#std-auth-oauth2">std.proto.auth.oauth2</a></li>
@@ -348,6 +349,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>BinaryReader</code></td><td>typed reads in either byte order, varints</td></tr>
           <tr><td><code>Bitstream</code></td><td>bit-level reader</td></tr>
           <tr><td><code>RecordReader</code>, <code>RewindableReader</code></td><td>record and rewindable readers</td></tr>
+          <tr><td><code>Pipe</code></td><td>in-memory stream between two tasks</td></tr>
           <tr><td><code>Endian</code>, <code>Whence</code></td><td>byte order, seek origin</td></tr>
         </table>
       </div>
@@ -523,6 +525,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>readFile</code>, <code>writeFile</code>, <code>open</code>, <code>stat</code>, <code>readDir</code>, <code>exists</code>, <code>remove</code>, <code>rename</code>, <code>mkdir</code>, <code>rmdir</code>, <code>chmod</code>, <code>touch</code></td><td>file operations</td></tr>
           <tr><td><code>join</code>, <code>dir</code>, <code>base</code>, <code>extension</code>, <code>split</code>, <code>clean</code>, <code>isAbs</code></td><td>paths</td></tr>
           <tr><td><code>run</code>, <code>output</code></td><td>start a program (needs <code>adm.runtime.spawn</code>)</td></tr>
+          <tr><td><code>Process</code>, <code>Pipe</code></td><td>a program started by <code>Runtime.start</code> that runs beside this one: <code>input</code>, <code>output</code> and <code>errors</code> pipes (<code>io.Reader</code>/<code>io.Writer</code>), <code>wait()</code>, <code>wait(timeout)</code>, <code>terminate()</code>, <code>kill()</code>, <code>id()</code></td></tr>
           <tr><td><code>mapFile</code>, <code>Mapping</code></td><td>memory-mapped files</td></tr>
           <tr><td><code>File.sync</code>, <code>File.lock</code>, <code>File.unlock</code></td><td>push writes to the device, advisory whole-file locks</td></tr>
           <tr><td><code>memoryFile</code>, <code>File.seal</code></td><td>a file with no path that lives in memory (Linux); making its content final before handing it to another process</td></tr>
@@ -587,6 +590,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>HttpClient</code></td><td>calls over HTTP POST</td></tr>
           <tr><td><code>Request</code>, <code>Handler</code>, <code>Call</code>, <code>Reply</code></td><td>requests, handlers, batches</td></tr>
           <tr><td><code>RPCError</code>, <code>ErrorCode</code>, <code>errorOf</code>, <code>kindOf</code></td><td>error objects</td></tr>
+          <tr><td><code>NoReply</code></td><td>the failure of a handler that must not be answered</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-msgpackrpc">
@@ -596,6 +600,27 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Request</code>, <code>Handler</code></td><td>requests and handlers</td></tr>
           <tr><td><code>RPCError</code>, <code>ErrorCode</code>, <code>errorOf</code></td><td>error objects</td></tr>
         </table>
+      </div>
+      <div class="docs-sub" id="std-mcp">
+        <h3><code>std.proto.mcp</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>@mcp.tool</code>, <code>@mcp.resource</code>, <code>@mcp.prompt</code></td><td>make a function or a method a tool, a resource or a prompt of an MCP server</td></tr>
+          <tr><td><code>serve</code></td><td>serves every marked function over standard input and output</td></tr>
+          <tr><td><code>Server</code></td><td>an MCP server: registration in code, <code>discover</code>, <code>add</code>, stdio, streams and HTTP</td></tr>
+          <tr><td><code>Request</code></td><td>what a handler gets: progress, log messages, cancellation, questions to the client, the access token and <code>require</code> for scopes</td></tr>
+          <tr><td><code>Client</code>, <code>connect</code>, <code>launch</code></td><td>an MCP client over a stream or HTTP, or of a server it starts as a program</td></tr>
+          <tr><td><code>Authorization</code>, <code>CredentialStore</code></td><td>a client's way into a server that asks for an access token: discovery, registration, the code flow, refresh, more scopes on demand</td></tr>
+          <tr><td><code>Tool</code>, <code>ToolResult</code>, <code>ToolHints</code>, <code>ToolHandler</code></td><td>tools</td></tr>
+          <tr><td><code>Task</code>, <code>TaskStatus</code>, <code>TaskSupport</code>, <code>ToolRun</code></td><td>tasks: tool calls a server carries on after it answered (<code>@mcp.tool(task = …)</code>; <code>Client.start</code>, <code>wait</code>, <code>task</code>, <code>cancelTask</code>)</td></tr>
+          <tr><td><code>Resource</code>, <code>ResourceTemplate</code>, <code>ResourceContents</code>, <code>ResourceHandler</code></td><td>resources</td></tr>
+          <tr><td><code>Prompt</code>, <code>PromptArgument</code>, <code>PromptMessage</code>, <code>PromptResult</code>, <code>PromptHandler</code></td><td>prompt templates</td></tr>
+          <tr><td><code>Content</code>, <code>ContentKind</code>, <code>text</code>, <code>image</code>, <code>audio</code>, <code>embedded</code>, <code>link</code>, <code>Annotations</code>, <code>Role</code></td><td>content of results and messages</td></tr>
+          <tr><td><code>Completion</code>, <code>CompletionHandler</code>, <code>Reference</code></td><td>completion of arguments</td></tr>
+          <tr><td><code>Elicitation</code>, <code>ElicitAction</code>, <code>ElicitationRequest</code>, <code>SamplingRequest</code>, <code>SamplingMessage</code>, <code>SamplingResult</code>, <code>ModelPreferences</code>, <code>Root</code></td><td>what a server asks of its client</td></tr>
+          <tr><td><code>Implementation</code>, <code>Icon</code>, <code>ClientCapabilities</code>, <code>ServerCapabilities</code>, <code>LogLevel</code>, <code>ProgressHandler</code></td><td>identity, capabilities, logging, progress</td></tr>
+          <tr><td><code>McpError</code>, <code>McpErrorKind</code></td><td>why a call or a transport failed</td></tr>
+        </table>
+        <p class="exports-note">Speaks protocol revisions 2026-07-28, 2025-11-25, 2025-06-18, 2025-03-26 and 2024-11-05, over a stream of lines (standard input and output) and over HTTP. <code>Server.protect(guard, scopes)</code> puts an <code>oauth2.ResourceServer</code> in front of the HTTP endpoint.</p>
       </div>
       <div class="docs-sub" id="std-journald">
         <h3><code>std.proto.journald</code></h3>
@@ -622,8 +647,11 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>Client</code>, <code>Token</code>, <code>AuthorizationRequest</code>, <code>DeviceAuthorization</code></td><td>OAuth 2 client: code with PKCE, client credentials, refresh, device flow, token exchange, DPoP</td></tr>
           <tr><td><code>AuthorizationServer</code>, <code>ClientStore</code>, <code>GrantStore</code></td><td>authorization server</td></tr>
-          <tr><td><code>ResourceServer</code>, <code>AccessToken</code>, <code>Introspection</code></td><td>resource server: JWT and introspected tokens</td></tr>
+          <tr><td><code>ResourceServer</code>, <code>AccessToken</code>, <code>Introspection</code></td><td>resource server: JWT and introspected tokens, challenges that name scopes and metadata</td></tr>
+          <tr><td><code>ResourceMetadata</code>, <code>discoverResource</code>, <code>parseResourceMetadata</code></td><td>protected resource metadata (RFC 9728): what a resource publishes, and how a client finds its authorization server</td></tr>
           <tr><td><code>ServerMetadata</code>, <code>discover</code>, <code>ClientRegistration</code></td><td>metadata discovery, dynamic client registration</td></tr>
+          <tr><td><code>ClientMetadata</code>, <code>ClientDocuments</code></td><td>client metadata; Client ID Metadata Documents: a client's own URL as its id, rendered by the client and fetched by the server</td></tr>
+          <tr><td><code>parseToken</code>, <code>parseMetadata</code></td><td>reading a kept token and a metadata document</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-auth-openid">
@@ -694,6 +722,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Binary</code></td><td>typed self-describing binary stream</td></tr>
           <tr><td><code>putVarint</code>, <code>varint</code></td><td>varints</td></tr>
         </table>
+        <p class="exports-note"><code>std.data.encoding.jsonschema</code>: <code>schemaOf</code> (the JSON Schema of an ADM type), <code>valueOf</code> (a JSON value as that type), <code>Callable</code> (a function or method described as JSON Schema and called with a JSON object), <code>Parameter</code>, <code>SchemaError</code>, <code>SchemaErrorKind</code>.</p>
       </div>
       <div class="docs-sub" id="std-codepages">
         <h3><code>std.data.encoding.codepages</code></h3>
@@ -1103,6 +1132,8 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Proxy</code>, <code>EnvironmentProxy</code>, <code>StaticProxy</code></td><td>HTTP, HTTPS and SOCKS proxies for the client, from the environment or one URL</td></tr>
           <tr><td><code>ForwardProxy</code></td><td>handler that serves as an HTTP proxy (<code>CONNECT</code> tunnels, forwarded requests)</td></tr>
           <tr><td><code>CrossOriginProtection</code></td><td>cross-origin request protection</td></tr>
+          <tr><td><code>EventReader</code>, <code>ServerEvent</code></td><td>reads server-sent events from a response body</td></tr>
+          <tr><td><code>parseChallenges</code>, <code>AuthChallenge</code></td><td>the challenges of <code>WWW-Authenticate</code> headers: scheme and parameters</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-http2">
@@ -1359,6 +1390,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>ChatFormat</code>, <code>detectChatFormat</code></td><td>chat formats of model families</td></tr>
           <tr><td><code>Tokenizer</code></td><td>BPE and SentencePiece tokenizers</td></tr>
           <tr><td><code>Stats</code></td><td>prompt and generation speed</td></tr>
+          <tr><td><code>toolsOf</code></td><td>the tools of an MCP server (<code>std.proto.mcp</code>) as tools of a session</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-ai-tensor">

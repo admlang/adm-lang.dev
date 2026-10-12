@@ -69,6 +69,7 @@
       <div class="docs-nav-group"><a class="docs-nav-top" href="#gpu">GPU Kernels</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#data-collections">Collections</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#semver">Semantic Versions</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#mcp">MCP Server</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#units">Units of Measure</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#media-player">Media Player</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#plugins">Plugins</a></div>
@@ -1206,6 +1207,58 @@ application Shop {
 		println(v.satisfies(&quot;&gt;=1.4.0-alpha&quot;))     // true
 		println(v.canonical())                    // 1.4.0-rc.1
 		return 0
+	}
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="mcp">
+      <h2>MCP Server</h2>
+      <p><code>std.proto.mcp</code> makes a program a Model Context Protocol server: mark functions as tools, resources and prompts, and <code>mcp.serve</code> offers them to an AI application over standard input and output. Names, descriptions and argument schemas come from the declarations and their doc comments. <code>new mcp.Server(...)</code> serves the same over HTTP, and <code>mcp.connect</code> is the client.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">calculator.adm</span>
+        </div>
+        <pre><code>application Calculator {
+	use (
+		std.proto.mcp
+		tools.calculator as _
+	)
+
+	def new(args string[]) int {
+		// Serves every marked function over standard input and output.
+		mcp.serve(&quot;calculator&quot;, &quot;1.0.0&quot;) onerror (err error) {
+			return 1
+		}
+		return 0
+	}
+}
+
+module tools.calculator {
+	use std.proto.mcp
+
+	// Adds two numbers.
+	// @param a the first number
+	// @param b the second number
+	@mcp.tool(readOnly = true)
+	def add(a int, b int) int {
+		return a + b
+	}
+
+	// A note by its number.
+	@mcp.resource(&quot;notes://\{id\}&quot;)
+	def note(id int) !string {
+		fail &quot;there are nine notes&quot; when id &gt; 9
+		return &quot;Note {id}&quot;
+	}
+
+	// Asks for a review of some code.
+	// @param code the code to review
+	// @param focus what to look for
+	@mcp.prompt()
+	def review(code string, focus string = &quot;bugs&quot;) string {
+		return &quot;Review this code for {focus}:\n{code}&quot;
 	}
 }</code></pre>
       </div>
