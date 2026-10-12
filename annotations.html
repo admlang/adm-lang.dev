@@ -437,7 +437,7 @@ component Shell {
       <h4><code>@tool(name = &quot;&quot;)</code></h4>
 <p>From <code>std.ai.llm</code>: makes a method a tool that <code>Session.use</code> offers the model. The doc comment is the tool's description; the parameters' names, types and defaults are the tool's parameters.</p>
       <h4><code>@ide(kind = IdeKind.Value, label = &quot;&quot;, refresh = 1s, unit = &quot;&quot;)</code></h4>
-<p>From <code>std.ide</code>: publishes a zero-argument service method to the IDE service panel, polled at most every <code>refresh</code>.</p>
+<p>From <code>std.ide</code>: publishes a zero-argument service method to the IDE service panel, polled at most every <code>refresh</code>. <code>kind</code> picks the widget: a value, a table (<code>IdeTable</code>), a graph, or a list of log entries colored by level (<code>IdeKind.Log</code>, an <code>IdeLog</code>).</p>
     </section>
 
     <section class="docs-section" id="writing">

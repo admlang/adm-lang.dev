@@ -813,6 +813,16 @@ let a = 1h</code></pre>
           <pre><code>let a = /./
 let a = /[a-z]{1,}+/mg</code></pre>
         </div>
+        <p>A pattern that is only known at run time, such as one read from a file, becomes a regex with <code>new regex(pattern, flags)</code>:</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">regex_runtime.adm</span>
+          </div>
+          <pre><code>let rule = new regex("^.+@example\\.com$", "i")
+rule.valid()                   // true: the pattern compiles
+rule.test("Ana@Example.com")   // true</code></pre>
+        </div>
 
         <p>
           SIMD's <code>vec2/4/8/16/32/64/128</code> and <code>mask2/4/8/16/32/64/128</code> types get their

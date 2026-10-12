@@ -63,6 +63,7 @@
           <li><a class="docs-nav-sub" href="#svc-debugger"><code>Debugger</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-devices"><code>Devices</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-diagnostics"><code>Diagnostics</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-features"><code>Features</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-i18n"><code>I18n</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-ipc"><code>IPC</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-logging"><code>Logging</code></a></li>
@@ -109,6 +110,7 @@
           <li><a class="docs-nav-sub" href="#meta-subscribe"><code>@subscribe</code></a></li>
           <li><a class="docs-nav-sub" href="#meta-topic"><code>@topic</code></a></li>
           <li><a class="docs-nav-sub" href="#meta-span"><code>@span</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-translate"><code>@translate</code></a></li>
         </ul>
       </div>
 
@@ -333,7 +335,7 @@ Depot.lab.conditions.fullAt = 0.6</code></pre>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def filePath(path string) !string</code></div>
-            <p class="api-doc">Resolves a package path: <code>package://assets/logo.png</code> is a file the calling package shipped, <code>acme:imaging://assets/logo.png</code> one a library shipped. Any other path comes back unchanged. Every <code>Storage</code> method, and so every <code>std.os</code> call, resolves its path this way, so <code>os.readFile(&quot;package://assets/logo.png&quot;)</code> works from <code>adm run</code>, from a build in the tree and from an installed program alike. Fails when the package has no shipped files.</p>
+            <p class="api-doc">Resolves a package path: <code>package://assets/logo.png</code> is a file the calling package shipped, <code>acme:imaging://assets/logo.png</code> one a library shipped. Any other path comes back unchanged. Of the folders a package's files can be in, the first that holds the path is taken, so a program started with <code>adm run</code> finds the files of its source tree. Every <code>Storage</code> method, and so every <code>std.os</code> call, resolves its path this way, so <code>os.readFile(&quot;package://assets/logo.png&quot;)</code> works from <code>adm run</code>, from a build in the tree and from an installed program alike. Fails when the package has no shipped files.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def pid() int</code></div>
@@ -877,10 +879,301 @@ Cache.lab.conditions.missRate = 0.25       // one read in four misses</code></pr
           </li>
         </ul>
       </div>
+      <div class="docs-sub" id="svc-features">
+        <h3><code>Features</code></h3>
+        <p>Asks a server which features this installation gets and answers from memory: kill switches, gradual rollouts per place, attribute gates and A/B groups. The server decides everything and signs its answer; the program never receives the rules. The server is <a href="modules.html"><code>std.net.features</code></a> (<code>FeatureServer</code>), or any server that speaks its exchange.</p>
+        <p>Reads never wait for the server and never fail: a name the server did not mention, a program that has no reply yet, and a reply past its validity all give the fallback written in the code. The last reply is kept in the <a href="#svc-vault"><code>Vault</code></a> (<code>features.assignments</code>), so a program that starts offline has what it had until the validity the server set (30 days by default). The service asks again as often as the server says (an hour by default); a kill switch reaches a program at its next request, there is no push.</p>
+        <p>A reply is taken only when its Ed25519 signature verifies with <code>FeaturesConfig.key</code>, it was made for this installation and it is not past its validity; otherwise what was held stays and <code>failed</code> is emitted.</p>
+        <p>The request carries the vault's id (<a href="#svc-vault"><code>Vault.id()</code></a>), the program's name, version, system and processor, the locale and whatever <code>set</code> added: what personal data goes into <code>set</code> is the program's choice. A telemetry collector and a feature server run by the same operator can join what they receive on that id.</p>
+        <p>The service asks whether or not the user agreed to telemetry, so kill switches and rollouts reach everyone. An A/B group takes only installations whose use is measured (<a href="#svc-telemetry"><code>Telemetry</code></a> is collecting), unless the group is for everyone; a user who withdraws consent leaves running tests at the next request, and results describe consenting users only. The first read of a feature or of a group is a Telemetry usage event (<code>feature</code> with <code>feature</code> and <code>enabled</code>, <code>group</code> with <code>group</code> and <code>arm</code>), sent under Telemetry's own consent.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">features.adm</span>
+          </div>
+          <pre><code>use std.services.features::(Features, FeaturesConfig)
+
+try Features.config(FeaturesConfig{url: &quot;https://features.example.com/&quot;, key: serverKey})
+try await Features.start()
+
+Features.set(&quot;plan&quot;, &quot;pro&quot;)                                    // an attribute the rules can match
+
+if Features.enabled(&quot;new-checkout&quot;) { ... }                    // a gate, a kill switch, a rollout
+let limit = Features.value&lt;int&gt;(&quot;upload.limit&quot;, 10)            // a feature&#x27;s value
+let arm = Features.arm(&quot;login-page&quot;)                           // the A/B arm, &quot;&quot; outside the test
+let color = Features.value&lt;string&gt;(&quot;login-page&quot;, &quot;button-color&quot;, &quot;blue&quot;)
+
+Features.override(&quot;new-checkout&quot;, true)                        // this run only</code></pre>
+        </div>
+        <table class="docs-table">
+          <tr>
+            <td><code>FeaturesConfig.url string</code></td>
+            <td>Where the feature server answers: the URL the request is posted to.</td>
+          </tr>
+          <tr>
+            <td><code>FeaturesConfig.key ?Ed25519PublicKey</code></td>
+            <td>The public half of the key the server signs with.</td>
+          </tr>
+          <tr>
+            <td><code>FeaturesConfig.retry duration = 1min</code></td>
+            <td>How long to wait before the first reply says how often to ask, and after a request that failed; twice as long after each further failure, up to the server's interval.</td>
+          </tr>
+          <tr>
+            <td><code>FeaturesConfig.timeout duration = 10s</code></td>
+            <td>How long one request may take.</td>
+          </tr>
+          <tr>
+            <td><code>FeaturesConfig.tls ?tls.Config</code></td>
+            <td>TLS settings for an https server; none trusts the system's roots.</td>
+          </tr>
+          <tr>
+            <td><code>FeaturesConfig.headers map&lt;string, string&gt;</code></td>
+            <td>Sent with every request: an API key the server asks for.</td>
+          </tr>
+          <tr>
+            <td><code>FeaturesConfig.name, version string</code></td>
+            <td>The program's name and version as the server sees them; the application's own when empty.</td>
+          </tr>
+          <tr>
+            <td><code>FeaturesConfig.locale string</code></td>
+            <td>The user's locale (<code>fr-FR</code>), for rules on locales; when empty, the language the <a href="#svc-i18n"><code>I18n</code></a> service has in use (the program's, else the system's).</td>
+          </tr>
+          <tr>
+            <td><code>FeaturesConditions</code></td>
+            <td>Lab conditions (<code>Features.lab.conditions</code>): <code>unreachable</code>, <code>badSignature</code>, <code>stale</code>, <code>fetchDelay</code>.</td>
+          </tr>
+        </table>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def config(val FeaturesConfig) !none</code></div>
+            <p class="api-doc">Applies the settings; on a started service the next request, made at once, goes to the new server, and a reply held from a server with another key is dropped. Fails when <code>retry</code> or <code>timeout</code> is not positive, and when the service is started and the settings have no <code>url</code> or no <code>key</code>. Needs the permission <code>adm.features.fetch</code>.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def set(key string, value string)</code></div>
+            <p class="api-doc">Adds an attribute to every request from now on, for the server's rules to match, and asks the server again in the background. An empty value takes the attribute away.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def enabled(name string, fallback bool = false) bool</code></div>
+            <p class="api-doc">Whether the feature is on for this installation; <code>fallback</code> when the server did not mention it, no reply has arrived yet, or the reply held is past its validity.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def value&lt;T&gt;(name string, fallback T) T</code></div>
+            <p class="api-doc">The feature's value as a <code>T</code>: a number, a text, a bool, a struct read from an object, an array. <code>fallback</code> when the server gave the feature no value or one that is not a <code>T</code>, and whenever <code>enabled</code> would give its fallback.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def arm(group string) string</code></div>
+            <p class="api-doc">The arm of the group this installation is in; <code>""</code> outside the test, for a group the server did not mention, and without a reply that holds.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def value&lt;T&gt;(group string, key string, fallback T) T</code></div>
+            <p class="api-doc">The value of one key of a group: what the installation's arm gives the key, the group's default outside the test, <code>fallback</code> for a group or a key the server did not mention.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def refresh() !none</code></div>
+            <p class="api-doc">Asks the server now and takes its reply. Fails with a <code>FeaturesError</code> (<code>kind</code>: <code>Transport</code>, <code>Reply</code>, <code>Signature</code>, <code>Subject</code>, <code>Expired</code>) and keeps what it held.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def override(name string, enabled bool, value ?any = none)</code></div>
+            <p class="api-doc">Makes this run answer <code>enabled</code> and <code>value</code> for the feature as given, whatever the server says: a developer's switch, a command-line flag, a test. Not kept between runs, not reported to Telemetry.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def override(group string, arm string, values map&lt;string, any&gt; = {})</code></div>
+            <p class="api-doc">Makes this run answer <code>arm</code> for the group as given, and <code>value</code> for the keys in <code>values</code>; the other keys stay as the server gave them.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def restore(name string = &quot;&quot;)</code></div>
+            <p class="api-doc">Takes back the overrides of the feature and of the group of that name; every override for <code>""</code>.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def changed(change FeaturesChange) FeaturesChange</code></div>
+            <p class="api-doc">Emitted when a reply gives a feature or a group something else than the reply before it: <code>features</code> and <code>groups</code> hold the names concerned.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def failed(failure FeaturesError) FeaturesError</code></div>
+            <p class="api-doc">Emitted when a request fails or its reply is refused; what was held stays.</p>
+          </li>
+        </ul>
+      </div>
       <div class="docs-sub" id="svc-i18n">
         <h3><code>I18n</code></h3>
-        <p>Locale selection and message catalogs.</p>
-        <p class="docs-placeholder">Planned - no public methods yet.</p>
+        <p>Translates the program&#x27;s texts and writes numbers, money, dates and times the way the user&#x27;s region writes them.</p>
+        <p>The language, the region and the time zone are three settings, as an operating system has them. The language picks the catalog translated text comes from; the region picks the formats; the time zone picks the wall clock an instant is shown on. English text with Romanian formats is <code>setLanguage(&quot;en&quot;)</code> and <code>setRegion(&quot;RO&quot;)</code>. Each starts as the system&#x27;s.</p>
+        <p>Catalogs are files of <code>std.formats.translations</code> (<code>.po</code>), one for each language, loaded from a folder at start and with <code>load</code> later. A text is a message in the ICU MessageFormat syntax (<code>std.i18n.Message</code>): <code>{count, plural, one{# item} other{# items}}</code>. It is looked up in the catalog of the language asked for, then in those of the languages close to it (<code>de</code> for <code>de-AT</code>); when none has it the answer is the source text, and <code>missing</code> reports it once.</p>
+        <p>A library ships its own catalogs in a <code>locales</code> folder of its <code>[package] files</code>. A text asked for by a library&#x27;s code, or by a <code>@translate</code> field a library declares, is looked up in the library&#x27;s catalogs first, then in the application&#x27;s, so an application can translate a library into a language the library does not ship.</p>
+        <p>A server answers each request in its user&#x27;s language, region and time zone: <code>setLanguage</code>, <code>setRegion</code> and <code>setTimeZone</code> with <code>I18nScope.Task</code> set them for the calling task and the tasks it starts, and the methods also take them as arguments. Texts and formats are read without starting the service; without catalogs every text is its source text.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">i18n.adm</span>
+          </div>
+          <pre><code>use std.services.i18n::(I18n, I18nConfig, I18nScope)
+
+try I18n.config(I18nConfig{folder: &quot;locales&quot;})          // locales/de.po, locales/fr.po, ...
+try await I18n.start()
+
+I18n.text(&quot;basket.count&quot;, {&quot;count&quot;: 3})                 // &quot;3 Artikel&quot;
+I18n.money(1999, &quot;EUR&quot;)                                 // &quot;19,99 €&quot;
+I18n.date(time.now())                                   // &quot;12.10.2026&quot;
+
+try I18n.setLanguage(&quot;en&quot;)                              // English text ...
+try I18n.setRegion(&quot;ES&quot;)                                // ... with Spanish formats
+try I18n.setTimeZone(&quot;Europe/Bucharest&quot;)                // instants on Bucharest&#x27;s clock
+
+// A server handler: this request&#x27;s language and region, for the code it calls.
+let asked = I18n.negotiate(acceptLanguage)                // &quot;de-CH, de;q=0.9, en;q=0.5&quot;
+try I18n.setLanguage(asked.str(), I18nScope.Task) unless asked is none
+I18n.text(&quot;basket.title&quot;, {}, &quot;fr&quot;)                     // or by argument</code></pre>
+        </div>
+        <table class="docs-table">
+          <tr>
+            <td><code>I18nConfig.language string = &quot;&quot;</code></td>
+            <td>The language translated text is shown in (<code>de</code>, <code>pt-BR</code>, <code>de_AT</code>); empty is the system&#x27;s.</td>
+          </tr>
+          <tr>
+            <td><code>I18nConfig.region string = &quot;&quot;</code></td>
+            <td>The region whose formats numbers, money, dates and times take: a region code in capitals (<code>RO</code>, the formats of its main language) or a locale (<code>en-GB</code>); empty is the system&#x27;s.</td>
+          </tr>
+          <tr>
+            <td><code>I18nConfig.timeZone string = &quot;&quot;</code></td>
+            <td>The time zone instants are written in: an IANA name (<code>Europe/Bucharest</code>) or an offset (<code>+02:00</code>); empty is the system&#x27;s.</td>
+          </tr>
+          <tr>
+            <td><code>I18nConfig.folder string = &quot;&quot;</code></td>
+            <td>The folder <code>start</code> loads the application&#x27;s catalogs from, one file for each language named by it (<code>de.po</code>, <code>pt_BR.po</code>); a relative path is looked for among the application&#x27;s shipped files. Empty loads <code>locales</code> when the application ships one.</td>
+          </tr>
+          <tr>
+            <td><code>I18nConfig.source string = &quot;en&quot;</code></td>
+            <td>The language the program&#x27;s own texts are written in. A user it serves is shown those texts, and nothing is reported missing for them.</td>
+          </tr>
+          <tr>
+            <td><code>I18nScope</code></td>
+            <td><code>Application</code> (the whole program) or <code>Task</code> (the calling task and the tasks it starts).</td>
+          </tr>
+          <tr>
+            <td><code>I18nChange</code></td>
+            <td><code>language Locale</code>, <code>region Locale</code>, <code>timeZone TimeZone</code>: all three as they are after a change.</td>
+          </tr>
+          <tr>
+            <td><code>MissingText</code></td>
+            <td><code>key</code>, <code>context</code>, <code>language Locale</code>, <code>package</code> (the library whose code asked, empty for the application).</td>
+          </tr>
+          <tr>
+            <td><code>SystemLocales</code></td>
+            <td><code>language Locale</code>, <code>languages Locale[]</code> (most preferred first), <code>region Locale</code>, <code>timeZone TimeZone</code>.</td>
+          </tr>
+        </table>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def config(val I18nConfig) !none</code></div>
+            <p class="api-doc">Applies the settings. A started service loads the folder again when it changed, and emits <code>changed</code> when the language or the region in use did.</p>
+            <p class="api-doc">Fails when <code>language</code>, <code>region</code> or <code>source</code> is not a well-formed locale, and on a started service as <code>start</code> does; the service then stays as it was.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def language() Locale</code></div>
+            <p class="api-doc">The language translated text is shown in: the calling task&#x27;s when it set one, else the program&#x27;s, else the system&#x27;s.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def region() Locale</code></div>
+            <p class="api-doc">The locale whose formats numbers, money, dates and times take, resolved the same way.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setLanguage(language string, scope I18nScope = I18nScope.Application) !none</code></div>
+            <p class="api-doc">Sets the language; empty goes back to the system&#x27;s, or for a task to the program&#x27;s. For the program it emits <code>changed</code> when the language in use becomes another.</p>
+            <p class="api-doc">Fails when the language is not a well-formed locale.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setRegion(region string, scope I18nScope = I18nScope.Application) !none</code></div>
+            <p class="api-doc">Sets the region: a region code in capitals (<code>RO</code>) or a locale (<code>en-GB</code>); empty goes back to the system&#x27;s, or for a task to the program&#x27;s.</p>
+            <p class="api-doc">Fails when the region is neither a region code nor a well-formed locale.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def timeZone() TimeZone</code></div>
+            <p class="api-doc">The time zone instants are written in: the calling task&#x27;s when it set one, else the program&#x27;s, else the system&#x27;s.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setTimeZone(timeZone string, scope I18nScope = I18nScope.Application) !none</code></div>
+            <p class="api-doc">Sets the time zone: an IANA name or an offset; empty goes back to the system&#x27;s, or for a task to the program&#x27;s. For the program it emits <code>changed</code> when the zone in use becomes another. A <code>ZonedDateTime</code> is always written in its own zone, and a plain date or time has none.</p>
+            <p class="api-doc">Fails when the zone is neither in the tz database nor an offset.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def system() SystemLocales</code></div>
+            <p class="api-doc">What the operating system says the user prefers, from the POSIX locale variables (<code>LANGUAGE</code>, <code>LC_ALL</code>, <code>LC_MESSAGES</code>, <code>LANG</code>, <code>LC_NUMERIC</code>, <code>LC_TIME</code>, <code>LC_MONETARY</code>); American English when it says nothing.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def languages() Locale[]</code></div>
+            <p class="api-doc">The languages the application has catalogs for, and its source language.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def negotiate(acceptLanguage string) ?Locale</code></div>
+            <p class="api-doc">The language of <code>languages()</code> that best serves an HTTP Accept-Language header; none when nothing is close.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def load(path string) !none</code></div>
+            <p class="api-doc">Loads a catalog file, or every catalog file of a folder. A file&#x27;s language is the one it names inside, else the one in its name (<code>de.po</code>, <code>messages.fr-CA.po</code>). The catalogs become those of the package that calls.</p>
+            <p class="api-doc">Fails when the path cannot be read, a file is not a well-formed catalog, or a file names no language.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def load(catalog Catalog) !none</code></div>
+            <p class="api-doc">Loads a catalog made in code. Fails when its locale is undetermined.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def text(key string, params map&lt;string, any&gt; = {}, language string = &quot;&quot;, region string = &quot;&quot;, context string = &quot;&quot;) string</code></div>
+            <p class="api-doc">The translated text of a message with the values of <code>params</code> written in: in <code>language</code> when given, else the language in use; numbers and dates in it as <code>region</code> writes them when given, else the region in use. <code>context</code> tells apart messages with the same key.</p>
+            <p class="api-doc">When no catalog has the message, the answer is the key with the values written in, and <code>missing</code> reports it.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def textIn(owner string, key string, fallback string, params map&lt;string, any&gt; = {}, language string = &quot;&quot;) string</code></div>
+            <p class="api-doc">The same for the code of the module <code>owner</code>, whose library&#x27;s catalogs are looked in first; <code>fallback</code> is the answer when no catalog has the message. <code>@translate</code> fields read through it.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def has(key string, language string = &quot;&quot;, context string = &quot;&quot;) bool</code></div>
+            <p class="api-doc">Whether a catalog has the message in the language or one close to it.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def number(value int | float | Decimal, region string = &quot;&quot;) string</code></div>
+            <p class="api-doc">The number as the region writes it: <code>1.234,5</code>.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def percent(value float | Decimal, region string = &quot;&quot;) string</code></div>
+            <p class="api-doc">A fraction as a percentage: 0.25 is <code>25 %</code>.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def money(amount Decimal | float, currency string = &quot;&quot;, region string = &quot;&quot;) string</code></div>
+            <p class="api-doc">An amount in a currency (ISO 4217), the region&#x27;s own when none is given: <code>1.234,50 €</code>.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def money(minorUnits int, currency string = &quot;&quot;, region string = &quot;&quot;) string</code></div>
+            <p class="api-doc">An amount given in the currency&#x27;s minor units: 1999 with <code>EUR</code> is 19.99 euros.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def date(value Time | ZonedDateTime | Date | DateTime, width DateTimeStyle = DateTimeStyle.Medium, region string = &quot;&quot;, timeZone string = &quot;&quot;) string</code></div>
+            <p class="api-doc">The day: <code>12.10.2026</code>, or longer or shorter by <code>width</code>. An instant is written in the time zone in use, or in <code>timeZone</code> when given (instants only); a zoned date-time in its own.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def time(value Time | ZonedDateTime | TimeOfDay | DateTime, width DateTimeStyle = DateTimeStyle.Short, region string = &quot;&quot;, timeZone string = &quot;&quot;) string</code></div>
+            <p class="api-doc">The time of day: <code>14:05</code>.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def dateTime(value Time | ZonedDateTime | DateTime, dateWidth DateTimeStyle = DateTimeStyle.Medium, timeWidth DateTimeStyle = DateTimeStyle.Short, region string = &quot;&quot;, timeZone string = &quot;&quot;) string</code></div>
+            <p class="api-doc">The day and the time: <code>12.10.2026, 14:05</code>.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def spellOut(value int | float | Decimal, ruleSet string = &quot;%spellout-numbering&quot;, region string = &quot;&quot;) string</code></div>
+            <p class="api-doc">The number in words, or through another rule set of the region&#x27;s language (<code>%spellout-ordinal</code>, <code>%digits-ordinal</code>).</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def plural(count int | float | Decimal, kind PluralType = PluralType.Cardinal, language string = &quot;&quot;) PluralCategory</code></div>
+            <p class="api-doc">The plural form the count takes in the language in use, or in <code>language</code> when given: <code>One</code> for 1 in English, <code>Few</code> for 3 in Romanian. The form belongs to the language of the text it picks; the region has no say in it.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def changed(change I18nChange) I18nChange</code></div>
+            <p class="api-doc">Emitted when the program&#x27;s language, region or time zone becomes another. Interface code shows its texts again on it; a task&#x27;s own language and region emit nothing.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def missing(text MissingText) MissingText</code></div>
+            <p class="api-doc">Emitted the first time a text is asked for that no catalog has in the language asked for or one close to it, for each key, context, language and package.</p>
+          </li>
+        </ul>
       </div>
       <div class="docs-sub" id="svc-ipc">
         <h3><code>IPC</code> <span class="api-tag api-planned">planned</span></h3>
@@ -938,7 +1231,7 @@ Cache.lab.conditions.missRate = 0.25       // one read in four misses</code></pr
       <div class="docs-sub" id="svc-logging">
         <h3><code>Logging</code></h3>
         <p>Leveled logging with structured fields, to the writers you configure.</p>
-        <p>A write call returns nothing and never fails: it puts the record in a queue with its time and the place it was called from, and one task encodes the records and hands them to the writers in the order they were written, so a slow disk or collector never holds the caller. Each writer has an encoder and the levels it takes. With no writers configured, records go to standard error in the console form (<code>ConsoleEncoder</code>: colored on a terminal, plain when redirected). When the program ends the records still waiting are written and the writers closed.</p>
+        <p>A write call returns nothing and never fails: it puts the record in a queue with its time and the place it was called from, and one task encodes the records and hands them to the writers in the order they were written, so a slow disk or collector never holds the caller. Each writer has an encoder and the levels it takes. With no writers configured, records go to standard error in the console form (<code>ConsoleEncoder</code>: colored on a terminal, plain when redirected). In a program started from the IDE, the service panel shows the level, the writers (where each writes, its encoder and its levels) and the latest 200 entries, colored by level. When the program ends the records still waiting are written and the writers closed.</p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -1320,6 +1613,20 @@ Network.lab.conditions.unreachable = "*"         // offline</code></pre>
             <p class="api-doc">Receive a datagram and return the byte count and sender address string.</p>
 
             <p class="api-doc">The returned address uses the same string format accepted by `sendTo` and `std.net.Address.parse`.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def sendDescriptor(fd int, descriptor int, addr string = "", timeout duration = 30s) !none</code></div>
+            <p class="api-doc">Hands an open descriptor (a file, a memory file, a socket) to the process at the other end of a Unix socket, which gets a descriptor of its own for the same open file; this one stays open. <code>addr</code> is the path of the receiving socket for a datagram socket that is not connected. On a stream socket one zero byte travels with the descriptor, which <code>receiveDescriptor</code> takes off again.</p>
+
+            <p class="api-doc">Fails when fd is not a Unix socket, the policy denies <code>addr</code>, the peer is gone or its queue stays full for the timeout.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def receiveDescriptor(fd int, timeout duration = 30s) !int</code></div>
+            <p class="api-doc">Takes the next message of a Unix socket and returns the descriptor it carries, which the caller owns and must close.</p>
+
+            <p class="api-doc">Fails when fd is closed, the timeout passes, or the message carries no descriptor (<code>ENOMSG</code>).</p>
 
           </li>
           <li class="api-item">
@@ -1808,6 +2115,20 @@ Storage.lab.conditions.corruptReads = 0.01</code></pre>
 
           </li>
           <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def memoryFile(name string = "") !int</code></div>
+            <p class="api-doc">Opens a file that lives in memory and has no path: it is read, written, mapped and closed as any open file, and is gone when its last descriptor closes. <code>name</code> only labels it for someone inspecting the process. No path permission applies.</p>
+
+            <p class="api-doc">Fails when the operating system has no memory files (only Linux has today) or no descriptors left.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def seal(fd int) !none</code></div>
+            <p class="api-doc">Makes a memory file final: its bytes and its size cannot change again, through this descriptor or any other, and that cannot be undone.</p>
+
+            <p class="api-doc">Fails when fd is not a memory file or part of it is mapped writable.</p>
+
+          </li>
+          <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def mmap(fd int, offset int = 0, length int = 0, access MapAccess = MapAccess.Read) !int</code></div>
             <p class="api-doc">Maps length bytes of the open descriptor from offset into memory and returns a mapping handle; length 0 maps to the end of the file.</p>
             <p class="api-doc">A device node reports no size, so a caller mapping one passes the length itself.</p>
@@ -1945,7 +2266,7 @@ Storage.lab.conditions.corruptReads = 0.01</code></pre>
       <div class="docs-sub" id="svc-telemetry">
         <h3><code>Telemetry</code></h3>
         <p>Sends what the program knows about itself to a server its developer configures: metrics, log records, errors, what the user did, and timed operations.</p>
-        <p>Nothing is collected until the service is configured with an exporter and started, and, unless <code>requireConsent</code> is off, until the user has agreed. The answer, a random installation id and the batches a collector did not take are kept in the application's home folder.</p>
+        <p>Nothing is collected until the service is configured with an exporter and started, and, unless <code>requireConsent</code> is off, until the user has agreed. The answer is kept in the <a href="#svc-vault"><code>Vault</code></a>, the batches a collector did not take in the application's home folder; what is sent carries the vault's id (<code>Vault.id()</code>) as <code>app.installation.id</code>.</p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -2043,7 +2364,7 @@ step.end()</code></pre>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def consent(granted bool) !none</code></div>
-            <p class="api-doc">Records the user's answer and keeps it across runs, in the <a href="#svc-vault"><code>Vault</code></a> (<code>telemetry.consent</code>, with the installation id as <code>telemetry.installation</code>). Agreeing makes the installation id; withdrawing drops what waits and the id.</p>
+            <p class="api-doc">Records the user's answer and keeps it across runs, in the <a href="#svc-vault"><code>Vault</code></a> (<code>telemetry.consent</code>). From then on what is sent carries the installation id. Withdrawing drops what waits, in memory and on disk; the id stays in the vault, where other services rely on it, and is no longer sent.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def consented() ?bool</code></div>
@@ -2051,7 +2372,11 @@ step.end()</code></pre>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def installation() string</code></div>
-            <p class="api-doc">A random id kept across runs. It names the installation, not the user or the machine.</p>
+            <p class="api-doc">The id sent with every batch: the vault's id (<code>Vault.id()</code>), which names the installation, not the user or the machine. Empty while the user has not agreed, unless <code>requireConsent</code> is off.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def collecting(signal TelemetrySignal = TelemetrySignal.Events) bool</code></div>
+            <p class="api-doc">Whether records of the signal are collected now: the service runs with an exporter, the signal is configured, and the user agreed unless <code>requireConsent</code> is off.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def session() string</code></div>
@@ -2309,6 +2634,10 @@ step.end()</code></pre>
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def has(name string) !bool</code></div>
             <p class="api-doc">Whether an entry called <code>name</code> is there. Fails when the vault is not started. Needs <code>adm.vault.read</code>.</p>
 
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def id() !string</code></div>
+            <p class="api-doc">The vault's id: a random UUID (version 4) written into the vault's file when the file is made, the same for every caller and every run afterwards. It names this installation of the application, not the user or the machine, and is the one id every service relies on (<a href="#svc-telemetry"><code>Telemetry</code></a> sends it as <code>app.installation.id</code>, <a href="#svc-features"><code>Features</code></a> as the subject's id), so whoever receives both can join them. Names under <code>vault.</code> are the vault's own and cannot be written or removed. Fails when the vault is not started. Needs <code>adm.vault.read</code>.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def list(prefix string = &quot;&quot;) !string[]</code></div>
@@ -2911,6 +3240,33 @@ def record(count StockCounted) {
 }
 
 try Messaging.publish(StockCounted{units: 3})</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-translate">
+        <h3><code>@translate</code></h3>
+        <p class="api-targets"><strong>I18n</strong> · targets fields of type <code>string</code></p>
+        <pre class="api-siglist"><code>@translate(key string, params map&lt;string, any&gt; = {}, lang string = "")</code></pre>
+        <p class="api-doc">Makes the field translated text: every read returns the message <code>key</code> from the catalogs of the <code>I18n</code> service in the language in use, or in <code>lang</code> when given, with <code>params</code> written in. The field&#x27;s own value is the source text: what a read returns, with <code>params</code> written in, when no catalog has the key. <code>params</code> are evaluated on each read, in the field&#x27;s scope. Imported from <code>std.i18n</code>.</p>
+        <p class="api-doc">Nothing is stored: a read after <code>I18n.setLanguage</code> returns the text in the new language, and interface code reads again on <code>I18n.changed</code>. A field a library declares is looked up in the library&#x27;s own catalogs first, then in the application&#x27;s.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">translate.adm</span>
+          </div>
+          <pre><code>use std.i18n::(translate)
+
+type Basket {
+	items Item[]
+
+	@translate(&quot;basket.title&quot;)
+	title string = &quot;Your basket&quot;
+
+	@translate(&quot;basket.count&quot;, params = {&quot;count&quot;: items.len()})
+	summary string = &quot;{count, plural, one{# item} other{# items}}&quot;
+
+	@translate(&quot;basket.title&quot;, lang = &quot;en&quot;)
+	titleInEnglish string = &quot;Your basket&quot;
+}</code></pre>
         </div>
       </div>
       <div class="docs-sub" id="meta-span">

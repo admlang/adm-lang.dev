@@ -129,6 +129,7 @@
           <li><a class="docs-nav-sub" href="#std-playlist">std.formats.playlist</a></li>
           <li><a class="docs-nav-sub" href="#std-calendar">std.formats.calendar</a></li>
           <li><a class="docs-nav-sub" href="#std-contacts">std.formats.contacts</a></li>
+          <li><a class="docs-nav-sub" href="#std-translations">std.formats.translations</a></li>
           <li><a class="docs-nav-sub" href="#std-formats-data">std.formats.data</a></li>
           <li><a class="docs-nav-sub" href="#std-formats-sheets">std.formats.sheets</a></li>
           <li><a class="docs-nav-sub" href="#std-formats-mmdb">std.formats.data.mmdb</a></li>
@@ -177,6 +178,7 @@
           <li><a class="docs-nav-sub" href="#std-snmp">std.net.snmp</a></li>
           <li><a class="docs-nav-sub" href="#std-mqtt">std.net.mqtt</a></li>
           <li><a class="docs-nav-sub" href="#std-ntp">std.net.ntp</a></li>
+          <li><a class="docs-nav-sub" href="#std-features">std.net.features</a></li>
           <li><a class="docs-nav-sub" href="#std-syslog">std.net.syslog</a></li>
           <li><a class="docs-nav-sub" href="#std-irc">std.net.irc</a></li>
           <li><a class="docs-nav-sub" href="#std-telnet">std.net.telnet</a></li>
@@ -484,7 +486,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.data.semver</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Semver</code></td><td>semantic version; precedence and <code>satisfies(range)</code></td></tr>
-          <tr><td><code>parse</code>, <code>compare</code></td><td>parsing and comparison</td></tr>
+          <tr><td><code>parse</code>, <code>compare</code>, <code>isRange</code></td><td>parsing, comparison, and whether a range parses</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-i18n">
@@ -497,8 +499,10 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>TimeZone</code>, <code>ZonedDateTime</code>, <code>parseTimeZone</code>, <code>systemTimeZone</code></td><td>time zones from the tz database</td></tr>
           <tr><td><code>Calendar</code>, <code>CalendarDate</code></td><td>Gregorian, Hebrew, Islamic, Chinese, Japanese and other calendars</td></tr>
           <tr><td><code>pluralCategory</code>, <code>pluralRange</code>, <code>PluralCategory</code></td><td>plural rules</td></tr>
+          <tr><td><code>Message</code>, <code>parseMessage</code>, <code>MessageError</code>, <code>MessagePart</code></td><td>translated text with places for values, in the ICU MessageFormat syntax: plurals, select, numbers, dates</td></tr>
+          <tr><td><code>Catalog</code>, <code>CatalogEntry</code>, <code>CatalogHeader</code></td><td>the messages of one language, with contexts and gettext plural forms</td></tr>
+          <tr><td><code>translate</code></td><td><code>@translate</code>: a field whose reads return translated text</td></tr>
           <tr><td><code>SpellOut</code></td><td>numbers in words</td></tr>
-          <tr><td><code>@translate</code> <span class="api-tag api-planned">planned</span></td><td>translated text on a field; no catalog is read yet</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-validations">
@@ -521,6 +525,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>run</code>, <code>output</code></td><td>start a program (needs <code>adm.runtime.spawn</code>)</td></tr>
           <tr><td><code>mapFile</code>, <code>Mapping</code></td><td>memory-mapped files</td></tr>
           <tr><td><code>File.sync</code>, <code>File.lock</code>, <code>File.unlock</code></td><td>push writes to the device, advisory whole-file locks</td></tr>
+          <tr><td><code>memoryFile</code>, <code>File.seal</code></td><td>a file with no path that lives in memory (Linux); making its content final before handing it to another process</td></tr>
           <tr><td><code>symlink</code>, <code>freeSpace</code>, <code>totalSpace</code>, <code>unixMode</code>, <code>fromUnixMode</code></td><td>links, disk space, Unix mode bits</td></tr>
           <tr><td><code>watch</code>, <code>Watcher</code>, <code>Change</code>, <code>ChangeKind</code></td><td>changes to files and directories</td></tr>
           <tr><td><code>appHome</code></td><td>the application's own folder</td></tr>
@@ -885,6 +890,14 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>VCard</code>, <code>XCard</code>, <code>LDIF</code>, <code>ContactsCSV</code></td><td>codecs</td></tr>
         </table>
       </div>
+      <div class="docs-sub" id="std-translations">
+        <h3><code>std.formats.translations</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>load</code>, <code>save</code>, <code>supports</code>, <code>localeOfName</code></td><td>translation catalogs read into and written from <code>std.i18n.Catalog</code></td></tr>
+          <tr><td><code>Po</code></td><td>gettext <code>.po</code> and <code>.pot</code>, written as <code>msgcat</code> lays them out</td></tr>
+          <tr><td><code>CatalogFormat</code>, <code>CatalogCodec</code>, <code>codec</code>, <code>CatalogFormatError</code></td><td>the format interface, its registration and its error</td></tr>
+        </table>
+      </div>
       <div class="docs-sub" id="std-formats-data">
         <h3><code>std.formats.data</code></h3>
         <table class="docs-table exports-table">
@@ -979,6 +992,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>NetError</code>, <code>ErrorCode</code></td><td>typed failures</td></tr>
           <tr><td><code>resolve</code>, <code>NetInterface</code></td><td>name resolution, interfaces</td></tr>
           <tr><td><code>parseIPText</code>, <code>ipText</code></td><td>IP address text to bytes and back</td></tr>
+          <tr><td><code>IPBlock</code>, <code>parseIPBlock</code></td><td>CIDR blocks of IPv4 and IPv6 addresses and whether one holds an address</td></tr>
           <tr><td><code>writeAll</code>, <code>readFull</code></td><td>every byte to, or a full buffer from, any stream</td></tr>
           <tr><td><code>RemoteFiles</code></td><td>remote file access (FTP, SFTP, WebDAV)</td></tr>
         </table>
@@ -1244,6 +1258,18 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Server</code></td><td>NTP server</td></tr>
         </table>
       </div>
+      <div class="docs-sub" id="std-features">
+        <h3><code>std.net.features</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>FeatureServer</code></td><td>feature server: signed assignments per subject over one HTTP POST; the client is the <a href="services.html#svc-features"><code>Features</code></a> service</td></tr>
+          <tr><td><code>Rules</code>, <code>Segment</code>, <code>Condition</code>, <code>Rule</code>, <code>Feature</code>, <code>Group</code>, <code>Variant</code></td><td>rules: segments by place, network, version, system, locale and attributes; rollout in percent; A/B groups with weighted arms</td></tr>
+          <tr><td><code>compile</code>, <code>RuleSet</code>, <code>bucket</code></td><td>checking rules and deciding with them</td></tr>
+          <tr><td><code>RuleSource</code>, <code>MemoryRules</code>, <code>FileRules</code></td><td>where a server takes its rules from; a JSON file read again when it changes</td></tr>
+          <tr><td><code>Subject</code>, <code>Seen</code>, <code>Assignments</code>, <code>Assignment</code>, <code>GroupAssignment</code></td><td>the request and the reply</td></tr>
+          <tr><td><code>sign</code>, <code>verify</code>, <code>digestOf</code></td><td>Ed25519 signature of a reply and the digest of its content</td></tr>
+          <tr><td><code>FeaturesError</code>, <code>FeaturesErrorKind</code></td><td>errors</td></tr>
+        </table>
+      </div>
       <div class="docs-sub" id="std-syslog">
         <h3><code>std.net.syslog</code></h3>
         <table class="docs-table exports-table">
@@ -1506,7 +1532,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.ide</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>@ide</code>, <code>IDE</code></td><td>service panels for a connected IDE</td></tr>
-          <tr><td><code>IdeTable</code>, <code>IdeKind</code></td><td>panel kinds</td></tr>
+          <tr><td><code>IdeTable</code>, <code>IdeLog</code>, <code>IdeLogEntry</code>, <code>IdeKind</code></td><td>panel kinds: value, table, series, tree, text, log</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-cli">
