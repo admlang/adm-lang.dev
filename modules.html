@@ -91,6 +91,7 @@
           <li><a class="docs-nav-sub" href="#std-proto">std.proto</a></li>
           <li><a class="docs-nav-sub" href="#std-jsonrpc">std.proto.jsonrpc</a></li>
           <li><a class="docs-nav-sub" href="#std-msgpackrpc">std.proto.msgpackrpc</a></li>
+          <li><a class="docs-nav-sub" href="#std-journald">std.proto.journald</a></li>
           <li><a class="docs-nav-sub" href="#std-auth-jose">std.proto.auth.jose</a></li>
           <li><a class="docs-nav-sub" href="#std-auth-oauth2">std.proto.auth.oauth2</a></li>
           <li><a class="docs-nav-sub" href="#std-auth-openid">std.proto.auth.openid</a></li>
@@ -562,7 +563,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.services</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Application</code>, <code>ServiceStatus</code>, <code>StartMode</code>, <code>RestartMode</code>, <code>Lifecycle</code>, <code>Dependencies</code>, <code>ServiceInfo</code>, <code>ServiceStatusChange</code></td><td>the application service and the types every service shares</td></tr>
-          <tr><td><code>Storage</code>, <code>Config</code>, <code>Logging</code>, <code>Cache</code>, <code>Scheduler</code>, <code>Runtime</code>, <code>Network</code>, <code>Diagnostics</code>, <code>Policy</code>, <code>Notifications</code>, <code>Clipboard</code>, …</td><td>builtin services, each in its own module <code>std.services.&lt;name&gt;</code> (<code>use std.services.cache::(Cache)</code>)</td></tr>
+          <tr><td><code>Storage</code>, <code>Config</code>, <code>Logging</code>, <code>Cache</code>, <code>Scheduler</code>, <code>Messaging</code>, <code>Telemetry</code>, <code>Runtime</code>, <code>Network</code>, <code>Diagnostics</code>, <code>Policy</code>, <code>Notifications</code>, <code>Clipboard</code>, …</td><td>builtin services, each in its own module <code>std.services.&lt;name&gt;</code> (<code>use std.services.cache::(Cache)</code>)</td></tr>
         </table>
         <p class="exports-note">Every method and annotation: <a href="services.html">services reference</a>.</p>
       </div>
@@ -589,6 +590,15 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Peer</code></td><td>MessagePack-RPC over a byte stream, both directions</td></tr>
           <tr><td><code>Request</code>, <code>Handler</code></td><td>requests and handlers</td></tr>
           <tr><td><code>RPCError</code>, <code>ErrorCode</code>, <code>errorOf</code></td><td>error objects</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-journald">
+        <h3><code>std.proto.journald</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Client</code>, <code>Entry</code>, <code>Field</code>, <code>Priority</code></td><td>systemd journal, native protocol</td></tr>
+          <tr><td><code>parse</code>, <code>fieldName</code>, <code>validName</code>, <code>defaultSocket</code></td><td>reading an entry, making and checking field names, the journal's socket</td></tr>
+          <tr><td><code>Encoder</code></td><td>log encoder for the <code>Logging</code> service</td></tr>
+          <tr><td><code>JournalError</code>, <code>JournalErrorKind</code></td><td>why an entry was not encoded, read or sent</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-auth-jose">
@@ -1554,6 +1564,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.metrics</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Counter</code>, <code>Gauge</code>, <code>Histogram</code>, <code>Toggle</code></td><td>metrics (<code>Metric</code>)</td></tr>
+          <tr><td><code>Distribution</code></td><td>a histogram's counts by range, from <code>Histogram.distribution()</code></td></tr>
         </table>
       </div>
     </section>

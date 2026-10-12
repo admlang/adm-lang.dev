@@ -97,6 +97,8 @@
           <li><a class="docs-nav-sub" href="#meta-measureerrors"><code>@measureErrors</code></a></li>
           <li><a class="docs-nav-sub" href="#meta-measureconcurrency"><code>@measureConcurrency</code></a></li>
           <li><a class="docs-nav-sub" href="#meta-log"><code>@log</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-logerrors"><code>@logErrors</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-logslow"><code>@logSlow</code></a></li>
           <li><a class="docs-nav-sub" href="#meta-logcontext"><code>@logContext</code></a></li>
           <li><a class="docs-nav-sub" href="#meta-sensitive"><code>@sensitive</code></a></li>
           <li><a class="docs-nav-sub" href="#meta-requires"><code>@requires</code></a></li>
@@ -104,6 +106,9 @@
           <li><a class="docs-nav-sub" href="#meta-at"><code>@at</code></a></li>
           <li><a class="docs-nav-sub" href="#meta-after"><code>@after</code></a></li>
           <li><a class="docs-nav-sub" href="#meta-runevery"><code>@runEvery</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-subscribe"><code>@subscribe</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-topic"><code>@topic</code></a></li>
+          <li><a class="docs-nav-sub" href="#meta-span"><code>@span</code></a></li>
         </ul>
       </div>
 
@@ -835,32 +840,39 @@ Cache.lab.conditions.missRate = 0.25       // one read in four misses</code></pr
         <p>Named metric registry - counters, gauges, histograms, and toggles.</p>
         <ul class="api-list">
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def register&lt;T: Metric&gt;(name string) !T</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def register&lt;T: Metric&gt;(name string, labels map&lt;string, string&gt; = {}, unit string = "", description string = "") !T</code></div>
             <p class="api-doc">Registers a metric under the specified name.</p>
 
-            <p class="api-doc">If a metric with the same name and type already exists, it is returned. Fails if the name is already registered with a different metric type.</p>
+            <p class="api-doc"><code>labels</code> tell the series of one metric apart: <code>register&lt;Counter&gt;("http.requests", {"route": "/orders"})</code> once per route. <code>unit</code> says what the value counts (<code>ms</code>, <code>By</code>, <code>1</code>) and <code>description</code> what it means; both belong to the name, and the first one given for a name stays.</p>
+
+            <p class="api-doc">If a metric with the same name, labels and type already exists, it is returned. Fails if the name and labels are already registered with a different metric type.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def get(name string) ?Metric</code></div>
-            <p class="api-doc">Returns the metric registered under the specified name.</p>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def get(name string, labels map&lt;string, string&gt; = {}) ?Metric</code></div>
+            <p class="api-doc">Returns the metric registered under the specified name and labels.</p>
 
-            <p class="api-doc">Returns none if no metric with that name exists.</p>
+            <p class="api-doc">Returns none if no such metric exists.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def has(name string) bool</code></div>
-            <p class="api-doc">Returns whether a metric with the specified name is registered.</p>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def has(name string, labels map&lt;string, string&gt; = {}) bool</code></div>
+            <p class="api-doc">Returns whether a metric with the specified name and labels is registered.</p>
 
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def list() map&lt;string, Metric&gt;</code></div>
-            <p class="api-doc">Returns all registered metrics.</p>
+            <p class="api-doc">Returns all registered metrics by name; one with labels is under <code>name{key="value",...}</code>, the labels sorted by key.</p>
 
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def names() string[]</code></div>
-            <p class="api-doc">Returns all registered metric names.</p>
+            <p class="api-doc">Returns the names <code>list</code> holds the metrics under.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def series() MetricSeries[]</code></div>
+            <p class="api-doc">Returns every registered metric with its <code>name</code>, <code>labels</code>, <code>unit</code>, <code>description</code> and <code>metric</code>, in the order they were registered.</p>
 
           </li>
         </ul>
@@ -871,42 +883,152 @@ Cache.lab.conditions.missRate = 0.25       // one read in four misses</code></pr
         <p class="docs-placeholder">Planned - no public methods yet.</p>
       </div>
       <div class="docs-sub" id="svc-ipc">
-        <h3><code>IPC</code></h3>
-        <p>Inter-process communication between ADM applications.</p>
-        <p class="docs-placeholder">Planned - no public methods yet.</p>
-      </div>
-      <div class="docs-sub" id="svc-logging">
-        <h3><code>Logging</code> <span class="api-tag api-planned">planned</span></h3>
-        <p>Leveled logging with structured fields. The methods are declared and callable; nothing is written yet.</p>
+        <h3><code>IPC</code> <span class="api-tag api-planned">planned</span></h3>
+        <p>Remote interfaces between processes, on one machine or several. A program calls the methods of an interface and another process runs them. The interface and the types in its signatures live in a library both programs import; the serving process marks a type <code>@remote&lt;I&gt;</code> and passes an instance to <code>provide</code>, and the calling process gets its own value of <code>I</code> from <code>connect&lt;I&gt;</code>. The methods are declared and the encoding of values between processes is built; the calls that serve and connect fail today with "IPC is not implemented yet". Permissions: <code>adm.ipc.connect</code> and <code>adm.ipc.listen</code>.</p>
         <ul class="api-list">
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def debug(message string, fields map&lt;string, any&gt; = {}) !none</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def provide&lt;T&gt;(instance T) !none</code></div>
+            <p class="api-doc">Serves <code>instance</code> to other processes, for every interface its type is marked <code>@remote</code> for, on every listener open now or later. Its methods are called from many tasks at once.</p>
+            <p class="api-doc">Fails when another instance already serves one of those interfaces.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def withdraw&lt;T&gt;(instance T) !none</code></div>
+            <p class="api-doc">Stops serving <code>instance</code>. Calls already running finish; new ones are answered as if the interface was never provided.</p>
+            <p class="api-doc">Fails when it is not provided.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def listen(address string, options Listener = Listener{}) !string</code></div>
+            <p class="api-doc">Starts accepting clients on <code>address</code>: <code>host:port</code>, <code>[v6]:port</code> or <code>unix:/path</code>. Returns the address bound, with the port the system chose for port 0.</p>
+            <p class="api-doc">Fails when the address cannot be bound, when a TCP address has neither a TLS certificate nor <code>plain</code>, or when the listener asks clients for no proof on an address other machines can reach and <code>open</code> is not set.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def close(address string) !none</code></div>
+            <p class="api-doc">Stops accepting clients on <code>address</code> and closes its connections once their running calls finish.</p>
+            <p class="api-doc">Fails when nothing listens there.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def connect&lt;I&gt;(address string, auth Auth = Auth{}, options Link = Link{}) !I</code></div>
+            <p class="api-doc">Returns an <code>I</code> whose methods run in the process at <code>address</code>.</p>
+            <p class="api-doc">Fails with an <code>IPCError</code>: <code>Unreachable</code> when the server cannot be reached, <code>Refused</code> when it does not accept <code>auth</code>, <code>Mismatch</code> when it provides another version of <code>I</code> or none.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def connect&lt;I&gt;(addresses string[], auth Auth = Auth{}, options Link = Link{}) !I</code></div>
+            <p class="api-doc">Returns an <code>I</code> served by several processes; <code>options.balance</code> decides which one takes each call. Succeeds when one server accepts.</p>
+            <p class="api-doc">Fails with an <code>IPCError</code>: <code>Unreachable</code> when none can be reached, <code>Refused</code> or <code>Mismatch</code> when a reachable one refuses the client or provides another version of <code>I</code>.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def disconnect&lt;I&gt;(client I) !none</code></div>
+            <p class="api-doc">Closes the connections behind a value <code>connect</code> returned. Calls in flight fail with <code>IPCErrorKind.Closed</code>.</p>
+            <p class="api-doc">Fails when <code>client</code> did not come from <code>connect</code>.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def caller() ?Caller</code></div>
+            <p class="api-doc">Who is calling, inside a method a client called; none anywhere else.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def links() LinkInfo[]</code></div>
+            <p class="api-doc">The connections open now, accepted and made.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def listeners() string[]</code></div>
+            <p class="api-doc">The addresses being listened on.</p>
+          </li>
+        </ul>
+      </div>
+      <div class="docs-sub" id="svc-logging">
+        <h3><code>Logging</code></h3>
+        <p>Leveled logging with structured fields, to the writers you configure.</p>
+        <p>A write call returns nothing and never fails: it puts the record in a queue with its time and the place it was called from, and one task encodes the records and hands them to the writers in the order they were written, so a slow disk or collector never holds the caller. Each writer has an encoder and the levels it takes. With no writers configured, records go to standard error in the console form (<code>ConsoleEncoder</code>: colored on a terminal, plain when redirected). When the program ends the records still waiting are written and the writers closed.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">logging.adm</span>
+          </div>
+          <pre><code>use std.services.logging::*
+
+try Logging.config(
+	LogConfig{
+		level:   LogLevel.Debug,
+		writers: [
+			LogWriterConfig{writer: new ConsoleWriter(), encoder: new TextEncoder()},
+			LogWriterConfig{
+				writer:  new FileWriter("logs/app.log", LogRotation{period: 24h, keep: 14, compress: true}),
+				encoder: new TextEncoder(),
+			},
+			LogWriterConfig{
+				writer:  new NetworkWriter("logs.example.com:5170"),
+				encoder: new JSONEncoder(),
+				levels:  [LogLevel.Warning, LogLevel.Error, LogLevel.Fatal],
+			},
+		],
+	}
+)
+
+Logging.info("user signed in", {"user": user.id})
+// [Mon Oct 12 14:05:09.250000 2026] [billing:info] [pid 4242] session.adm:17: user signed in user=42</code></pre>
+        </div>
+        <table class="docs-table">
+          <tr><th>Encoder</th><th>Writes</th></tr>
+          <tr><td><code>TextEncoder(offset = 0s, source = true, pid = true)</code></td><td>One line in the form of the Apache error log: time, <code>[module:level]</code>, <code>[pid n]</code>, <code>file:line:</code>, the message, then the fields as <code>name=value</code> sorted by name. <code>offset</code> shifts the time east of UTC.</td></tr>
+          <tr><td><code>ConsoleEncoder(stream = ConsoleStream.Stderr, offset = 0s, source = LogSource.Debug)</code></td><td>One line for a person at a terminal, in color: <code>14:05:09.250 ERROR billing  amount=12 user=ada  card declined</code>. The fields stand before the message; a debug entry ends with its <code>file:line</code> (<code>source</code>: <code>LogSource.Debug</code>, <code>Always</code> or <code>Never</code>). The level takes its color (<code>WARN</code> and <code>ERROR</code> in the terminal theme's warning and failure styles, <code>FATAL</code> white on red), the message of an error is bold, the field values are cyan, the rest is dimmed. Colors are left out when the stream is not a terminal or <code>NO_COLOR</code> is set, and forced by <code>FORCE_COLOR</code>.</td></tr>
+          <tr><td><code>JSONEncoder(fieldsKey = "", source = true)</code></td><td>One JSON object: <code>time</code> (RFC 3339, UTC), <code>level</code>, <code>message</code>, <code>module</code>, <code>file</code>, <code>line</code>, <code>trace</code> and <code>span</code> for an entry written inside a Telemetry span, then the fields. With <code>fieldsKey</code> the fields go under that key.</td></tr>
+          <tr><td><code>syslog.Encoder</code></td><td>RFC 5424 or RFC 3164 messages (<code>std.net.syslog</code>).</td></tr>
+          <tr><td><code>journald.Encoder</code></td><td>Journal entries (<code>std.proto.journald</code>): <code>MESSAGE</code>, <code>PRIORITY</code>, the call site and each field under an upper-case name.</td></tr>
+        </table>
+        <table class="docs-table">
+          <tr><th>Writer</th><th>Sends records to</th></tr>
+          <tr><td><code>ConsoleWriter(stream = ConsoleStream.Stderr)</code></td><td>Standard error or standard output, a line each.</td></tr>
+          <tr><td><code>FileWriter(path, rotation = LogRotation{})</code></td><td>A file, a line each. <code>LogRotation</code> starts a new file at <code>maxSize</code> bytes or every <code>period</code> (counted from midnight, moved by <code>offset</code>), keeps the newest <code>keep</code> rotated files and those younger than <code>maxAge</code>, and gzips them with <code>compress</code>. A rotated file is named <code>app.log.20261012T140509Z</code>. <code>rotate()</code> starts a new file now.</td></tr>
+          <tr><td><code>NetworkWriter(address, transport = LogTransport.Tcp)</code></td><td>A collector at <code>host:port</code>: over TCP or TLS (<code>LogTransport.Tls</code>, the collector's certificate verified; <code>tls</code> takes a <code>tls.Config</code>) a line per record on one connection, over UDP a datagram per record. While the collector cannot be reached, records fail at once for <code>retryAfter</code>.</td></tr>
+          <tr><td><code>syslog.Client</code></td><td>A syslog daemon or collector over UDP, TCP, TLS or the local socket.</td></tr>
+          <tr><td><code>journald.Client</code></td><td>The systemd journal, with <code>journald.Encoder</code>: the record's fields become journal fields (<code>journalctl ORDER_ID=A-17</code>).</td></tr>
+        </table>
+        <p>A writer of your own is any <code>io.WriteCloser</code>: each <code>write</code> receives one whole encoded record. An encoder is any type with <code>def encode(record LogRecord) !byte[]</code>. A value that implements <code>LogValue</code> (<code>def logValue() any</code>) is logged as what that returns.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def debug(message string, fields map&lt;string, any&gt; = {})</code></div>
             <p class="api-doc">Writes a log entry at debug level.</p>
-
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def info(message string, fields map&lt;string, any&gt; = {}) !none</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def info(message string, fields map&lt;string, any&gt; = {})</code></div>
             <p class="api-doc">Writes a log entry at info level.</p>
-
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def warning(message string, fields map&lt;string, any&gt; = {}) !none</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def warning(message string, fields map&lt;string, any&gt; = {})</code></div>
             <p class="api-doc">Writes a log entry at warning level.</p>
-
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def error(message string, fields map&lt;string, any&gt; = {}) !none</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def error(message string, fields map&lt;string, any&gt; = {})</code></div>
             <p class="api-doc">Writes a log entry at error level.</p>
-
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def fatal(message string, fields map&lt;string, any&gt; = {}) !none</code></div>
-            <p class="api-doc">Writes a log entry at fatal level.</p>
-
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def fatal(message string, fields map&lt;string, any&gt; = {}, wait duration = 5s)</code></div>
+            <p class="api-doc">Writes a log entry at fatal level and waits up to <code>wait</code> for the writers to have it, with everything written before it. The program goes on: ending it is the caller's decision.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def log(level LogLevel, message string, fields map&lt;string, any&gt; = {}) !none</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def log(level LogLevel, message string, fields map&lt;string, any&gt; = {})</code></div>
             <p class="api-doc">Writes a log entry at the given level.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def log(message string, fields map&lt;string, any&gt; = {})</code></div>
+            <p class="api-doc">Writes a plain log entry, one without a level: it is written whatever the configured level is, every writer gets it, and the encoders write <code>LOG</code> where the level stands.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def write(record LogRecord)</code></div>
+            <p class="api-doc">Writes a record built by the caller, for code that passes on entries made elsewhere: the level, message, fields, call site and trace are taken as they are, and the time too unless it is 0, which stands for now.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def context(scope string, fields map&lt;string, any&gt;)</code></div>
+            <p class="api-doc">Attaches fields to every entry written from <code>scope</code>, the qualified name of a function (<code>billing.charge</code>), a method (<code>billing.Till.ring</code>) or a type (<code>billing.Till</code>, for all its methods): what <code>@logContext</code> does. A method's fields win over its type's, and a field passed to the write call itself over both. Empty fields take the scope's away.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def flush(timeout duration = 5s) !none</code></div>
+            <p class="api-doc">Waits until every record written so far has been handed to the writers.</p>
+            <p class="api-doc">Fails when that takes longer than <code>timeout</code>.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def enabled(level LogLevel) bool</code></div>
+            <p class="api-doc">Reports whether an entry at <code>level</code> would be written, for code that builds costly fields only when they are used.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def level() LogLevel</code></div>
@@ -917,12 +1039,115 @@ Cache.lab.conditions.missRate = 0.25       // one read in four misses</code></pr
             <p class="api-doc">Sets the lowest level that is written.</p>
             <p class="api-doc">Entries below it are dropped before they reach any writer.</p>
           </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def dropped() int</code></div>
+            <p class="api-doc">How many records were dropped because the queue was full (<code>LogConfig.capacity</code>, 8192) or the service stopped.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def recorded(record LogRecord) LogRecord</code></div>
+            <p class="api-doc">Emitted for each record the service accepted, as the writers get it: past the level filter, with its time and call site, the <code>@logContext</code> fields merged in and the <code>LogValue</code> and <code>@sensitive</code> values replaced. It is emitted in the order the records were written, before the record goes to the writers.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def writeFailed(failure LogWriteFailure) LogWriteFailure</code></div>
+            <p class="api-doc">Emitted for each record a writer did not take, because its encoder or the writer failed. The first failure of a writer is also reported on standard error.</p>
+          </li>
         </ul>
       </div>
       <div class="docs-sub" id="svc-messaging">
         <h3><code>Messaging</code></h3>
-        <p>In-memory queues and topics.</p>
-        <p class="docs-placeholder">Planned - no public methods yet.</p>
+        <p>In-memory queues of messages by topic, with consumer groups, priorities, delays, retries and dead letters.</p>
+        <p>A message is published on a topic and goes to every subscription whose topic matches. A subscription names one topic or a pattern: <code>*</code> matches any run of characters and <code>?</code> one, so <code>orders.*</code> takes <code>orders.created</code> and <code>orders.eu.paid</code>. Subscriptions with the same topic and group share the messages, each going to one of them; a subscription without a group gets its own copy. A message nobody subscribes to is dropped.</p>
+        <p>A handler that fails gets the message again after <code>retryDelay</code>, doubled each time up to <code>maxRetryDelay</code>. After <code>maxAttempts</code> deliveries the message is published as a <code>DeadLetter</code> on the topic <code>messaging.dead</code>. Messages live in memory: stopping the service drops them and every subscription.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">messaging.adm</span>
+          </div>
+          <pre><code>use std.services.messaging::(Messaging, Message, subscribe, topic)
+
+@topic("orders.created")
+struct OrderCreated {
+	id int
+}
+
+@subscribe()
+def confirm(order OrderCreated) !none {
+	try mail.send(order.id)
+}
+
+@subscribe("orders.*", group = "audit")
+def audit(message Message) {
+	println(message.topic)
+}
+
+try Messaging.publish(OrderCreated{id: 7})
+try Messaging.publish("hello", "greetings", priority = 5, delay = 2s)</code></pre>
+        </div>
+        <table class="docs-table">
+          <tr>
+            <td><code>MessagingConfig.maxAttempts int = 5</code></td>
+            <td>How many times a message is delivered to one subscription before it becomes a dead letter.</td>
+          </tr>
+          <tr>
+            <td><code>MessagingConfig.retryDelay duration = 100ms</code></td>
+            <td>The wait before the second delivery; it doubles before each later one.</td>
+          </tr>
+          <tr>
+            <td><code>MessagingConfig.maxRetryDelay duration = 30s</code></td>
+            <td>The longest wait between two deliveries.</td>
+          </tr>
+          <tr>
+            <td><code>MessagingConfig.capacity int = 0</code></td>
+            <td>How many messages may wait on one subscription; <code>0</code> for no limit.</td>
+          </tr>
+        </table>
+        <p>A <code>Message</code> carries <code>id</code>, <code>topic</code>, <code>payload any</code>, <code>headers</code>, <code>priority</code>, <code>time</code>, <code>attempt</code> (1 on the first delivery) and <code>subscription</code>. Calls fail with a <code>MessagingError</code> whose <code>kind</code> is <code>Stopped</code>, <code>InvalidTopic</code>, <code>Full</code>, <code>UnknownSubscription</code>, <code>NotPending</code>, <code>InvalidHandler</code> or <code>InvalidConfig</code>.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def config(val MessagingConfig) !none</code></div>
+            <p class="api-doc">Applies the settings; messages already waiting keep the attempts they have had.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def publish(payload any, topic string = &quot;&quot;, priority int = 0, delay duration = 0s, headers map&lt;string, string&gt; = {}) !MessageId</code></div>
+            <p class="api-doc">Publishes payload and returns the message's id.</p>
+            <p class="api-doc">Without a topic the message goes to the topic of the payload's type: the name its <code>@topic</code> gives, else the type's qualified name. Higher priorities are delivered first; delay keeps the message back for that long.</p>
+            <p class="api-doc">Fails when the topic holds <code>*</code>, <code>?</code> or <code>\</code>, when no topic is given and the payload is not a struct, a type or an enum, and when a subscription the message goes to is full.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def subscribe(topic string, handler def (Message) !none, group string = &quot;&quot;, workers int = 1) !SubscriptionId</code></div>
+            <p class="api-doc">Subscribes handler to topic and returns the subscription's id.</p>
+            <p class="api-doc">The handler runs on workers tasks of its own, one message at a time on each. A message it fails on is delivered again.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def subscribe(topic string, group string = &quot;&quot;) !SubscriptionId</code></div>
+            <p class="api-doc">Subscribes without a handler: the messages wait until <code>receive</code> takes them, and each is settled with <code>ack</code> or <code>nack</code>.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def attach(consumer any) !SubscriptionId[]</code></div>
+            <p class="api-doc">Subscribes every <code>@subscribe</code> method of consumer's type, each run on consumer, and returns their subscriptions.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def unsubscribe(id SubscriptionId) !none</code></div>
+            <p class="api-doc">Ends the subscription. A <code>receive</code> waiting on it returns none; messages it took and did not settle go back to its group.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def receive(id SubscriptionId, timeout ?duration = none) !?Message</code></div>
+            <p class="api-doc">Returns the next message of a subscription made without a handler, waiting up to timeout: forever when none, not at all when <code>0s</code>.</p>
+            <p class="api-doc">Returns none when the time is up and when the subscription or the service ends.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def ack(message Message) !none</code></div>
+            <p class="api-doc">Settles a received message: it was handled.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def nack(message Message, delay ?duration = none) !none</code></div>
+            <p class="api-doc">Settles a received message: it was not handled. It is delivered again after delay, or becomes a dead letter when that was its last attempt.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def subscriptions() Subscription[]</code></div>
+            <p class="api-doc">Every subscription with its topic, group, payload type and counts: pending, in flight, delivered, failed.</p>
+          </li>
+        </ul>
       </div>
       <div class="docs-sub" id="svc-network">
         <h3><code>Network</code></h3>
@@ -1701,9 +1926,14 @@ Storage.lab.conditions.corruptReads = 0.01</code></pre>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-query">query</span><span class="api-tag api-planned">planned</span><code class="api-sig">def freeSpace(disk string)</code></div>
-            <p class="api-doc">Get the free space on a specific disk.</p>
-
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def freeSpace(disk Path) !int64</code></div>
+            <p class="api-doc">The bytes still free for the program on the disk that holds the path (the file system it is on).</p>
+            <p class="api-doc">Fails when the policy denies the path or the operating system refuses.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def totalSpace(disk Path) !int64</code></div>
+            <p class="api-doc">The size in bytes of the disk that holds the path.</p>
+            <p class="api-doc">Fails when the policy denies the path or the operating system refuses.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><span class="api-tag api-planned">planned</span><code class="api-sig">def disks()</code></div>
@@ -1714,8 +1944,172 @@ Storage.lab.conditions.corruptReads = 0.01</code></pre>
       </div>
       <div class="docs-sub" id="svc-telemetry">
         <h3><code>Telemetry</code></h3>
-        <p>Telemetry export.</p>
-        <p class="docs-placeholder">Planned - no public methods yet.</p>
+        <p>Sends what the program knows about itself to a server its developer configures: metrics, log records, errors, what the user did, and timed operations.</p>
+        <p>Nothing is collected until the service is configured with an exporter and started, and, unless <code>requireConsent</code> is off, until the user has agreed. The answer, a random installation id and the batches a collector did not take are kept in the application's home folder.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">telemetry.adm</span>
+          </div>
+          <pre><code>use std.services.telemetry::(Telemetry, TelemetryConfig, OTLPExporter, span)
+
+try Telemetry.config(TelemetryConfig{
+	exporters: [new OTLPExporter("https://telemetry.example.com:4318")],
+})
+try await Telemetry.start()
+
+try Telemetry.consent(true)                              // the user said yes
+Telemetry.event("export.finished", {"format": "pdf"})    // what the user did
+Telemetry.report(err, {"order": order.id})               // an error
+Telemetry.set("experiment.checkout", "B")                // on everything sent from now on
+
+let work = Telemetry.span("import", {"rows": rows.len()})
+defer work.end()
+let step = Telemetry.span("parse")                       // a child of work
+step.end()</code></pre>
+        </div>
+        <table class="docs-table">
+          <tr>
+            <td><code>Metrics</code></td>
+            <td>Everything the <code>Diagnostics</code> service holds, read every <code>interval</code>, with each metric's labels, unit and description.</td>
+          </tr>
+          <tr>
+            <td><code>Logs</code></td>
+            <td>Every record the <code>Logging</code> service accepts, with the trace and span it was written in.</td>
+          </tr>
+          <tr>
+            <td><code>Errors</code></td>
+            <td>Errors given to <code>report</code>, with the span they were reported in, and every <code>Logging.fatal</code>.</td>
+          </tr>
+          <tr>
+            <td><code>Events</code></td>
+            <td>What the user did, as given to <code>event</code>.</td>
+          </tr>
+          <tr>
+            <td><code>Spans</code></td>
+            <td>Timed operations: <code>@span</code> functions and <code>Telemetry.span</code>. From when it begins until it ends, a span is its task's current one: spans begun meanwhile, there or in tasks started with <code>async</code>, are its children. End a span on the task that began it, and the spans begun inside it first.</td>
+          </tr>
+        </table>
+        <table class="docs-table">
+          <tr>
+            <td><code>TelemetryConfig.exporters Exporter[]</code></td>
+            <td>Where batches go: <code>OTLPExporter</code> (an OpenTelemetry collector, over HTTP as Protocol Buffers or JSON, or over gRPC), <code>FileExporter</code> (one JSON line per batch), <code>ConsoleExporter</code> (standard error), or any type with <code>name() string</code>, <code>export(batch) !none</code> and <code>close() !none</code>. The name is the same on every run: batches kept for an exporter return to the exporter of that name, and two of one name are refused. An <code>OTLPExporter</code> takes <code>protocol</code>, <code>headers</code>, <code>timeout</code>, <code>compress</code> and <code>tls</code> (roots and a client certificate; the system's roots without it).</td>
+          </tr>
+          <tr>
+            <td><code>TelemetryConfig.signals TelemetrySignal[]</code></td>
+            <td>What is sent; all five by default.</td>
+          </tr>
+          <tr>
+            <td><code>TelemetryConfig.requireConsent bool = true</code></td>
+            <td>Whether the user has to agree first. A program on its owner's machines, a server, sets it to false.</td>
+          </tr>
+          <tr>
+            <td><code>TelemetryConfig.name, version string</code></td>
+            <td>The program as the collector sees it; the application's own when empty.</td>
+          </tr>
+          <tr>
+            <td><code>TelemetryConfig.resource map&lt;string, string&gt;</code></td>
+            <td>More about the program, added to every batch.</td>
+          </tr>
+          <tr>
+            <td><code>TelemetryConfig.interval duration = 10s</code></td>
+            <td>How often metrics are read and waiting records are sent.</td>
+          </tr>
+          <tr>
+            <td><code>TelemetryConfig.batch int = 512</code></td>
+            <td>A batch is also sent as soon as that many records wait.</td>
+          </tr>
+          <tr>
+            <td><code>TelemetryConfig.capacity int = 8192</code></td>
+            <td>How many records may wait in memory; one more is dropped and counted.</td>
+          </tr>
+          <tr>
+            <td><code>TelemetryConfig.sampling float = 1.0</code></td>
+            <td>The share of traces recorded.</td>
+          </tr>
+          <tr>
+            <td><code>TelemetryConfig.spool bool = true, spoolSize int = 16777216</code></td>
+            <td>Whether batches a collector did not take are kept on disk and sent later, also after a restart, and how many bytes they may take.</td>
+          </tr>
+          <tr>
+            <td><code>TelemetryConfig.scrub ?def (TelemetryBatch) TelemetryBatch</code></td>
+            <td>Called with each batch before any exporter sees it; what it returns is what is sent.</td>
+          </tr>
+        </table>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def config(val TelemetryConfig) !none</code></div>
+            <p class="api-doc">Applies the settings. Needs the permission <code>adm.telemetry.send</code>.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def consent(granted bool) !none</code></div>
+            <p class="api-doc">Records the user's answer and keeps it across runs, in the <a href="#svc-vault"><code>Vault</code></a> (<code>telemetry.consent</code>, with the installation id as <code>telemetry.installation</code>). Agreeing makes the installation id; withdrawing drops what waits and the id.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def consented() ?bool</code></div>
+            <p class="api-doc">The user's answer: none when they were never asked.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def installation() string</code></div>
+            <p class="api-doc">A random id kept across runs. It names the installation, not the user or the machine.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def session() string</code></div>
+            <p class="api-doc">A random id made each time the service starts.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def set(key string, value string)</code></div>
+            <p class="api-doc">Adds a value to everything sent from now on; an empty value takes the key away.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def report(err error, fields map&lt;string, any&gt; = {})</code></div>
+            <p class="api-doc">Sends an error with where it was raised, and the calling task's current span.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def event(name string, properties map&lt;string, any&gt; = {})</code></div>
+            <p class="api-doc">Sends something the user did.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def span(name string, attributes map&lt;string, any&gt; = {}, parent ?SpanContext = none) Span</code></div>
+            <p class="api-doc">Begins a timed operation and makes it the calling task's current span; <code>end</code> on the result finishes it. The span is a child of <code>parent</code>, and without one of the task's current span. A <code>Span</code> has <code>set</code>, <code>event</code>, <code>error</code>, <code>end</code>, <code>context</code> and <code>traceparent</code>.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def current() ?Span</code></div>
+            <p class="api-doc">The calling task's current span: the last one begun on it, or inherited from the task that started it, that has not ended. None outside any span.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def record(span SpanRecord)</code></div>
+            <p class="api-doc">Sends a finished span built by the caller.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def flush(timeout duration = 5s) !none</code></div>
+            <p class="api-doc">Sends what waits and returns once every exporter took it.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def dropped() int</code></div>
+            <p class="api-doc">How many records were lost: written while <code>capacity</code> waited already, refused for good by a receiver, in a batch nothing could keep, or in a kept batch removed to stay within <code>spoolSize</code>.</p>
+          </li>
+        </ul>
+        <p>An exporter that fails has the whole batch kept for another try. One that fails with an <code>ExportFailure</code> says more: <code>rest</code> is what to try again, <code>rejected</code> how many records the receiver refused for good, <code>retryAfter</code> a pause during which the exporter is left alone. <code>OTLPExporter</code> does: what the collector took is not sent again, a busy or absent collector gets the rest later and after the pause it asked for (<code>Retry-After</code>, gRPC <code>RetryInfo</code>, at most an hour), and records it refuses (any other answer, the count of a partial success) are dropped and counted. Each failure is emitted as <code>Telemetry.exportFailed</code>.</p>
+        <p><strong>Lab conditions</strong> (<code>Telemetry.lab.conditions</code>, see <a href="#labs">Service labs</a>). The defaults change nothing.</p>
+        <table class="docs-table">
+          <tr>
+            <td><code>unreachable bool</code></td>
+            <td>No exporter takes a batch, as if no receiver could be reached.</td>
+          </tr>
+          <tr>
+            <td><code>lossRate float</code></td>
+            <td>The share of batches an exporter does not take.</td>
+          </tr>
+          <tr>
+            <td><code>sendDelay duration</code></td>
+            <td>How much longer handing a batch to an exporter takes.</td>
+          </tr>
+          <tr>
+            <td><code>spoolFails bool</code></td>
+            <td>Kept batches cannot be written to disk; they wait in memory instead.</td>
+          </tr>
+        </table>
       </div>
       <div class="docs-sub" id="svc-ui">
         <h3><code>UI</code></h3>
@@ -2167,7 +2561,7 @@ type Session {
       <div class="docs-sub" id="meta-metric">
         <h3><code>@metric</code></h3>
         <p class="api-targets"><strong>Diagnostics</strong> · targets fields</p>
-        <pre class="api-siglist"><code>@metric(name string)</code></pre>
+        <pre class="api-siglist"><code>@metric(name string, unit string = "", description string = "")</code></pre>
         <p class="api-doc">Registers a metric using the annotated field's metric type and assigns the resulting metric handle to the field.</p>
 
         <p class="api-doc">If a metric with the same name and type already exists, the existing metric is used. Registration fails if the name is already registered with a different metric type.</p>
@@ -2217,7 +2611,7 @@ type Uploads {
         <h3><code>@measureTime</code></h3>
         <p class="api-targets"><strong>Diagnostics</strong> · targets methods</p>
         <pre class="api-siglist"><code>@measureTime(name string)</code></pre>
-        <p class="api-doc">Tracks the execution duration of the annotated method.</p>
+        <p class="api-doc">Tracks the execution duration of the annotated method, in nanoseconds.</p>
 
         <p class="api-doc">Registers a Histogram under the specified metric name and records the duration of every completed method invocation.</p>
 
@@ -2283,11 +2677,11 @@ type Uploads {
         </div>
       </div>
       <div class="docs-sub" id="meta-log">
-        <h3><code>@log</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>@log</code></h3>
         <p class="api-targets"><strong>Logging</strong> · targets functions, methods</p>
         <pre class="api-siglist"><code>@log(level LogLevel = LogLevel.Debug)</code></pre>
-        <p class="api-doc">Writes a log entry each time the function is called.</p>
-        <p class="api-doc">The arguments go in as fields.</p>
+        <p class="api-doc">Writes a log entry each time the function is called, before its body runs.</p>
+        <p class="api-doc">The message is the function's qualified name and the arguments go in as fields under the parameters' names, one marked <code>@sensitive()</code> as <code>***</code>.</p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -2302,33 +2696,96 @@ def createOrder(id string) !none {
 }</code></pre>
         </div>
       </div>
+      <div class="docs-sub" id="meta-logerrors">
+        <h3><code>@logErrors</code></h3>
+        <p class="api-targets"><strong>Logging</strong> · targets functions, methods</p>
+        <pre class="api-siglist"><code>@logErrors(level LogLevel = LogLevel.Error)</code></pre>
+        <p class="api-doc">Writes a log entry each time the function fails.</p>
+        <p class="api-doc">The message is the function's qualified name followed by <code>failed</code>; the fields are the arguments, as <code>@log</code> writes them, and <code>error</code>, the failure's message. The error itself goes on to the caller unchanged.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">logerrors.adm</span>
+          </div>
+          <pre><code>use std.services.logging::(logErrors)
+
+@logErrors()
+def charge(order string, amount int) !none {
+	return try gateway.pay(order, amount)
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-logslow">
+        <h3><code>@logSlow</code></h3>
+        <p class="api-targets"><strong>Logging</strong> · targets functions, methods</p>
+        <pre class="api-siglist"><code>@logSlow(threshold duration, level LogLevel = LogLevel.Warning)</code></pre>
+        <p class="api-doc">Writes a log entry each time a call of the function takes longer than <code>threshold</code>.</p>
+        <p class="api-doc">The message is the function's qualified name followed by <code>was slow</code>; the fields are the arguments, as <code>@log</code> writes them, and <code>duration</code>, how long the call took.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">logslow.adm</span>
+          </div>
+          <pre><code>use std.services.logging::(logSlow)
+
+@logSlow(250ms)
+def search(query string) string[] {
+	return index.find(query)
+}</code></pre>
+        </div>
+      </div>
       <div class="docs-sub" id="meta-logcontext">
-        <h3><code>@logContext</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>@logContext</code></h3>
         <p class="api-targets"><strong>Logging</strong> · targets types, functions, methods</p>
         <pre class="api-siglist"><code>@logContext(fields map&lt;string, any&gt;)</code></pre>
-        <p class="api-doc">Attaches fields to every log entry written from the type's methods.</p>
-        <p class="api-doc">A closer @logContext or a field passed to the call itself wins on the same key.</p>
+        <p class="api-doc">Attaches fields to every log entry written from the function, the method, or any method of the type: the write calls in the body, and the function's own <code>@log</code>, <code>@logErrors</code> and <code>@logSlow</code> entries.</p>
+        <p class="api-doc">A closer @logContext or a field passed to the call itself wins on the same key: a method's fields over its type's, the call's over both. Entries written by functions the annotated code calls do not carry the fields. On a type the fields are literals: text, numbers, <code>true</code> and <code>false</code>, and maps of those.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">logcontext.adm</span>
+          </div>
+          <pre><code>use std.services.logging::(Logging, logContext)
+
+@logContext({"component": "billing"})
+type Till {
+	def ring(amount int) {
+		Logging.info("rung", {"amount": amount})   // component=billing amount=12
+	}
+
+	@logContext({"op": "refund"})
+	def refund(order string) {
+		Logging.info("refunded", {"order": order})   // component=billing op=refund order=A-17
+	}
+}</code></pre>
+        </div>
       </div>
       <div class="docs-sub" id="meta-sensitive">
-        <h3><code>@sensitive</code> <span class="api-tag api-planned">planned</span></h3>
-        <p class="api-targets"><strong>Logging</strong> · targets parameters, fields, properties</p>
+        <h3><code>@sensitive</code></h3>
+        <p class="api-targets"><strong>Logging</strong> · targets parameters, fields</p>
         <pre class="api-siglist"><code>@sensitive()</code></pre>
         <p class="api-doc">Marks a value that must not show up in developer output.</p>
         <p class="api-doc">Logs, traces, watches, crash reports and the IDE inspector print it redacted.</p>
-        <p class="api-doc">struct Credentials { username string @sensitive() password string }</p>
-
-        <p class="api-doc">@log() def login(username string, @sensitive password string) {}</p>
-
+        <p class="api-doc">A marked field prints as <code>***</code> wherever its value is printed (<code>println</code>, string interpolation, <code>str()</code>) or logged, alone or inside another value, an array or a map; a marked parameter is written as <code>***</code> by <code>@log</code>, <code>@logErrors</code> and <code>@logSlow</code>. The codecs (JSON and the others) still write the real value, and so does code that reads the field. The debugger's variable view shows the real value: it is where a marked value is inspected. A <code>Secret&lt;T&gt;</code> value is never written to a log entry either: it is <code>***</code> as a field, as a logged argument, and inside any logged value, while the codecs still write what it holds.</p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">sensitive.adm</span>
           </div>
-          <pre><code>use std.services.logging
+          <pre><code>use std.services.logging::(Logging, log, sensitive)
 
-def login(email string, @logging.sensitive() password string) !Session {
-	return try authenticate(email, password)
-}</code></pre>
+struct Credentials {
+	username string
+	@sensitive()
+	password string
+}
+
+@log()
+def login(email string, @sensitive() password string) !Session {
+	return try authenticate(email, password)   // logged as login email=a@b.c password=***
+}
+
+println(Credentials{username: "ann", password: "hunter2"})   // {ann ***}</code></pre>
         </div>
       </div>
       <div class="docs-sub" id="meta-requires">
@@ -2407,6 +2864,71 @@ def warmUp() {
 @runEvery(5m)
 def heartbeat() {
 	println("alive")
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-subscribe">
+        <h3><code>@subscribe</code></h3>
+        <p class="api-targets"><strong>Messaging</strong> · targets functions and methods</p>
+        <pre class="api-siglist"><code>@subscribe(topic string = "", group string = "", workers int = 1)</code></pre>
+        <p class="api-doc">Subscribes the function to a topic: the Messaging service calls it with each message.</p>
+        <p class="api-doc">The function takes one parameter. A <code>Message</code> gets every message of the topic. Any other type gets the payload of the messages that carry one of that type, and the topic may then be left out: it is the topic of the type.</p>
+        <p class="api-doc">topic is a topic or a pattern. Subscriptions with the same topic and group share the messages. workers is how many tasks call the function at once. A function that fails gets the message again.</p>
+        <p class="api-doc">Functions and methods of services are subscribed when the service starts; a method of a type is subscribed for each value given to <code>Messaging.attach</code>.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">subscribe.adm</span>
+          </div>
+          <pre><code>use std.services.messaging::(Message, subscribe)
+
+@subscribe("orders.*", group = "billing", workers = 4)
+def bill(message Message) !none {
+	try charge(message.payload)
+}</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-topic">
+        <h3><code>@topic</code></h3>
+        <p class="api-targets"><strong>Messaging</strong> · targets types</p>
+        <pre class="api-siglist"><code>@topic(name string)</code></pre>
+        <p class="api-doc">Names the topic the values of a type are published on, for <code>Messaging.publish(value)</code> and for <code>@subscribe</code> functions that take the type. Without it the topic is the type's qualified name.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">topic.adm</span>
+          </div>
+          <pre><code>use std.services.messaging::(Messaging, subscribe, topic)
+
+@topic("stock.counted")
+struct StockCounted {
+	units int
+}
+
+@subscribe()
+def record(count StockCounted) {
+	println(count.units)
+}
+
+try Messaging.publish(StockCounted{units: 3})</code></pre>
+        </div>
+      </div>
+      <div class="docs-sub" id="meta-span">
+        <h3><code>@span</code></h3>
+        <p class="api-targets"><strong>Telemetry</strong> · targets functions and methods</p>
+        <pre class="api-siglist"><code>@span(name string = "")</code></pre>
+        <p class="api-doc">Times each call as a span, failed when the call fails. The span is the current one while the function runs, so the spans of what it calls are its children.</p>
+        <p class="api-doc">name is the span's name; the function's qualified name when empty.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">span.adm</span>
+          </div>
+          <pre><code>use std.services.telemetry::(span)
+
+@span()
+def checkout(cart Cart) !Receipt {
+	return try charge(cart)
 }</code></pre>
         </div>
       </div>

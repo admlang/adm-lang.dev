@@ -982,7 +982,6 @@ a += [7]     // append; type-checked at compile time</code></pre>
           <code>a = a + ["oops"]</code> on an <code>int[]</code> is a
           compile-time error.
         </p>
-        <p><span class="api-tag api-planned">planned</span> Arithmetic with a scalar that returns a new array, <code>a / 10</code>, is specified but the compiler does not accept it yet; the in-place form <code>a[:] /= 10</code> works.</p>
 
         <p>
           In an array literal <code>;</code> separates rows: <code>int[1, 2, 3; 4, 5, 6]</code> is an
@@ -1235,7 +1234,39 @@ struct User {
           </div>
           <pre><code>let u User = {id: 1, name: "MyName", address: {street: "street"}}</code></pre>
         </div>
-        <p><span class="api-tag api-planned">planned</span> An anonymous one-off literal, <code>struct {x: 2, y: 3}</code>, is specified but the compiler does not accept it yet.</p>
+        <p>
+          An <strong>anonymous struct</strong> is written where it is used, with no declaration:
+          <code>struct { x: 2, y: 3 }</code> as a value, each field taking the type of its value, and
+          <code>struct { x int, y int }</code> as a type. Two anonymous structs of a module with the
+          same field names and types, in the same order, are one type:
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">anonymous_struct.adm</span>
+          </div>
+          <pre><code>let p = struct { x: 2, y: 3 }
+p.x = 10
+p = struct { x: 30, y: 40 }             // same fields, same type
+
+let rows = [struct { name: "a", n: 1 }, struct { name: "b", n: 2 }]
+
+def sum(p struct { x int, y int }) int {
+	return p.x + p.y
+}
+
+sum(p)
+sum({x: 1, y: 2})                       // a literal without a type takes the parameter's</code></pre>
+        </div>
+        <p>
+          A field of the type form is a plain <code>name type</code>; defaults, annotations and
+          modifiers need a declared struct. A value with no type of its own (<code>none</code>, an
+          untyped <code>{...}</code>) cannot give a field its type. A different field order is a
+          different type, a declared struct is never an anonymous one, and two modules that write
+          the same fields have two types. The inline <code>address struct { ... }</code> field above
+          is such a type: it is built with <code>{street: "Main", city: "Cluj"}</code> or with an
+          anonymous literal of the same fields.
+        </p>
 
         <p>
           <strong>Embedding</strong> a struct - writing its type name as a bare field - copies that
@@ -1911,6 +1942,7 @@ if password := /:alpha/ &amp;&amp; /:digit/ &amp;&amp; /:punct/ {
 	sum += i
 }</code></pre>
         </div>
+        <p>The loop runs <code>i</code> from the first bound up to, not including, the second. <code>a..b</code> is only a loop header, of <code>for</code> and <code>forall</code>: a range is not a value, and writing one anywhere else is a compile-time error.</p>
 
         <p>The same <code>in</code> form iterates an array - with the index if you ask for it - and a map, exactly like <a href="#maps">Maps</a> showed earlier:</p>
         <div class="code-window">
@@ -1985,7 +2017,10 @@ for let j = 0; j &lt; 3; j++ {
           Any type can be iterated with <code>for let v in value</code> by implementing the builtin
           <code>Iterator&lt;T&gt;</code> interface, a single method <code>def iterate() ?T</code>. The
           loop calls it until it returns <code>none</code>; the type keeps its own cursor and resets it
-          after exhaustion so the value can be walked again. An <code>Iterator&lt;T&gt;</code> is a
+          after exhaustion so the value can be walked again. An iterator, like a channel, has no
+          index or key: with two names the first is <code>_</code> (<code>for let (_, v) in value</code>),
+          and two names never take an element apart, so an iterator of tuples is read with one name.
+          An <code>Iterator&lt;T&gt;</code> is a
           real interface value, so it can be stored and passed around:
         </p>
         <div class="code-window">
@@ -3040,6 +3075,33 @@ homepage.timeout(3s)</code></pre>
           call (<code>await fetch(id) onerror ...</code>) and an <code>AsyncScope</code>
           (<code>await group onerror (err error) { ... recover none }</code>).
         </p>
+        <p>
+          A <code>TaskLocal&lt;T&gt;</code> holds one value per running task. <code>set(value)</code>
+          stores it for the task that calls it (<code>none</code> clears) and <code>get()</code> reads
+          it later in the same task as a <code>?T</code>, however deep the calls between them. Declare
+          it once, as a module <code>let</code>. A task started with <code>async</code> begins with the
+          values of the task that started it, as they were at that moment; what either one sets
+          afterwards the other does not see, and a task's values are dropped when it ends.
+        </p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">task_local.adm</span>
+          </div>
+          <pre><code>let currentRequest = new TaskLocal&lt;Request&gt;()
+
+def handle(request Request) {
+    currentRequest.set(request)
+    route()
+}
+
+def audit(action string) {
+    let request = currentRequest.get()
+    if request is Request {
+        record(request.id, action)
+    }
+}</code></pre>
+        </div>
       </div>
 
       <div class="docs-sub" id="channels">
@@ -3310,11 +3372,11 @@ def log(evt Event&lt;string&gt;) {
         <tr><td>Debugger</td><td>CPU and memory profiles, call traces.</td></tr>
         <tr><td>UI</td><td>Windows, the renderer, UI events (<code>std.ui</code>).</td></tr>
         <tr><td>Config <span class="api-tag api-planned">planned</span></td><td>Layered configuration with profiles.</td></tr>
-        <tr><td>Logging <span class="api-tag api-planned">planned</span></td><td>Leveled logging with structured fields.</td></tr>
-        <tr><td>Messaging <span class="api-tag api-planned">planned</span></td><td>In-memory queue with topics.</td></tr>
+        <tr><td>Logging</td><td>Leveled logging with structured fields, to console, file and network writers.</td></tr>
+        <tr><td>Messaging</td><td>In-memory queues by topic: consumer groups, priorities, retries and dead letters.</td></tr>
         <tr><td>I18n <span class="api-tag api-planned">planned</span></td><td>Locale selection and message catalogs.</td></tr>
-        <tr><td>IPC <span class="api-tag api-planned">planned</span></td><td>Inter-process communication between ADM applications.</td></tr>
-        <tr><td>Telemetry <span class="api-tag api-planned">planned</span></td><td>Telemetry.</td></tr>
+        <tr><td>IPC <span class="api-tag api-planned">planned</span></td><td>Remote interfaces between processes; the methods are declared and fail until the transport is built.</td></tr>
+        <tr><td>Telemetry</td><td>Sends metrics, logs, errors, usage events and spans to a configured server (OpenTelemetry), with the user's consent.</td></tr>
         <tr><td>Vault</td><td>Encrypted key/value store for secrets, values and keys.</td></tr>
       </table>
     </section>
@@ -4268,6 +4330,8 @@ let results = try instance.invoke("add", wasm.Value[
         <tr><td><code>__file_name__</code></td><td>Basename of the current source file.</td></tr>
         <tr><td><code>__file_path__</code></td><td>Absolute path to the current source file.</td></tr>
         <tr><td><code>__dir__</code></td><td>Absolute directory path of the current file.</td></tr>
+        <tr><td><code>__owner__</code></td><td>Qualified name of the type, service, component or application the code stands in (<code>shop.Till</code>); empty in a function of a module.</td></tr>
+        <tr><td><code>__caller__</code></td><td>The instance the current method runs on, as <code>?any</code>: none in a function of a module. Inside a <code>@trackCaller</code> function, the instance of the caller.</td></tr>
         <tr><td><code>__file_hash__</code></td><td>Compiler-generated hash of the file contents (used for caching).</td></tr>
         <tr><td><code>__line__</code></td><td>Current line number, 1-based.</td></tr>
         <tr><td><code>__module__</code></td><td>Fully-qualified module of the current file.</td></tr>
