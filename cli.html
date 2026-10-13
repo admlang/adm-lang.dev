@@ -1182,7 +1182,7 @@ adm lint --list</code></pre>
         <tr><td><code>ADM_SCHED_MAX_WORKERS</code></td><td>Cap on carrier threads for tasks blocked in system calls (default 10000).</td></tr>
         <tr><td><code>ADM_PREEMPT</code></td><td><code>1</code> preempts a task that runs 10 ms without yielding (Linux x86-64); default is cooperative only.</td></tr>
         <tr><td><code>ADM_SCHED_DEBUG</code></td><td>Traces scheduling decisions to stderr.</td></tr>
-        <tr><td><code>ADM_AFFINITY_CHECK</code></td><td>Panics when a thread-affine call runs on an unpinned task.</td></tr>
+        <tr><td><code>ADM_AFFINITY_CHECK</code></td><td><code>1</code>: panics when a thread-affine call runs on an unpinned task, or on a pinned task that is not on its own thread.</td></tr>
         <tr><td><code>ADM_CPU</code></td><td><code>baseline</code> runs the SSE2 copies of SIMD functions; by default the AVX2/FMA copies run on CPUs that have them.</td></tr>
         <tr><td><code>ADM_CUDA</code></td><td>Launch path of a <code>cuda def</code>: unset picks the GPU when available, <code>gpu</code> requires it, <code>cpu</code> forces the CPU emulation. <code>ADM_CUDA_DEVICE</code> picks the device ordinal (default <code>0</code>).</td></tr>
         <tr><td><code>ADM_VIDEO_HW</code></td><td>GPU video decoding in <code>std.formats.video</code>: <code>auto</code> (default), <code>nvdec</code>, <code>vaapi</code> or <code>off</code>.</td></tr>
