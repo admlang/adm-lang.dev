@@ -413,9 +413,13 @@ component Shell {
       <h4><code>@column(name = &quot;&quot;, stored = Stored.Auto, ignore = false)</code></h4>
 <p>From <code>std.data.db</code>: how a field is kept in a database row. <code>name</code> is the column when it differs from the field, <code>stored</code> the form the value takes in it (<code>Text</code>, <code>Integer</code>, <code>Float</code>, <code>Bytes</code>, <code>JSON</code>), <code>ignore</code> leaves the field out. Read by <code>db.read</code>, <code>db.readAll</code>, <code>db.values</code> and the row results of <code>sql def</code>.</p>
       <h4><code>@db(name)</code></h4>
-<p>From <code>std.services.database</code>: names the connection of the <code>Database</code> service a <code>sql def</code> runs on, when it is not a method of a type with a <code>@connection</code> property. Without it such a function runs on the default connection.</p>
+<p>From <code>std.services.database</code>: names the connection of the <code>Database</code> service a <code>sql def</code> runs on, when it is not a method of a type with a <code>@connection</code> property. Without it such a function runs on the default connection. On a stored routine (a body written <code>BEGIN ... END</code>) it also names the connection the routine is installed on.</p>
       <h4><code>@connection()</code></h4>
 <p>From <code>std.data.db</code>: marks the property of a type that holds the connection its <code>sql def</code> methods run on (a <code>db.Queryable</code>: a connection or a transaction). One per type. An assignment to it waits until the queries running on that instance finish.</p>
+      <h4><code>@routine(name = &quot;&quot;, schema = &quot;&quot;)</code></h4>
+<p>From <code>std.data.db</code>, on a <code>sql def</code> whose body is a stored routine (<code>BEGIN ... END</code>): creates and calls it under <code>name</code> instead of the function's name, in <code>schema</code> (MySQL: the database) instead of the connection's current one. Both are plain identifiers. Two routines with the same schema and name on one connection stop the build.</p>
+      <h4><code>@sqlschema(file)</code></h4>
+<p>From <code>std.data.db</code>, on a type or one <code>sql def</code>: checks the statements against the schema in <code>file</code> (its DDL, relative to the source file) when the program is built. An unknown table or column, a placeholder whose value does not fit its column, or a result whose columns do not read as the declared type stops the build; a row field the query does not return is a warning.</p>
     </section>
 
     <section class="docs-section" id="parameters">

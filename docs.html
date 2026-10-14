@@ -2565,7 +2565,47 @@ type Users {
           isolation level and read-only mode of the transactions it begins after that call.
         </p>
         <p>
-          <span class="api-tag api-planned">planned</span> Stored procedures as bodies are not built yet.
+          A body of several statements is a script: the statements run one by one, each with its own
+          placeholders, and a failure names the statement (<code>statement 4 of 9: ...</code>). A
+          <code>;</code> inside quotes, comments or a trigger's <code>BEGIN ... END</code> does not end
+          a statement. A script returns <code>!none</code> and does not begin or commit a transaction
+          itself: it runs inside the caller's <code>transaction { }</code> block.
+        </p>
+<pre><code>sql def createSchema(firstTeam string) !none {
+	CREATE TABLE teams (id bigint PRIMARY KEY, name text NOT NULL);
+	ALTER TABLE users ADD COLUMN team bigint;
+	INSERT INTO teams (id, name) VALUES (1, {firstTeam});
+}</code></pre>
+        <p>
+          A body written <code>BEGIN ... END</code> (or <code>DECLARE ... BEGIN ... END</code>) is a stored
+          routine in the database's own language. It is created in the database under the function's
+          name when its connection is added to the <code>Database</code> service, and again only when
+          it changed; calling the function calls it. The result picks the kind: <code>!none</code> a
+          procedure, a single value a function, rows a function returning a table (PostgreSQL) or a
+          procedure that selects them (MySQL). SQLite has no stored routines.
+        </p>
+<pre><code>@db("reports")
+@db.routine(name = "top_users", schema = "analytics")   // optional: another name, a schema
+sql def topUsers(n int) !User[] {
+	BEGIN
+		RETURN QUERY SELECT * FROM users ORDER BY score DESC LIMIT n;
+	END
+}</code></pre>
+        <p>
+          <code>@db.sqlschema("schema.sql")</code> on a type (or on one <code>sql def</code>) checks its
+          statements against the schema's DDL when the program is built: a table or column the schema
+          does not have, a placeholder whose value does not fit its column, or a result whose columns do
+          not read as the declared type stops the build at the statement. The file is what
+          <code>pg_dump --schema-only</code> or <code>mysqldump --no-data</code> writes.
+        </p>
+        <p>
+          The database's schema is set up by the application's own migration steps:
+          <code>@migration(from = "4.32", to = "4.33", db = "main")</code> on a <code>sql def</code> (often
+          a script) or on a function that calls several. <code>Database.add</code> runs the steps the
+          database has not seen, each in a transaction, under a lock so instances starting together
+          migrate once; a database with no version yet runs them all. The version is kept in the
+          application's home folder, or with <code>versions = "ops.adm_versions"</code> in a table of the
+          database, which several servers sharing it need.
         </p>
         <p>
           Everything outside a <code>{name}</code> placeholder is plain text in the target language -

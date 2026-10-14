@@ -590,12 +590,16 @@ Cache.lab.conditions.missRate = 0.25       // one read in four misses</code></pr
         <p>Named SQL database connections, each a pool shared between tasks. Import with <code>use std.services.database::(Database)</code>; the driver for each URL comes from an <code>adm.database.*</code> library.</p>
         <ul class="api-list">
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">atomic def add(name string, target string, limit int = 8) !none</code></div>
-            <p class="api-doc">Registers a connection under a name: a pool of up to <code>limit</code> connections to the database the URL names, opened as statements need them.</p>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def add(name string, target string, limit int = 8, versions string = "") !none</code></div>
+            <p class="api-doc">Registers a connection under a name: a pool of up to <code>limit</code> connections to the database the URL names, opened as statements need them. Then migrates the database: the <code>@migration(db = ...)</code> steps on the connection that it has not seen run in order, each in a transaction (all of them on a database with no version yet), under a lock in the database so instances starting together migrate once; then the stored routines installed on it are created where they changed. The version is kept in the home folder, or with <code>versions</code> in that table of the database. Fails, and keeps no connection, when a step or routine fails or a newer version of the program migrated the database (unless <code>@allowDowngrade</code>).</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">atomic def add(target string) !none</code></div>
-            <p class="api-doc">Registers the default connection, the one <code>get()</code> returns.</p>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def add(target string) !none</code></div>
+            <p class="api-doc">Registers and migrates the default connection, the one <code>get()</code> returns.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def versionsTable(name string) ?string</code></div>
+            <p class="api-doc">The table a connection's migrations keep its version in; none when it is kept in the home folder.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">atomic def get(name string) !db.Pool</code></div>
@@ -2791,8 +2795,12 @@ step.end()</code></pre>
       <div class="docs-sub" id="meta-migration">
         <h3><code>@migration</code></h3>
         <p class="api-targets"><strong>Application</strong> · targets functions of the <code>application</code> block</p>
-        <pre class="api-siglist"><code>@migration(from string, to string = "")</code></pre>
+        <pre class="api-siglist"><code>@migration(from string, to string = "")
+@migration(from string, db string, to string = "")
+@migration(from string, db string[], to string = "")</code></pre>
         <p class="api-doc">Marks a step that upgrades the application's home folder from one version to another; see <code>Application.home()</code> and <a href="app-home.html">Application home &amp; migrations</a>.</p>
+
+        <p class="api-doc">With <code>db</code> the step upgrades a database of the <code>Database</code> service instead: the connection it names (<code>""</code> the default one), or several that it upgrades together once all are added. It takes no arguments and runs when the connection is added, in a transaction on it; a <code>sql def</code> step runs its statements there (a script of several statements sets a schema up in one step), a function step calls <code>sql def</code> functions inside a <code>transaction { }</code> block. See <a href="#svc-database"><code>Database.add</code></a>.</p>
 
         <p class="api-doc"><code>from</code> is the version whose data the step understands; <code>to</code> is the version it produces, or the next declared step's <code>from</code> when omitted. Steps run in ascending order, and only those newer than the version that last ran the folder. The annotated function takes the home folder path and returns <code>!none</code>; a failing step restores the snapshot taken before the first step.</p>
 
