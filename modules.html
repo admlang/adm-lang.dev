@@ -959,7 +959,7 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-formats-ai">
         <h3><code>std.formats.ai</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>ModelFile</code>, <code>load</code>, <code>info</code></td><td>model file: metadata and tensors; a file loaded by path is memory-mapped, <code>pages</code> gives a tensor's bytes without a copy</td></tr>
+          <tr><td><code>ModelFile</code>, <code>load</code>, <code>info</code></td><td>model file: metadata and tensors; a file loaded by path is memory-mapped, <code>pages</code> gives a tensor's bytes without a copy; <code>new ModelFile()</code> and <code>add</code> build one to <code>save</code></td></tr>
           <tr><td><code>Gguf</code>, <code>Safetensors</code></td><td>codecs, read and write</td></tr>
           <tr><td><code>TensorType</code>, <code>TensorInfo</code></td><td>tensor types (every ggml quantized type)</td></tr>
           <tr><td><code>dequantize</code>, <code>blockSize</code>, <code>blockBytes</code></td><td>quantized blocks to floats</td></tr>
@@ -1409,6 +1409,8 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>LanguageModel</code>, <code>load</code>, <code>Device</code></td><td>language model from a GGUF file, on the CPU or the GPU; <code>load</code>'s <code>gpuMemory</code> caps the GPU memory it takes, and a mixture-of-experts model larger than that keeps a part of its experts in host memory (<code>hostMemory</code> caps the page-locked copies); weights are read from the mapped file, so a model larger than memory loads</td></tr>
           <tr><td><code>Session</code></td><td>conversation: sampling, generation, chat</td></tr>
+          <tr><td><code>Tuning</code>, <code>Target</code></td><td>LoRA fine-tuning from <code>model.tune(rank, alpha, targets)</code>: <code>learn</code> from texts or chat conversations (AdamW steps on the CPU or the GPU, the model's weights untouched), <code>loss</code>, <code>save</code> as a GGUF adapter llama.cpp and Ollama read</td></tr>
+          <tr><td><code>Adapter</code></td><td>a GGUF LoRA adapter and its scale, applied by <code>load(path, adapters = ...)</code></td></tr>
           <tr><td><code>Message</code>, <code>Role</code>, <code>Reasoning</code></td><td>chat messages, thinking</td></tr>
           <tr><td><code>ChatFormat</code>, <code>detectChatFormat</code></td><td>chat formats of model families</td></tr>
           <tr><td><code>Tokenizer</code>, <code>loadTokenizer</code></td><td>tokenizers of GGUF models (BPE, SentencePiece, WordPiece) and Hugging Face tokenizer files (tokenizer.json, vocab.json with merges.txt, vocab.txt)</td></tr>
