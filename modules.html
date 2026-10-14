@@ -488,6 +488,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>positional</code>, <code>placeholders</code>, <code>Placeholder</code></td><td><code>:name</code> placeholders rewritten for a database that binds by position</td></tr>
           <tr><td><code>@connection</code>, <code>sqlExec</code>, <code>sqlOne</code>, <code>sqlOptional</code>, <code>sqlAll</code>, <code>sqlRow</code>, <code>sqlOptionalRow</code>, <code>sqlRows</code>, <code>sqlCell</code>, <code>sqlOptionalCell</code>, <code>sqlBound</code>, <code>sqlDefault</code>, <code>sqlNamed</code>, <code>provide</code></td><td>what a <code>sql def</code> compiles to, and where one without a <code>@connection</code> finds its connection</td></tr>
           <tr><td><code>Driver</code>, <code>@driver</code>, <code>Isolation</code></td><td>what a driver library implements and registers</td></tr>
+          <tr><td><code>isolate</code></td><td>inside a <code>transaction</code> block: the isolation level and read-only mode of the database transactions the block begins after the call</td></tr>
           <tr><td><code>DbError</code>, <code>ErrorKind</code>, <code>errorOf</code></td><td>failures with their kind, SQLSTATE and the database's error number</td></tr>
         </table>
       </div>
@@ -781,7 +782,8 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>MD5</code>, <code>SHA1</code>, <code>SHA256</code>, <code>SHA512</code>, <code>SHA3256</code>, <code>Keccak256</code>, <code>BLAKE2b512</code>, <code>RIPEMD160</code>, …</td><td>hashes (<code>Hasher</code>)</td></tr>
           <tr><td><code>SHAKE128</code>, <code>SHAKE256</code></td><td>extendable output</td></tr>
-          <tr><td><code>CRC8</code> … <code>CRC64</code>, <code>Adler32</code></td><td>checksums</td></tr>
+          <tr><td><code>CRC8</code> … <code>CRC64</code>, <code>Adler32</code>, <code>crc32c</code>, <code>xxh32</code>, <code>xxh64</code></td><td>checksums</td></tr>
+          <tr><td><code>murmur64a</code>, <code>murmur3</code></td><td>MurmurHash64A and MurmurHash3 x64 128, for hash tables and feature hashing</td></tr>
           <tr><td><code>HMAC</code>, <code>hmac</code></td><td>HMAC</td></tr>
           <tr><td><code>hkdf</code>, <code>pbkdf2</code>, <code>concatKDF</code>, <code>argon2id</code>, <code>argon2</code>, <code>Argon2Kind</code></td><td>key derivation (Argon2: RFC 9106, memory-hard)</td></tr>
           <tr><td><code>Hash</code></td><td>every digest by name</td></tr>
@@ -1429,6 +1431,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.ai.speech</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>SpeechModel</code>, <code>load</code>, <code>SpeechTask</code></td><td>Whisper speech to text: <code>transcribe</code> a recording, <code>listen</code> to a microphone as you speak</td></tr>
+          <tr><td><code>Voice</code>, <code>loadVoice</code></td><td>Kokoro text to speech: <code>speak</code> English text as sound with an American or British voice, misaki's pronunciations built in</td></tr>
           <tr><td><code>Heard</code></td><td>a sentence <code>listen</code> heard so far, and whether it is finished</td></tr>
         </table>
       </div>

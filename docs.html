@@ -2526,6 +2526,13 @@ type Users {
           <li>a tuple such as <code>!(int, ?string)</code> reads one column per element.</li>
         </ul>
         <p>
+          An alias reads as the type it stands for: <code>type Pair = (int, ?string)</code> makes
+          <code>!Pair</code> a tuple, <code>type MaybeUser = ?User</code> makes <code>!MaybeUser</code> an
+          optional row. The statement is the body's text without the indentation its lines share, so
+          <code>adm fmt</code> never changes it. Assigning the <code>@connection</code> property waits until
+          the queries running on that instance finish.
+        </p>
+        <p>
           A <code>sql def</code> outside a type, or in a type that marks no property, takes its connection
           from the <code>Database</code> service: the one <code>@db("name")</code> names, else the default
           connection. A missing connection fails the call, not the build.
@@ -2550,7 +2557,12 @@ type Users {
           transaction, with nothing to write at the call sites: the first call on a connection begins
           it, later calls on that connection reuse it (nested blocks and called functions included),
           the end of the block commits it and a failure in the block rolls it back. A block that
-          touches two databases holds one transaction on each; their commits are separate.
+          touches two databases holds one transaction on each; their commits are separate, and when
+          one fails after another committed the error is a <code>TransactionCommitError</code> whose
+          <code>committed</code> names the databases that stay committed. A task started inside the
+          block runs its queries outside the block's transactions.
+          <code>try db.isolate(db.Isolation.Serializable, readOnly = true)</code> inside the block sets the
+          isolation level and read-only mode of the transactions it begins after that call.
         </p>
         <p>
           <span class="api-tag api-planned">planned</span> Stored procedures as bodies are not built yet.

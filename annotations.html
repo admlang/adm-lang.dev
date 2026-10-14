@@ -415,7 +415,7 @@ component Shell {
       <h4><code>@db(name)</code></h4>
 <p>From <code>std.services.database</code>: names the connection of the <code>Database</code> service a <code>sql def</code> runs on, when it is not a method of a type with a <code>@connection</code> property. Without it such a function runs on the default connection.</p>
       <h4><code>@connection()</code></h4>
-<p>From <code>std.data.db</code>: marks the property of a type that holds the connection its <code>sql def</code> methods run on (a <code>db.Queryable</code>: a connection or a transaction). One per type.</p>
+<p>From <code>std.data.db</code>: marks the property of a type that holds the connection its <code>sql def</code> methods run on (a <code>db.Queryable</code>: a connection or a transaction). One per type. An assignment to it waits until the queries running on that instance finish.</p>
     </section>
 
     <section class="docs-section" id="parameters">
