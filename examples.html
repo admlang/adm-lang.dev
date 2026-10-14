@@ -187,8 +187,9 @@ application Interpolation {
     <section class="docs-section" id="regex">
       <h2>Regex</h2>
       <p>
-        Regexes are a primitive with their own literal syntax, not a library type - flags go after the
-        closing slash, and captures are referenced as <code>$1</code>, <code>$2</code> in replacements.
+        Regexes are a primitive with their own literal syntax in RE2 form, not a library type - flags go
+        after the closing slash, and captures are referenced as <code>$1</code>, <code>$2</code> or
+        <code>${name}</code> in replacements.
       </p>
       <div class="code-window">
         <div class="code-titlebar">
@@ -212,8 +213,14 @@ application Interpolation {
 		let cap = /(a)([0-9]+)/
 		cap.replace("a12 b a3", "$2-$1", -1)  // "12-a b 3-a"
 
+		// RE2 syntax: Perl classes, named groups, inline flags
+		let mail = /(?P&lt;user&gt;\w+)@(\w+)\.com/
+		mail.replace("ana@example.com", "$\{user\} at $2")  // "ana at example"
+		/(?i)hello/.test("Say HELLO")                      // true
+
 		// strings accept a regex directly
-		"hello123".contains(/[0-9]+/)     // true
+		"hello123".contains(/\d+/)       // true
+		"hello123".endsWith(/\d+/)       // true
 		return 0
 	}
 }</code></pre>

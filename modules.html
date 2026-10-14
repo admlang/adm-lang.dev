@@ -206,6 +206,9 @@
           <li><a class="docs-nav-sub" href="#std-ai-llm">std.ai.llm</a></li>
           <li><a class="docs-nav-sub" href="#std-ai-tensor">std.ai.tensor</a></li>
           <li><a class="docs-nav-sub" href="#std-ai-onnx">std.ai.onnx</a></li>
+          <li><a class="docs-nav-sub" href="#std-ai-speech">std.ai.speech</a></li>
+          <li><a class="docs-nav-sub" href="#std-ai-diffusion">std.ai.diffusion</a></li>
+          <li><a class="docs-nav-sub" href="#std-ai-embeddings">std.ai.embeddings</a></li>
         </ul>
       </div>
 
@@ -1371,6 +1374,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Compressor</code>, <code>Limiter</code>, <code>Gain</code>, <code>Balance</code>, <code>StereoWidth</code></td><td>dynamics, levels</td></tr>
           <tr><td><code>Reverb</code>, <code>Delay</code>, <code>Chorus</code></td><td>effects</td></tr>
           <tr><td><code>Spectrum</code>, <code>LevelMeter</code></td><td>analysis</td></tr>
+          <tr><td><code>MelSpectrogram</code>, <code>MelScale</code>, <code>MelFraming</code></td><td>energy in mel bands frame by frame, the input of speech models</td></tr>
           <tr><td><code>AudioEffect</code>, <code>AudioProcessor</code>, <code>EffectSwitch</code></td><td>effect interfaces, bypass switch</td></tr>
         </table>
       </div>
@@ -1401,7 +1405,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Session</code></td><td>conversation: sampling, generation, chat</td></tr>
           <tr><td><code>Message</code>, <code>Role</code>, <code>Reasoning</code></td><td>chat messages, thinking</td></tr>
           <tr><td><code>ChatFormat</code>, <code>detectChatFormat</code></td><td>chat formats of model families</td></tr>
-          <tr><td><code>Tokenizer</code></td><td>BPE and SentencePiece tokenizers</td></tr>
+          <tr><td><code>Tokenizer</code>, <code>loadTokenizer</code></td><td>tokenizers of GGUF models (BPE, SentencePiece, WordPiece) and Hugging Face tokenizer files (tokenizer.json, vocab.json with merges.txt, vocab.txt)</td></tr>
           <tr><td><code>Stats</code></td><td>prompt and generation speed</td></tr>
           <tr><td><code>toolsOf</code></td><td>the tools of an MCP server (<code>std.proto.mcp</code>) as tools of a session</td></tr>
         </table>
@@ -1410,7 +1414,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.ai.tensor</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Weights</code>, <code>loadWeights</code></td><td>quantized weights, SIMD matrix-vector multiply</td></tr>
-          <tr><td><code>rmsNorm</code>, <code>layerNorm</code>, <code>softmax</code>, <code>silu</code>, <code>gelu</code>, <code>rope</code></td><td>transformer operations</td></tr>
+          <tr><td><code>rmsNorm</code>, <code>layerNorm</code>, <code>softmax</code>, <code>silu</code>, <code>gelu</code>, <code>GeluForm</code>, <code>erf</code>, <code>rope</code></td><td>transformer operations</td></tr>
           <tr><td><code>Tensor</code>, <code>tensorOf</code></td><td>n-dimensional values of any ONNX element type</td></tr>
         </table>
       </div>
@@ -1419,6 +1423,27 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>Model</code>, <code>load</code></td><td>ONNX model ready to run: <code>run</code> takes input values by name and returns the outputs; on a GPU the graph runs there with its tensors kept in device memory</td></tr>
           <tr><td><code>Value</code></td><td>a tensor or a sequence of tensors</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-ai-speech">
+        <h3><code>std.ai.speech</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>SpeechModel</code>, <code>load</code>, <code>SpeechTask</code></td><td>Whisper speech to text: <code>transcribe</code> a recording, <code>listen</code> to a microphone as you speak</td></tr>
+          <tr><td><code>Heard</code></td><td>a sentence <code>listen</code> heard so far, and whether it is finished</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-ai-diffusion">
+        <h3><code>std.ai.diffusion</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>DiffusionModel</code>, <code>load</code></td><td>Stable Diffusion: <code>draw</code> a picture from a prompt</td></tr>
+          <tr><td><code>Lora</code></td><td>a LoRA file and its strength, merged into the model at load</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-ai-embeddings">
+        <h3><code>std.ai.embeddings</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>EmbeddingModel</code>, <code>load</code>, <code>Pooling</code></td><td>texts as vectors, from GGUF (BERT, Nomic BERT) or ONNX embedding models</td></tr>
+          <tr><td><code>similarity</code>, <code>nearest</code></td><td>cosine similarity, the closest vectors of a list</td></tr>
         </table>
       </div>
     </section>

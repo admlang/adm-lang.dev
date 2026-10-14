@@ -811,9 +811,20 @@ let a = 1h</code></pre>
             <span class="code-filename">regex.adm</span>
           </div>
           <pre><code>let a = /./
-let a = /[a-z]{1,}+/mg</code></pre>
+let a = /[a-z]{2,}\d*/mg</code></pre>
         </div>
-        <p>A pattern that is only known at run time, such as one read from a file, becomes a regex with <code>new regex(pattern, flags)</code>:</p>
+        <p>
+          Patterns use RE2 syntax: <code>\d \s \w</code>, Unicode classes such as <code>\p{L}</code> and
+          <code>\p{Greek}</code>, named groups <code>(?P&lt;name&gt;...)</code>, non-capturing groups
+          <code>(?:...)</code>, lazy repeats <code>*? +? ??</code>, counted repeats <code>{n,m}</code> and inline
+          flags <code>(?i)</code>. The flags are <code>i</code> (case-insensitive), <code>m</code> (<code>^</code>
+          and <code>$</code> at line breaks), <code>s</code> (<code>.</code> matches <code>\n</code>),
+          <code>U</code> (lazy and greedy swapped) and <code>g</code> (<code>replace</code> replaces every match).
+          Matching is leftmost-first and runs in linear time, with no backtracking; backreferences and
+          lookaround are not RE2 and make the pattern invalid. Two regexes are equal when their patterns
+          and flags are.
+        </p>
+        <p>A pattern that is only known at run time, such as one read from a file, becomes a regex with <code>new regex(pattern, flags)</code>; one that does not compile matches nothing:</p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -821,7 +832,8 @@ let a = /[a-z]{1,}+/mg</code></pre>
           </div>
           <pre><code>let rule = new regex("^.+@example\\.com$", "i")
 rule.valid()                   // true: the pattern compiles
-rule.test("Ana@Example.com")   // true</code></pre>
+rule.test("Ana@Example.com")   // true
+new regex("(a", "").valid()    // false: it matches nothing</code></pre>
         </div>
 
         <p>
