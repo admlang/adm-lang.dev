@@ -1384,7 +1384,7 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-ai-llm">
         <h3><code>std.ai.llm</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>LanguageModel</code>, <code>load</code></td><td>language model from a GGUF file, on the CPU</td></tr>
+          <tr><td><code>LanguageModel</code>, <code>load</code>, <code>Device</code></td><td>language model from a GGUF file, on the CPU or the GPU; <code>load</code>'s <code>gpuMemory</code> caps the GPU memory it takes, and a mixture-of-experts model larger than that keeps a part of its experts in host memory</td></tr>
           <tr><td><code>Session</code></td><td>conversation: sampling, generation, chat</td></tr>
           <tr><td><code>Message</code>, <code>Role</code>, <code>Reasoning</code></td><td>chat messages, thinking</td></tr>
           <tr><td><code>ChatFormat</code>, <code>detectChatFormat</code></td><td>chat formats of model families</td></tr>
@@ -1408,6 +1408,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.ui</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>UI</code>, <code>UIConfig</code></td><td>UI service</td></tr>
+          <tr><td><code>StyleSheet</code>, <code>StyleRule</code>, <code>rule</code></td><td>rules that restyle components by selector; <code>UI.addStyles(sheet)</code>, <code>components.Styled(sheet)</code></td></tr>
           <tr><td><code>ComponentRenderer</code>, <code>RenderContext</code>, <code>RenderPasses</code>, <code>Geometry</code>, <code>TextKind</code>, <code>WindowState</code>, <code>WindowKind</code>, <code>CloseRequest</code>, <code>MenuEntry</code>, <code>PointerEvent</code>, <code>PointerPhase</code>, <code>Modifiers</code>, <code>Limit</code>, <code>TextInputClient</code>, <code>TextRange</code>, <code>StateChange</code>, <code>@action</code>, <code>Viewport</code>, <code>Theme</code>, <code>Palette</code></td><td>component drawing, resolved layout, state events, actions</td></tr>
           <tr><td><code>Theme</code>, <code>themeOf</code></td><td>the values styles read as <code>theme</code>; <code>themeOf(component)</code> is the theme that component's style reads: the nearest one provided, else <code>UI.theme()</code></td></tr>
           <tr><td><code>DragData</code>, <code>DropEffect</code></td><td>what is dragged: a value of the application's own, text, file paths, other forms by MIME type; what a drop would do (none, copy, move, link)</td></tr>
@@ -1530,7 +1531,9 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.gpu</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>DeviceBuffer</code>, <code>upload</code></td><td>GPU memory kept between <a href="docs.html#functions"><code>cuda def</code></a> launches</td></tr>
-          <tr><td><code>available</code>, <code>deviceName</code></td><td>device info</td></tr>
+          <tr><td><code>Readback</code></td><td>reads a buffer back without waiting for launches queued after its <code>start</code></td></tr>
+          <tr><td><code>HostBuffer</code>, <code>hostBuffer</code></td><td>page-locked host memory; <code>buffer.write(from, start, count, at)</code> queues a copy of a range of it to the device and returns at once</td></tr>
+          <tr><td><code>available</code>, <code>deviceName</code>, <code>freeMemory</code></td><td>device info, bytes of GPU memory free</td></tr>
         </table>
       </div>
     </section>

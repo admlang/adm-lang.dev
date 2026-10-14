@@ -782,6 +782,42 @@ style CardLook {
           properties. A style may declare properties of its own with
           <code>@styleProperty let name Type = default</code>.
         </p>
+        <p>
+          A call can set properties of the style of the component it makes:
+          <code>Button("Save", style = {width: 120(px), on: {hover: {opacity: 0.8}}})</code>. What the call
+          sets wins over the component's own looks, its hover and pressed looks included; the call's
+          <code>on</code> gives states looks of its own.
+        </p>
+        <p>
+          A style can hold named variants of itself, <code>variants = {primary: {background: accent}, big: {padding: 12(px)}}</code>,
+          and a call asks for the ones it wants: <code>Button("Save", style = {variant: [primary, big]})</code>.
+          A variant may give states looks of its own with <code>on</code>, and a rule selects by it:
+          <code>kind&lt;Button&gt;().variant("primary")</code>.
+        </p>
+        <p>
+          A style sheet restyles components from outside them, a theme's look or an application's house
+          style: <code>new StyleSheet([rule(kind&lt;Button&gt;(), style = {radius: 0(px)}), rule(kind&lt;Button&gt;().hover(), style = {opacity: 0.9})])</code>.
+          <code>UI.addStyles(sheet)</code> applies it in every window, <code>Styled(sheet) { ... }</code> to
+          the components it holds. A rule goes over the component's own style and under its state looks;
+          what a call sets goes over both.
+        </p>
+        <p>
+          Some properties are inherited: <code>foreground</code>, <code>font</code>, <code>paragraph</code>,
+          <code>direction</code>, <code>rendering</code> and <code>cursor</code>. A component whose style leaves
+          one unset reads it, as <code>style.foreground</code>, with the value of the nearest component above
+          whose style has that property; set <code>font</code> on a panel and the texts and buttons inside it
+          follow, until one sets its own. A property of your own style is inherited when it is declared
+          <code>@styleProperty(inherit = true)</code> with an optional type. A font or a paragraph
+          is inherited field by field: <code>font = {weight: FontWeight.Bold}</code> in a style makes the
+          text bold and keeps the family and the size of the font above, while
+          <code>font = Font{family: "Inter"}</code> replaces all of it. A font size written in
+          <code>em</code> is of the size around the component that sets it, and every component has
+          <code>em</code>, its font size in pixels as of the last layout, and <code>viewport</code>, the
+          window as layouts see it: its <code>size</code>, <code>widthClass</code> and <code>heightClass</code>
+          (<code>Compact</code>, <code>Medium</code>, <code>Expanded</code>; the thresholds are in
+          <code>UIConfig</code>), <code>orientation</code>, <code>scale</code>, <code>active</code> and
+          <code>fullscreen</code>.
+        </p>
       </div>
 
       <div class="docs-sub" id="style-properties">
@@ -1423,7 +1459,7 @@ Row(gap = 8(px)) {
             <tr><td><a href="#events"><code>@on(UI.event, filter)</code></a></td><td>a function or a method</td><td>Listens to an event of the <code>UI</code> service.</td></tr>
             <tr><td><a href="#controller-apart"><code>@controller()</code></a></td><td>a type</td><td>The type is a controller components name as theirs.</td></tr>
             <tr><td><a href="#scoped"><code>@scoped</code></a></td><td>a component</td><td>Not laid out and not drawn; its children are placed as its parent's.</td></tr>
-            <tr><td><a href="#style-composition"><code>@styleProperty</code></a></td><td>a <code>let</code> of a style</td><td>Declares a property of the style; <code>inherit = true</code> makes an unset one take the parent's.</td></tr>
+            <tr><td><a href="#style-composition"><code>@styleProperty</code></a></td><td>a <code>let</code> of a style</td><td>Declares a property of the style; <code>inherit = true</code> makes an unset one read, through a component's <code>style</code>, as the nearest component above whose style has it (<code>foreground</code>, <code>font</code>, <code>paragraph</code>, <code>direction</code>, <code>rendering</code>, <code>cursor</code> are declared so).</td></tr>
             <tr><td><code>@childProperty</code></td><td>a <code>let</code> of a style</td><td>A property a child sets for its container (<code>alignSelf</code>, a grid cell's span).</td></tr>
           </tbody>
         </table>

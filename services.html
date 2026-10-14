@@ -677,13 +677,85 @@ Cache.lab.conditions.missRate = 0.25       // one read in four misses</code></pr
         </ul>
       </div>
       <div class="docs-sub" id="svc-config">
-        <h3><code>Config</code> <span class="api-tag api-planned">planned</span></h3>
-        <p>Layered configuration with profiles, typed reads, and reload events. The methods are declared; none does anything yet.</p>
+        <h3><code>Config</code></h3>
+        <p>Layered configuration: one or more sources merged by precedence, typed reads, profiles, overrides for the running process, and events for what changed. Later sources win over earlier ones, and a source that is not optional must load.</p>
+        <p>A key is a path of names joined by dots, compared without case and without the <code>-</code> and <code>_</code> inside its names: <code>db.maxConnections</code>, <code>db.max_connections</code> and <code>DB.MAX-CONNECTIONS</code> are one key, so a file and an environment variable can name the same value. A key that names no value but has keys below it reads as the map of those.</p>
+        <p>A profile is a set of keys a source keeps under <code>profiles.&lt;name&gt;.</code> (a TOML <code>[profiles.dev.db]</code> table): while the profile is active they replace the same source's plain keys, and they are left out otherwise.</p>
+        <p>A typed read converts the value to the type asked for: numbers, <code>bool</code> and <code>duration</code> also from their text (what an INI file or an environment variable holds), an enum member from its name, a list also from the texts between the commas of a text, a <code>map&lt;string, V&gt;</code>, and a struct or type from the keys below the key, by its fields' names. Reads answer from memory and never wait for a source that is loading.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">config.adm</span>
+          </div>
+          <pre><code>use std.services.config::(Config, ConfigConfig, SourceConfig, FileSource, EnvSource)
+
+try Config.config(
+	ConfigConfig{
+		sources: [
+			SourceConfig{source: new FileSource(&quot;app.toml&quot;)},
+			SourceConfig{source: new FileSource(&quot;local.toml&quot;), optional: true},
+			SourceConfig{source: new EnvSource(&quot;APP_&quot;)},          // APP_DB_HOST is db.host
+		],
+	}
+)
+try await Config.start()
+
+let port = try Config.get&lt;int&gt;(&quot;server.port&quot;)       // ?int: none when no source defines it
+let db = try Config.get&lt;Database&gt;(&quot;db&quot;)             // a struct from the keys below db
+Config.set(&quot;feature.flag&quot;, true)                    // an override, this run only
+try Config.switchProfile(&quot;dev&quot;)                     // [profiles.dev.db] now replaces [db]</code></pre>
+        </div>
+        <table class="docs-table">
+          <tr>
+            <td><code>ConfigConfig.profile ?string</code></td>
+            <td>The active profile; none loads only the plain keys.</td>
+          </tr>
+          <tr>
+            <td><code>ConfigConfig.sources SourceConfig[]</code></td>
+            <td>The sources, lowest precedence first.</td>
+          </tr>
+          <tr>
+            <td><code>SourceConfig{source ConfigSource, optional bool = false}</code></td>
+            <td>A source and whether the service tolerates it failing to load: an optional source that fails keeps what it last loaded.</td>
+          </tr>
+          <tr>
+            <td><code>interface ConfigSource</code></td>
+            <td><code>name() string</code>, distinct within one configuration, and <code>load() !map&lt;string, any&gt;</code>: every key the source holds, as dotted keys or as maps nested by name. <code>load</code> must not call <code>Config</code>.</td>
+          </tr>
+          <tr>
+            <td><code>interface WatchableConfigSource</code></td>
+            <td><code>watch(changed def ()) !none</code> and <code>unwatch() !none</code>: a source that reports its own changes; the service reloads when <code>changed</code> is called.</td>
+          </tr>
+          <tr>
+            <td><code>FileSource(path string, format ConfigFormat = ConfigFormat.Auto)</code></td>
+            <td>A file, read at each load and watched while the service is started (also when an editor replaces it). <code>ConfigFormat</code>: <code>Auto</code> (told by the name), <code>Toml</code>, <code>Json</code>, <code>Ini</code> (<code>section.key</code>), <code>Env</code> (<code>.env</code> files: <code>DB_HOST</code> is <code>db.host</code>).</td>
+          </tr>
+          <tr>
+            <td><code>EnvSource(prefix string = "", separator string = "_")</code></td>
+            <td>The environment variables whose name starts with the prefix, without it: the rest in lower case, each separator a dot. With <code>&quot;__&quot;</code>, <code>APP_DB__MAX_CONNECTIONS</code> is <code>db.max_connections</code>.</td>
+          </tr>
+          <tr>
+            <td><code>ConfigChange{key, oldValue ?any, newValue ?any, source ?string}</code></td>
+            <td>One changed key: none for a value that was not there or is gone; the name of the source the new value comes from, none for an override.</td>
+          </tr>
+          <tr>
+            <td><code>ConfigReloadError{source ?string, error error}</code></td>
+            <td>A source that failed to load, with the error it raised.</td>
+          </tr>
+          <tr>
+            <td><code>Config.config(val ConfigConfig) !none</code></td>
+            <td>Applies the profile and the sources. On a started service the new sources are loaded at once and watched in place of the old ones; on one that is not, they are loaded by <code>start</code>. Fails when a source has no name or two have the same one, and on a started service as <code>reload</code> does.</td>
+          </tr>
+          <tr>
+            <td><code>Config.start() / stop()</code></td>
+            <td><code>start</code> loads every source and starts watching the ones that can be watched; it fails when a source that is not optional cannot be loaded, when a <code>@config</code> variable that is not optional and has no default finds no value for its key, and when a value does not read as the type of the <code>@config</code> variable it fills. <code>stop</code> ends the watching; the values stay readable.</td>
+          </tr>
+        </table>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def switchProfile(profile ?string) !none</code></div>
             <p class="api-doc">Switches to the profile and reloads every source.</p>
-            <p class="api-doc">When the reload fails the old profile and its values stay in place.</p>
+            <p class="api-doc">When the reload fails the old profile and its values stay in place. Fails as <code>reload</code> does.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def profile() ?string</code></div>
@@ -691,36 +763,38 @@ Cache.lab.conditions.missRate = 0.25       // one read in four misses</code></pr
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def get(key string) ?any</code></div>
-            <p class="api-doc">The value the key resolves to, or none when no source defines it.</p>
+            <p class="api-doc">The value the key resolves to, or none when no source defines it. A key that names no value but has keys below it gives those as a <code>map&lt;string, any&gt;</code>.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def get&lt;T&gt;(key string) !?T</code></div>
-            <p class="api-doc">The value the key resolves to, converted to T; none when no source defines it, an error when it does not convert.</p>
+            <p class="api-doc">The value the key resolves to, converted to T; none when no source defines it.</p>
+            <p class="api-doc">Fails when the value does not read as a T or does not fit it.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def has(key string) bool</code></div>
-            <p class="api-doc">Whether some source defines the key.</p>
+            <p class="api-doc">Whether some source or an override defines the key, or a key below it.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def set(key string, value any)</code></div>
             <p class="api-doc">Overrides the key for this process.</p>
-            <p class="api-doc">An override wins over every source and is never written back to one.</p>
+            <p class="api-doc">An override wins over every source and is never written back to one. A map overrides the keys below the key, one for each of its values.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def reset(key string)</code></div>
-            <p class="api-doc">Drops the override on the key.</p>
+            <p class="api-doc">Drops the override on the key and on the keys below it.</p>
             <p class="api-doc">The key goes back to whatever the sources say.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def reload() !none</code></div>
             <p class="api-doc">Reloads every source.</p>
+            <p class="api-doc">Fails when a source that is not optional cannot be loaded, and as <code>start</code> does for the program's <code>@config</code> variables: the values of before then stay. A source that fails is emitted as <code>reloadFailed</code> whether or not it is optional.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def sources() ConfigSourceConfig[]</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def sources() SourceConfig[]</code></div>
             <p class="api-doc">The sources, highest precedence first.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def source(name string) ?ConfigSourceConfig</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def source(name string) ?SourceConfig</code></div>
             <p class="api-doc">The source with that name, or none.</p>
           </li>
           <li class="api-item">
@@ -729,16 +803,16 @@ Cache.lab.conditions.missRate = 0.25       // one read in four misses</code></pr
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def lastLoaded() time.Time</code></div>
-            <p class="api-doc">When the sources last loaded without error.</p>
+            <p class="api-doc">When the sources last loaded without error; the zero time before that.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def changed(change ConfigChange) ConfigChange</code></div>
-            <p class="api-doc">Emitted when a key's value changes.</p>
+            <p class="api-doc">Emitted when a key's value changes: by a reload, a change of profile or of sources, <code>set</code> or <code>reset</code>. The first load of a run emits every key it defines.</p>
             <p class="api-doc">A reload that leaves the value as it was emits nothing.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def reloadFailed(event ConfigReloadError) ConfigReloadError</code></div>
-            <p class="api-doc">Emitted when a source fails to reload.</p>
+            <p class="api-doc">Emitted when a source fails to load.</p>
             <p class="api-doc">The values from the last good load stay in place.</p>
           </li>
         </ul>
@@ -1600,12 +1674,28 @@ Network.lab.conditions.unreachable = "*"         // offline</code></pre>
 
             <p class="api-doc">This is the lowest-level "dial" helper: it returns a raw FD so higher-level wrappers (`std.net.dialStream`, connection pools, etc.) can build on it.</p>
 
+            <p class="api-doc">A TCP socket comes back sending what it is given at once (TCP_NODELAY), as one from <code>connect</code> or <code>accept</code> does; <code>setNoDelay(fd, false)</code> changes that.</p>
+
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def sendTo(fd int, data byte[], addr Endpoint, timeout duration = 30s) !int</code></div>
             <p class="api-doc">Send a datagram to a remote address (UDP / Unix datagram).</p>
 
             <p class="api-doc">Returns the number of bytes sent. For datagrams this is usually either `data.len()` or an error.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def send(fd int, data byte[], timeout duration = 30s) !int</code></div>
+            <p class="api-doc">Sends one datagram on a datagram socket connected to its peer (<code>connect</code>): no address travels with the call, and the policy was asked when the socket was connected.</p>
+
+            <p class="api-doc">Returns the number of bytes sent. Fails when fd is closed, not connected, or the send is refused or times out.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def receive(fd int, data byte[], timeout duration = 30s) !int</code></div>
+            <p class="api-doc">Receives the next datagram from the peer a datagram socket is connected to and returns its length; one longer than <code>data</code> is cut to it.</p>
+
+            <p class="api-doc">Fails when fd is closed or the timeout passes.</p>
 
           </li>
           <li class="api-item">
@@ -1902,6 +1992,10 @@ Network.lab.conditions.unreachable = "*"         // offline</code></pre>
 
             <p class="api-doc">Returns none when the variable is not defined.</p>
 
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def environment() map&lt;string, string&gt;</code></div>
+            <p class="api-doc">Returns every environment variable of the process as it is now, by name.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def services() ServiceInfo[]</code></div>
@@ -2781,11 +2875,12 @@ type Users {
         </div>
       </div>
       <div class="docs-sub" id="meta-config">
-        <h3><code>@config</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>@config</code></h3>
         <p class="api-targets"><strong>Config</strong> · targets variables, fields</p>
         <pre class="api-siglist"><code>@config(key string, defaultValue ?any = none)</code></pre>
-        <p class="api-doc">Fills the variable from the configuration key.</p>
-        <p class="api-doc">The value is converted to the variable's type. An optional variable reads none when the key is missing; a non-optional one with no default makes configuration loading fail.</p>
+        <p class="api-doc">Fills the variable or the field from the configuration key, converted to its type as <code>Config.get&lt;T&gt;</code> converts it.</p>
+        <p class="api-doc">A module variable is filled when the program first reads it and again whenever its key changes. An optional variable reads none when the key is missing; a non-optional one with no default makes configuration loading fail.</p>
+        <p class="api-doc">A field is filled when its object is made and whenever it is assigned: while its key has a value, that value is what the field holds. A field whose key is missing takes the default, and keeps what it holds when there is none.</p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -2793,8 +2888,16 @@ type Users {
           </div>
           <pre><code>use std.services.config::(config)
 
-@config("server.port", 8080)
-let port = 0</code></pre>
+@config(&quot;server.port&quot;, 8080)
+let port = 0                 // 8080 until a source defines server.port
+
+@config(&quot;server.host&quot;)
+let host ?string = none
+
+type Pool {
+	@config(&quot;db.pool.size&quot;, 4)
+	size int = 1
+}</code></pre>
         </div>
       </div>
       <div class="docs-sub" id="meta-trace">

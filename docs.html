@@ -2590,7 +2590,9 @@ def new(args string[]) int {
           Data that many launches share stays on the device in a <code>std.gpu.DeviceBuffer&lt;T&gt;</code>:
           <code>gpu.upload(data)</code> copies once, the kernel declares the parameter as a
           <code>gpu.DeviceBuffer&lt;T&gt;</code> and sees it like a <code>T[]</code>, <code>download</code> and <code>write</code> move data explicitly, and
-          <code>dispose</code> frees it. <code>async cuda def</code> returns a future, so the scheduler
+          <code>dispose</code> frees it. <code>download</code> waits for every queued launch; a <code>buffer.readback()</code>
+          (<code>start()</code>, then <code>wait(into)</code>) waits only for those queued before its <code>start</code>;
+          <code>readback(overlap = true)</code> also lets the launches queued after <code>start</code> run during the copy, provided they do not write the buffer. To send data without waiting, keep it in a <code>gpu.hostBuffer&lt;T&gt;(count)</code> (page-locked memory, filled with <code>write(from, at)</code>): <code>buffer.write(from, start, count, at)</code> queues the copy of a range behind the launches queued so far and returns at once; with <code>overlap = true</code> the copy runs beside the launches queued after it, which must leave the range alone until <code>buffer.join()</code>. <code>async cuda def</code> returns a future, so the scheduler
           keeps other tasks running while the driver works:
         </p>
         <div class="code-window">
