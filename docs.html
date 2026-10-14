@@ -962,7 +962,8 @@ let trimmed = a[:-1]  // drops the last element</code></pre>
         <ul>
           <li>Writes through a slice are visible through the original array (and any other slice) as
             long as they still share the same backing storage.</li>
-          <li>A slice has its own <code>len</code>/<code>cap</code>, independent of the original array.</li>
+          <li>A slice has its own <code>len</code>, and its capacity is its length: pushing onto a slice
+            copies it first, so it never writes over the elements of the array past its end.</li>
           <li>If growing an array or slice needs more capacity, it detaches - allocates a new backing
             buffer and copies. Existing slices keep working but stop sharing storage with the grown one.</li>
           <li>Use <code>.clone()</code> to force a copy instead of a view: <code>let copy = a.clone()</code>.</li>

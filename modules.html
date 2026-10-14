@@ -135,6 +135,7 @@
           <li><a class="docs-nav-sub" href="#std-formats-sheets">std.formats.sheets</a></li>
           <li><a class="docs-nav-sub" href="#std-formats-mmdb">std.formats.data.mmdb</a></li>
           <li><a class="docs-nav-sub" href="#std-formats-ai">std.formats.ai</a></li>
+          <li><a class="docs-nav-sub" href="#std-formats-ai-onnx">std.formats.ai.onnx</a></li>
           <li><a class="docs-nav-sub" href="#std-barcodes">std.barcodes</a></li>
           <li><a class="docs-nav-sub" href="#std-barcodes-qr">std.barcodes.qr</a></li>
           <li><a class="docs-nav-sub" href="#std-barcodes-datamatrix">std.barcodes.datamatrix</a></li>
@@ -204,6 +205,7 @@
         <ul class="docs-sub-list">
           <li><a class="docs-nav-sub" href="#std-ai-llm">std.ai.llm</a></li>
           <li><a class="docs-nav-sub" href="#std-ai-tensor">std.ai.tensor</a></li>
+          <li><a class="docs-nav-sub" href="#std-ai-onnx">std.ai.onnx</a></li>
         </ul>
       </div>
 
@@ -360,6 +362,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>approx</code></td><td>float comparison with a tolerance</td></tr>
           <tr><td><code>erf</code>, <code>erfc</code></td><td>error function and its complement</td></tr>
           <tr><td><code>Decimal</code>, <code>parseDecimal</code>, <code>RoundingMode</code></td><td>exact decimal numbers</td></tr>
+          <tr><td><code>Random</code></td><td>seeded random numbers of any numeric type: <code>of&lt;T&gt;</code>, <code>range</code>, <code>normal</code></td></tr>
         </table>
         <p class="exports-note">Other operations are methods on the numeric types; exponentiation is <code>**</code>.</p>
       </div>
@@ -393,7 +396,8 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-math-processing">
         <h3><code>std.math.processing</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>fft</code>, <code>ifft</code>, <code>rfft</code>, <code>irfft</code></td><td>Fourier transforms</td></tr>
+          <tr><td><code>fft</code>, <code>ifft</code>, <code>rfft</code>, <code>irfft</code></td><td>Fourier transforms of any length</td></tr>
+          <tr><td><code>Fourier</code></td><td>a transform planned once and run on many inputs of one length</td></tr>
           <tr><td><code>dct</code>, <code>idct</code></td><td>cosine transforms (DCT-II/III)</td></tr>
         </table>
       </div>
@@ -526,7 +530,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>join</code>, <code>dir</code>, <code>base</code>, <code>extension</code>, <code>split</code>, <code>clean</code>, <code>isAbs</code></td><td>paths</td></tr>
           <tr><td><code>run</code>, <code>output</code></td><td>start a program (needs <code>adm.runtime.spawn</code>)</td></tr>
           <tr><td><code>Process</code>, <code>Pipe</code></td><td>a program started by <code>Runtime.start</code> that runs beside this one: <code>input</code>, <code>output</code> and <code>errors</code> pipes (<code>io.Reader</code>/<code>io.Writer</code>), <code>wait()</code>, <code>wait(timeout)</code>, <code>terminate()</code>, <code>kill()</code>, <code>id()</code></td></tr>
-          <tr><td><code>mapFile</code>, <code>Mapping</code></td><td>memory-mapped files</td></tr>
+          <tr><td><code>mapFile</code>, <code>Mapping</code></td><td>memory-mapped files: <code>read</code> copies a range, <code>pages</code> is an array over the mapping's own pages (no copy; a file larger than memory)</td></tr>
           <tr><td><code>File.sync</code>, <code>File.lock</code>, <code>File.unlock</code></td><td>push writes to the device, advisory whole-file locks</td></tr>
           <tr><td><code>memoryFile</code>, <code>File.seal</code></td><td>a file with no path that lives in memory (Linux); making its content final before handing it to another process</td></tr>
           <tr><td><code>symlink</code>, <code>freeSpace</code>, <code>totalSpace</code>, <code>unixMode</code>, <code>fromUnixMode</code></td><td>links, disk space, Unix mode bits</td></tr>
@@ -708,7 +712,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>JSON.parse</code></td><td>JSON into maps, arrays and scalars</td></tr>
           <tr><td><code>CBOR</code>, <code>CBORValue</code>, <code>CBORReader</code>, <code>cbor</code></td><td>CBOR (RFC 8949), deterministic encoding</td></tr>
           <tr><td><code>MsgPack</code>, <code>MsgPackValue</code>, <code>MsgPackReader</code>, <code>msgpack</code></td><td>MessagePack, ext types and timestamps</td></tr>
-          <tr><td><code>Protobuf</code>, <code>ProtoMessage</code>, <code>ProtoReader</code>, <code>ProtoWriter</code>, <code>protoField</code></td><td>Protocol Buffers wire format, with or without a schema</td></tr>
+          <tr><td><code>Protobuf</code>, <code>ProtoMessage</code>, <code>ProtoReader</code>, <code>ProtoWriter</code>, <code>protoField</code></td><td>Protocol Buffers wire format, with or without a schema; <code>ProtoField.payload</code> reads a field's bytes without a copy</td></tr>
           <tr><td><code>ProtoSchema</code>, <code>ProtoFile</code></td><td><code>.proto</code> files: messages, enums and services</td></tr>
           <tr><td><code>CSV</code>, <code>CSVReader</code>, <code>CSVWriter</code>, <code>csv</code></td><td>CSV, any separator: whole texts or streams, rows bound to objects by header, separator detection</td></tr>
           <tr><td><code>XMLSignature</code>, <code>signXML</code>, <code>parseXMLSignature</code>, <code>canonicalize</code></td><td>XML signatures and canonical XML</td></tr>
@@ -817,7 +821,7 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>Image</code>, <code>load</code>, <code>info</code></td><td>image, implements <code>gfx.Raster</code></td></tr>
           <tr><td><code>ImageSequence</code>, <code>ImageFrame</code></td><td>animations: frames, delays, loops</td></tr>
-          <tr><td><code>PNG</code>, <code>APNG</code>, <code>GIF</code>, <code>JPEG</code>, <code>WEBP</code>, <code>BMP</code>, <code>TIFF</code>, <code>PSD</code>, <code>TGA</code>, <code>PCX</code>, <code>XPM</code>, <code>ICO</code>, <code>CUR</code>, <code>ANI</code></td><td>codecs</td></tr>
+          <tr><td><code>PNG</code>, <code>APNG</code>, <code>GIF</code>, <code>JPEG</code>, <code>WEBP</code>, <code>BMP</code>, <code>TIFF</code>, <code>PSD</code>, <code>TGA</code>, <code>PCX</code>, <code>XPM</code>, <code>ICO</code>, <code>CUR</code>, <code>ANI</code>, <code>PNM</code>, <code>JPEG2000</code>, <code>J2K</code></td><td>codecs; JPEG 2000 decodes all of Part 1 and encodes lossless or lossy (<code>JPEG2000</code> writes <code>.jp2</code>, <code>J2K</code> raw codestreams); JPEG decodes every process but hierarchical (12-bit, lossless, arithmetic, CMYK) as libjpeg-turbo does and keeps <code>iccProfile</code> and <code>exif</code>; PNM reads and writes PBM, PGM, PPM, PAM and PFM (<code>PNMFormat</code>)</td></tr>
           <tr><td><code>SVG.decode</code>, <code>SVG.picture</code></td><td>SVG and SVGZ rendering, SMIL animation at a given time</td></tr>
           <tr><td><code>SVG.encode</code></td><td>canvas pictures as SVG</td></tr>
           <tr><td><code>SVG.parsePath</code>, <code>SVG.pathData</code></td><td>SVG path data</td></tr>
@@ -946,10 +950,19 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-formats-ai">
         <h3><code>std.formats.ai</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>ModelFile</code>, <code>load</code>, <code>info</code></td><td>model file: metadata and tensors</td></tr>
+          <tr><td><code>ModelFile</code>, <code>load</code>, <code>info</code></td><td>model file: metadata and tensors; a file loaded by path is memory-mapped, <code>pages</code> gives a tensor's bytes without a copy</td></tr>
           <tr><td><code>Gguf</code>, <code>Safetensors</code></td><td>codecs, read and write</td></tr>
           <tr><td><code>TensorType</code>, <code>TensorInfo</code></td><td>tensor types (every ggml quantized type)</td></tr>
           <tr><td><code>dequantize</code>, <code>blockSize</code>, <code>blockBytes</code></td><td>quantized blocks to floats</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-formats-ai-onnx">
+        <h3><code>std.formats.ai.onnx</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>OnnxModel</code>, <code>load</code>, <code>decode</code></td><td>ONNX model file: graph, initializers, functions, external data; <code>encode</code>, <code>save</code></td></tr>
+          <tr><td><code>Graph</code>, <code>Node</code>, <code>Attribute</code>, <code>Function</code></td><td>operator graph</td></tr>
+          <tr><td><code>TensorData</code>, <code>SparseTensorData</code>, <code>decodeTensor</code></td><td>stored tensors of every element type</td></tr>
+          <tr><td><code>ValueInfo</code>, <code>ValueType</code>, <code>ElementType</code></td><td>declared types of graph values</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-barcodes">
@@ -1015,7 +1028,7 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-net">
         <h3><code>std.net</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>Socket</code>, <code>Address</code>, <code>Connection</code>, <code>Stream</code></td><td>sockets and connections</td></tr>
+          <tr><td><code>Socket</code>, <code>Address</code>, <code>Connection</code>, <code>Stream</code></td><td>sockets and connections; <code>Socket.connectDatagram</code>, <code>send</code>, <code>receive</code> for a datagram socket with one peer; <code>Connection.setNoDelay</code> (on by default)</td></tr>
           <tr><td><code>DatagramTransport</code></td><td>whole datagrams to and from one peer</td></tr>
           <tr><td><code>Listener</code>, <code>Server</code>, <code>StreamServer</code>, <code>DatagramServer</code></td><td>server interfaces</td></tr>
           <tr><td><code>NetError</code>, <code>ErrorCode</code></td><td>typed failures</td></tr>
@@ -1384,7 +1397,7 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-ai-llm">
         <h3><code>std.ai.llm</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>LanguageModel</code>, <code>load</code>, <code>Device</code></td><td>language model from a GGUF file, on the CPU or the GPU; <code>load</code>'s <code>gpuMemory</code> caps the GPU memory it takes, and a mixture-of-experts model larger than that keeps a part of its experts in host memory</td></tr>
+          <tr><td><code>LanguageModel</code>, <code>load</code>, <code>Device</code></td><td>language model from a GGUF file, on the CPU or the GPU; <code>load</code>'s <code>gpuMemory</code> caps the GPU memory it takes, and a mixture-of-experts model larger than that keeps a part of its experts in host memory (<code>hostMemory</code> caps the page-locked copies); weights are read from the mapped file, so a model larger than memory loads</td></tr>
           <tr><td><code>Session</code></td><td>conversation: sampling, generation, chat</td></tr>
           <tr><td><code>Message</code>, <code>Role</code>, <code>Reasoning</code></td><td>chat messages, thinking</td></tr>
           <tr><td><code>ChatFormat</code>, <code>detectChatFormat</code></td><td>chat formats of model families</td></tr>
@@ -1398,6 +1411,14 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>Weights</code>, <code>loadWeights</code></td><td>quantized weights, SIMD matrix-vector multiply</td></tr>
           <tr><td><code>rmsNorm</code>, <code>layerNorm</code>, <code>softmax</code>, <code>silu</code>, <code>gelu</code>, <code>rope</code></td><td>transformer operations</td></tr>
+          <tr><td><code>Tensor</code>, <code>tensorOf</code></td><td>n-dimensional values of any ONNX element type</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-ai-onnx">
+        <h3><code>std.ai.onnx</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Model</code>, <code>load</code></td><td>ONNX model ready to run: <code>run</code> takes input values by name and returns the outputs; on a GPU the graph runs there with its tensors kept in device memory</td></tr>
+          <tr><td><code>Value</code></td><td>a tensor or a sequence of tensors</td></tr>
         </table>
       </div>
     </section>
@@ -1408,7 +1429,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.ui</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>UI</code>, <code>UIConfig</code></td><td>UI service</td></tr>
-          <tr><td><code>StyleSheet</code>, <code>StyleRule</code>, <code>rule</code></td><td>rules that restyle components by selector; <code>UI.addStyles(sheet)</code>, <code>components.Styled(sheet)</code></td></tr>
+          <tr><td><code>StyleSheet</code>, <code>StyleRule</code>, <code>rule</code></td><td>rules that restyle components by selector; <code>UI.addStyles(sheet)</code>, <code>UI.removeStyles(sheet)</code>, <code>components.Styled(sheet)</code>, <code>StyleSheet.add</code>, <code>changed</code></td></tr>
           <tr><td><code>ComponentRenderer</code>, <code>RenderContext</code>, <code>RenderPasses</code>, <code>Geometry</code>, <code>TextKind</code>, <code>WindowState</code>, <code>WindowKind</code>, <code>CloseRequest</code>, <code>MenuEntry</code>, <code>PointerEvent</code>, <code>PointerPhase</code>, <code>Modifiers</code>, <code>Limit</code>, <code>TextInputClient</code>, <code>TextRange</code>, <code>StateChange</code>, <code>@action</code>, <code>Viewport</code>, <code>Theme</code>, <code>Palette</code></td><td>component drawing, resolved layout, state events, actions</td></tr>
           <tr><td><code>Theme</code>, <code>themeOf</code></td><td>the values styles read as <code>theme</code>; <code>themeOf(component)</code> is the theme that component's style reads: the nearest one provided, else <code>UI.theme()</code></td></tr>
           <tr><td><code>DragData</code>, <code>DropEffect</code></td><td>what is dragged: a value of the application's own, text, file paths, other forms by MIME type; what a drop would do (none, copy, move, link)</td></tr>
@@ -1530,7 +1551,7 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-gpu">
         <h3><code>std.gpu</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>DeviceBuffer</code>, <code>upload</code></td><td>GPU memory kept between <a href="docs.html#functions"><code>cuda def</code></a> launches</td></tr>
+          <tr><td><code>DeviceBuffer</code>, <code>upload</code>, <code>deviceBuffer</code></td><td>GPU memory kept between <a href="docs.html#functions"><code>cuda def</code></a> launches; <code>deviceBuffer&lt;T&gt;(count)</code> makes one of zeros on the device without copying from the host</td></tr>
           <tr><td><code>Readback</code></td><td>reads a buffer back without waiting for launches queued after its <code>start</code></td></tr>
           <tr><td><code>HostBuffer</code>, <code>hostBuffer</code></td><td>page-locked host memory; <code>buffer.write(from, start, count, at)</code> queues a copy of a range of it to the device and returns at once</td></tr>
           <tr><td><code>available</code>, <code>deviceName</code>, <code>freeMemory</code></td><td>device info, bytes of GPU memory free</td></tr>

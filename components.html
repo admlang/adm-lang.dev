@@ -784,22 +784,26 @@ style CardLook {
         </p>
         <p>
           A call can set properties of the style of the component it makes:
-          <code>Button("Save", style = {width: 120(px), on: {hover: {opacity: 0.8}}})</code>. What the call
+          <code>Button("Save", style = {width: 120(px), on: {hover: {font: {weight: FontWeight.Bold}}}})</code>. What the call
           sets wins over the component's own looks, its hover and pressed looks included; the call's
           <code>on</code> gives states looks of its own.
         </p>
         <p>
-          A style can hold named variants of itself, <code>variants = {primary: {background: accent}, big: {padding: 12(px)}}</code>,
+          A style can hold named variants of itself, <code>variants = {primary: {background: accent}, big: {minHeight: 40(px)}}</code>,
           and a call asks for the ones it wants: <code>Button("Save", style = {variant: [primary, big]})</code>.
           A variant may give states looks of its own with <code>on</code>, and a rule selects by it:
           <code>kind&lt;Button&gt;().variant("primary")</code>.
         </p>
         <p>
           A style sheet restyles components from outside them, a theme's look or an application's house
-          style: <code>new StyleSheet([rule(kind&lt;Button&gt;(), style = {radius: 0(px)}), rule(kind&lt;Button&gt;().hover(), style = {opacity: 0.9})])</code>.
+          style: <code>new StyleSheet([rule(kind&lt;Button&gt;(), style = {radius: new Corners&lt;Extent&gt;(0(px))}), rule(kind&lt;Button&gt;().hover(), style = {font: {weight: FontWeight.Bold}})])</code>.
           <code>UI.addStyles(sheet)</code> applies it in every window, <code>Styled(sheet) { ... }</code> to
           the components it holds. A rule goes over the component's own style and under its state looks;
-          what a call sets goes over both.
+          what a call sets goes over both. A selector that names no kind,
+          <code>rule(role(Role.Button).inside(kind&lt;Toolbar&gt;()), style = {minHeight: 28(px)})</code>, gives each
+          property to every style that has it. <code>sheet.add(rule(...))</code> adds a rule,
+          <code>sheet.changed()</code> has the looks made again after a value a rule reads changed, and
+          <code>UI.removeStyles(sheet)</code> takes a sheet away from the windows.
         </p>
         <p>
           Some properties are inherited: <code>foreground</code>, <code>font</code>, <code>paragraph</code>,
@@ -1518,6 +1522,8 @@ Row(gap = 8(px)) {
             <tr><td><code>exitOnLastWindowClose</code></td><td><code>true</code></td><td>Ask the application to end when the last window closes.</td></tr>
             <tr><td><code>showFPS</code></td><td><code>false</code></td><td>Show the frame rate in the window's title.</td></tr>
             <tr><td><code>forceRedraw</code></td><td><code>false</code></td><td>Draw every frame. Off, a window is drawn only after something happened in it.</td></tr>
+            <tr><td><code>compactWidth</code>, <code>expandedWidth</code></td><td><code>600(px)</code>, <code>1000(px)</code></td><td>Where <code>viewport.widthClass</code> changes: <code>Compact</code> below the first, <code>Expanded</code> from the second, <code>Medium</code> between.</td></tr>
+            <tr><td><code>compactHeight</code>, <code>expandedHeight</code></td><td><code>480(px)</code>, <code>900(px)</code></td><td>The same for <code>viewport.heightClass</code>.</td></tr>
           </tbody>
         </table>
       </div>

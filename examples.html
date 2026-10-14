@@ -73,6 +73,9 @@
       <div class="docs-nav-group"><a class="docs-nav-top" href="#units">Units of Measure</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#media-player">Media Player</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#plugins">Plugins</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#datagrams">Datagrams</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#mapped-files">Memory-Mapped Files</a></div>
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#styles-themes">Styles and Themes</a></div>
       <div class="docs-nav-group"><a class="docs-nav-top" href="#testing">Tests</a></div>
     </nav>
   </aside>
@@ -1391,6 +1394,189 @@ plugin ImageTools {
 }</code></pre>
       </div>
       <p><code>adm build</code> writes <code>ImageTools.admplugin</code>; the <a href="plugins.html">Plugins</a> page covers the package layout and the shared runtime.</p>
+    </section>
+
+    <section class="docs-section" id="datagrams">
+      <h2>Datagrams</h2>
+      <p><code>std.net.udp.dial</code> opens a UDP socket connected to one peer: the system drops datagrams from other senders, and <code>send</code> and <code>receive</code> name no address. Two such sockets on one machine exchange a datagram each way.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">pingpong.adm</span>
+        </div>
+        <pre><code>application PingPong {
+	use std.net.udp
+
+	def new(args string[]) !int {
+		// Two sockets on this machine, each connected to the other: the system drops
+		// datagrams from anyone else, and a send names no address.
+		let left = try udp.dial(&quot;127.0.0.1:47002&quot;, local = &quot;127.0.0.1:47001&quot;)
+		let right = try udp.dial(&quot;127.0.0.1:47001&quot;, local = &quot;127.0.0.1:47002&quot;)
+
+		try left.send(&quot;ping&quot;.bytes(), 1s)
+		let buf byte[] = []
+		buf.len(64)
+		let n = try right.receive(buf, 1s)
+		println(&quot;right got {string(buf.slice(0, n))} from {right.remoteAddr()}&quot;)
+
+		try right.send(&quot;pong&quot;.bytes(), 1s)
+		let m = try left.receive(buf, 1s)
+		println(&quot;left got {string(buf.slice(0, m))}&quot;)
+
+		try left.close()
+		try right.close()
+		return 0
+	}
+}</code></pre>
+      </div>
+      <p>A <code>udp.Peer</code> is a <code>net.DatagramTransport</code>, which DTLS and the other datagram protocols of <code>std.net</code> run over. For many peers on one socket, <code>net.Socket</code> has <code>writeTo</code> and <code>readFrom</code>; <code>Socket.connectDatagram(address)</code> connects a socket you made yourself, after which <code>send</code> and <code>receive</code> work as above.</p>
+    </section>
+
+    <section class="docs-section" id="mapped-files">
+      <h2>Memory-Mapped Files</h2>
+      <p><code>os.mapFile</code> maps a file into memory, and <code>Mapping.pages</code> gives its bytes as an ordinary <code>byte[]</code> over the mapping's own pages: nothing is copied, and the system reads each page when the loop first touches it, so the file may be larger than memory.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">lines.adm</span>
+        </div>
+        <pre><code>application Lines {
+	use (
+		std.os
+		std.services.storage::MapAccess
+	)
+
+	// Counts the lines of a file of any size: the pages are read as the loop
+	// touches them, and none of the file is copied.
+	def new(args string[]) !int {
+		let path = args.len() &gt; 1 ?? (args[1], &quot;/usr/share/dict/words&quot;)
+		let mapping = try os.mapFile(path, MapAccess.Copy)
+		defer mapping.close()
+		let text = try mapping.pages(0, mapping.length())
+		let lines = 0
+		for let b in text {
+			lines += 1 when b == 10
+		}
+		println(&quot;{path}: {lines} lines in {text.len()} bytes&quot;)
+		return 0
+	}
+}</code></pre>
+      </div>
+      <p>A <code>MapAccess.Copy</code> mapping keeps stores into the array in this process and works on a file you may only read; <code>MapAccess.ReadWrite</code> writes them to the file. The pages stay mapped while the array or a slice of it lives, even after <code>close</code>. <code>Mapping.read(offset, length)</code> copies a range instead, and <code>mapping.reader()</code> streams it.</p>
+    </section>
+
+    <section class="docs-section" id="styles-themes">
+      <h2>Styles and Themes</h2>
+      <p>A component's look comes from four places, later winning: its own style, the rules of the style sheets around it, its states' looks, and what the call that made it sets. This page uses all of them: a <code>Card</code> with states and named variants, a font set once on the page and inherited field by field, a house <code>StyleSheet</code> for every window with one rule by kind and one by role, and a sheet of its own for part of the page while the window is narrow.</p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">themed.adm</span>
+        </div>
+        <pre><code>module themed {
+	use (
+		std.math.geom::(Axes, Corners, Edges)
+		std.ui::(SizeClass, StyleSheet, kind, role, rule)
+		std.ui.components::*
+		std.ui.styles::*
+		std.units::*
+	)
+
+	// A card: a box with a background and a border, whose text follows its font.
+	component Card {
+		type {
+			@input(value = true)
+			title string = &quot;&quot;
+		}
+
+		view {
+			Heading(title)
+			children()
+		}
+
+		style {
+			Box
+			Layout
+			Decorated
+			Typography
+			Compositing
+			arrange  = Arrange.Column
+			gap      = new Axes&lt;Extent&gt;(8(px))
+			padding  = new Edges&lt;Extent&gt;(16(px))
+			radius   = new Corners&lt;Extent&gt;(8(px))
+			font     = {size: 15(px)}
+			on       = {
+				hover: {opacity: 0.95},
+			}
+			variants = {
+				quiet: {opacity: 0.7},
+				wide:  {width: 480(px)},
+			}
+		}
+	}
+
+	// House style: every button square; anything with the button role inside a card bold.
+	let house = new StyleSheet([
+		rule(kind&lt;Button&gt;(), style = {radius: new Corners&lt;Extent&gt;(0(px))}),
+		rule(role(Role.Button).inside(kind&lt;Card&gt;()), style = {font: {weight: FontWeight.Bold}}),
+	])
+
+	// A sheet of its own for one part of the page.
+	let compact = new StyleSheet([
+		rule(kind&lt;Card&gt;(), style = {padding: new Edges&lt;Extent&gt;(6(px)), gap: new Axes&lt;Extent&gt;(4(px))}),
+	])
+
+	component Page {
+		view {
+			Card(&quot;Account&quot;, style = {variant: [wide]}) {
+				Label(&quot;Signed in&quot;)
+				Button(&quot;Sign out&quot;, style = {width: 140(px), on: {hover: {font: {italic: true}}}})
+			}
+			// Below `UIConfig.compactWidth` the second card takes the compact sheet.
+			if viewport.widthClass == SizeClass.Compact {
+				Styled(compact) {
+					Card(&quot;Recent&quot;, style = {variant: [quiet]}) {
+						Label(&quot;Nothing yet&quot;)
+					}
+				}
+			} else {
+				Card(&quot;Recent&quot;, style = {variant: [quiet]}) {
+					Label(&quot;Nothing yet&quot;)
+				}
+			}
+		}
+
+		style {
+			Box
+			Layout
+			Typography
+			arrange = Arrange.Column
+			gap     = new Axes&lt;Extent&gt;(12(px))
+			padding = new Edges&lt;Extent&gt;(24(px))
+			// Inherited by every text and button on the page.
+			font    = Font{family: &quot;Inter&quot;, size: 14(px)}
+		}
+	}
+}
+
+application Themed {
+	use (
+		std.ui::(UI, UIConfig)
+		std.ui.renderer
+		std.units::*
+		themed::(Page, house)
+	)
+
+	async def new(args string[]) !int {
+		try UI.config(UIConfig{rendererName: &quot;opengl&quot;, compactWidth: 520(px)})
+		try await UI.start()
+		UI.addStyles(house)
+		try await UI.run(Page(), new renderer.WindowConfig(&quot;Themed&quot;, 900, 640))
+		return 0
+	}
+}</code></pre>
+      </div>
+      <p>The card's <code>font = {size: 15(px)}</code> names one field: the family is still the page's Inter. A rule whose selector names no kind, <code>role(Role.Button).inside(kind&lt;Card&gt;())</code>, sets <code>font</code> on any style that has it, so it reaches a <code>Button</code>, a link or anything else with the button role inside a card. <code>viewport.widthClass</code> is <code>Compact</code> below <code>UIConfig.compactWidth</code>; the <a href="components.html#styles">Components</a> page has the full list of style properties, states and selectors.</p>
     </section>
 
     <section class="docs-section" id="testing">
