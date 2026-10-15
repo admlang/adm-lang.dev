@@ -1960,11 +1960,11 @@ try nightly.run(importOrders)                      // check-ins: in progress, th
       </div>
 
       <div class="docs-sub" id="telemetry-prometheus">
-        <h3><code>adm.telemetry.prometheus</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.telemetry.prometheus</code></h3>
 
         <p>A Prometheus exporter for the <code>Telemetry</code> service, in ADM over <code>std.net.http</code>: the program&#39;s metrics pushed by Remote Write or to a Pushgateway, or served for scraping on a listener of their own, bound to loopback unless a token or client certificates guard it.</p>
 
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>Remote write 1.0 and 2.0 to Prometheus, Mimir, Thanos, VictoriaMetrics or Grafana Cloud, with native histograms; a Pushgateway for jobs that end before a scrape; or a token-guarded scrape endpoint answering in protobuf, OpenMetrics or the text format.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -1994,11 +1994,11 @@ try await Telemetry.start()</code></pre>
       </div>
 
       <div class="docs-sub" id="telemetry-statsd">
-        <h3><code>adm.telemetry.statsd</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.telemetry.statsd</code></h3>
 
         <p>A StatsD exporter for the <code>Telemetry</code> service, in ADM: the program&#39;s metrics sent as StatsD lines to Graphite, Telegraf, Netdata or any other StatsD server, over UDP, TCP or a Unix socket.</p>
 
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>Counters as what was added between batches, gauges absolute, histograms as per-range samples whose sample rates carry exact counts; tags in DogStatsD, Influx or Graphite form.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -2018,8 +2018,9 @@ try await Telemetry.start()</code></pre>
 	adm.telemetry.statsd
 )
 
-let metrics = new statsd.Exporter("udp://127.0.0.1:8125")
+let metrics = new statsd.Exporter("udp://127.0.0.1:8125")   // tcp://, unix:///path, unixgram:///path
 metrics.prefix = "shop."
+metrics.resourceTags = ["service.name"]
 try Telemetry.config(TelemetryConfig{exporters: [metrics], requireConsent: false})
 try await Telemetry.start()</code></pre>
       </div>
@@ -2028,11 +2029,11 @@ try await Telemetry.start()</code></pre>
       </div>
 
       <div class="docs-sub" id="telemetry-graylog">
-        <h3><code>adm.telemetry.graylog</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.telemetry.graylog</code></h3>
 
         <p>GELF for the <code>Logging</code> service, in ADM: an encoder and a writer that send the program&#39;s log records as GELF messages to a Graylog input over UDP, TCP or HTTP.</p>
 
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>A GELF 1.1 encoder and a writer for the <code>Logging</code> service: UDP with compression and chunking, TCP and TLS, or a GELF HTTP input.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
