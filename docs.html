@@ -2653,14 +2653,15 @@ def new(args string[]) int {
 }</code></pre>
         </div>
         <p>
-          The kernel is compiled to PTX at build time and also as plain C, so the same program runs
-          without a GPU: the CPU path runs the blocks in parallel. <code>ADM_CUDA=gpu</code> or
+          The kernel is compiled at build time for every GPU architecture the toolkit knows (PTX plus
+          SASS, one fatbin) and also as plain C, so the same program runs without a GPU, or with a driver
+          that cannot run the images: the CPU path runs the blocks in parallel. <code>ADM_CUDA=gpu</code> or
           <code>=cpu</code> forces either, <code>ADM_CUDA_DEVICE</code> picks the device, and
           <code>gpu.available()</code> / <code>gpu.deviceName()</code> report the path in use. A body
           that needs device-only features (<code>__shared__</code>, <code>__syncthreads</code>, warp
           intrinsics) declares <code>@launch(cpu = false)</code> and fails without a GPU. A kernel
           that uses newer instructions names the lowest compute capability it needs,
-          <code>@launch(arch = 80)</code> for TF32 tensor cores: its PTX targets that architecture,
+          <code>@launch(arch = 80)</code> for TF32 tensor cores: its image targets that architecture and newer,
           and on an older device it takes the CPU path (or fails, when GPU-only).
           <code>gpu.capability()</code> gives the device's capability times ten, so a caller picks
           the kernel: <code>if gpu.capability() &gt;= 80 { tf32Matmul(...) } else { matmul(...) }</code>.
