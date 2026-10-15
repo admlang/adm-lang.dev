@@ -152,6 +152,9 @@
         <ul class="docs-sub-list">
           <li><a class="docs-nav-sub" href="#telemetry-datadog">datadog</a></li>
           <li><a class="docs-nav-sub" href="#telemetry-sentry">sentry</a></li>
+          <li><a class="docs-nav-sub" href="#telemetry-prometheus">prometheus</a></li>
+          <li><a class="docs-nav-sub" href="#telemetry-statsd">statsd</a></li>
+          <li><a class="docs-nav-sub" href="#telemetry-graylog">graylog</a></li>
         </ul>
       </div>
 
@@ -716,7 +719,17 @@ let vectors = try ai.embedder("text-embedding-3-small").embed(string["one", "two
 let pictures = try ai.images.generate("a kettle on a windowsill", size = openai.ImageSize.Square)
 let words = try ai.audio.transcribe(recording)
 let file = try ai.files.upload("requests.jsonl", openai.Purpose.Batch)
-let batch = try ai.batches.create(file.id)</code></pre>
+let batch = try ai.batches.create(file.id)
+
+ai.webSearch = openai.WebSearch{}                    // tools OpenAI runs (Responses API)
+ai.codeInterpreter = openai.CodeInterpreter{}
+let found = ai.chat()
+print(try found.say("What did the ECB decide this week?"))
+for let (_, cite) in openai.citationsOf(found.messages()[1]) {
+	print(cite.url)
+}
+let live = ai.live()                                 // the Realtime API: speech both ways
+try live.hear(recording)</code></pre>
       </div>
 
         <p class="exports-note"><a href="https://github.com/admlang/ai/tree/main/openai" target="_blank" rel="noopener">README and source</a></p>
@@ -761,7 +774,13 @@ print(chat.usage().cachedTokens)
 
 print(try ai.countTokens(chat))
 let file = try ai.files.upload("report.pdf", "application/pdf")
-let batch = try ai.batches.create([anthropic.BatchRequest{id: "q1", request: request}])</code></pre>
+let batch = try ai.batches.create([anthropic.BatchRequest{id: "q1", request: request}])
+
+ai.webSearch = anthropic.WebSearch{maxUses: 3}                // server tools
+ai.codeExecution = true
+ai.memory = "notes"                                         // the memory tool over a folder
+ai.clearToolUses = anthropic.ClearToolUses{atTokens: 100000}  // context editing
+try ai.compact(chat)                                        // the conversation summed up</code></pre>
       </div>
 
         <p class="exports-note"><a href="https://github.com/admlang/ai/tree/main/anthropic" target="_blank" rel="noopener">README and source</a></p>
@@ -798,7 +817,12 @@ for let source in gemini.groundingOf(chat.messages()[2]).sources {
 let clip = try ai.files.wait((try ai.files.upload("talk.mp4", "video/mp4")).name)
 try chat.ask(llm.Message{text: "Summarise the talk.", files: [gemini.remote(clip)]})
 
-let vectors = try ai.embedder(task = gemini.TaskType.RetrievalDocument).embed(string["one", "two"])</code></pre>
+let vectors = try ai.embedder(task = gemini.TaskType.RetrievalDocument).embed(string["one", "two"])
+
+try chat.ask(llm.Message{text: "What happens here?", videos: [try video.open("clip.mp4")]})
+let batch = try ai.batches.create([gemini.BatchRequest{id: "q1", request: request}])
+let live = ai.live()                                 // the Live API: speech both ways
+try live.hear(recording)</code></pre>
       </div>
 
         <p class="exports-note"><a href="https://github.com/admlang/ai/tree/main/gemini" target="_blank" rel="noopener">README and source</a></p>
@@ -1224,11 +1248,11 @@ try new dns.Client(zone).create("A", "www", "203.0.113.7", proxied = true)</code
       <p class="exports-note">Source: <a href="https://github.com/admlang/dev" target="_blank" rel="noopener">github.com/admlang/dev</a></p>
 
       <div class="docs-sub" id="dev-git">
-        <h3><code>adm.dev.git</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.dev.git</code></h3>
 
-        <p>Git in ADM: repositories on disk, their objects and references, and the smart protocol over HTTP and SSH. There is no libgit2 and no <code>git</code> binary to call.</p>
+        <p>Git in ADM: repositories on disk, their objects and references, the working tree, merging, and the smart protocol over HTTP and SSH, client and server. There is no libgit2 and no <code>git</code> binary to call; what it writes git reads, and what git writes it reads.</p>
 
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>Clones (shallow, single-branch, partial with lazy fetching, bare, mirror, with submodules), fetch with negotiation, push with leases and per-reference reports, credential helpers and the SSH agent; SHA-1 and SHA-256 repositories, packs with multi-pack indexes and reachability bitmaps, reftables; diffs, merges, blame and status as git computes them; commits and tags signed with SSH or OpenPGP keys; and <code>git.Server</code>, a <code>std.net.http</code> handler that serves repositories with the program's own access checks.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -1250,7 +1274,7 @@ for let commit in try repo.log("main", limit = 10) {
 	print("{commit.id.short()} {commit.summary}")
 }
 let tree = try repo.tree("main")
-let readme = try tree.file("README.md").text()
+let readme = try (try tree.file("README.md")).text()
 
 try repo.add("notes.md")
 let id = try repo.commit("Add notes", author = new git.Signature("Ana", "ana@example.com"))
@@ -1413,11 +1437,9 @@ try cluster.deployments("shop").scale("web", 3)</code></pre>
       <p class="exports-note">Source: <a href="https://github.com/admlang/auth" target="_blank" rel="noopener">github.com/admlang/auth</a></p>
 
       <div class="docs-sub" id="auth-google">
-        <h3><code>adm.auth.google</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.auth.google</code></h3>
 
         <p>Sign in with Google in ADM over <code>std.proto.auth.openid</code>: the web flow, ID tokens from One Tap and mobile apps, refresh, and Google Workspace domain checks.</p>
-
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -1435,10 +1457,10 @@ try cluster.deployments("shop").scale("web", 3)</code></pre>
         <pre><code>use adm.auth.google
 
 let provider = new google.Provider(clientId, clientSecret, redirectURL = "https://example.com/auth/google")
-let start = try provider.begin(scopes = ["email", "profile"])
-// send the browser to start.url, keep start.state in the session
+let request = try provider.start()              // email and profile; more scopes as an argument
+// send the browser to request.url, keep request with the session
 
-let login = try provider.complete(callbackURL, start)
+let login = try provider.exchange(request, callbackURL)
 let profile = login.profile
 print("{profile.name} &lt;{profile.email}&gt;")
 
@@ -1450,11 +1472,9 @@ let claims = try provider.verifyIdToken(idToken)</code></pre>
       </div>
 
       <div class="docs-sub" id="auth-github">
-        <h3><code>adm.auth.github</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.auth.github</code></h3>
 
         <p>Sign in with GitHub in ADM over <code>std.proto.auth.oauth2</code>. GitHub has no OpenID Connect, so the library completes the OAuth flow and reads the profile from the user and emails API. It also offers the device flow for command-line tools, GitHub App user tokens, and GitHub Enterprise Server through a base URL.</p>
-
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -1472,25 +1492,23 @@ let claims = try provider.verifyIdToken(idToken)</code></pre>
         <pre><code>use adm.auth.github
 
 let provider = new github.Provider(clientId, clientSecret, redirectURL = "https://example.com/auth/github")
-let start = try provider.begin(scopes = ["read:user", "user:email"])
-let login = try provider.complete(callbackURL, start)
+let request = try provider.start()              // read:user and user:email
+let login = try provider.exchange(request, callbackURL)
 print(login.profile.email)                        // the primary verified address
 
 // a command-line tool
-let device = try provider.beginDevice(scopes = ["repo"])
+let device = try provider.startDevice(["repo"])
 print("Open {device.url} and enter {device.code}")
-let token = try device.wait()</code></pre>
+let signedIn = try device.wait()</code></pre>
       </div>
 
         <p class="exports-note"><a href="https://github.com/admlang/auth/tree/main/github" target="_blank" rel="noopener">README and source</a></p>
       </div>
 
       <div class="docs-sub" id="auth-microsoft">
-        <h3><code>adm.auth.microsoft</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.auth.microsoft</code></h3>
 
         <p>Sign in with Microsoft in ADM over <code>std.proto.auth.openid</code>: Entra ID (work and school accounts), personal Microsoft accounts, tenants and their issuers, certificates as client credentials, and the profile from Microsoft Graph.</p>
-
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -1509,8 +1527,8 @@ let token = try device.wait()</code></pre>
 
 let provider = new microsoft.Provider(clientId, clientSecret, tenant = "organizations",
 	redirectURL = "https://example.com/auth/microsoft")
-let start = try provider.begin(scopes = ["openid", "profile", "email", "User.Read"])
-let login = try provider.complete(callbackURL, start)
+let request = try provider.start(["Calendars.Read"])   // besides the profile and Graph's /me
+let login = try provider.exchange(request, callbackURL)
 print(login.profile.email)
 print(login.claims.get("tid"))                    // the user's tenant</code></pre>
       </div>
@@ -1519,11 +1537,9 @@ print(login.claims.get("tid"))                    // the user's tenant</code></p
       </div>
 
       <div class="docs-sub" id="auth-apple">
-        <h3><code>adm.auth.apple</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.auth.apple</code></h3>
 
         <p>Sign in with Apple in ADM over <code>std.proto.auth.openid</code>: the web and native flows, the client secret Apple wants as a signed JWT, the user's name that arrives only once, private relay addresses, and Apple's server-to-server notifications.</p>
-
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -1542,8 +1558,8 @@ print(login.claims.get("tid"))                    // the user's tenant</code></p
 
 let provider = new apple.Provider(servicesId, teamId, keyId, privateKey,
 	redirectURL = "https://example.com/auth/apple")
-let start = try provider.begin(scopes = ["name", "email"])
-let login = try provider.complete(callbackForm, start)   // Apple posts the result as a form
+let request = try provider.start()              // name and email
+let login = try provider.exchange(request, callbackForm)   // Apple posts the result as a form
 let profile = login.profile
 print(profile.name)                               // present on the first sign-in only: store it
 print(profile.email)                              // may be a privaterelay.appleid.com address
@@ -1867,11 +1883,11 @@ server.handle("/paypal", hooks.handler((event paypal.Event) =&gt; orders.record(
       <p class="exports-note">Source: <a href="https://github.com/admlang/telemetry" target="_blank" rel="noopener">github.com/admlang/telemetry</a></p>
 
       <div class="docs-sub" id="telemetry-datadog">
-        <h3><code>adm.telemetry.datadog</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.telemetry.datadog</code></h3>
 
         <p>A Datadog exporter for the <code>Telemetry</code> service, in ADM over <code>std.net.http</code>: metrics, logs, events and traces to the intake APIs of a Datadog site, with no agent in between.</p>
 
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>Counters as counts of what was added between batches, gauges as gauges, histograms as distributions; log records and error reports to the logs intake, correlated with their traces; usage events as Datadog events; spans to the trace intake with the APM stats Datadog builds its service metrics from.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -1892,24 +1908,23 @@ server.handle("/paypal", hooks.handler((event paypal.Event) =&gt; orders.record(
 )
 
 let dd = new datadog.Exporter(apiKey, site = "datadoghq.eu")   // DD_API_KEY, DD_SITE when left out
-dd.service = "shop"
-dd.env = "prod"
-dd.version = "1.4.0"
-dd.tags = ["team:payments"]
-let config = new TelemetryConfig()
-config.exporters = [dd]
-try await Telemetry.start(config)</code></pre>
+dd.serviceName = "shop"                                         // DD_SERVICE, else service.name
+dd.env = "prod"                                                 // DD_ENV
+dd.version = "1.4.0"                                            // DD_VERSION, else service.version
+dd.tags = ["team:payments"]                                     // with DD_TAGS
+try Telemetry.config(TelemetryConfig{exporters: [dd], requireConsent: false})
+try await Telemetry.start()</code></pre>
       </div>
 
         <p class="exports-note"><a href="https://github.com/admlang/telemetry/tree/main/datadog" target="_blank" rel="noopener">README and source</a></p>
       </div>
 
       <div class="docs-sub" id="telemetry-sentry">
-        <h3><code>adm.telemetry.sentry</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.telemetry.sentry</code></h3>
 
         <p>A Sentry exporter for the <code>Telemetry</code> service, in ADM over <code>std.net.http</code>: errors as Sentry events with stack traces and breadcrumbs, spans as transactions, and check-ins for scheduled jobs. It speaks the envelope protocol, so it works with sentry.io, self-hosted Sentry and GlitchTip.</p>
 
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>Errors become events with their stack, the log records and usage events before them as breadcrumbs, and their fields as user, request and extra data; spans become transactions, a span with no parent or with another program's parent being one; log records go as Sentry logs when asked for; scheduled jobs report their runs as check-ins. The server's rate limits are kept per category and drops are reported as client reports.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -1932,13 +1947,124 @@ try await Telemetry.start(config)</code></pre>
 let st = new sentry.Exporter(dsn)                 // SENTRY_DSN when left out
 st.release = "shop@1.4.0"
 st.environment = "prod"
-st.sampleRate = 0.2                                // of transactions; errors always go
-let config = new TelemetryConfig()
-config.exporters = [st]
-try await Telemetry.start(config)</code></pre>
+st.sampleRate = 0.2                                // of traces; errors always go
+try Telemetry.config(TelemetryConfig{exporters: [st], requireConsent: false})
+try await Telemetry.start()
+
+let nightly = st.monitor("nightly-import")
+nightly.crontab = "0 3 * * *"
+try nightly.run(importOrders)                      // check-ins: in progress, then ok or error</code></pre>
       </div>
 
         <p class="exports-note"><a href="https://github.com/admlang/telemetry/tree/main/sentry" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="telemetry-prometheus">
+        <h3><code>adm.telemetry.prometheus</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A Prometheus exporter for the <code>Telemetry</code> service, in ADM over <code>std.net.http</code>: the program&#39;s metrics pushed by Remote Write or to a Pushgateway, or served for scraping on a listener of their own, bound to loopback unless a token or client certificates guard it.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.telemetry.prometheus</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">prometheus.adm</span>
+        </div>
+        <pre><code>use (
+	std.services.telemetry::(Telemetry, TelemetryConfig)
+	adm.telemetry.prometheus
+)
+
+let metrics = new prometheus.Exporter("https://prometheus.internal/api/v1/write")
+metrics.headers["Authorization"] = "Bearer {token}"
+try Telemetry.config(TelemetryConfig{exporters: [metrics], requireConsent: false})
+try await Telemetry.start()</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/telemetry/tree/main/prometheus" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="telemetry-statsd">
+        <h3><code>adm.telemetry.statsd</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A StatsD exporter for the <code>Telemetry</code> service, in ADM: the program&#39;s metrics sent as StatsD lines to Graphite, Telegraf, Netdata or any other StatsD server, over UDP, TCP or a Unix socket.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.telemetry.statsd</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">statsd.adm</span>
+        </div>
+        <pre><code>use (
+	std.services.telemetry::(Telemetry, TelemetryConfig)
+	adm.telemetry.statsd
+)
+
+let metrics = new statsd.Exporter("udp://127.0.0.1:8125")
+metrics.prefix = "shop."
+try Telemetry.config(TelemetryConfig{exporters: [metrics], requireConsent: false})
+try await Telemetry.start()</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/telemetry/tree/main/statsd" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="telemetry-graylog">
+        <h3><code>adm.telemetry.graylog</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>GELF for the <code>Logging</code> service, in ADM: an encoder and a writer that send the program&#39;s log records as GELF messages to a Graylog input over UDP, TCP or HTTP.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.telemetry.graylog</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">graylog.adm</span>
+        </div>
+        <pre><code>use (
+	std.services.logging::*
+	adm.telemetry.graylog
+)
+
+try Logging.config(
+	LogConfig{
+		writers: [
+			LogWriterConfig{
+				writer:  new graylog.Writer("tcp+tls://graylog.internal:12201"),
+				encoder: new graylog.Encoder(),
+			},
+		],
+	}
+)</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/telemetry/tree/main/graylog" target="_blank" rel="noopener">README and source</a></p>
       </div>
 
     </section>

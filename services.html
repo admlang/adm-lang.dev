@@ -2500,7 +2500,7 @@ step.end()</code></pre>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def span(name string, attributes map&lt;string, any&gt; = {}, parent ?SpanContext = none) Span</code></div>
-            <p class="api-doc">Begins a timed operation and makes it the calling task's current span; <code>end</code> on the result finishes it. The span is a child of <code>parent</code>, and without one of the task's current span. A <code>Span</code> has <code>set</code>, <code>event</code>, <code>error</code>, <code>end</code>, <code>context</code> and <code>traceparent</code>.</p>
+            <p class="api-doc">Begins a timed operation and makes it the calling task's current span; <code>end</code> on the result finishes it. The span is a child of <code>parent</code>, and without one of the task's current span. A <code>Span</code> has <code>set</code>, <code>event</code>, <code>error</code>, <code>end</code>, <code>context</code> and <code>traceparent</code>. A parent read by <code>parseTraceparent</code> is another program's (<code>SpanContext.remote</code>), and the span begun under it records that as <code>SpanRecord.parentRemote</code>.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def current() ?Span</code></div>

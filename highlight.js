@@ -105,6 +105,16 @@
         continue;
       }
 
+      // raw (backtick) string: no escapes, may span lines
+      if (c === "`") {
+        var end = src.indexOf("`", i + 1);
+        var last = end === -1 ? n : end + 1;
+        out += span("str", src.slice(i, last));
+        i = last;
+        prevSignificant = '"';
+        continue;
+      }
+
       // string / char literal
       if (c === '"' || c === "'") {
         var q = c;

@@ -720,8 +720,15 @@ let b = "Hello {user}"  // interpolation
 let c = """
 This is a
    multi-line string
-"""</code></pre>
+"""
+
+let d = `{"name": "Ada", "path": "C:\data"}`  // raw: no escapes, no interpolation</code></pre>
         </div>
+        <p>
+          A backtick string is raw: its text is exactly what stands between the backticks, over any
+          number of lines, with no escapes and no <code>{expr}</code> interpolation. JSON, regexes and
+          Windows paths go in as written. It cannot hold a backtick; a carriage return in it is dropped.
+        </p>
         <p>
           Inside a string, <code>{expr}</code> interpolates any expression: a variable, a call, an
           index. A lone <code>{</code> followed by an expression start (a letter, a digit, a quote, a

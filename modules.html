@@ -701,6 +701,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.proto.auth.openid</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>RelyingParty</code>, <code>connect</code>, <code>Login</code>, <code>IdClaims</code></td><td>OpenID Connect relying party</td></tr>
+          <tr><td><code>Profile</code>, <code>SignInProvider</code></td><td>who signed in, the same for every provider; the interface the <code>adm.auth</code> sign-in libraries implement</td></tr>
           <tr><td><code>Provider</code>, <code>UserStore</code></td><td>OpenID Connect provider</td></tr>
           <tr><td><code>ProviderMetadata</code>, <code>discover</code></td><td>provider discovery</td></tr>
           <tr><td><code>LogoutEvent</code></td><td>RP-initiated, front- and back-channel logout</td></tr>
@@ -785,8 +786,8 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-compress">
         <h3><code>std.data.compress</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>flate</code></td><td>DEFLATE <code>Reader</code>/<code>Writer</code></td></tr>
-          <tr><td><code>gzip</code>, <code>zlib</code></td><td>gzip and zlib</td></tr>
+          <tr><td><code>flate</code></td><td>DEFLATE <code>Reader</code>/<code>Writer</code>, <code>Inflater</code>, and <code>inflate</code> for one stream held in memory (with the bytes it took)</td></tr>
+          <tr><td><code>gzip</code>, <code>zlib</code></td><td>gzip and zlib; <code>zlib.decompress</code> and <code>zlib.inflate</code> for streams held in memory</td></tr>
           <tr><td><code>lzw</code></td><td>LZW</td></tr>
           <tr><td><code>bzip2</code></td><td>bzip2</td></tr>
           <tr><td><code>lzma</code></td><td>LZMA and LZMA2</td></tr>
@@ -1503,18 +1504,20 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-ai-llm">
         <h3><code>std.ai.llm</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>LanguageModel</code>, <code>load</code>, <code>Device</code></td><td>language model from a GGUF file, on the CPU or the GPU; <code>load</code>'s <code>gpuMemory</code> caps the GPU memory it takes, and a mixture-of-experts model larger than that keeps a part of its experts in host memory (<code>hostMemory</code> caps the page-locked copies); weights are read from the mapped file, so a model larger than memory loads</td></tr>
+          <tr><td><code>LanguageModel</code>, <code>load</code>, <code>Device</code></td><td>language model from a GGUF file or a Hugging Face model folder (Llama, Mistral, Qwen2, Qwen3, Qwen3-MoE, Gemma 2/3, Phi-3), on the CPU or the GPU; <code>load</code>'s <code>gpuMemory</code> caps the GPU memory it takes, and a mixture-of-experts model larger than that keeps a part of its experts in host memory (<code>hostMemory</code> caps the page-locked copies); weights are read from the mapped file, so a model larger than memory loads</td></tr>
           <tr><td><code>Session</code></td><td>conversation: sampling, generation, chat; <code>schema</code> and <code>fill(target, text)</code> hold the answer to a JSON Schema (a struct's, filled from the reply); <code>precision</code> runs prompt batches on the GPU's tensor cores</td></tr>
-          <tr><td><code>ChatMemory</code>, <code>Forgetting</code></td><td>a conversation kept within a budget of tokens: older turns summed up by the model or dropped</td></tr>
+          <tr><td><code>ChatMemory</code>, <code>Forgetting</code></td><td>a conversation kept within a budget of tokens: older turns summed up by the model or dropped, room made before each question</td></tr>
+          <tr><td><code>LiveChat</code>, <code>LiveProvider</code>, <code>LiveConnection</code>, <code>LiveEvent</code>, <code>LiveEventKind</code>, <code>LiveSetup</code></td><td>a spoken conversation both ways at once with a hosted model (OpenAI's Realtime API, Gemini's Live API through the <code>adm.ai</code> libraries' <code>client.live()</code>): sound and text in, speech, words and calls out as they come</td></tr>
+          <tr><td><code>ToolOutput</code></td><td>a tool result with pictures (a screenshot, a chart), from a tool's <code>look</code></td></tr>
           <tr><td><code>Chat</code>, <code>RemoteChat</code></td><td>a conversation with any model: a local <code>Session</code> or a hosted one (the <code>adm.ai</code> provider libraries' <code>client.chat()</code>), with the same tools, messages and streaming; <code>model</code> can change between replies</td></tr>
           <tr><td><code>ChatProvider</code>, <code>ChatRequest</code>, <code>ReplyStream</code>, <code>ReplyEvent</code>, <code>Usage</code>, <code>StopReason</code></td><td>what a provider library implements so <code>RemoteChat</code> runs over its API</td></tr>
           <tr><td><code>RemoteError</code>, <code>RemoteErrorKind</code>, <code>remoteErrorKind</code>, <code>schemaOf</code></td><td>the failures of hosted APIs, one kind list for every provider; a tool's parameters as JSON Schema</td></tr>
           <tr><td><code>withDocuments</code></td><td>a message with its documents written as Markdown before its text</td></tr>
           <tr><td><code>Tuning</code>, <code>Target</code></td><td>LoRA fine-tuning from <code>model.tune(rank, alpha, targets, precision)</code>: <code>learn</code> from texts or chat conversations (AdamW steps on the CPU or the GPU, the model's weights untouched), <code>loss</code>, <code>save</code> as a GGUF adapter llama.cpp and Ollama read</td></tr>
           <tr><td><code>Adapter</code></td><td>a GGUF LoRA adapter and its scale, applied by <code>load(path, adapters = ...)</code></td></tr>
-          <tr><td><code>Message</code>, <code>Role</code>, <code>Reasoning</code>, <code>RemoteFile</code></td><td>chat messages, thinking; files uploaded to a hosted model's provider, named in a message</td></tr>
+          <tr><td><code>Message</code>, <code>Role</code>, <code>Reasoning</code>, <code>RemoteFile</code></td><td>chat messages (text, pictures, sound, videos, documents), thinking; files uploaded to a hosted model's provider, named in a message</td></tr>
           <tr><td><code>ChatFormat</code>, <code>detectChatFormat</code></td><td>chat formats of model families</td></tr>
-          <tr><td><code>Tokenizer</code>, <code>loadTokenizer</code></td><td>tokenizers of GGUF models (BPE, SentencePiece, WordPiece) and Hugging Face tokenizer files (tokenizer.json, vocab.json with merges.txt, vocab.txt)</td></tr>
+          <tr><td><code>Tokenizer</code>, <code>loadTokenizer</code></td><td>tokenizers of GGUF models (BPE, SentencePiece, WordPiece, Unigram) and Hugging Face tokenizer files (tokenizer.json, vocab.json with merges.txt, vocab.txt); pairs of texts for cross-encoders</td></tr>
           <tr><td><code>Stats</code></td><td>prompt and generation speed</td></tr>
           <tr><td><code>toolsOf</code></td><td>the tools of an MCP server (<code>std.proto.mcp</code>) as tools of a session</td></tr>
         </table>
@@ -1537,7 +1540,7 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-ai-retrieval">
         <h3><code>std.ai.retrieval</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>Index</code>, <code>load</code></td><td>texts and documents cut into passages, embedded by any embedder, searched by meaning; <code>ask</code> a chat to answer from the best passages; saved to a file</td></tr>
+          <tr><td><code>Index</code>, <code>load</code>, <code>Matching</code></td><td>texts and documents cut into passages, embedded by any embedder, searched by meaning, by words (BM25) or both, the best reordered by a reranker; large indexes searched through a graph (HNSW); <code>ask</code> a chat to answer from the best passages; saved to a file</td></tr>
           <tr><td><code>Passage</code>, <code>passagesOf</code></td><td>a passage found with its source and score; how a text is cut</td></tr>
         </table>
       </div>
@@ -1562,6 +1565,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>EmbeddingModel</code>, <code>load</code>, <code>Pooling</code></td><td>texts as vectors, from GGUF (BERT, Nomic BERT) or ONNX embedding models</td></tr>
           <tr><td><code>similarity</code>, <code>nearest</code></td><td>cosine similarity, the closest vectors of a list</td></tr>
           <tr><td><code>Embedder</code></td><td>what turns texts into vectors: a loaded model, or a hosted one of the <code>adm.ai</code> libraries</td></tr>
+          <tr><td><code>RerankModel</code>, <code>loadReranker</code>, <code>Reranker</code></td><td>cross-encoders (bge-reranker, ms-marco MiniLM; GGUF or ONNX): how well each passage answers a question, from 0 to 1</td></tr>
         </table>
       </div>
     </section>
