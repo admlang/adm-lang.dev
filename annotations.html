@@ -179,8 +179,8 @@ type Remote {
 <p>Warns at every use of the declaration with the given message.</p>
       <h4><code>@inline()  @noinline()</code></h4>
 <p>Asks the backend to inline the function, or forbids it.</p>
-      <h4><code>@launch(block = 256, x = &quot;&quot;, y = &quot;&quot;, z = &quot;&quot;, cpu = true)</code></h4>
-<p>Launch shape of a <code>cuda def</code>: threads per block, the integer parameters that give the thread count per axis, and whether a CPU fallback is built. See the language reference on CUDA kernels.</p>
+      <h4><code>@launch(block = 256, x = &quot;&quot;, y = &quot;&quot;, z = &quot;&quot;, cpu = true, arch = 75)</code></h4>
+<p>Launch shape of a <code>cuda def</code>: threads per block, the integer parameters that give the thread count per axis, whether a CPU fallback is built, and the lowest compute capability times ten the kernel runs on (<code>80</code> for TF32 tensor cores). See the language reference on CUDA kernels.</p>
       <h4><code>@c(lib, header = &quot;&quot;)  @c(header = &quot;&quot;, symbol = &quot;&quot;, name = &quot;&quot;, ret = &quot;&quot;, params = [], convention = &quot;&quot;)</code></h4>
 <p>On a module: the C library its signature-only declarations come from, and with <code>header</code> the header they are checked against. On a function: binds it to a C symbol, checked against <code>header</code> when one is named; <code>ret</code> and <code>params</code> write the C types by hand, <code>convention</code> names the calling convention.</p>
       <h4><code>@link(lib)  @native(lib)</code></h4>
@@ -397,6 +397,8 @@ component Shell {
 <p>For <code>Layout</code> and <code>Binary</code>: <code>id</code> and <code>name</code> identify the field in a <code>Binary</code> stream; <code>size</code> fixes the byte width of a <code>byte[]</code> or <code>string</code> field in a <code>Layout</code>, <code>count</code> the element count of an array, <code>pad</code> the zero bytes before the field.</p>
       <h4><code>@form(name = &quot;&quot;)</code></h4>
 <p>From <code>std.net.http</code>: names the form field, query key or route parameter a struct field is bound from by <code>Request.bind</code>, <code>bindQuery</code> and <code>bindParams</code>.</p>
+      <h4><code>@graphql(name = &quot;&quot;, description = &quot;&quot;, deprecated = &quot;&quot;, ignore = false)</code></h4>
+<p>From <code>std.net.graphql</code>, for <code>schemaOf</code>. On a field: its GraphQL name, description (the doc comment otherwise), deprecation reason, or <code>ignore</code> to leave it out. On a method: the method becomes a field of its type, its parameters the arguments (a <code>ResolveInfo</code> parameter receives the resolve information). On a type, struct or enum: its GraphQL name and description.</p>
       <h4><code>@xml(name = &quot;&quot;, omitempty = false, attribute = false, ignore = false)</code></h4>
 <p>On fields and properties; <code>attribute</code> writes the value as an attribute of the parent element. On a type or struct, <code>@xml(name, ignore)</code> renames or hides the element.</p>
       <div class="code-window">

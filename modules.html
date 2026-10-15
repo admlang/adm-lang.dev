@@ -54,6 +54,7 @@
           <li><a class="docs-nav-sub" href="#std-strings">std.strings</a></li>
           <li><a class="docs-nav-sub" href="#std-text-unicode">std.text.unicode</a></li>
           <li><a class="docs-nav-sub" href="#std-text-precis">std.text.precis</a></li>
+          <li><a class="docs-nav-sub" href="#std-text-idna">std.text.idna</a></li>
           <li><a class="docs-nav-sub" href="#std-text-jinja">std.text.templates.jinja</a></li>
           <li><a class="docs-nav-sub" href="#std-adm-lexer">std.adm.lexer</a></li>
           <li><a class="docs-nav-sub" href="#std-adm-syntax">std.adm.syntax</a></li>
@@ -62,6 +63,7 @@
           <li><a class="docs-nav-sub" href="#std-bytes">std.bytes</a></li>
           <li><a class="docs-nav-sub" href="#std-math">std.math</a></li>
           <li><a class="docs-nav-sub" href="#std-math-geom">std.math.geom</a></li>
+          <li><a class="docs-nav-sub" href="#std-math-geo">std.math.geo</a></li>
           <li><a class="docs-nav-sub" href="#std-math-bezier">std.math.bezier</a></li>
           <li><a class="docs-nav-sub" href="#std-math-easing">std.math.easing</a></li>
           <li><a class="docs-nav-sub" href="#std-math-processing">std.math.processing</a></li>
@@ -112,6 +114,7 @@
           <li><a class="docs-nav-sub" href="#std-crypto">std.crypto</a></li>
           <li><a class="docs-nav-sub" href="#std-hash">std.crypto.hash</a></li>
           <li><a class="docs-nav-sub" href="#std-cipher">std.crypto.cipher</a></li>
+          <li><a class="docs-nav-sub" href="#std-openpgp">std.crypto.openpgp</a></li>
           <li><a class="docs-nav-sub" href="#std-x509">std.crypto.x509</a></li>
         </ul>
       </div>
@@ -152,6 +155,7 @@
           <li><a class="docs-nav-sub" href="#std-net">std.net</a></li>
           <li><a class="docs-nav-sub" href="#std-tcp">std.net.tcp</a></li>
           <li><a class="docs-nav-sub" href="#std-tls">std.net.tls</a></li>
+          <li><a class="docs-nav-sub" href="#std-acme">std.net.tls.acme</a></li>
           <li><a class="docs-nav-sub" href="#std-proxy">std.net.proxy</a></li>
           <li><a class="docs-nav-sub" href="#std-quic">std.net.quic</a></li>
           <li><a class="docs-nav-sub" href="#std-stun">std.net.stun</a></li>
@@ -163,7 +167,10 @@
           <li><a class="docs-nav-sub" href="#std-http2">std.net.http.http2</a></li>
           <li><a class="docs-nav-sub" href="#std-http3">std.net.http.http3</a></li>
           <li><a class="docs-nav-sub" href="#std-grpc">std.net.grpc</a></li>
+          <li><a class="docs-nav-sub" href="#std-graphql">std.net.graphql</a></li>
           <li><a class="docs-nav-sub" href="#std-websocket">std.net.http.websocket</a></li>
+          <li><a class="docs-nav-sub" href="#std-webpush">std.net.http.webpush</a></li>
+          <li><a class="docs-nav-sub" href="#std-openapi">std.net.http.openapi</a></li>
           <li><a class="docs-nav-sub" href="#std-httptest">std.net.http.httptest</a></li>
           <li><a class="docs-nav-sub" href="#std-webdav">std.net.http.webdav</a></li>
           <li><a class="docs-nav-sub" href="#std-dns">std.net.dns</a></li>
@@ -297,6 +304,15 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>PrecisError</code></td><td>errors</td></tr>
         </table>
       </div>
+      <div class="docs-sub" id="std-text-idna">
+        <h3><code>std.text.idna</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>toASCII</code>, <code>toUnicode</code>, <code>IDNAOptions</code></td><td>internationalized domain names: UTS #46 processing (Unicode 18), IDNA2008 rules when strict</td></tr>
+          <tr><td><code>derivedProperty</code>, <code>DerivedProperty</code>, <code>allowedInContext</code>, <code>bidiRule</code></td><td>IDNA2008's derived property of a code point, its contextual rules, the Bidi Rule (RFC 5892, RFC 5893)</td></tr>
+          <tr><td><code>punycodeEncode</code>, <code>punycodeDecode</code></td><td>Punycode (RFC 3492)</td></tr>
+          <tr><td><code>IDNAError</code></td><td>errors, with the UTS #46 code</td></tr>
+        </table>
+      </div>
       <div class="docs-sub" id="std-text-jinja">
         <h3><code>std.text.templates.jinja</code></h3>
         <table class="docs-table exports-table">
@@ -378,6 +394,19 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Transform2D</code></td><td>2D affine transform</td></tr>
           <tr><td><code>Path</code>, <code>FillRule</code>, <code>StrokeStyle</code>, <code>LineCap</code>, <code>LineJoin</code></td><td>paths: build, stroke, dash, measure, trim, morph, boolean operations</td></tr>
           <tr><td><code>BezierPath</code>, <code>QuadraticBezier</code>, <code>CubicBezier</code></td><td>curves</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-math-geo">
+        <h3><code>std.math.geo</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Coordinate</code>, <code>DistanceMethod</code>, <code>earthRadius</code></td><td>positions on WGS84; geodesic and haversine distance, bearing, destination, interpolation</td></tr>
+          <tr><td><code>Bounds</code></td><td>latitude and longitude boxes, across the antimeridian too</td></tr>
+          <tr><td><code>Geometry</code>, <code>GeometryKind</code></td><td>points, lines, polygons and collections: area, length, centroid, point in polygon, simplification</td></tr>
+          <tr><td><code>Feature</code>, <code>FeatureCollection</code>, <code>parseGeoJSON</code>, <code>parseGeoJSONGeometry</code></td><td>GeoJSON (RFC 7946)</td></tr>
+          <tr><td><code>parseWKT</code>, <code>parseEWKT</code>, <code>parseWKB</code>, <code>parseEWKB</code></td><td>WKT and WKB, PostGIS extended forms</td></tr>
+          <tr><td><code>parseGeohash</code>, <code>geohashNeighbors</code></td><td>geohash cells</td></tr>
+          <tr><td><code>Tile</code>, <code>parseQuadkey</code>, <code>toWebMercator</code>, <code>fromWebMercator</code>, <code>maxMercatorLatitude</code></td><td>map tiles, quadkeys, Web Mercator</td></tr>
+          <tr><td><code>UTM</code>, <code>parseUTM</code></td><td>Universal Transverse Mercator grid</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-math-bezier">
@@ -715,11 +744,13 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>JSON</code>, <code>json</code></td><td>JSON</td></tr>
           <tr><td><code>XMLNode</code>, <code>XMLWriter</code>, <code>XML</code></td><td>XML objects (<code>encode</code>, <code>decode</code>, <code>@xml</code>), tree, writer and well-formedness check</td></tr>
-          <tr><td><code>YAML</code></td><td>YAML</td></tr>
+          <tr><td><code>YAML</code>, <code>YAMLError</code></td><td>YAML 1.2: <code>parse</code> and <code>parseAll</code> into plain values, <code>decode</code> into objects, <code>encode</code>; errors with line and column</td></tr>
           <tr><td><code>TOML</code></td><td>TOML</td></tr>
           <tr><td><code>JSON.parse</code></td><td>JSON into maps, arrays and scalars</td></tr>
           <tr><td><code>CBOR</code>, <code>CBORValue</code>, <code>CBORReader</code>, <code>cbor</code></td><td>CBOR (RFC 8949), deterministic encoding</td></tr>
           <tr><td><code>MsgPack</code>, <code>MsgPackValue</code>, <code>MsgPackReader</code>, <code>msgpack</code></td><td>MessagePack, ext types and timestamps</td></tr>
+          <tr><td><code>BSON</code>, <code>BSONValue</code>, <code>BSONKind</code>, <code>BSONReader</code>, <code>BSONVectorType</code>, <code>ExtendedJSON</code>, <code>bson</code></td><td>BSON documents, MongoDB Extended JSON v2 both ways; <code>BSON.bind</code> fills an object from a decoded tree</td></tr>
+          <tr><td><code>ObjectId</code>, <code>parseObjectId</code>, <code>Decimal128</code>, <code>parseDecimal128</code></td><td>MongoDB identifiers and 128-bit decimals</td></tr>
           <tr><td><code>Protobuf</code>, <code>ProtoMessage</code>, <code>ProtoReader</code>, <code>ProtoWriter</code>, <code>protoField</code></td><td>Protocol Buffers wire format, with or without a schema; <code>ProtoField.payload</code> reads a field's bytes without a copy</td></tr>
           <tr><td><code>ProtoSchema</code>, <code>ProtoFile</code></td><td><code>.proto</code> files: messages, enums and services</td></tr>
           <tr><td><code>CSV</code>, <code>CSVReader</code>, <code>CSVWriter</code>, <code>csv</code></td><td>CSV, any separator: whole texts or streams, rows bound to objects by header, separator detection</td></tr>
@@ -734,7 +765,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Binary</code></td><td>typed self-describing binary stream</td></tr>
           <tr><td><code>putVarint</code>, <code>varint</code></td><td>varints</td></tr>
         </table>
-        <p class="exports-note"><code>std.data.encoding.jsonschema</code>: <code>schemaOf</code> (the JSON Schema of an ADM type), <code>valueOf</code> (a JSON value as that type), <code>Callable</code> (a function or method described as JSON Schema and called with a JSON object), <code>Parameter</code>, <code>SchemaError</code>, <code>SchemaErrorKind</code>.</p>
+        <p class="exports-note"><code>std.data.encoding.jsonschema</code>: <code>schemaOf</code> (the JSON Schema of an ADM type), <code>valueOf</code> (a JSON value as that type), <code>Callable</code> (a function or method described as JSON Schema and called with a JSON object), <code>Parameter</code>, <code>SchemaError</code>, <code>SchemaErrorKind</code>; <code>compile</code>, <code>CompileOptions</code>, <code>Draft</code>, <code>Validator</code>, <code>ValidationError</code> (validating JSON values against a schema of drafts 2020-12, 2019-09, 7, 6 and 4, with every format and ECMA-262 patterns).</p>
       </div>
       <div class="docs-sub" id="std-codepages">
         <h3><code>std.data.encoding.codepages</code></h3>
@@ -770,14 +801,17 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>rand</code>, <code>randRange</code>, <code>randOf</code></td><td>random numbers</td></tr>
           <tr><td><code>UUID</code>, <code>UUIDVersion</code>, <code>parseUUID</code>, <code>uuidNamespaceDNS</code>, <code>uuidNamespaceURL</code>, <code>uuidNamespaceOID</code>, <code>uuidNamespaceX500</code></td><td>UUIDs (RFC 9562): random V4, time-ordered V7, name-based V5 and V3</td></tr>
+          <tr><td><code>ULID</code>, <code>parseULID</code></td><td>128-bit identifiers that sort by the millisecond they were made, monotonic within one</td></tr>
+          <tr><td><code>KSUID</code>, <code>parseKSUID</code></td><td>160-bit identifiers that sort by second, base62 text</td></tr>
+          <tr><td><code>nanoid</code>, <code>nanoidAlphabet</code></td><td>short random URL-safe identifiers, custom size and alphabet</td></tr>
           <tr><td><code>RSAPublicKey</code>, <code>RSAPrivateKey</code>, <code>generateRSAKey</code>, <code>RSAPadding</code></td><td>RSA signatures and encryption (OAEP, PKCS #1 v1.5)</td></tr>
-          <tr><td><code>ECDSAPublicKey</code>, <code>ECDSAPrivateKey</code>, <code>generateECDSAKey</code></td><td>ECDSA, P-224 to P-521</td></tr>
+          <tr><td><code>ECDSAPublicKey</code>, <code>ECDSAPrivateKey</code>, <code>generateECDSAKey</code></td><td>ECDSA, P-224 to P-521, secp256k1, brainpoolP256r1/384r1/512r1</td></tr>
           <tr><td><code>Ed25519PublicKey</code>, <code>Ed25519PrivateKey</code></td><td>Ed25519</td></tr>
           <tr><td><code>Ed448PublicKey</code>, <code>Ed448PrivateKey</code>, <code>generateEd448Key</code></td><td>Ed448 and Ed448ph</td></tr>
           <tr><td><code>x25519</code>, <code>x448</code>, <code>ecdh</code></td><td>key agreement</td></tr>
           <tr><td><code>MLKEMPublicKey</code>, <code>MLKEMPrivateKey</code>, <code>generateMLKEMKey</code></td><td>ML-KEM (FIPS 203)</td></tr>
           <tr><td><code>bcrypt</code>, <code>bcryptVerify</code></td><td>password hashes</td></tr>
-          <tr><td><code>parsePKIXPublicKey</code>, <code>parsePKCS1PrivateKey</code>, <code>parsePKCS8PrivateKey</code>, <code>marshalPKCS8PrivateKey</code>, <code>marshalPKCS1PrivateKey</code>, …</td><td>key encodings (PKIX, PKCS #1, PKCS #8 both ways)</td></tr>
+          <tr><td><code>parsePKIXPublicKey</code>, <code>parsePKCS1PrivateKey</code>, <code>parsePKCS8PrivateKey</code>, <code>marshalPKCS8PrivateKey</code>, <code>marshalPKCS1PrivateKey</code>, <code>parseEncryptedPKCS8PrivateKey</code>, <code>marshalEncryptedPKCS8PrivateKey</code>, …</td><td>key encodings (PKIX, PKCS #1, PKCS #8 both ways, password-encrypted PKCS #8)</td></tr>
           <tr><td><code>constantTimeEqual</code></td><td>constant-time comparison</td></tr>
         </table>
       </div>
@@ -796,9 +830,9 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-cipher">
         <h3><code>std.crypto.cipher</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>AES</code>, <code>Blowfish</code>, <code>DES</code>, <code>TripleDES</code></td><td>block ciphers (<code>Block</code>)</td></tr>
+          <tr><td><code>AES</code>, <code>Camellia</code>, <code>Blowfish</code>, <code>DES</code>, <code>TripleDES</code>, <code>CAST5</code>, <code>Twofish</code>, <code>IDEA</code></td><td>block ciphers (<code>Block</code>); CAST5, Twofish and IDEA for old OpenPGP data</td></tr>
           <tr><td><code>CBC</code>, <code>CFB</code>, <code>CTR</code></td><td>modes</td></tr>
-          <tr><td><code>GCM</code>, <code>ChaCha20Poly1305</code>, <code>XChaCha20Poly1305</code>, <code>SIV</code>, <code>CBCHMAC</code></td><td>authenticated encryption (<code>AEAD</code>)</td></tr>
+          <tr><td><code>GCM</code>, <code>OCB</code>, <code>EAX</code>, <code>ChaCha20Poly1305</code>, <code>XChaCha20Poly1305</code>, <code>SIV</code>, <code>CBCHMAC</code></td><td>authenticated encryption (<code>AEAD</code>)</td></tr>
           <tr><td><code>wrapKey</code>, <code>unwrapKey</code></td><td>AES key wrap (RFC 3394, RFC 5649)</td></tr>
           <tr><td><code>cmac</code></td><td>CMAC</td></tr>
         </table>
@@ -807,9 +841,22 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.crypto.x509</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Certificate</code>, <code>parseCertificate</code>, <code>parseCertificatesPEM</code></td><td>X.509 certificates</td></tr>
+          <tr><td><code>Template</code>, <code>createCertificate</code>, <code>createRequest</code></td><td>make certificates (self-signed or signed by a CA) and certificate signing requests</td></tr>
           <tr><td><code>CertPool</code>, <code>systemCertPool</code></td><td>trusted roots</td></tr>
           <tr><td><code>VerifyOptions</code></td><td>chain verification</td></tr>
           <tr><td><code>Name</code></td><td>distinguished names</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-openpgp">
+        <h3><code>std.crypto.openpgp</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>generateKey</code>, <code>KeyOptions</code>, <code>KeyAlgorithm</code></td><td>new keys (RFC 9580 version 6, or version 4): Ed25519/X25519, Ed448/X448, NIST curves, RSA</td></tr>
+          <tr><td><code>Key</code>, <code>KeyInfo</code>, <code>readKeys</code>, <code>RevocationReason</code></td><td>certificates and secret keys: user IDs, subkeys, expiry, lock and unlock, renew, revoke, merge, sign, cleartext signatures</td></tr>
+          <tr><td><code>Keyring</code>, <code>Message</code>, <code>Verification</code></td><td>decrypt and verify messages, detached and cleartext signatures</td></tr>
+          <tr><td><code>encrypt</code>, <code>EncryptOptions</code></td><td>encrypt to keys or a passphrase, signed and compressed (SEIPD v2 AEAD, or v1 for version 4 peers)</td></tr>
+          <tr><td><code>armor</code>, <code>dearmor</code>, <code>Armored</code>, <code>ArmorKind</code></td><td>ASCII armor</td></tr>
+          <tr><td><code>lookupWKD</code>, <code>KeyServer</code></td><td>find keys by Web Key Directory and on HKP key servers</td></tr>
+          <tr><td><code>PublicKeyAlgorithm</code>, <code>SymmetricAlgorithm</code>, <code>AEADAlgorithm</code>, <code>HashAlgorithm</code>, <code>CompressionAlgorithm</code>, <code>OpenPGPError</code></td><td>algorithm IDs and the error type</td></tr>
         </table>
       </div>
     </section>
@@ -1061,9 +1108,22 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Conn</code>, <code>dial</code>, <code>client</code>, <code>server</code></td><td>TLS 1.3 and 1.2 connection, over a socket or any stream</td></tr>
           <tr><td><code>HandshakeCarrier</code></td><td>TLS 1.3 handshake without records, for QUIC</td></tr>
           <tr><td><code>Config</code></td><td>certificates, names, versions</td></tr>
+          <tr><td><code>KeyPair</code>, <code>parseKeyPair</code>, <code>loadKeyPair</code></td><td>certificate chain and private key from PEM, encrypted PKCS #8 keys with a password</td></tr>
           <tr><td><code>DTLSConn</code>, <code>dtlsDial</code>, <code>dtlsClient</code>, <code>dtlsServer</code></td><td>DTLS 1.3 and 1.2 over any datagram transport</td></tr>
           <tr><td><code>DTLSListener</code>, <code>dtlsListen</code></td><td>DTLS server on a UDP socket, stateless cookies</td></tr>
           <tr><td><code>DTLSConfig</code>, <code>SRTPProfile</code>, <code>SRTPKeys</code></td><td>DTLS settings, DTLS-SRTP profiles and keys, connection IDs</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-acme">
+        <h3><code>std.net.tls.acme</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Manager</code>, <code>CertificateKey</code></td><td>certificates obtained and renewed for an HTTPS server: on demand, tls-alpn-01, http-01 and dns-01, renewal information</td></tr>
+          <tr><td><code>CertificateStore</code>, <code>FolderStore</code>, <code>VaultStore</code></td><td>where the account key and certificates are kept</td></tr>
+          <tr><td><code>Client</code>, <code>Directory</code>, <code>Account</code>, <code>Order</code>, <code>Authorization</code>, <code>Challenge</code>, <code>Identifier</code>, <code>Status</code>, <code>ChallengeType</code></td><td>the ACME protocol (RFC 8555) step by step</td></tr>
+          <tr><td><code>ExternalAccountBinding</code>, <code>RenewalInfo</code>, <code>renewalId</code></td><td>external accounts, renewal windows (RFC 9773)</td></tr>
+          <tr><td><code>DNSProvider</code>, <code>dnsRecordName</code>, <code>dnsRecordValue</code>, <code>tlsAlpnCertificate</code>, <code>reverseName</code>, <code>acmeTLSProtocol</code>, <code>http01Prefix</code></td><td>challenge responses</td></tr>
+          <tr><td><code>Problem</code>, <code>AcmeError</code></td><td>the CA's problem documents</td></tr>
+          <tr><td><code>letsEncrypt</code>, <code>letsEncryptStaging</code>, <code>zeroSSL</code>, <code>buypass</code>, <code>buypassStaging</code>, <code>googleTrustServices</code>, <code>googleTrustServicesStaging</code></td><td>CA directories</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-quic">
@@ -1187,6 +1247,39 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>Conn</code>, <code>dial</code>, <code>Upgrader</code></td><td>WebSocket</td></tr>
           <tr><td><code>ReconnectingConn</code>, <code>Hub</code></td><td>reconnects, broadcast</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-webpush">
+        <h3><code>std.net.http.webpush</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Sender</code>, <code>PushMessage</code>, <code>Urgency</code>, <code>maxPayload</code></td><td>send and cancel push messages (RFC 8030), encrypted with aes128gcm (RFC 8291)</td></tr>
+          <tr><td><code>VapidKey</code>, <code>generateVapidKey</code>, <code>parseVapidKey</code></td><td>application server identification (VAPID, RFC 8292)</td></tr>
+          <tr><td><code>Subscription</code>, <code>parseSubscription</code></td><td>a browser's push subscription</td></tr>
+          <tr><td><code>PushError</code>, <code>PushErrorKind</code></td><td>the push service's refusals: expired subscriptions, rate limits</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-openapi">
+        <h3><code>std.net.http.openapi</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>parse</code>, <code>Document</code></td><td>OpenAPI descriptions (3.2; reads 3.0 and 3.1), JSON or YAML, written back with <code>json</code> and <code>yaml</code>; <code>problems</code> checks them against the specification</td></tr>
+          <tr><td><code>Info</code>, <code>Server</code>, <code>PathItem</code>, <code>Operation</code>, <code>Parameter</code>, <code>RequestBody</code>, <code>MediaType</code>, <code>Encoding</code>, <code>Response</code>, <code>Header</code>, <code>Callback</code>, <code>Example</code>, <code>Link</code>, <code>Tag</code>, <code>Components</code>, <code>SecurityScheme</code>, <code>OAuthFlows</code></td><td>the objects of a description, with their extensions and references</td></tr>
+          <tr><td><code>Document.addRoutes</code>, <code>Document.serve</code>, <code>Document.page</code></td><td>operations from a <code>ServeMux</code>'s routes; <code>/openapi.json</code>, <code>/openapi.yaml</code> and a documentation page</td></tr>
+          <tr><td><code>Validator</code>, <code>ValidatorOptions</code>, <code>Match</code>, <code>Problem</code></td><td>requests, responses and webhooks checked against a description; middleware answering with problem documents</td></tr>
+          <tr><td><code>ParameterIn</code>, <code>Style</code>, <code>SchemeKind</code>, <code>OpenAPIError</code></td><td>parameter locations and styles, security scheme types, errors</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-graphql">
+        <h3><code>std.net.graphql</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>parse</code>, <code>Document</code></td><td>GraphQL documents (September 2025 specification), printed as graphql-js prints them</td></tr>
+          <tr><td><code>parseSchema</code>, <code>schemaOf</code>, <code>Schema</code>, <code>@graphql</code></td><td>schemas from SDL or from annotated ADM types (subscriptions from methods returning channels): validation, execution, introspection, schema coordinates</td></tr>
+          <tr><td><code>Request</code>, <code>Response</code>, <code>GraphQLError</code>, <code>Location</code></td><td>a request and its response, <code>decode</code> into a typed value</td></tr>
+          <tr><td><code>ResolveInfo</code>, <code>Resolver</code>, <code>Subscriber</code>, <code>TypeResolver</code>, <code>ScalarCoercion</code></td><td>resolvers, subscription sources, abstract types and custom scalars</td></tr>
+          <tr><td><code>Subscription</code></td><td>a running subscription's responses</td></tr>
+          <tr><td><code>Handler</code></td><td>GraphQL over HTTP and graphql-transport-ws (subscriptions over WebSocket) for <code>std.net.http</code></td></tr>
+          <tr><td><code>Client</code></td><td>requests over HTTP, subscriptions over one shared WebSocket</td></tr>
+          <tr><td><code>SchemaElement</code>, <code>ElementKind</code></td><td>what a schema coordinate names</td></tr>
+          <tr><td><code>SchemaError</code>, <code>ClientError</code>, <code>SyntaxError</code></td><td>errors of schemas, clients and documents</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-httptest">
@@ -1346,6 +1439,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.net.sasl</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>ScramClient</code>, <code>ScramServer</code>, <code>ScramCredentials</code></td><td>SCRAM authentication</td></tr>
+          <tr><td><code>saslprep</code></td><td>SASLprep (RFC 4013) for user names and passwords</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="net-planned">
@@ -1408,10 +1502,14 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.ai.llm</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>LanguageModel</code>, <code>load</code>, <code>Device</code></td><td>language model from a GGUF file, on the CPU or the GPU; <code>load</code>'s <code>gpuMemory</code> caps the GPU memory it takes, and a mixture-of-experts model larger than that keeps a part of its experts in host memory (<code>hostMemory</code> caps the page-locked copies); weights are read from the mapped file, so a model larger than memory loads</td></tr>
-          <tr><td><code>Session</code></td><td>conversation: sampling, generation, chat</td></tr>
-          <tr><td><code>Tuning</code>, <code>Target</code></td><td>LoRA fine-tuning from <code>model.tune(rank, alpha, targets)</code>: <code>learn</code> from texts or chat conversations (AdamW steps on the CPU or the GPU, the model's weights untouched), <code>loss</code>, <code>save</code> as a GGUF adapter llama.cpp and Ollama read</td></tr>
+          <tr><td><code>Session</code></td><td>conversation: sampling, generation, chat; <code>precision</code> runs prompt batches on the GPU's tensor cores</td></tr>
+          <tr><td><code>Chat</code>, <code>RemoteChat</code></td><td>a conversation with any model: a local <code>Session</code> or a hosted one (the <code>adm.ai</code> provider libraries' <code>client.chat()</code>), with the same tools, messages and streaming; <code>model</code> can change between replies</td></tr>
+          <tr><td><code>ChatProvider</code>, <code>ChatRequest</code>, <code>ReplyStream</code>, <code>ReplyEvent</code>, <code>Usage</code>, <code>StopReason</code></td><td>what a provider library implements so <code>RemoteChat</code> runs over its API</td></tr>
+          <tr><td><code>RemoteError</code>, <code>RemoteErrorKind</code>, <code>remoteErrorKind</code>, <code>schemaOf</code></td><td>the failures of hosted APIs, one kind list for every provider; a tool's parameters as JSON Schema</td></tr>
+          <tr><td><code>withDocuments</code></td><td>a message with its documents written as Markdown before its text</td></tr>
+          <tr><td><code>Tuning</code>, <code>Target</code></td><td>LoRA fine-tuning from <code>model.tune(rank, alpha, targets, precision)</code>: <code>learn</code> from texts or chat conversations (AdamW steps on the CPU or the GPU, the model's weights untouched), <code>loss</code>, <code>save</code> as a GGUF adapter llama.cpp and Ollama read</td></tr>
           <tr><td><code>Adapter</code></td><td>a GGUF LoRA adapter and its scale, applied by <code>load(path, adapters = ...)</code></td></tr>
-          <tr><td><code>Message</code>, <code>Role</code>, <code>Reasoning</code></td><td>chat messages, thinking</td></tr>
+          <tr><td><code>Message</code>, <code>Role</code>, <code>Reasoning</code>, <code>RemoteFile</code></td><td>chat messages, thinking; files uploaded to a hosted model's provider, named in a message</td></tr>
           <tr><td><code>ChatFormat</code>, <code>detectChatFormat</code></td><td>chat formats of model families</td></tr>
           <tr><td><code>Tokenizer</code>, <code>loadTokenizer</code></td><td>tokenizers of GGUF models (BPE, SentencePiece, WordPiece) and Hugging Face tokenizer files (tokenizer.json, vocab.json with merges.txt, vocab.txt)</td></tr>
           <tr><td><code>Stats</code></td><td>prompt and generation speed</td></tr>
@@ -1429,7 +1527,7 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-ai-onnx">
         <h3><code>std.ai.onnx</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>Model</code>, <code>load</code></td><td>ONNX model ready to run: <code>run</code> takes input values by name and returns the outputs; on a GPU the graph runs there with its tensors kept in device memory</td></tr>
+          <tr><td><code>Model</code>, <code>load</code></td><td>ONNX model ready to run: <code>run</code> takes input values by name and returns the outputs; on a GPU the graph runs there with its tensors kept in device memory, its products on the tensor cores with <code>precision = gpu.Precision.Tf32</code></td></tr>
           <tr><td><code>Value</code></td><td>a tensor or a sequence of tensors</td></tr>
         </table>
       </div>
@@ -1453,6 +1551,7 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>EmbeddingModel</code>, <code>load</code>, <code>Pooling</code></td><td>texts as vectors, from GGUF (BERT, Nomic BERT) or ONNX embedding models</td></tr>
           <tr><td><code>similarity</code>, <code>nearest</code></td><td>cosine similarity, the closest vectors of a list</td></tr>
+          <tr><td><code>Embedder</code></td><td>what turns texts into vectors: a loaded model, or a hosted one of the <code>adm.ai</code> libraries</td></tr>
         </table>
       </div>
     </section>
@@ -1588,7 +1687,8 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>DeviceBuffer</code>, <code>upload</code>, <code>deviceBuffer</code></td><td>GPU memory kept between <a href="docs.html#functions"><code>cuda def</code></a> launches; <code>deviceBuffer&lt;T&gt;(count)</code> makes one of zeros on the device without copying from the host</td></tr>
           <tr><td><code>Readback</code></td><td>reads a buffer back without waiting for launches queued after its <code>start</code></td></tr>
           <tr><td><code>HostBuffer</code>, <code>hostBuffer</code></td><td>page-locked host memory; <code>buffer.write(from, start, count, at)</code> queues a copy of a range of it to the device and returns at once</td></tr>
-          <tr><td><code>available</code>, <code>deviceName</code>, <code>freeMemory</code></td><td>device info, bytes of GPU memory free</td></tr>
+          <tr><td><code>available</code>, <code>deviceName</code>, <code>freeMemory</code>, <code>capability</code></td><td>device info, bytes of GPU memory free, compute capability times ten (0 on the CPU path)</td></tr>
+          <tr><td><code>Precision</code></td><td>how the AI libraries multiply on the GPU: <code>Exact</code> (the default) or <code>Tf32</code>, the tensor cores of Ampere and newer GPUs, several times faster with results that differ slightly</td></tr>
         </table>
       </div>
     </section>
@@ -1610,8 +1710,9 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Field</code></td><td>one field of a value: its name, kind, type and annotations (<code>attr</code>, <code>hasAttr</code>), the doc comment of an annotated field (<code>doc</code>), typed reads and writes, and <code>set</code>, which stores a boxed value of any kind the field holds</td></tr>
           <tr><td><code>typeName</code>, <code>kindOf</code></td><td>runtime type info</td></tr>
           <tr><td><code>MetaContext</code>, …</td><td>meta contexts</td></tr>
+          <tr><td><code>receive</code>, <code>close</code></td><td>a channel carried as <code>any</code>, whatever its element type: the next message boxed and whether there was one; closing it</td></tr>
           <tr><td><code>instantiate</code>, <code>field</code>, <code>elements</code>, <code>arrayOf</code>, <code>mapOf</code>, <code>defaultOf</code></td><td><code>defaultOf</code> computes the default a parameter of an annotated function is declared with; building and reading values by descriptor; <code>arrayOf</code> makes an array of a described element type from boxed values, <code>mapOf</code> a <code>map&lt;string, V&gt;</code> of a described value type</td></tr>
-          <tr><td><code>TypeDescriptor</code>, <code>TypeKind</code></td><td>a type as spelled in a signature or field: <code>kind</code>, <code>typeName</code>, the <code>optional</code>/<code>errorable</code>/<code>future</code> flags, an array's or map's <code>element</code> and <code>key</code>, a tuple's <code>elements</code></td></tr>
+          <tr><td><code>TypeDescriptor</code>, <code>TypeKind</code></td><td>a type as spelled in a signature or field: <code>kind</code>, <code>typeName</code>, the <code>optional</code>/<code>errorable</code>/<code>future</code> flags, an array's, map's or channel's <code>element</code>, a map's <code>key</code>, a tuple's <code>elements</code></td></tr>
           <tr><td><code>EmbeddedFile</code></td><td>a file an annotation builds into the program</td></tr>
           <tr><td><code>BuildMetaContext&lt;T&gt;</code></td><td>context of an <a href="annotations.html#writing">annotation that runs during the build</a></td></tr>
           <tr><td><code>SourceEditor</code>, <code>SourceField</code>, <code>SourceAnnotation</code></td><td>the fields a build-time annotation of a type reads, and the members and declarations it adds</td></tr>

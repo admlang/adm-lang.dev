@@ -823,12 +823,12 @@ try Config.switchProfile(&quot;dev&quot;)                     // [profiles.dev.d
       </div>
       <div class="docs-sub" id="svc-debugger">
         <h3><code>Debugger</code></h3>
-        <p>CPU and memory profiles and call traces. Both need a debug build.</p>
+        <p>CPU, memory and heap profiles, call traces, heap snapshots and <code>@watch</code>. Profiles and traces need a debug build.</p>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def profileStart(kind ProfileKind) !ProfileId</code></div>
-            <p class="api-doc">Starts a profile of the given kind and returns its id. A CPU profile samples every running task's stack 100 times a second; a Memory profile records the stack and size of every allocation.</p>
-            <p class="api-doc">Fails when a profile of that kind already runs, when the kind is Heap or GPU (not implemented yet), on a platform without profiling signals (CPU), and in release builds.</p>
+            <p class="api-doc">Starts a profile of the given kind and returns its id. A CPU profile samples every running task's stack 100 times a second; a Memory profile records the stack and size of every allocation; a Heap profile records every allocation until it is freed, so it ends with what is still live of what was allocated while it ran.</p>
+            <p class="api-doc">Fails when a profile of that kind already runs, when the kind is GPU (not implemented yet), on a platform without profiling signals (CPU), and in release builds.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def profileStop(id ProfileId) !Profile</code></div>
@@ -850,17 +850,17 @@ try Config.switchProfile(&quot;dev&quot;)                     // [profiles.dev.d
             <p class="api-doc">The stack trace of the calling task.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-query">query</span><span class="api-tag api-planned">planned</span><code class="api-sig">def heapSnapshot() !HeapSnapshot</code></div>
-            <p class="api-doc">Takes a heap snapshot.</p>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def heapSnapshot() !HeapSnapshot</code></div>
+            <p class="api-doc">Takes a heap snapshot: the allocations live now and the bytes they hold, and, while a Heap profile runs, its live allocations by stack.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><span class="api-tag api-planned">planned</span><code class="api-sig">def pause() !none</code></div>
             <p class="api-doc">Breaks into the debugger when one is attached; otherwise does nothing.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-emit">emit</span><span class="api-tag api-planned">planned</span><code class="api-sig">def watched(event WatchEvent) WatchEvent</code></div>
-            <p class="api-doc">Emitted when a watched field or variable is read or written.</p>
-            <p class="api-doc">Which accesses count is the watch's mode.</p>
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def watched(event WatchEvent) WatchEvent</code></div>
+            <p class="api-doc">Emitted when a watched field or variable is read or written: the event names it, says whether it was a store, carries the value read or stored, the value a store replaced, where the access is written, the task and the time.</p>
+            <p class="api-doc">Which accesses count is the watch's mode. A handler that touches a watched field or variable itself reports nothing.</p>
           </li>
         </ul>
       </div>
@@ -2984,22 +2984,27 @@ def logHere(message string) {
         </div>
       </div>
       <div class="docs-sub" id="meta-watch">
-        <h3><code>@watch</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>@watch</code></h3>
         <p class="api-targets"><strong>Debugger</strong> · targets fields, variables</p>
         <pre class="api-siglist"><code>@watch(mode WatchMode = WatchMode.Write)</code></pre>
         <p class="api-doc">Emits Debugger.watched on every access to the field.</p>
         <p class="api-doc">mode picks reads, writes or both.</p>
-        <p class="api-doc">Every access becomes a call, so leave it out of release builds.</p>
+        <p class="api-doc">Every access becomes a call, so leave it out of release builds. On a field of a type, struct, service or component, or on a module variable; what builds the object (its defaults, a service's first values) is no access.</p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">watch.adm</span>
           </div>
-          <pre><code>use std.services.debugger::(watch, WatchMode)
+          <pre><code>use std.services.debugger::(watch, WatchMode, Debugger, WatchEvent)
 
 type Session {
 	@watch(WatchMode.Write)
 	token string
+}
+
+@on(Debugger.watched)
+def changed(ev Event&lt;WatchEvent&gt;) {
+	println("{ev.result.name}: {ev.result.previous} -&gt; {ev.result.value}")
 }</code></pre>
         </div>
       </div>

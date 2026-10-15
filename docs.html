@@ -822,7 +822,8 @@ let a = /[a-z]{2,}\d*/mg</code></pre>
           <code>U</code> (lazy and greedy swapped) and <code>g</code> (<code>replace</code> replaces every match).
           Matching is leftmost-first and runs in linear time, with no backtracking; backreferences and
           lookaround are not RE2 and make the pattern invalid. Two regexes are equal when their patterns
-          and flags are.
+          and flags are. <code>test</code> also takes a <code>byte[]</code> of UTF-8 text, which, unlike a
+          <code>string</code>, can hold U+0000.
         </p>
         <p>A pattern that is only known at run time, such as one read from a file, becomes a regex with <code>new regex(pattern, flags)</code>; one that does not compile matches nothing:</p>
         <div class="code-window">
@@ -2649,7 +2650,12 @@ def new(args string[]) int {
           <code>=cpu</code> forces either, <code>ADM_CUDA_DEVICE</code> picks the device, and
           <code>gpu.available()</code> / <code>gpu.deviceName()</code> report the path in use. A body
           that needs device-only features (<code>__shared__</code>, <code>__syncthreads</code>, warp
-          intrinsics) declares <code>@launch(cpu = false)</code> and fails without a GPU.
+          intrinsics) declares <code>@launch(cpu = false)</code> and fails without a GPU. A kernel
+          that uses newer instructions names the lowest compute capability it needs,
+          <code>@launch(arch = 80)</code> for TF32 tensor cores: its PTX targets that architecture,
+          and on an older device it takes the CPU path (or fails, when GPU-only).
+          <code>gpu.capability()</code> gives the device's capability times ten, so a caller picks
+          the kernel: <code>if gpu.capability() &gt;= 80 { tf32Matmul(...) } else { matmul(...) }</code>.
         </p>
         <p>
           Data that many launches share stays on the device in a <code>std.gpu.DeviceBuffer&lt;T&gt;</code>:
