@@ -1,0 +1,1961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Libraries - adm</title>
+<meta name="description" content="The official ADM libraries: database drivers, network clients, AI providers, interop, cloud, developer tools, sign-in, notifications, payments and telemetry.">
+<link rel="icon" type="image/svg+xml" href="assets/adm.svg">
+<link rel="canonical" href="https://adm-lang.dev/catalog.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="adm">
+<meta property="og:title" content="adm libraries">
+<meta property="og:description" content="The official ADM libraries: database drivers, network clients, AI providers, interop, cloud, developer tools, sign-in, notifications, payments and telemetry.">
+<meta property="og:url" content="https://adm-lang.dev/catalog.html">
+<meta property="og:image" content="https://adm-lang.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="adm libraries">
+<meta name="twitter:description" content="The official ADM libraries: database drivers, network clients, AI providers, interop, cloud, developer tools, sign-in, notifications, payments and telemetry.">
+<meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/adm.svg" alt="ADM" class="brand-mark">
+      <span class="brand-name"><span class="brand-sub">programming language</span></span>
+    </a>
+    <nav class="nav">
+      <a href="docs.html">Docs</a>
+      <a href="examples.html">Examples</a>
+      <a href="services.html">Services</a>
+      <a href="modules.html">Modules</a>
+      <a href="catalog.html" class="nav-active">Libraries</a>
+      <a class="nav-icon" href="https://github.com/admlang" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+        </svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs-layout">
+
+  <aside class="docs-sidebar">
+    <nav class="docs-nav" id="docs-nav">
+
+      <div class="docs-nav-group"><a class="docs-nav-top" href="#overview">Overview</a></div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#database">Database</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#database-sqlite">sqlite</a></li>
+          <li><a class="docs-nav-sub" href="#database-postgres">postgres</a></li>
+          <li><a class="docs-nav-sub" href="#database-mysql">mysql</a></li>
+          <li><a class="docs-nav-sub" href="#database-mongodb">mongodb</a></li>
+          <li><a class="docs-nav-sub" href="#database-store">store</a></li>
+          <li><a class="docs-nav-sub" href="#database-orm">orm</a></li>
+          <li><a class="docs-nav-sub" href="#database-elasticsearch">elasticsearch</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#network">Network</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#network-redis">redis</a></li>
+          <li><a class="docs-nav-sub" href="#network-kafka">kafka</a></li>
+          <li><a class="docs-nav-sub" href="#network-amqp">amqp</a></li>
+          <li><a class="docs-nav-sub" href="#network-s3">s3</a></li>
+          <li><a class="docs-nav-sub" href="#network-memcached">memcached</a></li>
+          <li><a class="docs-nav-sub" href="#network-etcd">etcd</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#ai">AI providers</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#ai-openai">openai</a></li>
+          <li><a class="docs-nav-sub" href="#ai-anthropic">anthropic</a></li>
+          <li><a class="docs-nav-sub" href="#ai-gemini">gemini</a></li>
+          <li><a class="docs-nav-sub" href="#ai-ollama">ollama</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#interop">Interop</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#interop-js">js</a></li>
+          <li><a class="docs-nav-sub" href="#interop-python">python</a></li>
+          <li><a class="docs-nav-sub" href="#interop-lua">lua</a></li>
+          <li><a class="docs-nav-sub" href="#interop-wasm">wasm</a></li>
+          <li><a class="docs-nav-sub" href="#interop-java">java</a></li>
+          <li><a class="docs-nav-sub" href="#interop-dotnet">dotnet</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#cloud">Cloud</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#cloud-aws">aws</a></li>
+          <li><a class="docs-nav-sub" href="#cloud-gcp">gcp</a></li>
+          <li><a class="docs-nav-sub" href="#cloud-azure">azure</a></li>
+          <li><a class="docs-nav-sub" href="#cloud-cloudflare">cloudflare</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#dev">Developer tools</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#dev-git">git</a></li>
+          <li><a class="docs-nav-sub" href="#dev-github">github</a></li>
+          <li><a class="docs-nav-sub" href="#dev-gitlab">gitlab</a></li>
+          <li><a class="docs-nav-sub" href="#dev-docker">docker</a></li>
+          <li><a class="docs-nav-sub" href="#dev-kubernetes">kubernetes</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#auth">Sign-in</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#auth-google">google</a></li>
+          <li><a class="docs-nav-sub" href="#auth-github">github</a></li>
+          <li><a class="docs-nav-sub" href="#auth-microsoft">microsoft</a></li>
+          <li><a class="docs-nav-sub" href="#auth-apple">apple</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#notify">Notifications</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#notify-slack">slack</a></li>
+          <li><a class="docs-nav-sub" href="#notify-discord">discord</a></li>
+          <li><a class="docs-nav-sub" href="#notify-telegram">telegram</a></li>
+          <li><a class="docs-nav-sub" href="#notify-twilio">twilio</a></li>
+          <li><a class="docs-nav-sub" href="#notify-sendgrid">sendgrid</a></li>
+          <li><a class="docs-nav-sub" href="#notify-postmark">postmark</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#payment">Payments</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#payment-stripe">stripe</a></li>
+          <li><a class="docs-nav-sub" href="#payment-paypal">paypal</a></li>
+        </ul>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#telemetry">Telemetry</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#telemetry-datadog">datadog</a></li>
+          <li><a class="docs-nav-sub" href="#telemetry-sentry">sentry</a></li>
+        </ul>
+      </div>
+
+    </nav>
+  </aside>
+
+  <main class="docs-content">
+
+    <section class="docs-section" id="overview">
+      <h2>Libraries</h2>
+      <p>
+        The official libraries ship outside the standard library, so a new product version or API
+        change reaches programs without a compiler release. Each is published by the
+        <code>admlang</code> publisher, signed, and installed with <code>adm get</code>; the groups are
+        separate repositories on GitHub. How libraries are declared, signed and published is on the
+        <a href="libraries.html">Libraries</a> docs page. 19 of the 46 libraries below are built; the
+        rest are marked <span class="api-tag api-planned">planned</span>.
+      </p>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm search adm.database
+adm get admlang:adm.database.postgres</code></pre>
+      </div>
+    </section>
+
+    <section class="docs-section" id="database">
+      <h2>Database</h2>
+      <p>Official <a href="https://github.com/admlang/adm" target="_blank" rel="noopener">ADM</a> libraries that connect an ADM program to a database. Each is published as <code>adm.database.&lt;name&gt;</code> and signed by the <code>admlang</code> publisher. They live outside the standard library so that a fix or a new protocol version ships without a std release.</p>
+      <p class="exports-note">Source: <a href="https://github.com/admlang/database" target="_blank" rel="noopener">github.com/admlang/database</a></p>
+
+      <div class="docs-sub" id="database-sqlite">
+        <h3><code>adm.database.sqlite</code></h3>
+
+        <p>SQLite for <code>std.data.db</code>. The engine (SQLite 3.53.4) is compiled into your program from the C source that ships with the library, so there is nothing else to install and no server to run.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.database.sqlite</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">sqlite.adm</span>
+        </div>
+        <pre><code>use (
+	std.data.db
+	adm.database.sqlite
+)
+
+let conn = try db.connect("sqlite:app.db")</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/database/tree/main/sqlite" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="database-postgres">
+        <h3><code>adm.database.postgres</code></h3>
+
+        <p>PostgreSQL for <code>std.data.db</code>. The driver speaks the server's wire protocol (version 3.0) itself, in ADM, over <code>std.net</code>: there is no C library to install.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.database.postgres</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">postgres.adm</span>
+        </div>
+        <pre><code>use (
+	std.data.db
+	adm.database.postgres
+)
+
+let conn = try db.connect("postgres://app:secret@db.internal:5432/shop?sslmode=verify-full")</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/database/tree/main/postgres" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="database-mysql">
+        <h3><code>adm.database.mysql</code></h3>
+
+        <p>MySQL and MariaDB for <code>std.data.db</code>. The driver speaks the client/server protocol itself, in ADM, over <code>std.net</code>: there is no C library to install.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.database.mysql</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">mysql.adm</span>
+        </div>
+        <pre><code>use (
+	std.data.db
+	adm.database.mysql
+)
+
+let conn = try db.connect("mysql://app:secret@db.internal:3306/shop?sslmode=verify-full")</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/database/tree/main/mysql" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="database-mongodb">
+        <h3><code>adm.database.mongodb</code></h3>
+
+        <p>A MongoDB driver in ADM over <code>std.net</code>: the wire protocol itself, BSON from <code>std.data.encoding</code>, replica sets and sharded clusters. It talks to MongoDB 4.2 and later and to the servers that speak its protocol (Amazon DocumentDB, Azure Cosmos DB for MongoDB, FerretDB). MongoDB is not SQL, so this is not a <code>std.data.db</code> driver: it has an API of its own, shaped like the official drivers.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.database.mongodb</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">mongodb.adm</span>
+        </div>
+        <pre><code>use (
+	adm.database.mongodb
+	std.data.encoding::(bson)
+)
+
+struct Customer {
+	@bson("_id")
+	id    mongodb.ObjectId
+	name  string
+	email ?string = none
+	tags  string[]
+}
+
+let client = try mongodb.connect("mongodb://app:secret@db.internal/shop?replicaSet=rs0&amp;tls=true")
+let customers = client.database("shop").collection&lt;Customer&gt;("customers")
+try customers.insert(Customer{name: "Ana", tags: ["new"]})        // the driver makes the _id
+let ana = try customers.findOne({"name": "Ana"})                  // ?Customer
+for let c in try customers.find({"tags": "new"}).sort({"name": 1}).limit(100).cursor() {
+	print(c.name)
+}
+try customers.updateOne({"name": "Ana"}, {"$set": {"email": "ana@example.net"}})
+try client.close()</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/database/tree/main/mongodb" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="database-store">
+        <h3><code>adm.database.store</code></h3>
+
+        <p>An embedded key-value database: one file, buckets of ordered keys, transactions that are all-or-nothing and survive a crash. It is written in ADM; there is nothing to install and no server to run. For SQL in the same process use [<code>adm.database.sqlite</code>](../sqlite/).</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.database.store</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">store.adm</span>
+        </div>
+        <pre><code>use adm.database.store
+
+let db = try store.open("app.db")
+try db.write(def (tx store.Transaction) !none {
+	let users = try tx.createBucket("users")
+	try users.put("ana", "ana@example.com")
+	return none
+})
+try db.read(def (tx store.Transaction) !none {
+	let users = try tx.bucket("users")
+	print(try users.text("ana")) unless users is none
+	return none
+})
+try db.close()</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/database/tree/main/store" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="database-orm">
+        <h3><code>adm.database.orm</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A typed data access layer over <code>std.data.db</code> and its drivers: a repository per struct, a query builder that writes each database's SQL with bound parameters, relations, and migrations derived from the structs. It is one opinion about how to use SQL from ADM, so it is a library rather than part of <code>std.data.db</code>, which stays the neutral SQL layer every driver implements.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.database.orm</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">orm.adm</span>
+        </div>
+        <pre><code>use (
+	std.data.db
+	adm.database.orm
+	adm.database.postgres
+)
+
+@orm.table("customers")
+struct Customer {
+	@orm.key(generated = true)
+	id      int
+	name    string
+	@db.column("mail")
+	email   ?string
+	@orm.hasMany(by = "customerId")
+	orders  Order[]
+	@orm.version()
+	version int
+}
+
+let conn = try db.connect("postgres://app:secret@db.internal/shop")
+let customers = new orm.Repository&lt;Customer&gt;(conn)
+let ana = try customers.find(7)                                  // ?Customer
+let recent = try customers.query().where("name", orm.like, "A%").orderBy("name").limit(50).all()
+try customers.save(ana)                                          // insert or update, version checked
+let withOrders = try customers.query().include("orders").all()</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/database/tree/main/orm" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="database-elasticsearch">
+        <h3><code>adm.database.elasticsearch</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>An Elasticsearch and OpenSearch client in ADM over <code>std.net.http</code>: documents as typed structs, bulk indexing, search with a typed query builder, aggregations, and index management. It talks to Elasticsearch 8 and OpenSearch 2 and later.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.database.elasticsearch</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">elasticsearch.adm</span>
+        </div>
+        <pre><code>use adm.database.elasticsearch
+
+struct Product {
+	id    string
+	name  string
+	price float
+	tags  string[]
+}
+
+let es = try elasticsearch.connect("https://search.internal:9200", apiKey = key)
+let products = es.index&lt;Product&gt;("products")
+try products.put("7", {id: "7", name: "Kettle", price: 39.9, tags: ["kitchen"]})
+
+let query = elasticsearch.match("name", "kettle").and(elasticsearch.term("tags", "kitchen"))
+let hits = try products.search(query, size = 20, sort = "price")
+for let hit in hits {
+	print("{hit.source.name} {hit.score}")
+}</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/database/tree/main/elasticsearch" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+    </section>
+
+    <section class="docs-section" id="network">
+      <h2>Network</h2>
+      <p>Official <a href="https://github.com/admlang/adm" target="_blank" rel="noopener">ADM</a> libraries that connect an ADM program to infrastructure services. Each is written in ADM over <code>std.net</code>, published as <code>adm.network.&lt;name&gt;</code> and signed by the <code>admlang</code> publisher. They live outside the standard library so that a fix or a new protocol version ships without a std release.</p>
+      <p class="exports-note">Source: <a href="https://github.com/admlang/network" target="_blank" rel="noopener">github.com/admlang/network</a></p>
+
+      <div class="docs-sub" id="network-redis">
+        <h3><code>adm.network.redis</code></h3>
+
+        <p>A Redis client. It speaks RESP2 and RESP3 itself, in ADM, over <code>std.net</code>: there is no C library to install. It talks to Redis, Valkey and other servers that speak the same protocol.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.network.redis</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">redis.adm</span>
+        </div>
+        <pre><code>use adm.network.redis
+
+let r = try redis.connect("redis://cache.internal:6379/0")
+try r.set("greeting", "hello", expire = 1min)
+let greeting = try r.get("greeting")          // ?string
+let hits = try r.incr("hits")
+try r.hset("user:7", {"name": "Ana", "visits": 3})
+let user = try r.hgetAll("user:7")            // map&lt;string, string&gt;
+try r.close()</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/network/tree/main/redis" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="network-kafka">
+        <h3><code>adm.network.kafka</code></h3>
+
+        <p>An Apache Kafka client. It speaks the Kafka protocol itself, in ADM, over <code>std.net</code>: there is no C library to install. It talks to Kafka brokers from version 2.4 on and to the services that speak the same protocol (Redpanda, Amazon MSK, Confluent Cloud, Azure Event Hubs).</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.network.kafka</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">kafka.adm</span>
+        </div>
+        <pre><code>use adm.network.kafka
+
+let k = try kafka.connect("broker1:9092", "broker2:9092")
+try k.createTopic("orders", partitions = 6)
+
+let out = try k.producer()
+let sent = try out.send("orders", "paid", key = "order-7")     // Sent{topic, partition, offset}
+
+let orders = try k.consumer("billing", "orders")
+for let record in try orders.poll(1s) {
+	print("{record.partition}/{record.offset}: {kafka.text(record)}")
+}
+try orders.close()
+try out.close()
+try k.close()</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/network/tree/main/kafka" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="network-amqp">
+        <h3><code>adm.network.amqp</code></h3>
+
+        <p>An AMQP 0-9-1 client. It speaks the protocol itself, in ADM, over <code>std.net</code>: there is no C library to install. It talks to RabbitMQ and to brokers that speak the same protocol (LavinMQ, Apache Qpid).</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.network.amqp</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">amqp.adm</span>
+        </div>
+        <pre><code>use adm.network.amqp
+
+let mq = try amqp.connect("amqp://app:secret@broker.internal/orders")
+let ch = try mq.channel()
+try ch.declareQueue("jobs", durable = true)
+try ch.publish("", "jobs", "resize 7.png")
+
+let jobs = try ch.consume("jobs")
+let d = try jobs.next(5s)                     // ?Delivery
+if !(d is none) {
+	print(d.text())
+	try d.ack()
+}
+try mq.close()</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/network/tree/main/amqp" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="network-s3">
+        <h3><code>adm.network.s3</code></h3>
+
+        <p>An S3 client. It signs requests with AWS Signature Version 4 itself, in ADM, over <code>std.net.http</code>: there is no SDK to install. It talks to Amazon S3 and to the servers that speak its API (MinIO, Ceph, Garage, Cloudflare R2, Backblaze B2).</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.network.s3</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">s3.adm</span>
+        </div>
+        <pre><code>use adm.network.s3
+
+let store = try s3.connect("https://s3.eu-central-1.amazonaws.com", accessKey, secretKey)
+let photos = store.bucket("photos")
+try photos.put("2026/cat.jpg", pixels, "image/jpeg")
+let cat = try photos.get("2026/cat.jpg")          // s3.Object, an io.Reader
+let data = try cat.bytes()
+for let entry in try photos.list("2026/").all() {
+	print("{entry.key} {entry.size}")
+}
+let link = try photos.presign("2026/cat.jpg", 1h) // a URL anyone can read for an hour</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/network/tree/main/s3" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="network-memcached">
+        <h3><code>adm.network.memcached</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A Memcached client. It speaks the text and meta protocols itself, in ADM, over <code>std.net</code>: there is no C library to install. It talks to memcached 1.6 and later and to the services that speak its protocol (ElastiCache, Memorystore).</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.network.memcached</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">memcached.adm</span>
+        </div>
+        <pre><code>use adm.network.memcached
+
+let cache = try memcached.connect("cache1.internal:11211", "cache2.internal:11211")
+try cache.set("session:7", data, expire = 30min)
+let session = try cache.get("session:7")           // ?bytes
+let hits = try cache.increment("hits", 1, initial = 0)
+let many = try cache.getMany(["a", "b", "c"])      // map&lt;string, bytes&gt;
+try cache.close()</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/network/tree/main/memcached" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="network-etcd">
+        <h3><code>adm.network.etcd</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>An etcd v3 client. It speaks the gRPC API over <code>std.net.grpc</code>, in ADM: key-value with transactions, watches, leases, locks and elections, against etcd 3.4 and later.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.network.etcd</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">etcd.adm</span>
+        </div>
+        <pre><code>use adm.network.etcd
+
+let cluster = try etcd.connect("https://etcd1.internal:2379", "https://etcd2.internal:2379")
+try cluster.put("/config/shop/theme", "dark")
+let theme = try cluster.get("/config/shop/theme")            // ?string
+for let kv in try cluster.getPrefix("/config/shop/") {
+	print("{kv.key} = {kv.value}")
+}
+
+let watch = try cluster.watch("/config/shop/", prefix = true)
+for let event in watch {
+	print("{event.kind} {event.key}")
+}
+
+let lease = try cluster.grant(10s)                           // kept alive until closed
+try cluster.put("/workers/{id}", "alive", lease = lease)
+let lock = try cluster.lock("/locks/rebuild", lease)
+try lock.unlock()</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/network/tree/main/etcd" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+    </section>
+
+    <section class="docs-section" id="ai">
+      <h2>AI providers</h2>
+      <p>Official <a href="https://github.com/admlang/adm" target="_blank" rel="noopener">ADM</a> libraries that call hosted model APIs. <code>std.ai</code> runs models on the machine; these libraries talk to a provider over <code>std.net.http</code>, in ADM, with no SDK to install. Each is published as <code>adm.ai.&lt;provider&gt;</code> and signed by the <code>admlang</code> publisher. They live outside the standard library because provider APIs change every few weeks, and a new model or endpoint should ship without a std release.</p>
+      <p class="exports-note">Source: <a href="https://github.com/admlang/ai" target="_blank" rel="noopener">github.com/admlang/ai</a></p>
+
+      <div class="docs-sub" id="ai-openai">
+        <h3><code>adm.ai.openai</code></h3>
+
+        <p>An OpenAI API client in ADM over <code>std.net.http</code>. It also talks to the servers that speak the same API (OpenRouter, Groq, Mistral, DeepSeek, Together, vLLM, LM Studio, Ollama) through <code>baseURL</code>. Its conversations are <code>std.ai.llm</code>'s, so tools, <code>@tool</code> methods, MCP tools, pictures and documents work as they do with a model loaded by <code>std.ai.llm</code> itself.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.ai.openai</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">openai.adm</span>
+        </div>
+        <pre><code>use adm.ai.openai
+
+let ai = new openai.Client(model = "gpt-5-mini")    // OPENAI_API_KEY; baseURL for another server
+let chat = ai.chat()
+chat.system = "Answer in one sentence."
+chat.useTool(new Weather())
+print(try chat.say("Do I need a coat in Oslo today?"))
+
+chat.model = "gpt-5"                                 // the conversation goes on with another model
+try chat.ask("Why?")
+for {
+	let piece = try chat.next()
+	break when piece is none
+	print(piece)
+}
+
+let vectors = try ai.embedder("text-embedding-3-small").embed(string["one", "two"])
+let pictures = try ai.images.generate("a kettle on a windowsill", size = openai.ImageSize.Square)
+let words = try ai.audio.transcribe(recording)
+let file = try ai.files.upload("requests.jsonl", openai.Purpose.Batch)
+let batch = try ai.batches.create(file.id)</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/ai/tree/main/openai" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="ai-anthropic">
+        <h3><code>adm.ai.anthropic</code></h3>
+
+        <p>An Anthropic API client in ADM over <code>std.net.http</code>: the Messages API of the Claude models. Its conversations are <code>std.ai.llm</code>'s, so tools, <code>@tool</code> methods, MCP tools, pictures and documents work as they do with a model loaded by <code>std.ai.llm</code> itself.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.ai.anthropic</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">anthropic.adm</span>
+        </div>
+        <pre><code>use adm.ai.anthropic
+
+let ai = new anthropic.Client(model = "claude-opus-5-5")    // ANTHROPIC_API_KEY
+let chat = ai.chat()
+chat.system = "Answer in one sentence."
+chat.reasoning = llm.Reasoning.High
+chat.useTool(new Weather())
+print(try chat.say("Do I need a coat in Oslo today?"))
+print(chat.messages()[1].thinking)
+
+chat.model = "claude-haiku-5-5"                             // the conversation goes on with another model
+try chat.ask("Why?")
+for {
+	let piece = try chat.next()
+	break when piece is none
+	print(piece)
+}
+print(chat.usage().cachedTokens)
+
+print(try ai.countTokens(chat))
+let file = try ai.files.upload("report.pdf", "application/pdf")
+let batch = try ai.batches.create([anthropic.BatchRequest{id: "q1", request: request}])</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/ai/tree/main/anthropic" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="ai-gemini">
+        <h3><code>adm.ai.gemini</code></h3>
+
+        <p>A Gemini API client in ADM over <code>std.net.http</code>, for Google's models through an API key. The same models under Google Cloud credentials are <code>adm.cloud.gcp.vertex</code>. Its conversations are <code>std.ai.llm</code>'s, so tools, <code>@tool</code> methods, MCP tools, pictures, sound, documents and uploaded files work as they do with a model loaded by <code>std.ai.llm</code> itself.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.ai.gemini</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">gemini.adm</span>
+        </div>
+        <pre><code>use adm.ai.gemini
+
+let ai = new gemini.Client(model = "gemini-flash-latest")   // GEMINI_API_KEY
+ai.googleSearch = true
+let chat = ai.chat()
+let answer = try chat.say("What is the weather in Oslo today?")
+for let source in gemini.groundingOf(chat.messages()[2]).sources {
+	print("{source.title} {source.uri}")
+}
+
+let clip = try ai.files.wait((try ai.files.upload("talk.mp4", "video/mp4")).name)
+try chat.ask(llm.Message{text: "Summarise the talk.", files: [gemini.remote(clip)]})
+
+let vectors = try ai.embedder(task = gemini.TaskType.RetrievalDocument).embed(string["one", "two"])</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/ai/tree/main/gemini" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="ai-ollama">
+        <h3><code>adm.ai.ollama</code></h3>
+
+        <p>An Ollama client in ADM over <code>std.net.http</code>: the native API of a local or remote Ollama server. Its conversations are <code>std.ai.llm</code>'s, so tools, <code>@tool</code> methods, MCP tools, pictures and documents work as they do with a model loaded by <code>std.ai.llm</code> itself.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.ai.ollama</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">ollama.adm</span>
+        </div>
+        <pre><code>use adm.ai.ollama
+
+let ai = new ollama.Client(model = "qwen3:4b")   // the server of OLLAMA_HOST, else 127.0.0.1:11434
+try ai.pull("qwen3:4b")
+
+let chat = ai.chat()
+chat.system = "Answer in one sentence."
+chat.useTool(new Weather())
+print(try chat.say("Do I need a coat in Oslo today?"))
+
+chat.model = "qwen3:30b"                         // the conversation goes on with another model
+try chat.ask("Why?")
+for {
+	let piece = try chat.next()
+	break when piece is none
+	print(piece)
+}
+print(chat.usage().inputTokens)
+
+let vectors = try ai.embedder("nomic-embed-text").embed(string["a cat", "a dog"])
+
+for let m in try ai.models() {
+	print("{m.name} {m.size}")
+}</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/ai/tree/main/ollama" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+    </section>
+
+    <section class="docs-section" id="interop">
+      <h2>Interop</h2>
+      <p>Official <a href="https://github.com/admlang/adm" target="_blank" rel="noopener">ADM</a> libraries that run other languages inside an ADM program. Each library embeds one engine, is published as <code>adm.interop.&lt;language&gt;</code> and is signed by the <code>admlang</code> publisher.</p>
+      <p class="exports-note">Source: <a href="https://github.com/admlang/interop" target="_blank" rel="noopener">github.com/admlang/interop</a></p>
+
+      <div class="docs-sub" id="interop-js">
+        <h3><code>adm.interop.js</code></h3>
+
+        <p>JavaScript inside an ADM program. The engine is <a href="https://github.com/quickjs-ng/quickjs" target="_blank" rel="noopener">QuickJS-ng</a>; its C sources ship with the library and are compiled into your program, so there is nothing else to install.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.interop.js</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">js.adm</span>
+        </div>
+        <pre><code>module billing {
+	use adm.interop.js::*
+
+	struct Item {
+		price    float
+		quantity int
+	}
+
+	@js("billing.js")
+	def total(items Item[]) !float;
+}</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/interop/tree/main/js" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="interop-python">
+        <h3><code>adm.interop.python</code></h3>
+
+        <p>Python inside an ADM program. The engine is <a href="https://micropython.org" target="_blank" rel="noopener">MicroPython</a> 1.29; its C sources ship with the library and are compiled into your program, so there is nothing else to install.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.interop.python</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">python.adm</span>
+        </div>
+        <pre><code>module shop {
+	use adm.interop.python::*
+
+	struct Customer {
+		name   string
+		years  int
+		orders int
+	}
+
+	@python("rules.py")
+	def discount(customer Customer) !float;
+}</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/interop/tree/main/python" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="interop-lua">
+        <h3><code>adm.interop.lua</code></h3>
+
+        <p>Lua inside an ADM program. The engine is <a href="https://www.lua.org" target="_blank" rel="noopener">Lua 5.4</a>; its C sources ship with the library and are compiled into your program, so there is nothing else to install.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.interop.lua</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">lua.adm</span>
+        </div>
+        <pre><code>module shop {
+	use adm.interop.lua::*
+
+	struct Customer {
+		name   string
+		years  int
+		orders int
+	}
+
+	@lua("rules.lua")
+	def discount(customer Customer) !float;
+}</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/interop/tree/main/lua" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="interop-wasm">
+        <h3><code>adm.interop.wasm</code></h3>
+
+        <p>WebAssembly inside an ADM program, written in ADM: no C, nothing else to install.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.interop.wasm</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">wasm.adm</span>
+        </div>
+        <pre><code>use adm.interop.wasm
+
+let loaded = try wasm.decode(bytes)
+let store = new wasm.Store()
+let instance = try store.instantiate(loaded)
+let results = try instance.invoke("add", wasm.Value[
+	wasm.Value{kind: wasm.ValueType.I32, bits: 2},
+	wasm.Value{kind: wasm.ValueType.I32, bits: 3}
+])
+println(results[0].bits)</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/interop/tree/main/wasm" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="interop-java">
+        <h3><code>adm.interop.java</code></h3>
+
+        <p>Java inside an ADM program: classes, objects and static methods of the installed Java VM, called from ADM, and ADM functions Java calls back. The library loads the Java VM of the installed JDK or JRE into the program when it is first used; nothing of Java is needed to build.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.interop.java</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">java.adm</span>
+        </div>
+        <pre><code>use adm.interop.java::*
+
+@java("com.acme.Billing")
+def total(prices float[], quantity int32) !float;
+
+@java("com.acme.Billing")
+def invoiceNumber(customer string) !?string;</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/interop/tree/main/java" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="interop-dotnet">
+        <h3><code>adm.interop.dotnet</code></h3>
+
+        <p>.NET inside an ADM program: types, objects and static methods of .NET assemblies (C#, F#, VB), called from ADM, and ADM functions .NET calls back. The library loads the installed .NET runtime into the program when it is first used; nothing of .NET is needed to build.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.interop.dotnet</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">dotnet.adm</span>
+        </div>
+        <pre><code>use adm.interop.dotnet::*
+
+@dotnet("Acme.Billing")
+def total(prices float[], quantity int32) !float;
+
+@dotnet("Acme.Billing")
+def invoiceNumber(customer string) !?string;</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/interop/tree/main/dotnet" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+    </section>
+
+    <section class="docs-section" id="cloud">
+      <h2>Cloud</h2>
+      <p>Official <a href="https://github.com/admlang/adm" target="_blank" rel="noopener">ADM</a> libraries that connect an ADM program to a cloud provider. Each library is one cloud, written in ADM over <code>std.net.http</code>, published as <code>adm.cloud.&lt;cloud&gt;</code> and signed by the <code>admlang</code> publisher. They live outside the standard library because the clouds add and change operations every week.</p>
+      <p class="exports-note">Source: <a href="https://github.com/admlang/cloud" target="_blank" rel="noopener">github.com/admlang/cloud</a></p>
+
+      <div class="docs-sub" id="cloud-aws">
+        <h3><code>adm.cloud.aws</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>An Amazon Web Services client in ADM over <code>std.net.http</code>: one module per service, and a root module that holds credentials, Signature Version 4, regions, endpoints, retries and errors. There is no SDK to install.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.cloud.aws</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">aws.adm</span>
+        </div>
+        <pre><code>use (
+	adm.cloud.aws
+	adm.cloud.aws.sqs
+	adm.cloud.aws.secretsmanager
+)
+
+let account = try aws.connect("eu-central-1")        // the credential chain
+let queue = new sqs.Client(account).queue("https://sqs.eu-central-1.amazonaws.com/123456789012/jobs")
+try queue.send("resize 7.png", delay = 10s)
+for let m in try queue.receive(10, wait = 20s) {
+	print(m.body)
+	try m.delete()
+}
+
+let secrets = new secretsmanager.Client(account)
+let dbPassword = try secrets.get("prod/db/password")  // Secret&lt;string&gt;</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/cloud/tree/main/aws" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="cloud-gcp">
+        <h3><code>adm.cloud.gcp</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A Google Cloud client in ADM over <code>std.net.http</code>: one module per service, and a root module that holds credentials, OAuth2 tokens, projects and locations, retries and errors. There is no SDK to install.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.cloud.gcp</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">gcp.adm</span>
+        </div>
+        <pre><code>use (
+	adm.cloud.gcp
+	adm.cloud.gcp.storage
+	adm.cloud.gcp.pubsub
+)
+
+let project = try gcp.connect("my-project")          // application default credentials
+let photos = new storage.Client(project).bucket("photos")
+try photos.put("2026/cat.jpg", pixels, "image/jpeg")
+
+let topic = new pubsub.Client(project).topic("orders")
+try topic.publish("order 7 paid", orderingKey = "7")</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/cloud/tree/main/gcp" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="cloud-azure">
+        <h3><code>adm.cloud.azure</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A Microsoft Azure client in ADM over <code>std.net.http</code>: one module per service, and a root module that holds credentials, shared keys and SAS, clouds and endpoints, retries and errors. There is no SDK to install.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.cloud.azure</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">azure.adm</span>
+        </div>
+        <pre><code>use (
+	adm.cloud.azure
+	adm.cloud.azure.blob
+	adm.cloud.azure.keyvault
+)
+
+let account = try azure.connect()                    // the credential chain
+let photos = new blob.Client(account, "mystorage").container("photos")
+try photos.upload("2026/cat.jpg", pixels, "image/jpeg")
+let link = try photos.sasURL("2026/cat.jpg", 1h)
+
+let vault = new keyvault.Client(account, "https://myvault.vault.azure.net")
+let dbPassword = try vault.secret("db-password")     // Secret&lt;string&gt;</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/cloud/tree/main/azure" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="cloud-cloudflare">
+        <h3><code>adm.cloud.cloudflare</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A Cloudflare API client in ADM over <code>std.net.http</code>: one module per product, and a root module that holds API tokens, accounts and zones, the v4 API envelope, pagination, retries and errors.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.cloud.cloudflare</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">cloudflare.adm</span>
+        </div>
+        <pre><code>use (
+	adm.cloud.cloudflare
+	adm.cloud.cloudflare.kv
+	adm.cloud.cloudflare.dns
+)
+
+let cf = try cloudflare.connect(token)               // CLOUDFLARE_API_TOKEN when left out
+let settings = new kv.Client(cf.account("0123abcd")).namespace("settings")
+try settings.put("theme", "dark", expire = 7d)
+let theme = try settings.get("theme")                // ?string
+
+let zone = try cf.zone("example.com")
+try new dns.Client(zone).create("A", "www", "203.0.113.7", proxied = true)</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/cloud/tree/main/cloudflare" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+    </section>
+
+    <section class="docs-section" id="dev">
+      <h2>Developer tools</h2>
+      <p>Official <a href="https://github.com/admlang/adm" target="_blank" rel="noopener">ADM</a> libraries for the tools around a codebase: version control, containers, clusters and the hosting platforms. Each is written in ADM over <code>std.net</code>, published as <code>adm.dev.&lt;name&gt;</code> and signed by the <code>admlang</code> publisher. They live outside the standard library because these APIs change with every release of the product behind them.</p>
+      <p class="exports-note">Source: <a href="https://github.com/admlang/dev" target="_blank" rel="noopener">github.com/admlang/dev</a></p>
+
+      <div class="docs-sub" id="dev-git">
+        <h3><code>adm.dev.git</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>Git in ADM: repositories on disk, their objects and references, and the smart protocol over HTTP and SSH. There is no libgit2 and no <code>git</code> binary to call.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.dev.git</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">git.adm</span>
+        </div>
+        <pre><code>use adm.dev.git
+
+let repo = try git.clone("https://github.com/admlang/examples.git", "examples", depth = 1)
+for let commit in try repo.log("main", limit = 10) {
+	print("{commit.id.short()} {commit.summary}")
+}
+let tree = try repo.tree("main")
+let readme = try tree.file("README.md").text()
+
+try repo.add("notes.md")
+let id = try repo.commit("Add notes", author = new git.Signature("Ana", "ana@example.com"))
+try repo.push("origin", "main", credentials = token)</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/dev/tree/main/git" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="dev-github">
+        <h3><code>adm.dev.github</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A GitHub API client in ADM over <code>std.net.http</code>: REST and GraphQL, webhooks, and the three ways to be someone on GitHub (a token, an OAuth app, a GitHub App). GitHub Enterprise Server works through a base URL.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.dev.github</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">github.adm</span>
+        </div>
+        <pre><code>use adm.dev.github
+
+let gh = try github.connect(token)                // GITHUB_TOKEN when left out
+let repo = gh.repo("admlang", "examples")
+for let issue in try repo.issues(state = github.State.Open).all() {
+	print("#{issue.number} {issue.title}")
+}
+let pr = try repo.pullRequests.create("feature", "main", title = "Add geo examples")
+try pr.comment("Ready for review")
+
+// a webhook endpoint
+let hooks = new github.Webhooks(secret)
+server.handle("/github", hooks.handler((event github.Event) =&gt; print(event.name)))</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/dev/tree/main/github" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="dev-gitlab">
+        <h3><code>adm.dev.gitlab</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A GitLab API client in ADM over <code>std.net.http</code>: REST and GraphQL, webhooks, and the tokens GitLab issues to people, projects, groups and CI jobs. Self-managed instances work through a base URL.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.dev.gitlab</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">gitlab.adm</span>
+        </div>
+        <pre><code>use adm.dev.gitlab
+
+let gl = try gitlab.connect(token, url = "https://gitlab.example.com")   // GITLAB_TOKEN, gitlab.com when left out
+let project = gl.project("group/app")
+for let mr in try project.mergeRequests(state = gitlab.State.Opened).all() {
+	print("!{mr.iid} {mr.title}")
+}
+let pipeline = try project.pipelines.create("main", variables = {"DEPLOY": "staging"})</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/dev/tree/main/gitlab" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="dev-docker">
+        <h3><code>adm.dev.docker</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A Docker Engine API client in ADM over <code>std.net.http</code>, on a Unix socket or TCP with TLS. It also talks to Podman through its Docker-compatible API.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.dev.docker</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">docker.adm</span>
+        </div>
+        <pre><code>use adm.dev.docker
+
+let engine = try docker.connect()                 // DOCKER_HOST, else the local socket
+try engine.images.pull("postgres:17")
+let pg = try engine.containers.create("postgres:17", name = "db", env = {"POSTGRES_PASSWORD": "secret"}, ports = {"5432/tcp": 5432})
+try pg.start()
+for let line in try pg.logs(follow = true) {
+	print(line.text)
+}
+let result = try pg.exec("pg_isready")
+try pg.stop()
+try pg.remove(volumes = true)</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/dev/tree/main/docker" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="dev-kubernetes">
+        <h3><code>adm.dev.kubernetes</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A Kubernetes API client in ADM over <code>std.net.http</code>: the API server, its resources typed or unstructured, and the credentials a kubeconfig or a pod carries.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.dev.kubernetes</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">kubernetes.adm</span>
+        </div>
+        <pre><code>use adm.dev.kubernetes
+
+let cluster = try kubernetes.connect()            // KUBECONFIG or ~/.kube/config, else in-cluster
+let pods = cluster.pods("shop")
+for let pod in try pods.list(labels = "app=web") {
+	print("{pod.name} {pod.status.phase}")
+}
+for let event in try pods.watch(labels = "app=web") {
+	print("{event.kind} {event.object.name}")
+}
+let logs = try pods.logs("web-7f9d", container = "web", tail = 100)
+try cluster.deployments("shop").scale("web", 3)</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/dev/tree/main/kubernetes" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+    </section>
+
+    <section class="docs-section" id="auth">
+      <h2>Sign-in</h2>
+      <p>Official <a href="https://github.com/admlang/adm" target="_blank" rel="noopener">ADM</a> libraries for signing users in with the identity providers most applications offer. The protocols (OAuth 2.0, OpenID Connect, JOSE) are in <code>std.proto.auth</code>; each library here knows one provider: its endpoints, scopes, credential format, the quirks of its tokens, and where its profile data comes from. They are written in ADM, published as <code>adm.auth.&lt;provider&gt;</code> and signed by the <code>admlang</code> publisher, and live outside the standard library because providers change these details without notice.</p>
+      <p class="exports-note">Source: <a href="https://github.com/admlang/auth" target="_blank" rel="noopener">github.com/admlang/auth</a></p>
+
+      <div class="docs-sub" id="auth-google">
+        <h3><code>adm.auth.google</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>Sign in with Google in ADM over <code>std.proto.auth.openid</code>: the web flow, ID tokens from One Tap and mobile apps, refresh, and Google Workspace domain checks.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.auth.google</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">google.adm</span>
+        </div>
+        <pre><code>use adm.auth.google
+
+let provider = new google.Provider(clientId, clientSecret, redirectURL = "https://example.com/auth/google")
+let start = try provider.begin(scopes = ["email", "profile"])
+// send the browser to start.url, keep start.state in the session
+
+let login = try provider.complete(callbackURL, start)
+let profile = login.profile
+print("{profile.name} &lt;{profile.email}&gt;")
+
+// a token Google Identity Services or a mobile app obtained
+let claims = try provider.verifyIdToken(idToken)</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/auth/tree/main/google" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="auth-github">
+        <h3><code>adm.auth.github</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>Sign in with GitHub in ADM over <code>std.proto.auth.oauth2</code>. GitHub has no OpenID Connect, so the library completes the OAuth flow and reads the profile from the user and emails API. It also offers the device flow for command-line tools, GitHub App user tokens, and GitHub Enterprise Server through a base URL.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.auth.github</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">github.adm</span>
+        </div>
+        <pre><code>use adm.auth.github
+
+let provider = new github.Provider(clientId, clientSecret, redirectURL = "https://example.com/auth/github")
+let start = try provider.begin(scopes = ["read:user", "user:email"])
+let login = try provider.complete(callbackURL, start)
+print(login.profile.email)                        // the primary verified address
+
+// a command-line tool
+let device = try provider.beginDevice(scopes = ["repo"])
+print("Open {device.url} and enter {device.code}")
+let token = try device.wait()</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/auth/tree/main/github" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="auth-microsoft">
+        <h3><code>adm.auth.microsoft</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>Sign in with Microsoft in ADM over <code>std.proto.auth.openid</code>: Entra ID (work and school accounts), personal Microsoft accounts, tenants and their issuers, certificates as client credentials, and the profile from Microsoft Graph.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.auth.microsoft</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">microsoft.adm</span>
+        </div>
+        <pre><code>use adm.auth.microsoft
+
+let provider = new microsoft.Provider(clientId, clientSecret, tenant = "organizations",
+	redirectURL = "https://example.com/auth/microsoft")
+let start = try provider.begin(scopes = ["openid", "profile", "email", "User.Read"])
+let login = try provider.complete(callbackURL, start)
+print(login.profile.email)
+print(login.claims.get("tid"))                    // the user's tenant</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/auth/tree/main/microsoft" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="auth-apple">
+        <h3><code>adm.auth.apple</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>Sign in with Apple in ADM over <code>std.proto.auth.openid</code>: the web and native flows, the client secret Apple wants as a signed JWT, the user's name that arrives only once, private relay addresses, and Apple's server-to-server notifications.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.auth.apple</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">apple.adm</span>
+        </div>
+        <pre><code>use adm.auth.apple
+
+let provider = new apple.Provider(servicesId, teamId, keyId, privateKey,
+	redirectURL = "https://example.com/auth/apple")
+let start = try provider.begin(scopes = ["name", "email"])
+let login = try provider.complete(callbackForm, start)   // Apple posts the result as a form
+let profile = login.profile
+print(profile.name)                               // present on the first sign-in only: store it
+print(profile.email)                              // may be a privaterelay.appleid.com address
+
+// a token a native app obtained
+let claims = try provider.verifyIdToken(idToken, audience = bundleId)</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/auth/tree/main/apple" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+    </section>
+
+    <section class="docs-section" id="notify">
+      <h2>Notifications</h2>
+      <p>Official <a href="https://github.com/admlang/adm" target="_blank" rel="noopener">ADM</a> libraries that send messages to people through the services most teams use: chat platforms, SMS and voice, transactional mail. Each is written in ADM over <code>std.net.http</code>, published as <code>adm.notify.&lt;service&gt;</code> and signed by the <code>admlang</code> publisher. They live outside the standard library because these APIs change with the product; mail over SMTP and IMAP is in <code>std.net.mail</code>, which does not.</p>
+      <p class="exports-note">Source: <a href="https://github.com/admlang/notify" target="_blank" rel="noopener">github.com/admlang/notify</a></p>
+
+      <div class="docs-sub" id="notify-slack">
+        <h3><code>adm.notify.slack</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A Slack client in ADM over <code>std.net.http</code>: the Web API, Block Kit, incoming webhooks, and the two ways Slack calls an app back (HTTP with signed requests, Socket Mode over WebSocket).</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.notify.slack</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">slack.adm</span>
+        </div>
+        <pre><code>use adm.notify.slack
+
+let bot = new slack.Client(botToken)              // SLACK_BOT_TOKEN when left out
+try bot.send("#deploys", "Release 1.4 is out")
+let message = new slack.Message()
+message.section("*Release 1.4* is out")
+message.button("Release notes", url = "https://example.com/notes/1.4")
+try bot.send("#deploys", message)
+try bot.upload("#deploys", report, "report.pdf")
+
+// a hook that posts without a bot
+try slack.webhook(hookURL).send("Build passed")</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/notify/tree/main/slack" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="notify-discord">
+        <h3><code>adm.notify.discord</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A Discord client in ADM over <code>std.net.http</code>: the REST API, webhooks, application commands with interactions, and the Gateway for bots that stay connected.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.notify.discord</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">discord.adm</span>
+        </div>
+        <pre><code>use adm.notify.discord
+
+let bot = new discord.Client(botToken)            // DISCORD_TOKEN when left out
+let embed = new discord.Embed("Release 1.4", "Now available")
+embed.field("Downloads", "https://example.com/1.4")
+try bot.send(channelId, "Release 1.4 is out", embeds = [embed])
+
+try discord.webhook(hookURL).send("Build passed")</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/notify/tree/main/discord" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="notify-telegram">
+        <h3><code>adm.notify.telegram</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A Telegram Bot API client in ADM over <code>std.net.http</code>: messages, media, keyboards, and updates by long polling or webhook.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.notify.telegram</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">telegram.adm</span>
+        </div>
+        <pre><code>use adm.notify.telegram
+
+let bot = new telegram.Bot(token)                 // TELEGRAM_BOT_TOKEN when left out
+try bot.send(chatId, "Release 1.4 is out", parseMode = telegram.ParseMode.MarkdownV2)
+let keyboard = new telegram.InlineKeyboard()
+keyboard.button("Release notes", url = "https://example.com/notes/1.4")
+try bot.send(chatId, "Details:", keyboard = keyboard)
+
+for let update in try bot.updates() {             // long polling
+	let message = update.message
+	continue when message is none
+	try bot.send(message.chat.id, "Got it")
+}</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/notify/tree/main/telegram" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="notify-twilio">
+        <h3><code>adm.notify.twilio</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A Twilio client in ADM over <code>std.net.http</code>: SMS and MMS, WhatsApp, voice with TwiML, Verify, and the webhooks Twilio sends with their signatures checked.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.notify.twilio</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">twilio.adm</span>
+        </div>
+        <pre><code>use adm.notify.twilio
+
+let tw = new twilio.Client(accountSid, authToken)   // TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN
+let sms = try tw.messages.send("+15005550006", "+15551234567", "Your code is 482913")
+print(sms.sid)
+
+let check = try tw.verify("VA...").start("+15551234567", channel = twilio.Channel.Sms)
+let ok = try tw.verify("VA...").check("+15551234567", code)</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/notify/tree/main/twilio" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="notify-sendgrid">
+        <h3><code>adm.notify.sendgrid</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A SendGrid client in ADM over <code>std.net.http</code>: mail send v3 from <code>std.formats.mail</code> messages or dynamic templates, suppressions, the event webhook, inbound parse.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.notify.sendgrid</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">sendgrid.adm</span>
+        </div>
+        <pre><code>use (
+	adm.notify.sendgrid
+	std.formats.mail
+)
+
+let sg = new sendgrid.Client(apiKey)              // SENDGRID_API_KEY when left out
+let message = new mail.Message()
+message.from = "Shop &lt;orders@example.com&gt;"
+message.to = ["ana@example.net"]
+message.subject = "Your order"
+message.text = "Thanks, Ana."
+try sg.send(message)
+
+try sg.send(new sendgrid.Template("d-1234", to = "ana@example.net", data = {"name": "Ana", "order": "7"}))</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/notify/tree/main/sendgrid" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="notify-postmark">
+        <h3><code>adm.notify.postmark</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A Postmark client in ADM over <code>std.net.http</code>: transactional mail from <code>std.formats.mail</code> messages or templates, batches, message streams, bounces, and Postmark's webhooks.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.notify.postmark</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">postmark.adm</span>
+        </div>
+        <pre><code>use (
+	adm.notify.postmark
+	std.formats.mail
+)
+
+let pm = new postmark.Client(serverToken)         // POSTMARK_SERVER_TOKEN when left out
+let message = new mail.Message()
+message.from = "Shop &lt;orders@example.com&gt;"
+message.to = ["ana@example.net"]
+message.subject = "Your order"
+message.html = "&lt;p&gt;Thanks, Ana.&lt;/p&gt;"
+let sent = try pm.send(message, stream = "outbound", tag = "order")
+print(sent.messageId)</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/notify/tree/main/postmark" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+    </section>
+
+    <section class="docs-section" id="payment">
+      <h2>Payments</h2>
+      <p>Official <a href="https://github.com/admlang/adm" target="_blank" rel="noopener">ADM</a> libraries that take payments through a provider. Each is written in ADM over <code>std.net.http</code>, published as <code>adm.payment.&lt;provider&gt;</code> and signed by the <code>admlang</code> publisher. They live outside the standard library because payment APIs are versioned by date and change often, and a fix must ship the week the provider changes something.</p>
+      <p class="exports-note">Source: <a href="https://github.com/admlang/payment" target="_blank" rel="noopener">github.com/admlang/payment</a></p>
+
+      <div class="docs-sub" id="payment-stripe">
+        <h3><code>adm.payment.stripe</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A Stripe client in ADM over <code>std.net.http</code>: the core objects of a business that charges cards and runs subscriptions, and the webhooks that tell it what happened.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.payment.stripe</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">stripe.adm</span>
+        </div>
+        <pre><code>use adm.payment.stripe
+
+let st = new stripe.Client(secretKey)             // STRIPE_SECRET_KEY when left out
+let customer = try st.customers.create(email = "ana@example.net", name = "Ana")
+let intent = try st.paymentIntents.create(2499, "eur", customer = customer.id, idempotencyKey = orderId)
+print(intent.clientSecret)                        // handed to Stripe.js in the browser
+
+let session = try st.checkout.sessions.create(mode = stripe.CheckoutMode.Subscription,
+	price = "price_123", successURL = "https://example.com/done", cancelURL = "https://example.com/cart")
+
+// the webhook endpoint
+let hooks = new stripe.Webhooks(endpointSecret)
+server.handle("/stripe", hooks.handler((event stripe.Event) =&gt; orders.record(event)))</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/payment/tree/main/stripe" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="payment-paypal">
+        <h3><code>adm.payment.paypal</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A PayPal client in ADM over <code>std.net.http</code>: the REST APIs (orders, payments, subscriptions, payouts), their webhooks, and verification of IPN messages for integrations that still receive them.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.payment.paypal</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">paypal.adm</span>
+        </div>
+        <pre><code>use adm.payment.paypal
+
+let pp = try paypal.connect(clientId, secret, sandbox = true)   // PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET
+let order = try pp.orders.create(new paypal.Money(2499, "EUR"), returnURL = "https://example.com/done", cancelURL = "https://example.com/cart")
+print(order.approveLink)                           // where the buyer goes
+let captured = try pp.orders.capture(order.id)
+
+let hooks = new paypal.Webhooks(pp, webhookId)
+server.handle("/paypal", hooks.handler((event paypal.Event) =&gt; orders.record(event)))</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/payment/tree/main/paypal" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+    </section>
+
+    <section class="docs-section" id="telemetry">
+      <h2>Telemetry</h2>
+      <p>Official <a href="https://github.com/admlang/adm" target="_blank" rel="noopener">ADM</a> libraries that send what the <code>Telemetry</code> service of <code>std.services.telemetry</code> collects (metrics, logs, errors, usage events, spans) to a vendor. The service itself ships OTLP, file and console exporters; a vendor's own ingestion API changes with the vendor, so each is a library, written in ADM over <code>std.net.http</code>, published as <code>adm.telemetry.&lt;vendor&gt;</code> and signed by the <code>admlang</code> publisher.</p>
+      <p class="exports-note">Source: <a href="https://github.com/admlang/telemetry" target="_blank" rel="noopener">github.com/admlang/telemetry</a></p>
+
+      <div class="docs-sub" id="telemetry-datadog">
+        <h3><code>adm.telemetry.datadog</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A Datadog exporter for the <code>Telemetry</code> service, in ADM over <code>std.net.http</code>: metrics, logs, events and traces to the intake APIs of a Datadog site, with no agent in between.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.telemetry.datadog</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">datadog.adm</span>
+        </div>
+        <pre><code>use (
+	std.services.telemetry::(Telemetry, TelemetryConfig)
+	adm.telemetry.datadog
+)
+
+let dd = new datadog.Exporter(apiKey, site = "datadoghq.eu")   // DD_API_KEY, DD_SITE when left out
+dd.service = "shop"
+dd.env = "prod"
+dd.version = "1.4.0"
+dd.tags = ["team:payments"]
+let config = new TelemetryConfig()
+config.exporters = [dd]
+try await Telemetry.start(config)</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/telemetry/tree/main/datadog" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+      <div class="docs-sub" id="telemetry-sentry">
+        <h3><code>adm.telemetry.sentry</code> <span class="api-tag api-planned">planned</span></h3>
+
+        <p>A Sentry exporter for the <code>Telemetry</code> service, in ADM over <code>std.net.http</code>: errors as Sentry events with stack traces and breadcrumbs, spans as transactions, and check-ins for scheduled jobs. It speaks the envelope protocol, so it works with sentry.io, self-hosted Sentry and GlitchTip.</p>
+
+        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">terminal</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm get admlang:adm.telemetry.sentry</code></pre>
+      </div>
+
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">sentry.adm</span>
+        </div>
+        <pre><code>use (
+	std.services.telemetry::(Telemetry, TelemetryConfig)
+	adm.telemetry.sentry
+)
+
+let st = new sentry.Exporter(dsn)                 // SENTRY_DSN when left out
+st.release = "shop@1.4.0"
+st.environment = "prod"
+st.sampleRate = 0.2                                // of transactions; errors always go
+let config = new TelemetryConfig()
+config.exporters = [st]
+try await Telemetry.start(config)</code></pre>
+      </div>
+
+        <p class="exports-note"><a href="https://github.com/admlang/telemetry/tree/main/sentry" target="_blank" rel="noopener">README and source</a></p>
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>adm programming language</span>
+    <span class="footer-muted">Statically typed &middot; multi-paradigm</span>
+  </div>
+</footer>
+
+<script src="docs.js"></script>
+<script src="highlight.js"></script>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "f0b264e327ed4ca4b04c4182c930c88c"}'></script><!-- End Cloudflare Web Analytics -->
+</body>
+</html>

@@ -26,6 +26,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://adm-lang.dev/catalog.html</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://adm-lang.dev/plugins.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
