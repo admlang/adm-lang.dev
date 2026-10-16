@@ -740,6 +740,10 @@ try Config.switchProfile(&quot;dev&quot;)                     // [profiles.dev.d
             <td>The environment variables whose name starts with the prefix, without it: the rest in lower case, each separator a dot. With <code>&quot;__&quot;</code>, <code>APP_DB__MAX_CONNECTIONS</code> is <code>db.max_connections</code>.</td>
           </tr>
           <tr>
+            <td><code>adm.network.etcd</code> <code>Source(client, prefix, format = ValueFormat.Text, name = "")</code></td>
+            <td>A library's source for a remote store: the keys under a prefix of an etcd cluster, the names after it joined by dots (<code>/config/db/host</code> under <code>/config/</code> is <code>db.host</code>), watched while the service is started. <code>ValueFormat.Json</code> reads each value as a JSON document.</td>
+          </tr>
+          <tr>
             <td><code>ConfigChange{key, oldValue ?any, newValue ?any, source ?string}</code></td>
             <td>One changed key: none for a value that was not there or is gone; the name of the source the new value comes from, none for an override.</td>
           </tr>
