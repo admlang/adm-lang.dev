@@ -786,8 +786,8 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-compress">
         <h3><code>std.data.compress</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>flate</code></td><td>DEFLATE <code>Reader</code>/<code>Writer</code>, <code>Inflater</code>, and <code>inflate</code> for one stream held in memory (with the bytes it took)</td></tr>
-          <tr><td><code>gzip</code>, <code>zlib</code></td><td>gzip and zlib; <code>zlib.decompress</code> and <code>zlib.inflate</code> for streams held in memory</td></tr>
+          <tr><td><code>flate</code></td><td>DEFLATE <code>Reader</code>/<code>Writer</code>, <code>Inflater</code>, <code>inflate</code> for one stream held in memory (with the bytes it took), and <code>deflate</code> to compress a whole input (large ones on several tasks)</td></tr>
+          <tr><td><code>gzip</code>, <code>zlib</code></td><td>gzip and zlib; <code>zlib.compress</code>, <code>zlib.decompress</code> and <code>zlib.inflate</code> for streams held in memory</td></tr>
           <tr><td><code>lzw</code></td><td>LZW</td></tr>
           <tr><td><code>bzip2</code></td><td>bzip2</td></tr>
           <tr><td><code>lzma</code></td><td>LZMA and LZMA2</td></tr>

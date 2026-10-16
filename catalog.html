@@ -632,11 +632,9 @@ try cache.close()</code></pre>
       </div>
 
       <div class="docs-sub" id="network-etcd">
-        <h3><code>adm.network.etcd</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.network.etcd</code></h3>
 
-        <p>An etcd v3 client. It speaks the gRPC API over <code>std.net.grpc</code>, in ADM: key-value with transactions, watches, leases, locks and elections, against etcd 3.4 and later.</p>
-
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>An etcd v3 client. It speaks the gRPC API over <code>std.net.grpc</code>, in ADM: key-value with transactions, watches that resume after a broken connection, leases kept alive in the background, locks and elections, members and maintenance, users and roles, against etcd 3.4 and later. Calls go to the members in turn and pass over one that does not answer. <code>etcd.Source</code> feeds the <code>Config</code> service with the keys under a prefix, watched for changes.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -665,7 +663,7 @@ for let event in watch {
 	print("{event.kind} {event.key}")
 }
 
-let lease = try cluster.grant(10s)                           // kept alive until closed
+let lease = try cluster.grant(10s)                           // kept alive until revoked
 try cluster.put("/workers/{id}", "alive", lease = lease)
 let lock = try cluster.lock("/locks/rebuild", lease)
 try lock.unlock()</code></pre>
@@ -1616,11 +1614,11 @@ try slack.webhook(hookURL).send("Build passed")</code></pre>
       </div>
 
       <div class="docs-sub" id="notify-discord">
-        <h3><code>adm.notify.discord</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.notify.discord</code></h3>
 
         <p>A Discord client in ADM over <code>std.net.http</code>: the REST API, webhooks, application commands with interactions, and the Gateway for bots that stay connected.</p>
 
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>Messages with embeds, files, polls and components (buttons and selects, or whole layouts of text, media and containers), with Discord&#39;s limits checked before sending; channels, threads and forum posts, guilds, members, roles, bans, emojis, stickers, scheduled events and the audit log, lists walked page by page; the per-route and global rate limits waited for. Slash and menu commands registered with typed options; a handler that checks each interaction&#39;s Ed25519 signature and defers a slow answer by itself. The Gateway with intents, zlib-stream compression, heartbeats, resume and sharding, handing out typed events.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -1642,7 +1640,16 @@ let embed = new discord.Embed("Release 1.4", "Now available")
 embed.field("Downloads", "https://example.com/1.4")
 try bot.send(channelId, "Release 1.4 is out", embeds = [embed])
 
-try discord.webhook(hookURL).send("Build passed")</code></pre>
+try discord.webhook(hookURL).send("Build passed")
+
+let gw = bot.gateway(discord.Intent.GuildMessages, discord.Intent.MessageContent)
+for let event in gw {
+	match event {
+		case discord.MessageCreate:
+			try bot.send(event.message.channelId, "pong") when event.message.content == "!ping"
+		default:
+	}
+}</code></pre>
       </div>
 
         <p class="exports-note"><a href="https://github.com/admlang/notify/tree/main/discord" target="_blank" rel="noopener">README and source</a></p>
