@@ -59,6 +59,7 @@
         <a class="docs-page-link" href="plugins.html">Plugins</a>
         <a class="docs-page-link" href="libraries.html">Libraries</a>
         <a class="docs-page-link current" href="cli.html">Command line</a>
+        <a class="docs-page-link" href="diagnostics.html">Diagnostics</a>
       </div>
 
       <div class="docs-nav-group">
@@ -66,6 +67,7 @@
         <ul class="docs-nav-list">
           <li><a class="docs-nav-sub" href="#build">adm build</a></li>
           <li><a class="docs-nav-sub" href="#check">adm check</a></li>
+          <li><a class="docs-nav-sub" href="#explain">adm explain</a></li>
           <li><a class="docs-nav-sub" href="#doc">adm doc</a></li>
           <li><a class="docs-nav-sub" href="#fmt">adm fmt</a></li>
           <li><a class="docs-nav-sub" href="#run">adm run</a></li>
@@ -200,8 +202,8 @@ adm build App1 --release --os linux --arch arm64</code></pre>
         Builds are incremental. The compiler caches each module's checked and lowered form and its
         object code under <code>~/.adm/cache</code>, so after an edit only the modules whose sources or
         imported interfaces changed are checked and compiled again. An unchanged binary is not linked
-        again. An application build also drops every function the program cannot reach before code
-        generation. <code>--no-cache</code>, <code>ADM_NO_INCREMENTAL=1</code> and
+        again. An application or plugin build also drops every function the program cannot reach before
+        code generation (a plugin keeps what it exports). <code>--no-cache</code>, <code>ADM_NO_INCREMENTAL=1</code> and
         <code>ADM_NO_SHAKE=1</code> turn these off.
       </p>
       <h3 id="check"><code>adm check</code></h3>
@@ -219,8 +221,23 @@ adm build App1 --release --os linux --arch arm64</code></pre>
         <tr><td><code>--limit N</code></td><td>Maximum number of errors shown (default 10).</td></tr>
         <tr><td><code>--context N</code></td><td>Lines of context around each error (default 2).</td></tr>
         <tr><td><code>--exclude GLOB</code></td><td>Skip paths matching the globs.</td></tr>
-        <tr><td><code>--json</code></td><td>Diagnostics as JSON.</td></tr>
+        <tr><td><code>--fix</code></td><td>Apply the fix of every diagnostic that has one (the first, when it offers several) to the files under the paths, then check again; the report is what is left. A file whose fixes overlap is left as it is and named.</td></tr>
+        <tr><td><code>--json</code></td><td>Diagnostics as JSON: each with its <code>code</code> (<a href="diagnostics.html">Diagnostics</a>) and, when the compiler knows the edit that resolves it, its <code>fixes</code>.</td></tr>
         <tr><td><code>--perf</code></td><td>Show performance metrics.</td></tr>
+      </table>
+      <h3 id="explain"><code>adm explain</code></h3>
+      <div class="code-window">
+        <div class="code-titlebar">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="code-filename">usage</span>
+        </div>
+        <pre><code data-hl="off" class="nohighlight">adm explain [codes...] [flags]</code></pre>
+      </div>
+      <p>What a diagnostic code stands for: error or warning, its area, the message the compiler reports and its entry on the <a href="diagnostics.html">Diagnostics</a> page.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--list [AREA...]</code></td><td>Every code, or those of the areas named (<code>TYPE</code>, <code>FFI</code>, ...).</td></tr>
+        <tr><td><code>--json</code></td><td>The codes as JSON (code, severity, area, message, url).</td></tr>
       </table>
       <h3 id="doc"><code>adm doc</code></h3>
       <div class="code-window">
@@ -421,11 +438,11 @@ adm test --list --json std/io</code></pre>
         </div>
         <pre><code data-hl="off" class="nohighlight">adm audit [DIR] [flags]</code></pre>
       </div>
-      <p>Lists the permissions a package's code reaches: every function is walked and each call followed, through the standard library and dependencies, to the gated functions it can reach (a service method with <code>@commit(policy = ...)</code> or <code>@query(policy = ...)</code>, a function with <code>@requires</code>). Each permission comes with the chain that reaches it; an <code>@on</code> observer of a gated commit is listed as <code>observe</code>, and files binding foreign code (<code>@c</code>, <code>@native</code>) are named, since no policy can verify them. In a library tree the package is each library's exported modules and their closure; elsewhere it is the application's own modules. A library build writes the same set into the package manifest and fails when <code>adm.toml</code> narrows it with <code>[requires] permissions = [...]</code> to less than the code reaches.</p>
+      <p>Lists the permissions a package's code reaches: every function is walked and each call followed, through the standard library and dependencies, to the gated functions it can reach (a service method with <code>@commit(policy = ...)</code> or <code>@query(policy = ...)</code>, a function with <code>@requires</code>). Each permission comes with the chain that reaches it; an <code>@on</code> observer of a gated commit is listed as <code>observe</code>, and files binding foreign code (<code>@c</code>, <code>@native</code>) are named, since no policy can verify them. The interfaces the package serves to other processes (<code>@remote&lt;I&gt;</code>) and the ones it calls in them (<code>IPC.connect&lt;I&gt;</code>) are listed after the permissions. In a library tree the package is each library's exported modules and their closure; elsewhere it is the application's own modules. A library build writes the same set into the package manifest and fails when <code>adm.toml</code> narrows it with <code>[requires] permissions = [...]</code> to less than the code reaches.</p>
       <table class="docs-table">
         <tr><th>Flag</th><th>Meaning</th></tr>
         <tr><td><code>--library NAME</code></td><td>Audit one library of the tree.</td></tr>
-        <tr><td><code>--json</code></td><td><code>{package, requirements: [{permission, observe, via, sites, description, spec, fields}], foreign}</code> per package. <code>sites</code> runs parallel to <code>via</code>: the file and line where each hop of the chain is declared, relative to the audited directory.</td></tr>
+        <tr><td><code>--json</code></td><td><code>{package, requirements: [{permission, observe, via, sites, description, spec, fields}], foreign, build_scripts, provides, connects}</code> per package. <code>sites</code> runs parallel to <code>via</code>: the file and line where each hop of the chain is declared, relative to the audited directory.</td></tr>
         <tr><td><code>--catalog</code></td><td>Instead of what the code reaches, every permission the program's services declare, with its description and rule fields; <code>--json</code> gives <code>[{permission, description, fields}]</code>. The IDE's permission picker for <code>[requires]</code> reads it.</td></tr>
       </table>
       <div class="code-window">
@@ -713,13 +730,15 @@ adm get acme:imaging@^1.4 --accept adm.storage.*</code></pre>
         <pre><code data-hl="off" class="nohighlight">adm publish [flags]</code></pre>
       </div>
       <p>In a library's source tree with a clean git working tree and a GitHub origin: builds and signs the <code>.admlib</code>, tags the source <code>&lt;name&gt;@&lt;version&gt;</code>, pushes the tag, creates its GitHub release with the container as the asset, and opens a pull request on the registry adding the index line. The container never enters the repository. Needs the GitHub CLI (<code>gh</code>), logged in as the account that owns the origin. Refuses when the version is not newer than the registry's, when nothing signs the package, or when the tree is dirty.</p>
+      <p>Before building, the library's API is compared with the newest version in the registry, read from the sources of both. Anything removed or changed in a way that breaks callers (a parameter renamed or retyped, a default dropped, a method added to an interface, an enum member added) calls for a major release, an addition for a minor one, anything else for a patch. When the version raises less than that, publish lists the changes and suggests the version semantic versioning gives (a break after <code>0.5.3</code> suggests <code>1.0.0</code>): a terminal is asked whether to take it, publish anyway or abort; without a terminal <code>--semver</code> must say.</p>
       <table class="docs-table">
         <tr><th>Flag</th><th>Meaning</th></tr>
         <tr><td><code>--description TEXT</code></td><td>One line saying what the library is, shown by <code>search</code> (default: <code>description</code> under <code>[apps.&lt;Name&gt;]</code> in <code>adm.toml</code>).</td></tr>
         <tr><td><code>--bump major|minor|patch</code></td><td>Raise the library's <code>@manifest(version)</code> first; the change rides in the release commit.</td></tr>
+        <tr><td><code>--semver bump|ignore</code></td><td>When the version raises less than the API changes call for, or the previous release cannot be compared: <code>bump</code> publishes the suggested version, <code>ignore</code> the declared one. Default: ask on a terminal, else refuse.</td></tr>
         <tr><td><code>--library NAME</code></td><td>Which library, when the tree declares several.</td></tr>
         <tr><td><code>--registry NAME</code></td><td>Registry from <code>adm.toml</code> (default: the first).</td></tr>
-        <tr><td><code>--dry-run</code></td><td>Build and print the index line, touch nothing.</td></tr>
+        <tr><td><code>--dry-run</code></td><td>Build and print the index line and the API report, touch nothing.</td></tr>
         <tr><td><code>--no-pr</code></td><td>Push the release but print the index line instead of opening the pull request.</td></tr>
         <tr><td><code>--dir DIR</code></td><td>Library source directory.</td></tr>
       </table>
@@ -1009,6 +1028,7 @@ adm graph services [DIR] [flags]</code></pre>
         <tr><td><code>name-variant-overload</code></td><td><code>readFile</code> beside <code>readFileWith</code> or <code>readFileFrom</code> in one body, where an overload or a default argument would do.</td></tr>
         <tr><td><code>could-be-internal</code></td><td>An exported function or type of an application module that no other module refers to.</td></tr>
         <tr><td><code>redundant-internal</code></td><td><code>internal</code> on a service member; a service exposes only its datatypes, interfaces and <code>@commit</code>, <code>@emit</code> and <code>@query</code> members. The fix deletes the keyword.</td></tr>
+        <tr><td><code>non-exhaustive-match</code></td><td>A <code>match</code> without <code>default</code> that leaves out members of a union type, an optional, an errorable or an enum. A value of a missing member takes no clause and falls through; the warning names the missing members.</td></tr>
         <tr><td><code>array-identity</code></td><td><code>==</code> or <code>!=</code> between an array and an array literal: it compares which array each side is, so it is always false (or true). The fix writes <code>a.equals(b)</code>.</td></tr>
         <tr><td><code>bind-copy</code></td><td>A field that is not <code>@bindable</code> passed to a component's bound input (<code>@input(bind = true)</code>): the component edits a copy and the field never changes. Fix: mark the field <code>@bindable</code>.</td></tr>
         <tr><td><code>unreachable</code></td><td>A statement after a <code>return</code>, <code>fail</code>, <code>break</code>, <code>continue</code>, <code>recover</code> or <code>rollback</code> in the same block (contract blocks excepted).</td></tr>
@@ -1036,7 +1056,7 @@ adm graph services [DIR] [flags]</code></pre>
         <tr><td><code>accessor-prefix</code></td><td><code>getX()</code> and <code>setX(v)</code> methods over a field, which ADM reads as a property. When both do nothing but read and write the field, the fix rewrites the field into a property block carrying the accessors' doc comments, deletes the methods and turns every caller into <code>o.x</code> or <code>o.x = v</code>. A getter with logic, or a setter used as an expression, is reported without a fix.</td></tr>
         <tr><td><code>todo</code></td><td><code>TODO</code>, <code>FIXME</code>, <code>HACK</code> and <code>XXX</code> comments.</td></tr>
       </table>
-      <p>What leaks, breaks or is dead is a warning: <code>bind-copy</code>, <code>ref-cycle</code>, <code>closure-cycle</code>, <code>observer-cycle</code>, <code>missing-dispose</code>, <code>unsynchronised-field</code>, <code>blocking-observer</code>, <code>unchecked-map-index</code>, <code>array-identity</code>, <code>unreachable</code>, <code>empty-onerror</code>, <code>self-assign</code>, <code>constant-condition</code>, <code>undeclared-dependency</code>, <code>undeclared-permission</code>, <code>assertless-test</code>, <code>suite-file-without-suite</code>, <code>unused-import</code>, <code>unused-internal</code> and <code>unused-local</code>. The rest are informational. Test files skip the naming and documentation checks, and constructors and destructors need no doc comment. <code>--skip</code> leaves checks out; the exit code is 0 either way. Fixes exist for <code>ref-cycle</code> (inserts <code>weak</code> on the optional field), <code>unused-import</code> (removes the line or the name), <code>accessor-prefix</code>, <code>redundant-internal</code>, <code>array-identity</code> and the <code>prefer-*</code> rewrites.</p>
+      <p>What leaks, breaks or is dead is a warning: <code>bind-copy</code>, <code>ref-cycle</code>, <code>closure-cycle</code>, <code>observer-cycle</code>, <code>missing-dispose</code>, <code>unsynchronised-field</code>, <code>blocking-observer</code>, <code>unchecked-map-index</code>, <code>array-identity</code>, <code>non-exhaustive-match</code>, <code>unreachable</code>, <code>empty-onerror</code>, <code>self-assign</code>, <code>constant-condition</code>, <code>undeclared-dependency</code>, <code>undeclared-permission</code>, <code>assertless-test</code>, <code>suite-file-without-suite</code>, <code>unused-import</code>, <code>unused-internal</code> and <code>unused-local</code>. The rest are informational. Test files skip the naming and documentation checks, and constructors and destructors need no doc comment. <code>--skip</code> leaves checks out; the exit code is 0 either way. Fixes exist for <code>ref-cycle</code> (inserts <code>weak</code> on the optional field), <code>unused-import</code> (removes the line or the name), <code>accessor-prefix</code>, <code>redundant-internal</code>, <code>array-identity</code> and the <code>prefer-*</code> rewrites.</p>
       <div class="code-window">
         <div class="code-titlebar">
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>

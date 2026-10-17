@@ -59,6 +59,7 @@
         <a class="docs-page-link" href="plugins.html">Plugins</a>
         <a class="docs-page-link" href="libraries.html">Libraries</a>
         <a class="docs-page-link" href="cli.html">Command line</a>
+        <a class="docs-page-link" href="diagnostics.html">Diagnostics</a>
       </div>
 
       <div class="docs-nav-group">
@@ -917,6 +918,11 @@ s[-2:]    // "cd"</code></pre>
         <p>
           Arrays are <code>T[]</code>, dynamically sized, with a literal form - <code>[1, 2, 3]</code>,
           or <code>Type[1, 2, 3]</code> with an explicit element type.
+        </p>
+        <p>
+          <code>==</code> and <code>!=</code> on arrays compare identity: <code>[1, 2] == [1, 2]</code>
+          is <code>false</code>, since the two literals are two arrays. <code>a.equals(b)</code>
+          compares contents.
         </p>
         <p>
           An untyped literal takes its element type from the items, or from where it is used: a
@@ -2124,9 +2130,12 @@ def countdown(from int) Iterator&lt;int&gt; {
           <code>yield</code> is a statement and takes <code>when</code> / <code>unless</code> guards.
           A generator is a plain function (not <code>async</code>, <code>atomic</code>,
           <code>sql</code>, <code>cuda</code> or <code>meta</code>); <code>yield</code> cannot stand
-          inside <code>forall</code>, <code>transaction</code> or an anonymous function, and
-          <code>defer</code> is not available in a generator. It costs one object and needs no
-          cleanup when a sequence is left unfinished.
+          inside <code>forall</code> or <code>transaction</code>. An anonymous function that returns
+          <code>Iterator&lt;T&gt;</code> and yields is a generator too, keeping what it captures for
+          as long as the iterator lives. <code>defer</code> runs once per sequence: when it ends, or
+          when the iterator is dropped before that. A generator of <code>Iterator&lt;!T&gt;</code> may
+          use <code>try</code> and <code>fail</code>: the error is the sequence's last value, and the
+          next <code>iterate()</code> answers <code>none</code>. It costs one object.
         </p>
       </div>
       <div class="docs-sub" id="match">
@@ -2211,7 +2220,10 @@ def userId(u User) int {
           A case can also be a bare type instead of a pattern. On a union-typed value, that narrows
           it: inside <code>case string:</code> the value really is a <code>string</code>; fall
           through to <code>default</code> and it's narrowed to whatever's left of the union.
-          Multiple types can share one case, narrowing to that subset instead of just one:
+          Multiple types can share one case, narrowing to that subset instead of just one.
+          A <code>match</code> without <code>default</code> need not name every member: a value no
+          case takes skips the <code>match</code>, and <code>adm lint</code> warns
+          (<code>non-exhaustive-match</code>) naming the members left out:
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -3095,7 +3107,12 @@ homepage.timeout(3s)</code></pre>
           instance, nothing for <code>any</code> or a union), an <code>async ?T</code> gives <code>none</code>, and an
           <code>async !T</code> gives an error with code <code>canceled</code> or
           <code>timeout</code> whose message is the reason passed to <code>cancel</code>.
-          <code>.canceled()</code> tells a cancelled result from a computed one.
+          <code>.canceled()</code> tells a cancelled result from a computed one, and so does
+          the tag <code>canceled</code>: on the value itself when it is an object, on the
+          variable an <code>await</code> initialises when it is a number, a <code>bool</code> or
+          another scalar (<code>let n = await job</code>, then <code>n.tags().has("canceled")</code>).
+          Cancelling an <code>a || b</code> or <code>a &amp;&amp; b</code> cancels both operands,
+          except those kept alive.
         </p>
         <p>
           The task running the body is told, not stopped: its <code>time.sleep</code> returns
@@ -3467,7 +3484,7 @@ def log(evt Event&lt;string&gt;) {
         <tr><td>Logging</td><td>Leveled logging with structured fields, to console, file and network writers.</td></tr>
         <tr><td>Messaging</td><td>In-memory queues by topic: consumer groups, priorities, retries and dead letters.</td></tr>
         <tr><td>I18n <span class="api-tag api-planned">planned</span></td><td>Locale selection and message catalogs.</td></tr>
-        <tr><td>IPC <span class="api-tag api-planned">planned</span></td><td>Remote interfaces between processes; the methods are declared and fail until the transport is built.</td></tr>
+        <tr><td>IPC</td><td>Remote interfaces between processes: <code>@remote&lt;I&gt;</code> serves an interface, <code>IPC.connect&lt;I&gt;</code> calls it, over TCP, TLS or Unix sockets.</td></tr>
         <tr><td>Telemetry</td><td>Sends metrics, logs, errors, usage events and spans to a configured server (OpenTelemetry), with the user's consent.</td></tr>
         <tr><td>Vault</td><td>Encrypted key/value store for secrets, values and keys.</td></tr>
       </table>

@@ -137,6 +137,7 @@
           <li><a class="docs-nav-sub" href="#std-translations">std.formats.translations</a></li>
           <li><a class="docs-nav-sub" href="#std-formats-data">std.formats.data</a></li>
           <li><a class="docs-nav-sub" href="#std-formats-sheets">std.formats.sheets</a></li>
+          <li><a class="docs-nav-sub" href="#std-formats-models">std.formats.models</a></li>
           <li><a class="docs-nav-sub" href="#std-formats-mmdb">std.formats.data.mmdb</a></li>
           <li><a class="docs-nav-sub" href="#std-formats-ai">std.formats.ai</a></li>
           <li><a class="docs-nav-sub" href="#std-formats-ai-onnx">std.formats.ai.onnx</a></li>
@@ -233,6 +234,7 @@
           <li><a class="docs-nav-sub" href="#std-gfx-color">std.gfx.color</a></li>
           <li><a class="docs-nav-sub" href="#std-gfx-canvas">std.gfx.canvas</a></li>
           <li><a class="docs-nav-sub" href="#std-gfx-render">std.gfx.render</a></li>
+          <li><a class="docs-nav-sub" href="#std-gfx-scene">std.gfx.scene</a></li>
           <li><a class="docs-nav-sub" href="#std-gfx-processing">std.gfx.processing</a></li>
           <li><a class="docs-nav-sub" href="#std-simd">std.simd</a></li>
           <li><a class="docs-nav-sub" href="#std-gpu">std.gpu</a></li>
@@ -394,6 +396,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Circle</code>, <code>Line</code>, <code>Ray</code>, <code>Polygon</code></td><td>shapes</td></tr>
           <tr><td><code>Edges</code>, <code>Corners</code>, <code>Axes</code></td><td>per-side, per-corner and per-axis values</td></tr>
           <tr><td><code>Transform2D</code></td><td>2D affine transform</td></tr>
+          <tr><td><code>Quaternion</code></td><td>3D rotation: axis-angle, matrix, slerp, Euler angles</td></tr>
           <tr><td><code>Path</code>, <code>FillRule</code>, <code>StrokeStyle</code>, <code>LineCap</code>, <code>LineJoin</code></td><td>paths: build, stroke, dash, measure, trim, morph, boolean operations</td></tr>
           <tr><td><code>BezierPath</code>, <code>QuadraticBezier</code>, <code>CubicBezier</code></td><td>curves</td></tr>
         </table>
@@ -1076,9 +1079,25 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>serialOf</code>, <code>timeOf</code></td><td>spreadsheet day numbers and <code>time.Time</code></td></tr>
         </table>
       </div>
+      <div class="docs-sub" id="std-formats-models">
+        <h3><code>std.formats.models</code></h3>
+        <p class="docs-placeholder">The model, the loader and the glTF, GLB, OBJ and STL codecs are built; the other codecs are declared with their signatures, extensions and options, and their <code>decode</code>/<code>encode</code> bodies are pending.</p>
+        <table class="docs-table exports-table">
+          <tr><td><code>Model</code>, <code>Node</code>, <code>Axis</code></td><td>a 3D scene: a tree of placed nodes, the meshes, materials, textures, cameras, lights, skins and animations it owns, embedded resources, unit and up axis</td></tr>
+          <tr><td><code>Mesh</code>, <code>Primitive</code>, <code>Topology</code>, <code>MorphTarget</code></td><td>geometry as flat attribute arrays and indices; normals, tangents, vertex merging, triangulation</td></tr>
+          <tr><td><code>Material</code>, <code>Texture</code>, <code>TextureRef</code>, <code>TextureTransform</code>, <code>AlphaMode</code>, <code>Wrap</code>, <code>Filter</code></td><td>metallic-roughness shading with an emissive strength and the classic Phong fields, metadata for what the file attached beyond the fields, textures by resource name or URI, each reference with its coordinate set, strength and transform</td></tr>
+          <tr><td><code>Camera</code>, <code>Light</code>, <code>Skin</code>, <code>Animation</code>, <code>Channel</code></td><td>cameras (<code>projection</code>), lights, skinning (<code>jointMatrices</code>) and keyframe animation (<code>sample</code>, <code>apply</code>, <code>duration</code>)</td></tr>
+          <tr><td><code>load</code>, <code>Model.save</code>, <code>Model.write</code></td><td>read and write by signature or extension</td></tr>
+          <tr><td><code>ModelCodec</code>, <code>ResourceReader</code>, <code>ResourceWriter</code>, <code>DirectoryResources</code>, <code>ModelError</code></td><td>the codec contract, with the files a model keeps beside it</td></tr>
+          <tr><td><code>Stl</code></td><td>STL, text and binary, with VisCAM and Materialise colours</td></tr>
+          <tr><td><code>Obj</code></td><td>Wavefront OBJ with its <code>.mtl</code> libraries and textures: objects and groups as nodes, polygons of any size, lines, points, vertex colours; <code>decodeMaterials</code>/<code>encodeMaterials</code> for a library on its own</td></tr>
+          <tr><td><code>Gltf</code>, <code>Glb</code></td><td>glTF 2.0 as JSON with files beside it or data URIs (<code>embed</code>), and as one GLB: every core feature (scenes, nodes, meshes with every attribute, morph targets and sparse accessors, materials, textures and samplers, cameras, skins, animations) plus <code>KHR_lights_punctual</code>, <code>KHR_materials_unlit</code>, <code>KHR_materials_emissive_strength</code> and <code>KHR_texture_transform</code>; other extensions kept as text</td></tr>
+          <tr><td><code>Ply</code>, <code>Fbx</code>, <code>ThreeDS</code>, <code>Dxf</code>, <code>Dwg</code>, <code>Jt</code></td><td>codecs (declared)</td></tr>
+        </table>
+      </div>
       <div class="docs-sub" id="formats-planned">
         <h3>Planned</h3>
-        <p class="docs-placeholder"><code>std.formats.slides</code> and the container formats of <code>std.formats.data</code>.</p>
+        <p class="docs-placeholder"><code>std.formats.slides</code>, the <code>std.formats.models</code> codec bodies and the container formats of <code>std.formats.data</code>.</p>
       </div>
     </section>
 
@@ -1087,7 +1106,7 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-net">
         <h3><code>std.net</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>Socket</code>, <code>Address</code>, <code>Connection</code>, <code>Stream</code></td><td>sockets and connections; <code>Socket.connectDatagram</code>, <code>send</code>, <code>receive</code> for a datagram socket with one peer; <code>Connection.setNoDelay</code> (on by default)</td></tr>
+          <tr><td><code>Socket</code>, <code>Address</code>, <code>Connection</code>, <code>Stream</code></td><td>sockets and connections; <code>Socket.connectDatagram</code>, <code>send</code>, <code>receive</code> for a datagram socket with one peer; <code>Connection.setNoDelay</code> (on by default), <code>Connection.peerUserId</code> (the user at the other end of a Unix socket)</td></tr>
           <tr><td><code>DatagramTransport</code></td><td>whole datagrams to and from one peer</td></tr>
           <tr><td><code>Listener</code>, <code>Server</code>, <code>StreamServer</code>, <code>DatagramServer</code></td><td>server interfaces</td></tr>
           <tr><td><code>NetError</code>, <code>ErrorCode</code></td><td>typed failures</td></tr>
@@ -1678,6 +1697,14 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.gfx.render</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>DrawCommand</code>, <code>CommandKind</code></td><td>render commands a recording keeps for GPU renderers (clears, blits, video)</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-gfx-scene">
+        <h3><code>std.gfx.scene</code></h3>
+        <p>Draws a <code>std.formats.models</code> scene to an image on the CPU: the model's camera or one framing the scene, its lights or a key light, skins and morph targets at an animation time, metallic-roughness shading with every texture slot, mipmapped textures, blended surfaces, supersampling.</p>
+        <table class="docs-table exports-table">
+          <tr><td><code>render</code></td><td><code>render(model, width, height, options)</code> draws the model into a new <code>Image</code></td></tr>
+          <tr><td><code>RenderOptions</code></td><td><code>camera</code> (the node to look through), <code>time</code> (seconds into the animations), <code>background</code>, <code>samples</code> (drawn pixels per output pixel along each axis, 1 to 4)</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-gfx-processing">

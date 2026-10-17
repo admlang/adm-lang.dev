@@ -1259,8 +1259,32 @@ I18n.text(&quot;basket.title&quot;, {}, &quot;fr&quot;)                     // o
         </ul>
       </div>
       <div class="docs-sub" id="svc-ipc">
-        <h3><code>IPC</code> <span class="api-tag api-planned">planned</span></h3>
-        <p>Remote interfaces between processes, on one machine or several. A program calls the methods of an interface and another process runs them. The interface and the types in its signatures live in a library both programs import; the serving process marks a type <code>@remote&lt;I&gt;</code> and passes an instance to <code>provide</code>, and the calling process gets its own value of <code>I</code> from <code>connect&lt;I&gt;</code>. The methods are declared and the encoding of values between processes is built; the calls that serve and connect fail today with "IPC is not implemented yet". Permissions: <code>adm.ipc.connect</code> and <code>adm.ipc.listen</code>.</p>
+        <h3><code>IPC</code></h3>
+        <p>Remote interfaces between processes, on one machine or several. A program calls the methods of an interface and another process runs them. The interface and the types in its signatures live in a library both programs import; the serving process marks a type <code>@remote&lt;I&gt;</code> and passes an instance to <code>provide</code>, and the calling process gets its own value of <code>I</code> from <code>connect&lt;I&gt;</code>. Every method of a remote interface is errorable and not generic, and everything it takes and returns can cross to another process; the build checks this where the interface is named. Permissions: <code>adm.ipc.connect</code> and <code>adm.ipc.listen</code>.</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">orders.adm</span>
+          </div>
+          <pre><code>// shared by both programs
+interface Orders {
+	def place(order Order) !Receipt
+	def cancel(id int) !none
+}
+
+// the server
+@remote&lt;Orders&gt;
+type Warehouse { ... }
+
+try IPC.provide(new Warehouse())
+try IPC.listen("0.0.0.0:7400", Listener{tls: config, secrets: [secret]})
+
+// the client
+let desk = try IPC.connect&lt;Orders&gt;("orders.internal:7400", Auth{secret: secret})
+let receipt = try desk.place(Order{customer: "ada", item: "desk", quantity: 2})</code></pre>
+        </div>
+        <p>TCP speaks TLS 1.3 unless <code>plain</code> is set on both sides; a Unix socket (<code>unix:/path</code>) is plain unless given a TLS config. A client proves itself with a shared secret (answered as HMAC over the server's challenge and the TLS channel, never sent), a token the server's <code>verifyToken</code> checks (only over TLS or a Unix socket), a client certificate, or on a Unix socket its user id (<code>Listener.users</code>). <code>IPC.caller()</code> tells a served method who called it. Many calls run at once on one connection, each on its own task on the server; cancelling the waiting task, or <code>Link.timeout</code>, cancels the call on the server too. With several addresses, <code>Link.balance</code> picks the server of each call (<code>RoundRobin</code>, <code>Random</code>, <code>Pinned</code>); a server that cannot be reached or stops answering pings is set aside and tried again later. A call the server never took moves to another server; one that was sent and lost its link fails with <code>Lost</code>. Dropping the last reference to the value <code>connect</code> returned closes its connections. A client keeps calling a server whose version of the interface still has every method and type the client uses, so servers can be upgraded first with additive changes. <code>adm audit</code> lists the interfaces a package provides and the ones it calls.</p>
+        <p><strong>Clusters.</strong> <code>IPC.join(Cluster{...})</code> makes a process a node of a cluster: nodes find each other through a <code>Discovery</code> (<code>StaticNodes</code>, <code>DNSNodes</code>, or <code>IPCNodes</code> of the Redis, PostgreSQL and etcd libraries), then keep each other's state by gossip over their own IPC links, so the store is only needed to start. A node silent too long is set aside, then dropped; one that leaves says so. A client given one node's address learns the others and spreads its calls over them (<code>Link.follow</code>). A node busier than <code>refuseAbove</code> sends a call to a less busy member before running it, and the client follows without the caller noticing; after <code>forceAfter</code> refusals the least busy node is told to take the call. <code>IPC.members()</code> lists the members, and the <code>joined</code> and <code>left</code> events report changes.</p>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def provide&lt;T&gt;(instance T) !none</code></div>
@@ -1273,29 +1297,47 @@ I18n.text(&quot;basket.title&quot;, {}, &quot;fr&quot;)                     // o
             <p class="api-doc">Fails when it is not provided.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def listen(address string, options Listener = Listener{}) !string</code></div>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def listen(address Endpoint, options Listener = Listener{}) !string</code></div>
             <p class="api-doc">Starts accepting clients on <code>address</code>: <code>host:port</code>, <code>[v6]:port</code> or <code>unix:/path</code>. Returns the address bound, with the port the system chose for port 0.</p>
             <p class="api-doc">Fails when the address cannot be bound, when a TCP address has neither a TLS certificate nor <code>plain</code>, or when the listener asks clients for no proof on an address other machines can reach and <code>open</code> is not set.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def close(address string) !none</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def close(address string) !none</code></div>
             <p class="api-doc">Stops accepting clients on <code>address</code> and closes its connections once their running calls finish.</p>
             <p class="api-doc">Fails when nothing listens there.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def connect&lt;I&gt;(address string, auth Auth = Auth{}, options Link = Link{}) !I</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def connect&lt;I&gt;(address Endpoint, auth Auth = Auth{}, options Link = Link{}) !I</code></div>
             <p class="api-doc">Returns an <code>I</code> whose methods run in the process at <code>address</code>.</p>
             <p class="api-doc">Fails with an <code>IPCError</code>: <code>Unreachable</code> when the server cannot be reached, <code>Refused</code> when it does not accept <code>auth</code>, <code>Mismatch</code> when it provides another version of <code>I</code> or none.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def connect&lt;I&gt;(addresses string[], auth Auth = Auth{}, options Link = Link{}) !I</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def connect&lt;I&gt;(addresses string[], auth Auth = Auth{}, options Link = Link{}) !I</code></div>
             <p class="api-doc">Returns an <code>I</code> served by several processes; <code>options.balance</code> decides which one takes each call. Succeeds when one server accepts.</p>
             <p class="api-doc">Fails with an <code>IPCError</code>: <code>Unreachable</code> when none can be reached, <code>Refused</code> or <code>Mismatch</code> when a reachable one refuses the client or provides another version of <code>I</code>.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def disconnect&lt;I&gt;(client I) !none</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def disconnect&lt;I&gt;(client I) !none</code></div>
             <p class="api-doc">Closes the connections behind a value <code>connect</code> returned. Calls in flight fail with <code>IPCErrorKind.Closed</code>.</p>
             <p class="api-doc">Fails when <code>client</code> did not come from <code>connect</code>.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def join(cluster Cluster) !none</code></div>
+            <p class="api-doc">Makes this process a node of a cluster: it serves gossip on its listeners, announces itself to <code>cluster.discovery</code>, learns the other members, tells its clients of them, and sends calls to less busy members above <code>refuseAbove</code>. Listen first.</p>
+            <p class="api-doc">Fails when this process is a node already, or when discovery cannot record it.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def leave() !none</code></div>
+            <p class="api-doc">Leaves the cluster: the other members are told, discovery forgets this node.</p>
+            <p class="api-doc">Fails when this process is in no cluster.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def members() Member[]</code></div>
+            <p class="api-doc">The members of the cluster as this node knows them, itself first: address, interfaces, state, load.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def joined(member Member) Member</code>, <code class="api-sig">def left(member Member) Member</code></div>
+            <p class="api-doc">A member became alive; a member left or fell silent too long.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def caller() ?Caller</code></div>
@@ -1818,14 +1860,19 @@ Network.lab.conditions.unreachable = "*"         // offline</code></pre>
 
           </li>
           <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def peerUserId(fd int) !int</code></div>
+            <p class="api-doc">The user id of the process at the other end of a connected Unix socket, as the kernel recorded it when the connection was made: who is calling, without anything the caller sends. <code>net.Connection.peerUserId()</code> asks it for a connection.</p>
+            <p class="api-doc">Fails when <code>fd</code> is not a connected Unix socket, or on a platform that does not report it (Windows).</p>
+          </li>
+          <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def remoteAddr(fd int) !string</code></div>
             <p class="api-doc">Return the remote endpoint of a connected socket FD, formatted as an address string.</p>
 
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def publicAddr() !string</code></div>
-            <p class="api-doc">Returns the host's public address as seen from outside the local network.</p>
-
+            <p class="api-doc">Returns the host's public address as seen from outside the local network: the IP address a STUN server (RFC 8489) saw a Binding request come from. Behind a NAT that is the NAT's outside address. The servers of <code>NetworkConfig.stunServers</code> are asked in turn (<code>Network.config(NetworkConfig{stunServers: ["stun.example.org:3478"]})</code>; by default Google's and Cloudflare's public servers), each with a request sent three times, so a server that never answers costs 3.5 seconds.</p>
+            <p class="api-doc">Fails when no STUN server is configured, the policy denies connecting to one (<code>adm.network.connect</code>), or none answers.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def netIface() !net.NetInterface[]</code></div>
@@ -2335,8 +2382,8 @@ Storage.lab.conditions.corruptReads = 0.01</code></pre>
             <p class="api-doc">Fails when the policy denies the path, the path is not a link or the operating system refuses.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-query">query</span><span class="api-tag api-planned">planned</span><code class="api-sig">def openedFiles()</code></div>
-            <p class="api-doc">Return a list of opened file descriptors.</p>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def openedFiles() OpenedFile[]</code></div>
+            <p class="api-doc">Returns the files the Storage service opened (<code>open</code>, <code>memoryFile</code>) and has not closed, ordered by descriptor, each with its path, mode, the time it was opened and its reads and writes so far. A descriptor that came from elsewhere (<code>Network.receiveDescriptor</code>) is not listed.</p>
 
           </li>
           <li class="api-item">
@@ -2350,9 +2397,9 @@ Storage.lab.conditions.corruptReads = 0.01</code></pre>
             <p class="api-doc">Fails when the policy denies the path or the operating system refuses.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-query">query</span><span class="api-tag api-planned">planned</span><code class="api-sig">def metrics(fd ?int)</code></div>
-            <p class="api-doc">Return read/write metrics for a file descriptor if a fd is provided or for all if not</p>
-
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def metrics(fd ?int) !FileMetrics</code></div>
+            <p class="api-doc">Returns the reads and writes (<code>reads</code>, <code>writes</code>, <code>bytesRead</code>, <code>bytesWritten</code>) of the open file <code>fd</code>, or with <code>fd</code> none those of every file since the service started: closed files, <code>readFile</code>, <code>writeFile</code> and mapped reads and writes included.</p>
+            <p class="api-doc">Fails when <code>fd</code> is not a file the Storage service has open.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def freeSpace(disk Path) !int64</code></div>
@@ -2365,9 +2412,9 @@ Storage.lab.conditions.corruptReads = 0.01</code></pre>
             <p class="api-doc">Fails when the policy denies the path or the operating system refuses.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-query">query</span><span class="api-tag api-planned">planned</span><code class="api-sig">def disks()</code></div>
-            <p class="api-doc">List of all available disks.</p>
-
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def disks() !Disk[]</code></div>
+            <p class="api-doc">Returns the mounted file systems that hold files: disks, partitions, network shares, each with its device, mount point, file system type and whether it is read-only or on another machine. Pseudo file systems (<code>proc</code>, <code>sysfs</code>, <code>tmpfs</code>, <code>overlay</code>, ...) and package images (<code>squashfs</code>: snaps, AppImages) are left out. Their sizes are <code>freeSpace</code> and <code>totalSpace</code> of the mount point, which the read policy decides on.</p>
+            <p class="api-doc">Fails when the operating system cannot list its mounts.</p>
           </li>
         </ul>
       </div>

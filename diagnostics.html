@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnostics - adm</title>
+<meta name="description" content="Every diagnostic the ADM compiler reports, by code: what it says and where it belongs.">
+<link rel="icon" type="image/svg+xml" href="assets/adm.svg">
+<link rel="canonical" href="https://adm-lang.dev/diagnostics.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="adm">
+<meta property="og:title" content="adm diagnostics">
+<meta property="og:description" content="Every diagnostic the ADM compiler reports, by code.">
+<meta property="og:url" content="https://adm-lang.dev/diagnostics.html">
+<meta property="og:image" content="https://adm-lang.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="adm diagnostics">
+<meta name="twitter:description" content="Every diagnostic the ADM compiler reports, by code.">
+<meta name="twitter:image" content="https://adm-lang.dev/assets/og.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/adm.svg" alt="ADM" class="brand-mark">
+      <span class="brand-name"><span class="brand-sub">programming language</span></span>
+    </a>
+    <nav class="nav">
+      <a href="docs.html" class="nav-active">Docs</a>
+      <a href="examples.html">Examples</a>
+      <a href="services.html">Services</a>
+      <a href="modules.html">Modules</a>
+      <a href="catalog.html">Libraries</a>
+      <a class="nav-icon" href="https://github.com/admlang" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+      </a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap docs-layout">
+
+  <aside class="docs-sidebar">
+    <nav class="docs-nav" id="docs-nav">
+
+      <div class="docs-pages">
+        <span class="docs-pages-label">Docs</span>
+        <a class="docs-page-link" href="docs.html">Language reference</a>
+        <a class="docs-page-link" href="memory.html">Memory model</a>
+        <a class="docs-page-link" href="units.html">Units of measure</a>
+        <a class="docs-page-link" href="annotations.html">Annotations</a>
+        <a class="docs-page-link" href="components.html">UI components</a>
+        <a class="docs-page-link" href="app-home.html">Application home &amp; migrations</a>
+        <a class="docs-page-link" href="policy.html">Policy &amp; permissions</a>
+        <a class="docs-page-link" href="plugins.html">Plugins</a>
+        <a class="docs-page-link" href="libraries.html">Libraries</a>
+        <a class="docs-page-link" href="cli.html">Command line</a>
+        <a class="docs-page-link current" href="diagnostics.html">Diagnostics</a>
+      </div>
+
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#codes">Codes</a>
+        <ul class="docs-nav-list">
+          <li><a class="docs-nav-sub" href="#area-syntax">Syntax</a></li>
+          <li><a class="docs-nav-sub" href="#area-name">Names</a></li>
+          <li><a class="docs-nav-sub" href="#area-type">Types</a></li>
+          <li><a class="docs-nav-sub" href="#area-async">Async</a></li>
+          <li><a class="docs-nav-sub" href="#area-contract">Contracts</a></li>
+          <li><a class="docs-nav-sub" href="#area-service">Services</a></li>
+          <li><a class="docs-nav-sub" href="#area-ui">UI</a></li>
+          <li><a class="docs-nav-sub" href="#area-meta">Annotations</a></li>
+          <li><a class="docs-nav-sub" href="#area-plugin">Plugins</a></li>
+          <li><a class="docs-nav-sub" href="#area-policy">Policy</a></li>
+          <li><a class="docs-nav-sub" href="#area-sql">SQL</a></li>
+          <li><a class="docs-nav-sub" href="#area-unit">Units</a></li>
+          <li><a class="docs-nav-sub" href="#area-ffi">Foreign code</a></li>
+          <li><a class="docs-nav-sub" href="#area-gpu">GPU</a></li>
+          <li><a class="docs-nav-sub" href="#area-shader">Shaders</a></li>
+          <li><a class="docs-nav-sub" href="#area-internal">Internal</a></li>
+        </ul>
+      </div>
+
+    </nav>
+  </aside>
+
+  <main class="docs-content">
+
+    <p class="docs-eyebrow">Docs</p>
+    <h1 class="docs-page-title">Diagnostics</h1>
+    <p class="docs-lede" id="codes">Every error and warning the compiler reports has a code: <code>E-</code> for an error or <code>W-</code> for a warning, the area, and a number that stays with the message (<code>E-TYPE-0042</code>). <code>adm check</code> prints it beside the place, <code>--json</code> gives it as <code>code</code>, and editors show it with a link here. What the C compiler, nvcc, zig, rustc, go and the linker report on your code is shown the same way, at the line of the C, Zig, Rust or Go file, at the line of a <code>cuda def</code> body, or at the declaration a missing symbol belongs to. <code>adm explain E-TYPE-0042</code> prints one entry in the terminal. Where the compiler knows the edit that resolves a diagnostic, it attaches a fix: editors offer it as a quick fix, <code>adm check --fix</code> applies them, and <code>adm check --json</code> lists them under <code>fixes</code>. In the messages below, <span class="diag-hole">%s</span> and its kin stand for the names and types the compiler fills in.</p>
+
+    <section class="docs-section" id="area-syntax">
+      <h2>Syntax</h2>
+      <p>What the parser cannot read. 178 codes.</p>
+      <table class="docs-table diag-table">
+        <tr id="E-SYNTAX-0001"><td><code>E-SYNTAX-0001</code></td><td>error</td><td>illegal token <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-SYNTAX-0002"><td><code>E-SYNTAX-0002</code></td><td>error</td><td>expected <span class="diag-hole">%s</span>, found <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SYNTAX-0003"><td><code>E-SYNTAX-0003</code></td><td>error</td><td>too many errors; the rest of the file is not parsed</td></tr>
+        <tr id="E-SYNTAX-0004"><td><code>E-SYNTAX-0004</code></td><td>error</td><td>expected &#x27;,&#x27; in attribute arguments</td></tr>
+        <tr id="E-SYNTAX-0005"><td><code>E-SYNTAX-0005</code></td><td>error</td><td>unsupported attribute argument <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SYNTAX-0006"><td><code>E-SYNTAX-0006</code></td><td>error</td><td>expected identifier, found keyword <span class="diag-hole">%q</span>; it cannot be used as a name</td></tr>
+        <tr id="E-SYNTAX-0007"><td><code>E-SYNTAX-0007</code></td><td>error</td><td>expected identifier, found <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SYNTAX-0008"><td><code>E-SYNTAX-0008</code></td><td>error</td><td>expected operator, found <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SYNTAX-0009"><td><code>E-SYNTAX-0009</code></td><td>error</td><td>an anonymous struct takes <code>name type</code> fields only; declare a struct for defaults, annotations and modifiers</td></tr>
+        <tr id="E-SYNTAX-0010"><td><code>E-SYNTAX-0010</code></td><td>error</td><td>field <span class="diag-hole">%q</span> is written twice</td></tr>
+        <tr id="E-SYNTAX-0011"><td><code>E-SYNTAX-0011</code></td><td>error</td><td>an anonymous struct literal takes <code>name: value</code> fields only</td></tr>
+        <tr id="E-SYNTAX-0012"><td><code>E-SYNTAX-0012</code></td><td>error</td><td><code>style</code> takes the properties the call sets and their values: <code>style = {opacity: 0.8}</code></td></tr>
+        <tr id="E-SYNTAX-0013"><td><code>E-SYNTAX-0013</code></td><td>error</td><td><code>style = {...}</code> is given to a component called by its name: <code>Button(&quot;Save&quot;, style = {...})</code></td></tr>
+        <tr id="E-SYNTAX-0014"><td><code>E-SYNTAX-0014</code></td><td>error</td><td><code>style</code> lists properties of the component&#x27;s style by name: <code>{opacity: 0.8}</code></td></tr>
+        <tr id="E-SYNTAX-0015"><td><code>E-SYNTAX-0015</code></td><td>error</td><td><code>on</code> takes the states and what each changes: <code>on: {hover: {opacity: 0.8}}</code></td></tr>
+        <tr id="E-SYNTAX-0016"><td><code>E-SYNTAX-0016</code></td><td>error</td><td>a rule selects components by variant (<code>kind&lt;Button&gt;().variant(&quot;primary&quot;)</code>); it cannot ask for one</td></tr>
+        <tr id="E-SYNTAX-0017"><td><code>E-SYNTAX-0017</code></td><td>error</td><td><code>variant</code> lists the variants to apply by name: <code>variant: [primary, big]</code></td></tr>
+        <tr id="E-SYNTAX-0018"><td><code>E-SYNTAX-0018</code></td><td>error</td><td>only modules can be declared internal</td></tr>
+        <tr id="E-SYNTAX-0019"><td><code>E-SYNTAX-0019</code></td><td>error</td><td>functions cannot be declared at the top level</td></tr>
+        <tr id="E-SYNTAX-0020"><td><code>E-SYNTAX-0020</code></td><td>error</td><td>let declarations are not allowed at the top level</td></tr>
+        <tr id="E-SYNTAX-0021"><td><code>E-SYNTAX-0021</code></td><td>error</td><td>const declarations are not allowed at the top level</td></tr>
+        <tr id="E-SYNTAX-0022"><td><code>E-SYNTAX-0022</code></td><td>error</td><td>components cannot be declared at the top level</td></tr>
+        <tr id="E-SYNTAX-0023"><td><code>E-SYNTAX-0023</code></td><td>error</td><td>types cannot be declared at the top level</td></tr>
+        <tr id="E-SYNTAX-0024"><td><code>E-SYNTAX-0024</code></td><td>error</td><td>structs cannot be declared at the top level</td></tr>
+        <tr id="E-SYNTAX-0025"><td><code>E-SYNTAX-0025</code></td><td>error</td><td>enums cannot be declared at the top level</td></tr>
+        <tr id="E-SYNTAX-0026"><td><code>E-SYNTAX-0026</code></td><td>error</td><td>unions cannot be declared at the top level</td></tr>
+        <tr id="E-SYNTAX-0027"><td><code>E-SYNTAX-0027</code></td><td>error</td><td>interfaces cannot be declared at the top level</td></tr>
+        <tr id="E-SYNTAX-0028"><td><code>E-SYNTAX-0028</code></td><td>error</td><td>datatypes cannot be declared at the top level</td></tr>
+        <tr id="E-SYNTAX-0029"><td><code>E-SYNTAX-0029</code></td><td>error</td><td>services cannot be declared at the top level</td></tr>
+        <tr id="E-SYNTAX-0030"><td><code>E-SYNTAX-0030</code></td><td>error</td><td>views cannot be declared at the top level</td></tr>
+        <tr id="E-SYNTAX-0031"><td><code>E-SYNTAX-0031</code></td><td>error</td><td>styles cannot be declared at the top level</td></tr>
+        <tr id="E-SYNTAX-0032"><td><code>E-SYNTAX-0032</code></td><td>error</td><td>invalid declaration</td></tr>
+        <tr id="E-SYNTAX-0033"><td><code>E-SYNTAX-0033</code></td><td>error</td><td>unexpected <span class="diag-hole">%s</span> at top level</td></tr>
+        <tr id="E-SYNTAX-0034"><td><code>E-SYNTAX-0034</code></td><td>error</td><td>module declarations require a name</td></tr>
+        <tr id="E-SYNTAX-0035"><td><code>E-SYNTAX-0035</code></td><td>error</td><td>check suites cannot be internal</td></tr>
+        <tr id="E-SYNTAX-0036"><td><code>E-SYNTAX-0036</code></td><td>error</td><td>check suites cannot be partial</td></tr>
+        <tr id="E-SYNTAX-0037"><td><code>E-SYNTAX-0037</code></td><td>error</td><td>check suites require a quoted name</td></tr>
+        <tr id="E-SYNTAX-0038"><td><code>E-SYNTAX-0038</code></td><td>error</td><td>unterminated <span class="diag-hole">%s</span> body</td></tr>
+        <tr id="E-SYNTAX-0039"><td><code>E-SYNTAX-0039</code></td><td>error</td><td>property accessors must use the &#x27;def&#x27; keyword</td></tr>
+        <tr id="E-SYNTAX-0040"><td><code>E-SYNTAX-0040</code></td><td>error</td><td>duplicate <span class="diag-hole">%s</span> accessor</td></tr>
+        <tr id="E-SYNTAX-0041"><td><code>E-SYNTAX-0041</code></td><td>error</td><td>unexpected <span class="diag-hole">%s</span> in property body</td></tr>
+        <tr id="E-SYNTAX-0042"><td><code>E-SYNTAX-0042</code></td><td>error</td><td>unterminated property body</td></tr>
+        <tr id="E-SYNTAX-0043"><td><code>E-SYNTAX-0043</code></td><td>error</td><td>property storage declarations require a type or initializer</td></tr>
+        <tr id="E-SYNTAX-0044"><td><code>E-SYNTAX-0044</code></td><td>error</td><td>nested properties are not allowed</td></tr>
+        <tr id="E-SYNTAX-0045"><td><code>E-SYNTAX-0045</code></td><td>error</td><td>only get/set accessors are allowed inside property bodies</td></tr>
+        <tr id="E-SYNTAX-0046"><td><code>E-SYNTAX-0046</code></td><td>error</td><td>property accessors cannot be async</td></tr>
+        <tr id="E-SYNTAX-0047"><td><code>E-SYNTAX-0047</code></td><td>error</td><td>property accessors cannot be meta</td></tr>
+        <tr id="E-SYNTAX-0048"><td><code>E-SYNTAX-0048</code></td><td>error</td><td>property accessors cannot be infix</td></tr>
+        <tr id="E-SYNTAX-0049"><td><code>E-SYNTAX-0049</code></td><td>error</td><td>property accessors require bodies</td></tr>
+        <tr id="E-SYNTAX-0050"><td><code>E-SYNTAX-0050</code></td><td>error</td><td>get accessor cannot declare parameters</td></tr>
+        <tr id="E-SYNTAX-0051"><td><code>E-SYNTAX-0051</code></td><td>error</td><td>set accessor requires exactly one parameter</td></tr>
+        <tr id="E-SYNTAX-0052"><td><code>E-SYNTAX-0052</code></td><td>error</td><td>views cannot have attributes</td></tr>
+        <tr id="E-SYNTAX-0053"><td><code>E-SYNTAX-0053</code></td><td>error</td><td>styles cannot have attributes</td></tr>
+        <tr id="E-SYNTAX-0054"><td><code>E-SYNTAX-0054</code></td><td>error</td><td>export declarations cannot have attributes</td></tr>
+        <tr id="E-SYNTAX-0055"><td><code>E-SYNTAX-0055</code></td><td>error</td><td>use declarations cannot have attributes</td></tr>
+        <tr id="E-SYNTAX-0056"><td><code>E-SYNTAX-0056</code></td><td>error</td><td><span class="diag-hole">%s</span> do not support where blocks</td></tr>
+        <tr id="E-SYNTAX-0057"><td><code>E-SYNTAX-0057</code></td><td>error</td><td>where blocks cannot have attributes</td></tr>
+        <tr id="E-SYNTAX-0058"><td><code>E-SYNTAX-0058</code></td><td>error</td><td><span class="diag-hole">%s</span> do not support <span class="diag-hole">%s</span> declarations</td></tr>
+        <tr id="E-SYNTAX-0059"><td><code>E-SYNTAX-0059</code></td><td>error</td><td>embedded structs cannot have attributes</td></tr>
+        <tr id="E-SYNTAX-0060"><td><code>E-SYNTAX-0060</code></td><td>error</td><td>expected a declaration, found keyword <span class="diag-hole">%q</span>; it cannot be used as a name</td></tr>
+        <tr id="E-SYNTAX-0061"><td><code>E-SYNTAX-0061</code></td><td>error</td><td><span class="diag-hole">%s</span> bodies only allow declarations; unexpected <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SYNTAX-0062"><td><code>E-SYNTAX-0062</code></td><td>error</td><td>unterminated where block</td></tr>
+        <tr id="E-SYNTAX-0063"><td><code>E-SYNTAX-0063</code></td><td>error</td><td><span class="diag-hole">%s</span> bodies cannot declare methods; use a type instead</td></tr>
+        <tr id="E-SYNTAX-0064"><td><code>E-SYNTAX-0064</code></td><td>error</td><td>services cannot declare <span class="diag-hole">%s</span> methods</td></tr>
+        <tr id="E-SYNTAX-0065"><td><code>E-SYNTAX-0065</code></td><td>error</td><td><span class="diag-hole">%s</span> methods cannot be internal</td></tr>
+        <tr id="E-SYNTAX-0066"><td><code>E-SYNTAX-0066</code></td><td>error</td><td><span class="diag-hole">%s</span> do not support infix methods</td></tr>
+        <tr id="E-SYNTAX-0067"><td><code>E-SYNTAX-0067</code></td><td>error</td><td>infix methods cannot be internal</td></tr>
+        <tr id="E-SYNTAX-0068"><td><code>E-SYNTAX-0068</code></td><td>error</td><td>infix methods cannot be async</td></tr>
+        <tr id="E-SYNTAX-0069"><td><code>E-SYNTAX-0069</code></td><td>error</td><td>function declarations without bodies are only allowed inside modules</td></tr>
+        <tr id="E-SYNTAX-0070"><td><code>E-SYNTAX-0070</code></td><td>error</td><td><span class="diag-hole">%s</span> declarations require a type or initializer</td></tr>
+        <tr id="E-SYNTAX-0071"><td><code>E-SYNTAX-0071</code></td><td>error</td><td><span class="diag-hole">%s</span> bodies cannot declare properties; use a type instead</td></tr>
+        <tr id="E-SYNTAX-0072"><td><code>E-SYNTAX-0072</code></td><td>error</td><td>property declarations require a single identifier</td></tr>
+        <tr id="E-SYNTAX-0073"><td><code>E-SYNTAX-0073</code></td><td>error</td><td>properties cannot be marked atomic</td></tr>
+        <tr id="E-SYNTAX-0074"><td><code>E-SYNTAX-0074</code></td><td>error</td><td>properties cannot be marked weak</td></tr>
+        <tr id="E-SYNTAX-0075"><td><code>E-SYNTAX-0075</code></td><td>error</td><td><span class="diag-hole">%s</span> properties cannot be internal</td></tr>
+        <tr id="E-SYNTAX-0076"><td><code>E-SYNTAX-0076</code></td><td>error</td><td><span class="diag-hole">%s</span> members cannot be internal</td></tr>
+        <tr id="E-SYNTAX-0077"><td><code>E-SYNTAX-0077</code></td><td>error</td><td>a <code>let</code> of a style body is set once and would keep the theme it was made with: read <code>theme</code> where the property is assigned (<code>background = new BackgroundFill(theme.palette.surface)</code>)</td></tr>
+        <tr id="E-SYNTAX-0078"><td><code>E-SYNTAX-0078</code></td><td>error</td><td><code>on</code> takes the states and what each changes: <code>on = {hover: {opacity: 0.8}}</code></td></tr>
+        <tr id="E-SYNTAX-0079"><td><code>E-SYNTAX-0079</code></td><td>error</td><td><code><span class="diag-hole">%s</span></code> takes the properties to change and their values: <code><span class="diag-hole">%s</span> = {opacity: 0.0}</code></td></tr>
+        <tr id="E-SYNTAX-0080"><td><code>E-SYNTAX-0080</code></td><td>error</td><td><code><span class="diag-hole">%s</span></code> is written twice in this style</td></tr>
+        <tr id="E-SYNTAX-0081"><td><code>E-SYNTAX-0081</code></td><td>error</td><td><code>$</code> is followed by the name of a component: <code>$parent</code>, <code>$root</code>, <code>$prev</code>, <code>$next</code> or a <code>ref</code> of the view</td></tr>
+        <tr id="E-SYNTAX-0082"><td><code>E-SYNTAX-0082</code></td><td>error</td><td><code>$<span class="diag-hole">%s</span></code> names a <code>ref</code> of a component&#x27;s view, which only the component&#x27;s own <code>style { ... }</code> sees; a style declared apart reads <code>$parent</code>, <code>$root</code>, <code>$prev</code> and <code>$next</code></td></tr>
+        <tr id="E-SYNTAX-0083"><td><code>E-SYNTAX-0083</code></td><td>error</td><td><code>self</code> in a style body is the component whose own <code>style { ... }</code> it is; a style declared apart has none</td></tr>
+        <tr id="E-SYNTAX-0084"><td><code>E-SYNTAX-0084</code></td><td>error</td><td>a patch lists properties of the style by name: <code>{opacity: 0.0}</code></td></tr>
+        <tr id="E-SYNTAX-0085"><td><code>E-SYNTAX-0085</code></td><td>error</td><td>a state takes the properties it changes: <code>hover: {opacity: 0.8}</code></td></tr>
+        <tr id="E-SYNTAX-0086"><td><code>E-SYNTAX-0086</code></td><td>error</td><td>a state lists properties of the style by name: <code>{opacity: 0.8}</code></td></tr>
+        <tr id="E-SYNTAX-0087"><td><code>E-SYNTAX-0087</code></td><td>error</td><td>a state cannot ask for variants: <code>variant</code> is set by the style&#x27;s body, by code or by the call</td></tr>
+        <tr id="E-SYNTAX-0088"><td><code>E-SYNTAX-0088</code></td><td>error</td><td>a variant is a name and the properties it sets: <code>big: {minHeight: 40(px)}</code></td></tr>
+        <tr id="E-SYNTAX-0089"><td><code>E-SYNTAX-0089</code></td><td>error</td><td>a variant lists properties of the style by name: <code>{minHeight: 40(px)}</code></td></tr>
+        <tr id="E-SYNTAX-0090"><td><code>E-SYNTAX-0090</code></td><td>error</td><td>a variant cannot ask for variants: <code>variant</code> is set by the style&#x27;s body, by code or by the call</td></tr>
+        <tr id="E-SYNTAX-0091"><td><code>E-SYNTAX-0091</code></td><td>error</td><td>a key of <code>on</code> is a state, or a list of states that all hold: <code>hover</code> or <code>[hover, selected]</code></td></tr>
+        <tr id="E-SYNTAX-0092"><td><code>E-SYNTAX-0092</code></td><td>error</td><td>component bodies cannot contain attributes</td></tr>
+        <tr id="E-SYNTAX-0093"><td><code>E-SYNTAX-0093</code></td><td>error</td><td>types cannot have attributes</td></tr>
+        <tr id="E-SYNTAX-0094"><td><code>E-SYNTAX-0094</code></td><td>error</td><td>unexpected <span class="diag-hole">%s</span> in component body</td></tr>
+        <tr id="E-SYNTAX-0095"><td><code>E-SYNTAX-0095</code></td><td>error</td><td>unterminated component body</td></tr>
+        <tr id="E-SYNTAX-0096"><td><code>E-SYNTAX-0096</code></td><td>error</td><td>inline component views must be declared as view { ... }</td></tr>
+        <tr id="E-SYNTAX-0097"><td><code>E-SYNTAX-0097</code></td><td>error</td><td>inline component styles must be declared as style { ... }</td></tr>
+        <tr id="E-SYNTAX-0098"><td><code>E-SYNTAX-0098</code></td><td>error</td><td>inline component controllers must be declared as type { ... }</td></tr>
+        <tr id="E-SYNTAX-0099"><td><code>E-SYNTAX-0099</code></td><td>error</td><td>type alias requires a target type</td></tr>
+        <tr id="E-SYNTAX-0100"><td><code>E-SYNTAX-0100</code></td><td>error</td><td>type aliases cannot be partial</td></tr>
+        <tr id="E-SYNTAX-0101"><td><code>E-SYNTAX-0101</code></td><td>error</td><td>unions cannot have attributes</td></tr>
+        <tr id="E-SYNTAX-0102"><td><code>E-SYNTAX-0102</code></td><td>error</td><td>interfaces cannot have attributes</td></tr>
+        <tr id="E-SYNTAX-0103"><td><code>E-SYNTAX-0103</code></td><td>error</td><td>datatypes cannot have attributes</td></tr>
+        <tr id="E-SYNTAX-0104"><td><code>E-SYNTAX-0104</code></td><td>error</td><td>enum values cannot have attributes</td></tr>
+        <tr id="E-SYNTAX-0105"><td><code>E-SYNTAX-0105</code></td><td>error</td><td>union variants cannot have attributes</td></tr>
+        <tr id="E-SYNTAX-0106"><td><code>E-SYNTAX-0106</code></td><td>error</td><td>interface methods cannot have attributes</td></tr>
+        <tr id="E-SYNTAX-0107"><td><code>E-SYNTAX-0107</code></td><td>error</td><td>exported modules cannot be aliased</td></tr>
+        <tr id="E-SYNTAX-0108"><td><code>E-SYNTAX-0108</code></td><td>error</td><td>exported symbols cannot be aliased</td></tr>
+        <tr id="E-SYNTAX-0109"><td><code>E-SYNTAX-0109</code></td><td>error</td><td>wildcard import cannot be combined with named symbols</td></tr>
+        <tr id="E-SYNTAX-0110"><td><code>E-SYNTAX-0110</code></td><td>error</td><td>unexpected tokens after wildcard import</td></tr>
+        <tr id="E-SYNTAX-0111"><td><code>E-SYNTAX-0111</code></td><td>error</td><td>expected &#x27;,&#x27; between imported symbols</td></tr>
+        <tr id="E-SYNTAX-0112"><td><code>E-SYNTAX-0112</code></td><td>error</td><td>unterminated block</td></tr>
+        <tr id="E-SYNTAX-0113"><td><code>E-SYNTAX-0113</code></td><td>error</td><td>unterminated check block</td></tr>
+        <tr id="E-SYNTAX-0114"><td><code>E-SYNTAX-0114</code></td><td>error</td><td>attributes can only be applied to declarations inside check suites</td></tr>
+        <tr id="E-SYNTAX-0115"><td><code>E-SYNTAX-0115</code></td><td>error</td><td>weak applies to fields only</td></tr>
+        <tr id="E-SYNTAX-0116"><td><code>E-SYNTAX-0116</code></td><td>error</td><td>function declarations without bodies cannot use cuda modifier</td></tr>
+        <tr id="E-SYNTAX-0117"><td><code>E-SYNTAX-0117</code></td><td>error</td><td>function declarations without bodies cannot use sql modifier</td></tr>
+        <tr id="E-SYNTAX-0118"><td><code>E-SYNTAX-0118</code></td><td>error</td><td>function declarations without bodies cannot use meta modifier</td></tr>
+        <tr id="E-SYNTAX-0119"><td><code>E-SYNTAX-0119</code></td><td>error</td><td>function declarations without bodies cannot be infix</td></tr>
+        <tr id="E-SYNTAX-0120"><td><code>E-SYNTAX-0120</code></td><td>error</td><td><span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SYNTAX-0121"><td><code>E-SYNTAX-0121</code></td><td>error</td><td>expected &#x27;,&#x27; between parameters</td></tr>
+        <tr id="E-SYNTAX-0122"><td><code>E-SYNTAX-0122</code></td><td>error</td><td>variadic parameter requires a type</td></tr>
+        <tr id="E-SYNTAX-0123"><td><code>E-SYNTAX-0123</code></td><td>error</td><td>parameter default value requires an expression</td></tr>
+        <tr id="E-SYNTAX-0124"><td><code>E-SYNTAX-0124</code></td><td>error</td><td>variadic parameter must be last</td></tr>
+        <tr id="E-SYNTAX-0125"><td><code>E-SYNTAX-0125</code></td><td>error</td><td>parameter requires a type (or a default value)</td></tr>
+        <tr id="E-SYNTAX-0126"><td><code>E-SYNTAX-0126</code></td><td>error</td><td>destructuring let requires initializer</td></tr>
+        <tr id="E-SYNTAX-0127"><td><code>E-SYNTAX-0127</code></td><td>error</td><td>expected identifier in destructuring let</td></tr>
+        <tr id="E-SYNTAX-0128"><td><code>E-SYNTAX-0128</code></td><td>error</td><td>expected identifier after &#x27;as&#x27;</td></tr>
+        <tr id="E-SYNTAX-0129"><td><code>E-SYNTAX-0129</code></td><td>error</td><td>expected &#x27;,&#x27; between declarations</td></tr>
+        <tr id="E-SYNTAX-0130"><td><code>E-SYNTAX-0130</code></td><td>error</td><td>expected identifier in declaration</td></tr>
+        <tr id="E-SYNTAX-0131"><td><code>E-SYNTAX-0131</code></td><td>error</td><td>expected identifier</td></tr>
+        <tr id="E-SYNTAX-0132"><td><code>E-SYNTAX-0132</code></td><td>error</td><td>expected &#x27;,&#x27; or &#x27;)&#x27;</td></tr>
+        <tr id="E-SYNTAX-0133"><td><code>E-SYNTAX-0133</code></td><td>error</td><td>expected a dimension after <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SYNTAX-0134"><td><code>E-SYNTAX-0134</code></td><td>error</td><td>a dimension&#x27;s exponent is an integer: Length ** 2</td></tr>
+        <tr id="E-SYNTAX-0135"><td><code>E-SYNTAX-0135</code></td><td>error</td><td>a conditional junction after <span class="diag-hole">%s</span> needs parentheses: write <code>a <span class="diag-hole">%s</span> (b := c || d)</code></td></tr>
+        <tr id="E-SYNTAX-0136"><td><code>E-SYNTAX-0136</code></td><td>error</td><td>conditional junction requires at least one expression</td></tr>
+        <tr id="E-SYNTAX-0137"><td><code>E-SYNTAX-0137</code></td><td>error</td><td>conditional junction cannot mix &amp;&amp; and || operators</td></tr>
+        <tr id="E-SYNTAX-0138"><td><code>E-SYNTAX-0138</code></td><td>error</td><td>conditional junction is malformed</td></tr>
+        <tr id="E-SYNTAX-0139"><td><code>E-SYNTAX-0139</code></td><td>error</td><td>choice operator requires expressions for both branches</td></tr>
+        <tr id="E-SYNTAX-0140"><td><code>E-SYNTAX-0140</code></td><td>error</td><td>expected &gt; after the scope of async&lt;scope&gt;</td></tr>
+        <tr id="E-SYNTAX-0141"><td><code>E-SYNTAX-0141</code></td><td>error</td><td>async call prefix expects a call expression</td></tr>
+        <tr id="E-SYNTAX-0142"><td><code>E-SYNTAX-0142</code></td><td>error</td><td>duplicate async call prefix</td></tr>
+        <tr id="E-SYNTAX-0143"><td><code>E-SYNTAX-0143</code></td><td>error</td><td>expected &#x27;,&#x27; between lambda parameters</td></tr>
+        <tr id="E-SYNTAX-0144"><td><code>E-SYNTAX-0144</code></td><td>error</td><td>expected &#x27;=&gt;&#x27; after lambda parameters</td></tr>
+        <tr id="E-SYNTAX-0145"><td><code>E-SYNTAX-0145</code></td><td>error</td><td>lambda requires an expression body</td></tr>
+        <tr id="E-SYNTAX-0146"><td><code>E-SYNTAX-0146</code></td><td>error</td><td>expected &#x27;=&gt;&#x27; after lambda parameter</td></tr>
+        <tr id="E-SYNTAX-0147"><td><code>E-SYNTAX-0147</code></td><td>error</td><td>expected expression in string interpolation</td></tr>
+        <tr id="E-SYNTAX-0148"><td><code>E-SYNTAX-0148</code></td><td>error</td><td>assert requires an expression</td></tr>
+        <tr id="E-SYNTAX-0149"><td><code>E-SYNTAX-0149</code></td><td>error</td><td>expected &#x27;,&#x27; between arguments</td></tr>
+        <tr id="E-SYNTAX-0150"><td><code>E-SYNTAX-0150</code></td><td>error</td><td>duplicate named argument <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-SYNTAX-0151"><td><code>E-SYNTAX-0151</code></td><td>error</td><td>positional arguments cannot follow named arguments</td></tr>
+        <tr id="E-SYNTAX-0152"><td><code>E-SYNTAX-0152</code></td><td>error</td><td>new expression requires a type</td></tr>
+        <tr id="E-SYNTAX-0153"><td><code>E-SYNTAX-0153</code></td><td>error</td><td>unexpected token <span class="diag-hole">%s</span> in array literal</td></tr>
+        <tr id="E-SYNTAX-0154"><td><code>E-SYNTAX-0154</code></td><td>error</td><td>type cast requires an expression</td></tr>
+        <tr id="E-SYNTAX-0155"><td><code>E-SYNTAX-0155</code></td><td>error</td><td>type cast expects exactly 1 argument, got <span class="diag-hole">%d</span></td></tr>
+        <tr id="E-SYNTAX-0156"><td><code>E-SYNTAX-0156</code></td><td>error</td><td>invalid escape <span class="diag-hole">%q</span> in a string: use \n, \t, \r, \\, \&quot;, \xHH, \uHHHH or \UHHHHHHHH</td></tr>
+        <tr id="E-SYNTAX-0157"><td><code>E-SYNTAX-0157</code></td><td>error</td><td>check suites are not allowed inside function bodies</td></tr>
+        <tr id="E-SYNTAX-0158"><td><code>E-SYNTAX-0158</code></td><td>error</td><td>unexpected token <span class="diag-hole">%q</span> in statement</td></tr>
+        <tr id="E-SYNTAX-0159"><td><code>E-SYNTAX-0159</code></td><td>error</td><td>duplicate every block</td></tr>
+        <tr id="E-SYNTAX-0160"><td><code>E-SYNTAX-0160</code></td><td>error</td><td>duplicate empty block</td></tr>
+        <tr id="E-SYNTAX-0161"><td><code>E-SYNTAX-0161</code></td><td>error</td><td>duplicate finish block</td></tr>
+        <tr id="E-SYNTAX-0162"><td><code>E-SYNTAX-0162</code></td><td>error</td><td>recover requires an expression</td></tr>
+        <tr id="E-SYNTAX-0163"><td><code>E-SYNTAX-0163</code></td><td>error</td><td>expected case or default clause</td></tr>
+        <tr id="E-SYNTAX-0164"><td><code>E-SYNTAX-0164</code></td><td>error</td><td>case requires at least one expression</td></tr>
+        <tr id="E-SYNTAX-0165"><td><code>E-SYNTAX-0165</code></td><td>error</td><td>match case requires at least one pattern</td></tr>
+        <tr id="E-SYNTAX-0166"><td><code>E-SYNTAX-0166</code></td><td>error</td><td>invalid match pattern</td></tr>
+        <tr id="E-SYNTAX-0167"><td><code>E-SYNTAX-0167</code></td><td>error</td><td>expected &#x27;,&#x27; between struct pattern fields</td></tr>
+        <tr id="E-SYNTAX-0168"><td><code>E-SYNTAX-0168</code></td><td>error</td><td>invalid tuple pattern element</td></tr>
+        <tr id="E-SYNTAX-0169"><td><code>E-SYNTAX-0169</code></td><td>error</td><td>defer requires a call expression</td></tr>
+        <tr id="E-SYNTAX-0170"><td><code>E-SYNTAX-0170</code></td><td>error</td><td>yield requires a value</td></tr>
+        <tr id="E-SYNTAX-0171"><td><code>E-SYNTAX-0171</code></td><td>error</td><td>send statement requires a value</td></tr>
+        <tr id="E-SYNTAX-0172"><td><code>E-SYNTAX-0172</code></td><td>error</td><td>dispose requires an expression</td></tr>
+        <tr id="E-SYNTAX-0173"><td><code>E-SYNTAX-0173</code></td><td>error</td><td>expected identifier for onerror binding</td></tr>
+        <tr id="E-SYNTAX-0174"><td><code>E-SYNTAX-0174</code></td><td>error</td><td>expected type for onerror binding</td></tr>
+        <tr id="E-SYNTAX-0175"><td><code>E-SYNTAX-0175</code></td><td>error</td><td>union requires a type on the right-hand side</td></tr>
+        <tr id="E-SYNTAX-0176"><td><code>E-SYNTAX-0176</code></td><td>error</td><td>intersection requires a type on the right-hand side</td></tr>
+        <tr id="E-SYNTAX-0177"><td><code>E-SYNTAX-0177</code></td><td>error</td><td>reserved keyword <span class="diag-hole">%q</span> cannot be used as an identifier</td></tr>
+        <tr id="E-SYNTAX-0178"><td><code>E-SYNTAX-0178</code></td><td>error</td><td>unexpected token <span class="diag-hole">%q</span> in expression</td></tr>
+      </table>
+    </section>
+
+    <section class="docs-section" id="area-name">
+      <h2>Names</h2>
+      <p>Names, declarations, imports and overloads. 35 codes.</p>
+      <table class="docs-table diag-table">
+        <tr id="E-NAME-0001"><td><code>E-NAME-0001</code></td><td>error</td><td>partial type <span class="diag-hole">%q</span> cannot be an alias</td></tr>
+        <tr id="E-NAME-0002"><td><code>E-NAME-0002</code></td><td>error</td><td>partial type <span class="diag-hole">%q</span> must repeat the generic parameter list of its other parts</td></tr>
+        <tr id="E-NAME-0003"><td><code>E-NAME-0003</code></td><td>error</td><td>embedded style <span class="diag-hole">%q</span> redeclares <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-NAME-0004"><td><code>E-NAME-0004</code></td><td>error</td><td>controller member <span class="diag-hole">%q</span> conflicts with existing <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-NAME-0005"><td><code>E-NAME-0005</code></td><td>error</td><td>internal scope <span class="diag-hole">%q</span> must be a namespace that contains module <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-NAME-0006"><td><code>E-NAME-0006</code></td><td>error</td><td>module <span class="diag-hole">%q</span> is internal to <span class="diag-hole">%s</span> in another file; every internal part must name the same scope</td></tr>
+        <tr id="E-NAME-0007"><td><code>E-NAME-0007</code></td><td>error</td><td><span class="diag-hole">%q</span> is internal to module <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-NAME-0008"><td><code>E-NAME-0008</code></td><td>error</td><td>module <span class="diag-hole">%q</span> has no symbol <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-NAME-0009"><td><code>E-NAME-0009</code></td><td>error</td><td>mixed partial and non-partial definitions for <span class="diag-hole">%s</span> <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-NAME-0010"><td><code>E-NAME-0010</code></td><td>error</td><td>duplicate pattern binding <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-NAME-0011"><td><code>E-NAME-0011</code></td><td>error</td><td>undefined identifier <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-NAME-0012"><td><code>E-NAME-0012</code></td><td>error</td><td>module <span class="diag-hole">%q</span> is reserved for the standard library</td></tr>
+        <tr id="E-NAME-0013"><td><code>E-NAME-0013</code></td><td>error</td><td>application <span class="diag-hole">%q</span> is missing def new entrypoint</td></tr>
+        <tr id="E-NAME-0014"><td><code>E-NAME-0014</code></td><td>error</td><td>unknown module <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-NAME-0015"><td><code>E-NAME-0015</code></td><td>error</td><td>module <span class="diag-hole">%q</span> is internal to <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-NAME-0016"><td><code>E-NAME-0016</code></td><td>error</td><td>module <span class="diag-hole">%q</span> is internal to library <span class="diag-hole">%q</span>; it exports <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-NAME-0017"><td><code>E-NAME-0017</code></td><td>error</td><td>cannot alias module <span class="diag-hole">%q</span> when importing symbols</td></tr>
+        <tr id="E-NAME-0018"><td><code>E-NAME-0018</code></td><td>error</td><td>undefined identifier <span class="diag-hole">%q</span>; declare the loop variable with <code>for let <span class="diag-hole">%s</span> in ...</code></td></tr>
+        <tr id="E-NAME-0019"><td><code>E-NAME-0019</code></td><td>error</td><td>unknown controller type <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-NAME-0020"><td><code>E-NAME-0020</code></td><td>error</td><td>@on target <span class="diag-hole">%q</span>.<span class="diag-hole">%s</span> is ambiguous (overloaded); overload selection is not supported in @on</td></tr>
+        <tr id="E-NAME-0021"><td><code>E-NAME-0021</code></td><td>error</td><td>duplicate field <span class="diag-hole">%q</span> in struct pattern</td></tr>
+        <tr id="E-NAME-0022"><td><code>E-NAME-0022</code></td><td>error</td><td>unknown builtin primitive <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-NAME-0023"><td><code>E-NAME-0023</code></td><td>error</td><td>duplicate union variant <span class="diag-hole">%q</span> (previously at <span class="diag-hole">%d</span>:<span class="diag-hole">%d</span>)</td></tr>
+        <tr id="E-NAME-0024"><td><code>E-NAME-0024</code></td><td>error</td><td>duplicate interface method <span class="diag-hole">%q</span> (previously at <span class="diag-hole">%d</span>:<span class="diag-hole">%d</span>)</td></tr>
+        <tr id="E-NAME-0025"><td><code>E-NAME-0025</code></td><td>error</td><td>unknown type <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-NAME-0026"><td><code>E-NAME-0026</code></td><td>error</td><td>unknown module alias <span class="diag-hole">%q</span> (add <code>use &lt;module&gt;</code> to import it)</td></tr>
+        <tr id="E-NAME-0027"><td><code>E-NAME-0027</code></td><td>error</td><td>where constraint references unknown generic <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-NAME-0028"><td><code>E-NAME-0028</code></td><td>error</td><td>unknown initializer field <span class="diag-hole">%q</span> on <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-NAME-0029"><td><code>E-NAME-0029</code></td><td>error</td><td>duplicate enum value <span class="diag-hole">%q</span> (previously at <span class="diag-hole">%d</span>:<span class="diag-hole">%d</span>)</td></tr>
+        <tr id="E-NAME-0030"><td><code>E-NAME-0030</code></td><td>error</td><td>unknown function <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-NAME-0031"><td><code>E-NAME-0031</code></td><td>error</td><td>ambiguous overload of <span class="diag-hole">%q</span> for arguments (<span class="diag-hole">%s</span>); candidates: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-NAME-0032"><td><code>E-NAME-0032</code></td><td>error</td><td>unknown named argument <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-NAME-0033"><td><code>E-NAME-0033</code></td><td>error</td><td>ambiguous overload of <span class="diag-hole">%q</span> for argument (<span class="diag-hole">%s</span>) on <span class="diag-hole">%s</span>; candidates: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-NAME-0034"><td><code>E-NAME-0034</code></td><td>error</td><td>duplicate field <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-NAME-0035"><td><code>E-NAME-0035</code></td><td>error</td><td>unknown field <span class="diag-hole">%q</span> in struct literal</td></tr>
+      </table>
+    </section>
+
+    <section class="docs-section" id="area-type">
+      <h2>Types</h2>
+      <p>Types, expressions and statements. 203 codes.</p>
+      <table class="docs-table diag-table">
+        <tr id="E-TYPE-0001"><td><code>E-TYPE-0001</code></td><td>error</td><td><span class="diag-hole">%s</span> is only valid inside functions</td></tr>
+        <tr id="E-TYPE-0002"><td><code>E-TYPE-0002</code></td><td>error</td><td>datatype fields cannot be marked weak</td></tr>
+        <tr id="E-TYPE-0003"><td><code>E-TYPE-0003</code></td><td>error</td><td>a field cannot be both atomic and weak</td></tr>
+        <tr id="E-TYPE-0004"><td><code>E-TYPE-0004</code></td><td>error</td><td>weak field must declare an optional reference type (?T)</td></tr>
+        <tr id="E-TYPE-0005"><td><code>E-TYPE-0005</code></td><td>error</td><td>weak field must have an optional reference type (?T), got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0006"><td><code>E-TYPE-0006</code></td><td>error</td><td>the default of <span class="diag-hole">%q</span> cannot name <span class="diag-hole">%q</span>: a default is evaluated before the instance exists; assign the field in the constructor (<code>def new()</code>)</td></tr>
+        <tr id="E-TYPE-0007"><td><code>E-TYPE-0007</code></td><td>error</td><td>&#x27;<span class="diag-hole">%s</span>&#x27; names <span class="diag-hole">%d</span> functions; give the variable the function type of the one meant</td></tr>
+        <tr id="E-TYPE-0008"><td><code>E-TYPE-0008</code></td><td>error</td><td>array element type mismatch: got <span class="diag-hole">%s</span>, want <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0009"><td><code>E-TYPE-0009</code></td><td>error</td><td>initializer count mismatch: got <span class="diag-hole">%d</span> values for <span class="diag-hole">%d</span> names</td></tr>
+        <tr id="E-TYPE-0010"><td><code>E-TYPE-0010</code></td><td>error</td><td>tuple destructuring mismatch: got <span class="diag-hole">%d</span> bindings for <span class="diag-hole">%d</span> elements</td></tr>
+        <tr id="E-TYPE-0011"><td><code>E-TYPE-0011</code></td><td>error</td><td>destructuring let expects tuple or struct-like value, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0012"><td><code>E-TYPE-0012</code></td><td>error</td><td><span class="diag-hole">%s</span> has no field <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-TYPE-0013"><td><code>E-TYPE-0013</code></td><td>error</td><td>condition must be bool, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0014"><td><code>E-TYPE-0014</code></td><td>error</td><td>break statement requires enclosing loop</td></tr>
+        <tr id="E-TYPE-0015"><td><code>E-TYPE-0015</code></td><td>error</td><td>continue is not allowed inside select</td></tr>
+        <tr id="E-TYPE-0016"><td><code>E-TYPE-0016</code></td><td>error</td><td>continue statement requires enclosing loop</td></tr>
+        <tr id="E-TYPE-0017"><td><code>E-TYPE-0017</code></td><td>error</td><td>defer does not support onerror handlers</td></tr>
+        <tr id="E-TYPE-0018"><td><code>E-TYPE-0018</code></td><td>error</td><td>dispose expects a struct/type instance, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0019"><td><code>E-TYPE-0019</code></td><td>error</td><td>multi-assignment only supports &#x27;=&#x27;</td></tr>
+        <tr id="E-TYPE-0020"><td><code>E-TYPE-0020</code></td><td>error</td><td>multi-assignment requires at least 1 target and 1 value</td></tr>
+        <tr id="E-TYPE-0021"><td><code>E-TYPE-0021</code></td><td>error</td><td>multi-assignment gives <span class="diag-hole">%d</span> targets one value; unpack a tuple with <code>(a, b) = value</code></td></tr>
+        <tr id="E-TYPE-0022"><td><code>E-TYPE-0022</code></td><td>error</td><td>multi-assignment requires the same number of targets and values (<span class="diag-hole">%d</span> vs <span class="diag-hole">%d</span>)</td></tr>
+        <tr id="E-TYPE-0023"><td><code>E-TYPE-0023</code></td><td>error</td><td>function <span class="diag-hole">%q</span> cannot be declared inside a function body; write <code>let <span class="diag-hole">%s</span> = def (...) { ... }</code>, or declare it in the module</td></tr>
+        <tr id="E-TYPE-0024"><td><code>E-TYPE-0024</code></td><td>error</td><td>a tuple of targets only supports &#x27;=&#x27;</td></tr>
+        <tr id="E-TYPE-0025"><td><code>E-TYPE-0025</code></td><td>error</td><td>cannot unpack <span class="diag-hole">%s</span> into <span class="diag-hole">%d</span> targets; the value is not a tuple</td></tr>
+        <tr id="E-TYPE-0026"><td><code>E-TYPE-0026</code></td><td>error</td><td>cannot unpack a tuple of <span class="diag-hole">%d</span> elements into <span class="diag-hole">%d</span> targets</td></tr>
+        <tr id="E-TYPE-0027"><td><code>E-TYPE-0027</code></td><td>error</td><td>the result may be an error and is dropped; use try, handle it with onerror, or discard it with _ =</td></tr>
+        <tr id="E-TYPE-0028"><td><code>E-TYPE-0028</code></td><td>error</td><td>missing return</td></tr>
+        <tr id="E-TYPE-0029"><td><code>E-TYPE-0029</code></td><td>error</td><td>range loop binding cannot use destructuring</td></tr>
+        <tr id="E-TYPE-0030"><td><code>E-TYPE-0030</code></td><td>error</td><td>range loop binding type must be int, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0031"><td><code>E-TYPE-0031</code></td><td>error</td><td>range loop requires exactly 1 binding name</td></tr>
+        <tr id="E-TYPE-0032"><td><code>E-TYPE-0032</code></td><td>error</td><td>range loop binding cannot be const</td></tr>
+        <tr id="E-TYPE-0033"><td><code>E-TYPE-0033</code></td><td>error</td><td>range loop binding must be int, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0034"><td><code>E-TYPE-0034</code></td><td>error</td><td>range loop binding must be an identifier</td></tr>
+        <tr id="E-TYPE-0035"><td><code>E-TYPE-0035</code></td><td>error</td><td>every block requires enclosing loop</td></tr>
+        <tr id="E-TYPE-0036"><td><code>E-TYPE-0036</code></td><td>error</td><td>for-in binds a value, or a key and a value, got <span class="diag-hole">%d</span> names</td></tr>
+        <tr id="E-TYPE-0037"><td><code>E-TYPE-0037</code></td><td>error</td><td><span class="diag-hole">%s</span> has no index or key to bind: write <code>(_, value)</code> or a single name (two names never destructure the element)</td></tr>
+        <tr id="E-TYPE-0038"><td><code>E-TYPE-0038</code></td><td>error</td><td>switch default clause cannot have expressions</td></tr>
+        <tr id="E-TYPE-0039"><td><code>E-TYPE-0039</code></td><td>error</td><td>switch case must be bool, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0040"><td><code>E-TYPE-0040</code></td><td>error</td><td>switch case type mismatch: got <span class="diag-hole">%s</span>, want <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0041"><td><code>E-TYPE-0041</code></td><td>error</td><td>switch guard must be bool, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0042"><td><code>E-TYPE-0042</code></td><td>error</td><td>select default clause cannot have expressions</td></tr>
+        <tr id="E-TYPE-0043"><td><code>E-TYPE-0043</code></td><td>error</td><td>select guard must be bool, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0044"><td><code>E-TYPE-0044</code></td><td>error</td><td>match case pattern <span class="diag-hole">%d</span> missing binding <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-TYPE-0045"><td><code>E-TYPE-0045</code></td><td>error</td><td>match guard must be bool, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0046"><td><code>E-TYPE-0046</code></td><td>error</td><td><span class="diag-hole">%s</span> is a value, and a case of match names a type or a pattern: use switch to compare values</td></tr>
+        <tr id="E-TYPE-0047"><td><code>E-TYPE-0047</code></td><td>error</td><td>match pattern type mismatch: got <span class="diag-hole">%s</span>, want <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0048"><td><code>E-TYPE-0048</code></td><td>error</td><td><code>.<span class="diag-hole">%s</span></code> reads an element of a tuple; this is <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0049"><td><code>E-TYPE-0049</code></td><td>error</td><td><code>.<span class="diag-hole">%s</span></code> is not a position in a tuple; write it without leading zeros</td></tr>
+        <tr id="E-TYPE-0050"><td><code>E-TYPE-0050</code></td><td>error</td><td><span class="diag-hole">%s</span> has <span class="diag-hole">%d</span> elements, <code>.0</code> to <code>.<span class="diag-hole">%d</span></code></td></tr>
+        <tr id="E-TYPE-0051"><td><code>E-TYPE-0051</code></td><td>error</td><td>tuple pattern type mismatch: got <span class="diag-hole">%s</span>, want tuple</td></tr>
+        <tr id="E-TYPE-0052"><td><code>E-TYPE-0052</code></td><td>error</td><td>tuple pattern arity mismatch: got <span class="diag-hole">%d</span>, want <span class="diag-hole">%d</span></td></tr>
+        <tr id="E-TYPE-0053"><td><code>E-TYPE-0053</code></td><td>error</td><td>previous use of <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-TYPE-0054"><td><code>E-TYPE-0054</code></td><td>error</td><td>struct pattern type mismatch: got <span class="diag-hole">%s</span>, want struct-like type</td></tr>
+        <tr id="E-TYPE-0055"><td><code>E-TYPE-0055</code></td><td>error</td><td>struct pattern field <span class="diag-hole">%q</span> type mismatch: got <span class="diag-hole">%s</span>, want <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0056"><td><code>E-TYPE-0056</code></td><td>error</td><td>map expects 2 type arguments (key, value)</td></tr>
+        <tr id="E-TYPE-0057"><td><code>E-TYPE-0057</code></td><td>error</td><td>array expects 1 type argument, got <span class="diag-hole">%d</span></td></tr>
+        <tr id="E-TYPE-0058"><td><code>E-TYPE-0058</code></td><td>error</td><td><span class="diag-hole">%s</span> expects <span class="diag-hole">%d</span> type arguments, got <span class="diag-hole">%d</span></td></tr>
+        <tr id="E-TYPE-0059"><td><code>E-TYPE-0059</code></td><td>error</td><td>type argument <span class="diag-hole">%d</span> does not satisfy bound: got <span class="diag-hole">%s</span>, want <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0060"><td><code>E-TYPE-0060</code></td><td>error</td><td><span class="diag-hole">%s</span> is not a generic type</td></tr>
+        <tr id="E-TYPE-0061"><td><code>E-TYPE-0061</code></td><td>error</td><td>union variant <span class="diag-hole">%q</span> requires a type</td></tr>
+        <tr id="E-TYPE-0062"><td><code>E-TYPE-0062</code></td><td>error</td><td>embedded type <span class="diag-hole">%q</span> is not an interface</td></tr>
+        <tr id="E-TYPE-0063"><td><code>E-TYPE-0063</code></td><td>error</td><td>recursive interface embedding of <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0064"><td><code>E-TYPE-0064</code></td><td>error</td><td>previously seen <span class="diag-hole">%s</span> here</td></tr>
+        <tr id="E-TYPE-0065"><td><code>E-TYPE-0065</code></td><td>error</td><td>recursive datatype embedding of <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0066"><td><code>E-TYPE-0066</code></td><td>error</td><td>identifier <span class="diag-hole">%q</span> is not a type</td></tr>
+        <tr id="E-TYPE-0067"><td><code>E-TYPE-0067</code></td><td>error</td><td>qualified type must use imported module alias (e.g. <code>use std.reflection</code> then <code>reflection.MetaContext</code>)</td></tr>
+        <tr id="E-TYPE-0068"><td><code>E-TYPE-0068</code></td><td>error</td><td>module <span class="diag-hole">%q</span> symbol <span class="diag-hole">%q</span> is not a type</td></tr>
+        <tr id="E-TYPE-0069"><td><code>E-TYPE-0069</code></td><td>error</td><td>module <span class="diag-hole">%q</span> has no type <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-TYPE-0070"><td><code>E-TYPE-0070</code></td><td>error</td><td><span class="diag-hole">%s</span> <span class="diag-hole">%q</span> is internal to <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0071"><td><code>E-TYPE-0071</code></td><td>error</td><td><span class="diag-hole">%s</span> <span class="diag-hole">%q</span> is internal</td></tr>
+        <tr id="E-TYPE-0072"><td><code>E-TYPE-0072</code></td><td>error</td><td>property <span class="diag-hole">%q</span> is write-only (missing get accessor)</td></tr>
+        <tr id="E-TYPE-0073"><td><code>E-TYPE-0073</code></td><td>error</td><td>compound assignment to property <span class="diag-hole">%q</span> requires both get and set accessors</td></tr>
+        <tr id="E-TYPE-0074"><td><code>E-TYPE-0074</code></td><td>error</td><td>property <span class="diag-hole">%q</span> is read-only (missing set accessor)</td></tr>
+        <tr id="E-TYPE-0075"><td><code>E-TYPE-0075</code></td><td>error</td><td>cannot assign to const <span class="diag-hole">%q</span>; a const keeps the value it was declared with</td></tr>
+        <tr id="E-TYPE-0076"><td><code>E-TYPE-0076</code></td><td>error</td><td>an element of a tuple cannot be assigned; make a new tuple</td></tr>
+        <tr id="E-TYPE-0077"><td><code>E-TYPE-0077</code></td><td>error</td><td>a tuple of targets stands alone on the left of &#x27;=&#x27;: <code>(a, b) = value</code></td></tr>
+        <tr id="E-TYPE-0078"><td><code>E-TYPE-0078</code></td><td>error</td><td>where blocks require a generic declaration</td></tr>
+        <tr id="E-TYPE-0079"><td><code>E-TYPE-0079</code></td><td>error</td><td>where blocks require generic parameters</td></tr>
+        <tr id="E-TYPE-0080"><td><code>E-TYPE-0080</code></td><td>error</td><td>where block requires a constraint expression</td></tr>
+        <tr id="E-TYPE-0081"><td><code>E-TYPE-0081</code></td><td>error</td><td>where constraint must target a generic parameter</td></tr>
+        <tr id="E-TYPE-0082"><td><code>E-TYPE-0082</code></td><td>error</td><td>where constraint must compare a generic parameter with a type</td></tr>
+        <tr id="E-TYPE-0083"><td><code>E-TYPE-0083</code></td><td>error</td><td>where constraint parameters must match (<span class="diag-hole">%s</span> vs <span class="diag-hole">%s</span>)</td></tr>
+        <tr id="E-TYPE-0084"><td><code>E-TYPE-0084</code></td><td>error</td><td>unsupported where constraint expression</td></tr>
+        <tr id="E-TYPE-0085"><td><code>E-TYPE-0085</code></td><td>error</td><td>binary operands must match: <span class="diag-hole">%s</span> vs <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0086"><td><code>E-TYPE-0086</code></td><td>error</td><td><span class="diag-hole">%s</span> must be int, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0087"><td><code>E-TYPE-0087</code></td><td>error</td><td>try requires errorable return type</td></tr>
+        <tr id="E-TYPE-0088"><td><code>E-TYPE-0088</code></td><td>error</td><td>try requires errorable return type, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0089"><td><code>E-TYPE-0089</code></td><td>error</td><td><span class="diag-hole">%s</span> requires function to return an errorable type</td></tr>
+        <tr id="E-TYPE-0090"><td><code>E-TYPE-0090</code></td><td>error</td><td><span class="diag-hole">%s</span> requires errorable return type, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0091"><td><code>E-TYPE-0091</code></td><td>error</td><td>onerror binding requires exactly 1 name</td></tr>
+        <tr id="E-TYPE-0092"><td><code>E-TYPE-0092</code></td><td>error</td><td>onerror binding type must be error, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0093"><td><code>E-TYPE-0093</code></td><td>error</td><td><span class="diag-hole">%s</span>: use try to unwrap <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0094"><td><code>E-TYPE-0094</code></td><td>error</td><td><span class="diag-hole">%s</span>: optional value <span class="diag-hole">%s</span> requires explicit none handling</td></tr>
+        <tr id="E-TYPE-0095"><td><code>E-TYPE-0095</code></td><td>error</td><td><span class="diag-hole">%s</span>: <span class="diag-hole">%s</span> does not satisfy datatype <span class="diag-hole">%s</span><span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0096"><td><code>E-TYPE-0096</code></td><td>error</td><td><span class="diag-hole">%s</span> type mismatch: got <span class="diag-hole">%s</span>, want <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0097"><td><code>E-TYPE-0097</code></td><td>error</td><td><span class="diag-hole">%s</span> is a type, not a value</td></tr>
+        <tr id="E-TYPE-0098"><td><code>E-TYPE-0098</code></td><td>error</td><td>is: <span class="diag-hole">%s</span> is error or <span class="diag-hole">%s</span>; test one of those, or use try to unwrap it</td></tr>
+        <tr id="E-TYPE-0099"><td><code>E-TYPE-0099</code></td><td>error</td><td>is comparison requires a type on the right</td></tr>
+        <tr id="E-TYPE-0100"><td><code>E-TYPE-0100</code></td><td>error</td><td><span class="diag-hole">%s</span> is not compatible with datatype <span class="diag-hole">%s</span><span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0101"><td><code>E-TYPE-0101</code></td><td>error</td><td><span class="diag-hole">%s</span> does not implement interface <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0102"><td><code>E-TYPE-0102</code></td><td>error</td><td>spread (...) is only allowed in call arguments</td></tr>
+        <tr id="E-TYPE-0103"><td><code>E-TYPE-0103</code></td><td>error</td><td>unary operator <span class="diag-hole">%q</span> expects numeric operand, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0104"><td><code>E-TYPE-0104</code></td><td>error</td><td>unary operator <span class="diag-hole">%q</span> expects bool or integral operand, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0105"><td><code>E-TYPE-0105</code></td><td>error</td><td>unary operator <span class="diag-hole">%q</span> expects integral operand, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0106"><td><code>E-TYPE-0106</code></td><td>error</td><td>a range is not a value: <code>a..b</code> is only the header of a loop, <code>for let i in a..b</code></td></tr>
+        <tr id="E-TYPE-0107"><td><code>E-TYPE-0107</code></td><td>error</td><td>in expects array or map container, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0108"><td><code>E-TYPE-0108</code></td><td>error</td><td>in operand type mismatch: got <span class="diag-hole">%s</span>, want <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0109"><td><code>E-TYPE-0109</code></td><td>error</td><td>in on an array of <span class="diag-hole">%s</span> is not supported; use .includes(x), which compares with ==</td></tr>
+        <tr id="E-TYPE-0110"><td><code>E-TYPE-0110</code></td><td>error</td><td><span class="diag-hole">%s</span> values cannot be compared with <span class="diag-hole">%s</span>: the type defines no infix <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0111"><td><code>E-TYPE-0111</code></td><td>error</td><td>tuples cannot be compared with <span class="diag-hole">%s</span>; compare their members</td></tr>
+        <tr id="E-TYPE-0112"><td><code>E-TYPE-0112</code></td><td>error</td><td>operator <span class="diag-hole">%s</span> is not defined on arrays (<span class="diag-hole">%s</span>); matrix arithmetic is on matrix&lt;T&gt;</td></tr>
+        <tr id="E-TYPE-0113"><td><code>E-TYPE-0113</code></td><td>error</td><td>tuple literal requires at least one element</td></tr>
+        <tr id="E-TYPE-0114"><td><code>E-TYPE-0114</code></td><td>error</td><td>type cast requires a value, e.g. byte[](text)</td></tr>
+        <tr id="E-TYPE-0115"><td><code>E-TYPE-0115</code></td><td>error</td><td>cannot cast <span class="diag-hole">%s</span> to <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0116"><td><code>E-TYPE-0116</code></td><td>error</td><td>try expects errorable expression, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0117"><td><code>E-TYPE-0117</code></td><td>error</td><td>choice condition must be bool</td></tr>
+        <tr id="E-TYPE-0118"><td><code>E-TYPE-0118</code></td><td>error</td><td>assert requires bool, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0119"><td><code>E-TYPE-0119</code></td><td>error</td><td><span class="diag-hole">%s</span> has no member <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-TYPE-0120"><td><code>E-TYPE-0120</code></td><td>error</td><td>could not parse expression</td></tr>
+        <tr id="E-TYPE-0121"><td><code>E-TYPE-0121</code></td><td>error</td><td>onerror handler requires errorable <span class="diag-hole">%s</span>, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0122"><td><code>E-TYPE-0122</code></td><td>error</td><td>onerror handler must recover or fail</td></tr>
+        <tr id="E-TYPE-0123"><td><code>E-TYPE-0123</code></td><td>error</td><td>onerror handler must recover</td></tr>
+        <tr id="E-TYPE-0124"><td><code>E-TYPE-0124</code></td><td>error</td><td>conditional member <span class="diag-hole">%q</span> has inconsistent types: <span class="diag-hole">%s</span> vs <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0125"><td><code>E-TYPE-0125</code></td><td>error</td><td><code>new(...)</code> names no type and nothing declared here takes the value: write the type, new T(...)</td></tr>
+        <tr id="E-TYPE-0126"><td><code>E-TYPE-0126</code></td><td>error</td><td>cannot instantiate <span class="diag-hole">%s</span> <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0127"><td><code>E-TYPE-0127</code></td><td>error</td><td>type <span class="diag-hole">%s</span> has no constructor; use named arguments to initialize members</td></tr>
+        <tr id="E-TYPE-0128"><td><code>E-TYPE-0128</code></td><td>error</td><td>cannot slice map types</td></tr>
+        <tr id="E-TYPE-0129"><td><code>E-TYPE-0129</code></td><td>error</td><td>index must be <span class="diag-hole">%s</span>, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0130"><td><code>E-TYPE-0130</code></td><td>error</td><td>map literal entries must specify a value</td></tr>
+        <tr id="E-TYPE-0131"><td><code>E-TYPE-0131</code></td><td>error</td><td>cannot slice non-sliceable type <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0132"><td><code>E-TYPE-0132</code></td><td>error</td><td>cannot index non-indexable type <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0133"><td><code>E-TYPE-0133</code></td><td>error</td><td>recursive embedding of <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0134"><td><code>E-TYPE-0134</code></td><td>error</td><td>conflicting field <span class="diag-hole">%q</span> types: <span class="diag-hole">%s</span> vs <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0135"><td><code>E-TYPE-0135</code></td><td>error</td><td>previous definition of <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-TYPE-0136"><td><code>E-TYPE-0136</code></td><td>error</td><td>datatype fields cannot be marked atomic</td></tr>
+        <tr id="E-TYPE-0137"><td><code>E-TYPE-0137</code></td><td>error</td><td>an enum value is a constant: a number, another member, a const, or arithmetic over those</td></tr>
+        <tr id="E-TYPE-0138"><td><code>E-TYPE-0138</code></td><td>error</td><td>cannot modify const <span class="diag-hole">%q</span>; its value is frozen (clone() it for a copy you can change)</td></tr>
+        <tr id="E-TYPE-0139"><td><code>E-TYPE-0139</code></td><td>error</td><td>cannot modify const <span class="diag-hole">%q</span>: <span class="diag-hole">%s</span> changes it in place (clone() it for a copy you can change)</td></tr>
+        <tr id="E-TYPE-0140"><td><code>E-TYPE-0140</code></td><td>error</td><td>variadic parameter cannot declare multiple names</td></tr>
+        <tr id="E-TYPE-0141"><td><code>E-TYPE-0141</code></td><td>error</td><td>variadic parameters cannot have default values</td></tr>
+        <tr id="E-TYPE-0142"><td><code>E-TYPE-0142</code></td><td>error</td><td>this literal has no type here: write its type (<code>Type{...}</code>, <code>map&lt;K, V&gt;{...}</code>)</td></tr>
+        <tr id="E-TYPE-0143"><td><code>E-TYPE-0143</code></td><td>error</td><td>cannot call <span class="diag-hole">%s</span>: the element is not a function</td></tr>
+        <tr id="E-TYPE-0144"><td><code>E-TYPE-0144</code></td><td>error</td><td>union variant constructors do not accept type arguments</td></tr>
+        <tr id="E-TYPE-0145"><td><code>E-TYPE-0145</code></td><td>error</td><td>union variant constructors do not accept named arguments</td></tr>
+        <tr id="E-TYPE-0146"><td><code>E-TYPE-0146</code></td><td>error</td><td>union <span class="diag-hole">%q</span> has no variant <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-TYPE-0147"><td><code>E-TYPE-0147</code></td><td>error</td><td>union variant constructor <span class="diag-hole">%q</span> expects 1 argument, got <span class="diag-hole">%d</span></td></tr>
+        <tr id="E-TYPE-0148"><td><code>E-TYPE-0148</code></td><td>error</td><td>a literal without a type cannot be converted: write <span class="diag-hole">%s</span>{...}</td></tr>
+        <tr id="E-TYPE-0149"><td><code>E-TYPE-0149</code></td><td>error</td><td><span class="diag-hole">%s</span>.<span class="diag-hole">%s</span> does not take arguments</td></tr>
+        <tr id="E-TYPE-0150"><td><code>E-TYPE-0150</code></td><td>error</td><td>cannot dispatch method on non-named receiver of type <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0151"><td><code>E-TYPE-0151</code></td><td>error</td><td><span class="diag-hole">%s</span> has no method <span class="diag-hole">%q</span>; <span class="diag-hole">%q</span> is a field or local here and shadows module <span class="diag-hole">%s</span>, so call <span class="diag-hole">%s</span>.<span class="diag-hole">%s</span> outside the type or through a helper</td></tr>
+        <tr id="E-TYPE-0152"><td><code>E-TYPE-0152</code></td><td>error</td><td>cannot call non-function</td></tr>
+        <tr id="E-TYPE-0153"><td><code>E-TYPE-0153</code></td><td>error</td><td>named arguments require a direct function call</td></tr>
+        <tr id="E-TYPE-0154"><td><code>E-TYPE-0154</code></td><td>error</td><td><span class="diag-hole">%q</span> is not callable</td></tr>
+        <tr id="E-TYPE-0155"><td><code>E-TYPE-0155</code></td><td>error</td><td>no overload of <span class="diag-hole">%q</span> matches arguments (<span class="diag-hole">%s</span>); candidates: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0156"><td><code>E-TYPE-0156</code></td><td>error</td><td>named arguments are not supported for variadic functions</td></tr>
+        <tr id="E-TYPE-0157"><td><code>E-TYPE-0157</code></td><td>error</td><td>call argument count mismatch: got <span class="diag-hole">%d</span>, want <span class="diag-hole">%d</span></td></tr>
+        <tr id="E-TYPE-0158"><td><code>E-TYPE-0158</code></td><td>error</td><td>argument <span class="diag-hole">%q</span> is provided more than once</td></tr>
+        <tr id="E-TYPE-0159"><td><code>E-TYPE-0159</code></td><td>error</td><td>missing argument <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-TYPE-0160"><td><code>E-TYPE-0160</code></td><td>error</td><td>missing argument <span class="diag-hole">%d</span></td></tr>
+        <tr id="E-TYPE-0161"><td><code>E-TYPE-0161</code></td><td>error</td><td>no overload of <span class="diag-hole">%q</span> matches argument (<span class="diag-hole">%s</span>) on <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0162"><td><code>E-TYPE-0162</code></td><td>error</td><td>lambda parameters cannot be variadic or have default values</td></tr>
+        <tr id="E-TYPE-0163"><td><code>E-TYPE-0163</code></td><td>error</td><td>lambda parameter requires a type (or must be used in a typed context)</td></tr>
+        <tr id="E-TYPE-0164"><td><code>E-TYPE-0164</code></td><td>error</td><td>argument <span class="diag-hole">%d</span> type mismatch: got <span class="diag-hole">%s</span>, want bigint</td></tr>
+        <tr id="E-TYPE-0165"><td><code>E-TYPE-0165</code></td><td>error</td><td>multiple spread (...) arguments are not supported</td></tr>
+        <tr id="E-TYPE-0166"><td><code>E-TYPE-0166</code></td><td>error</td><td>spread (...) requires a variadic function</td></tr>
+        <tr id="E-TYPE-0167"><td><code>E-TYPE-0167</code></td><td>error</td><td>spread (...) must be the final argument</td></tr>
+        <tr id="E-TYPE-0168"><td><code>E-TYPE-0168</code></td><td>error</td><td>spread (...) must appear after fixed arguments</td></tr>
+        <tr id="E-TYPE-0169"><td><code>E-TYPE-0169</code></td><td>error</td><td>call argument count mismatch: got <span class="diag-hole">%d</span>, want at least <span class="diag-hole">%d</span></td></tr>
+        <tr id="E-TYPE-0170"><td><code>E-TYPE-0170</code></td><td>error</td><td>spread (...) expects an array argument, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0171"><td><code>E-TYPE-0171</code></td><td>error</td><td>fail inside an onerror handler needs an errorable enclosing function; recover here, or declare the function&#x27;s result as !T</td></tr>
+        <tr id="E-TYPE-0172"><td><code>E-TYPE-0172</code></td><td>error</td><td>fail requires errorable return type</td></tr>
+        <tr id="E-TYPE-0173"><td><code>E-TYPE-0173</code></td><td>error</td><td>fail requires errorable return type, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0174"><td><code>E-TYPE-0174</code></td><td>error</td><td>return needs a value: the function returns <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0175"><td><code>E-TYPE-0175</code></td><td>error</td><td>function has no return value</td></tr>
+        <tr id="E-TYPE-0176"><td><code>E-TYPE-0176</code></td><td>error</td><td>recover is only allowed inside call onerror handlers</td></tr>
+        <tr id="E-TYPE-0177"><td><code>E-TYPE-0177</code></td><td>error</td><td>dispose cannot declare a result</td></tr>
+        <tr id="E-TYPE-0178"><td><code>E-TYPE-0178</code></td><td>error</td><td>a matrix size in the type must be an integer known at compile time; use matrix&lt;T&gt;[].size(rows, cols) for sizes computed at run time</td></tr>
+        <tr id="E-TYPE-0179"><td><code>E-TYPE-0179</code></td><td>error</td><td>matrix product <span class="diag-hole">%s</span> * <span class="diag-hole">%s</span>: the columns of the left (<span class="diag-hole">%d</span>) must equal the rows of the right (<span class="diag-hole">%d</span>)</td></tr>
+        <tr id="E-TYPE-0180"><td><code>E-TYPE-0180</code></td><td>error</td><td>matrix <span class="diag-hole">%s</span> needs equal shapes, got <span class="diag-hole">%s</span> and <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0181"><td><code>E-TYPE-0181</code></td><td>error</td><td>matrix literal row <span class="diag-hole">%d</span> has <span class="diag-hole">%d</span> values, row 0 has <span class="diag-hole">%d</span>; the rows of a matrix must have the same length</td></tr>
+        <tr id="E-TYPE-0182"><td><code>E-TYPE-0182</code></td><td>error</td><td>matrix cell type mismatch: got <span class="diag-hole">%s</span>, want <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0183"><td><code>E-TYPE-0183</code></td><td>error</td><td>matrix literal is <span class="diag-hole">%d</span>×<span class="diag-hole">%d</span>, the type <span class="diag-hole">%s</span> is <span class="diag-hole">%d</span>×<span class="diag-hole">%d</span></td></tr>
+        <tr id="E-TYPE-0184"><td><code>E-TYPE-0184</code></td><td>error</td><td>cannot infer the type arguments of <span class="diag-hole">%s</span> from this <code>new</code>: nothing declared takes the value and the constructor&#x27;s arguments do not settle them; write them: new <span class="diag-hole">%s</span>&lt;...&gt;(...)</td></tr>
+        <tr id="E-TYPE-0185"><td><code>E-TYPE-0185</code></td><td>error</td><td>property <span class="diag-hole">%q</span> has inconsistent types: <span class="diag-hole">%s</span> vs <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0186"><td><code>E-TYPE-0186</code></td><td>error</td><td>property <span class="diag-hole">%q</span> <span class="diag-hole">%s</span> accessor type mismatch: got <span class="diag-hole">%s</span>, want <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0187"><td><code>E-TYPE-0187</code></td><td>error</td><td>property <span class="diag-hole">%q</span> get accessor must declare a return type</td></tr>
+        <tr id="E-TYPE-0188"><td><code>E-TYPE-0188</code></td><td>error</td><td>property <span class="diag-hole">%q</span> set accessor cannot declare a return type</td></tr>
+        <tr id="E-TYPE-0189"><td><code>E-TYPE-0189</code></td><td>error</td><td>property <span class="diag-hole">%q</span> set accessor requires a parameter</td></tr>
+        <tr id="E-TYPE-0190"><td><code>E-TYPE-0190</code></td><td>error</td><td>property <span class="diag-hole">%q</span> set accessor parameter must declare a type</td></tr>
+        <tr id="E-TYPE-0191"><td><code>E-TYPE-0191</code></td><td>error</td><td>property <span class="diag-hole">%q</span> storage type mismatch: got <span class="diag-hole">%s</span>, want <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0192"><td><code>E-TYPE-0192</code></td><td>error</td><td><span class="diag-hole">%s</span>: <span class="diag-hole">%s</span> holds <span class="diag-hole">%d</span> bits and <span class="diag-hole">%s</span> holds <span class="diag-hole">%d</span>; a bitcast needs vectors of the same size</td></tr>
+        <tr id="E-TYPE-0193"><td><code>E-TYPE-0193</code></td><td>error</td><td>cannot infer struct literal type for generic <span class="diag-hole">%s</span>; use <span class="diag-hole">%s</span>{...} or specify type arguments</td></tr>
+        <tr id="E-TYPE-0194"><td><code>E-TYPE-0194</code></td><td>error</td><td>field <span class="diag-hole">%q</span> of an anonymous struct takes its type from its value: write the value&#x27;s type (<code>Type{...}</code>, <code>struct { ... }</code>, <code>map&lt;K, V&gt;{...}</code>)</td></tr>
+        <tr id="E-TYPE-0195"><td><code>E-TYPE-0195</code></td><td>error</td><td>field <span class="diag-hole">%q</span> of an anonymous struct takes its type from its value, and <code>none</code> has none: declare a struct with an optional field</td></tr>
+        <tr id="E-TYPE-0196"><td><code>E-TYPE-0196</code></td><td>error</td><td>struct spread expects struct type, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0197"><td><code>E-TYPE-0197</code></td><td>error</td><td>cannot assign spread field <span class="diag-hole">%q</span> of type <span class="diag-hole">%s</span> to <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0198"><td><code>E-TYPE-0198</code></td><td>error</td><td>struct literal keys must be identifiers</td></tr>
+        <tr id="E-TYPE-0199"><td><code>E-TYPE-0199</code></td><td>error</td><td>struct literal entries must specify a value</td></tr>
+        <tr id="E-TYPE-0200"><td><code>E-TYPE-0200</code></td><td>error</td><td>Permission spec must name a type</td></tr>
+        <tr id="E-TYPE-0201"><td><code>E-TYPE-0201</code></td><td>error</td><td>cannot assign <span class="diag-hole">%s</span> to field <span class="diag-hole">%q</span> of type <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-TYPE-0202"><td><code>E-TYPE-0202</code></td><td>error</td><td>where constraints must reference types</td></tr>
+        <tr id="W-TYPE-0001"><td><code>W-TYPE-0001</code></td><td>warning</td><td><span class="diag-hole">%s</span> is deprecated<span class="diag-hole">%s</span></td></tr>
+      </table>
+    </section>
+
+    <section class="docs-section" id="area-async">
+      <h2>Async</h2>
+      <p>async, await, generators, channels and tasks. 40 codes.</p>
+      <table class="docs-table diag-table">
+        <tr id="E-ASYNC-0001"><td><code>E-ASYNC-0001</code></td><td>error</td><td>send expects channel&lt;T&gt;, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-ASYNC-0002"><td><code>E-ASYNC-0002</code></td><td>error</td><td>mutating iterated map <span class="diag-hole">%q</span> inside forall is not allowed</td></tr>
+        <tr id="E-ASYNC-0003"><td><code>E-ASYNC-0003</code></td><td>error</td><td>forall does not support C-style loop headers; use <code>forall let ... in ...</code></td></tr>
+        <tr id="E-ASYNC-0004"><td><code>E-ASYNC-0004</code></td><td>error</td><td>forall requires a range-style header: <code>forall let ... in &lt;iterable&gt;</code></td></tr>
+        <tr id="E-ASYNC-0005"><td><code>E-ASYNC-0005</code></td><td>error</td><td>forall requires <code>let</code> bindings in the header</td></tr>
+        <tr id="E-ASYNC-0006"><td><code>E-ASYNC-0006</code></td><td>error</td><td>forall bindings cannot have initializers; use <code>forall let ... in ...</code></td></tr>
+        <tr id="E-ASYNC-0007"><td><code>E-ASYNC-0007</code></td><td>error</td><td>forall currently supports ranges, arrays, strings, maps, and channels; got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-ASYNC-0008"><td><code>E-ASYNC-0008</code></td><td>error</td><td>for-in expects an array, map, string, channel, or a type with <code>def iterate() ?T</code> (builtin.Iterator), got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-ASYNC-0009"><td><code>E-ASYNC-0009</code></td><td>error</td><td>select case expects channel, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-ASYNC-0010"><td><code>E-ASYNC-0010</code></td><td>error</td><td><span class="diag-hole">%s</span>: await async <span class="diag-hole">%s</span> to use <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-ASYNC-0011"><td><code>E-ASYNC-0011</code></td><td>error</td><td>receive expects channel&lt;T&gt;, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-ASYNC-0012"><td><code>E-ASYNC-0012</code></td><td>error</td><td>future boolean composition requires both operands to be async: <span class="diag-hole">%s</span> vs <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-ASYNC-0013"><td><code>E-ASYNC-0013</code></td><td>error</td><td>await expects async value, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-ASYNC-0014"><td><code>E-ASYNC-0014</code></td><td>error</td><td>await expects an async value, and this returns nothing: the call is not async, so it has finished when it returns; remove the await</td></tr>
+        <tr id="E-ASYNC-0015"><td><code>E-ASYNC-0015</code></td><td>error</td><td>async&lt;...&gt; expects an AsyncScope, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-ASYNC-0016"><td><code>E-ASYNC-0016</code></td><td>error</td><td>async call prefix requires a direct function call</td></tr>
+        <tr id="E-ASYNC-0017"><td><code>E-ASYNC-0017</code></td><td>error</td><td>async call prefix cannot be combined with onerror</td></tr>
+        <tr id="E-ASYNC-0018"><td><code>E-ASYNC-0018</code></td><td>error</td><td>async call prefix is not supported on union variant constructors</td></tr>
+        <tr id="E-ASYNC-0019"><td><code>E-ASYNC-0019</code></td><td>error</td><td>async call prefix is not supported on type conversions</td></tr>
+        <tr id="E-ASYNC-0020"><td><code>E-ASYNC-0020</code></td><td>error</td><td>future helpers do not accept type arguments</td></tr>
+        <tr id="E-ASYNC-0021"><td><code>E-ASYNC-0021</code></td><td>error</td><td>future helpers do not accept named arguments</td></tr>
+        <tr id="E-ASYNC-0022"><td><code>E-ASYNC-0022</code></td><td>error</td><td>future.<span class="diag-hole">%s</span> does not take arguments</td></tr>
+        <tr id="E-ASYNC-0023"><td><code>E-ASYNC-0023</code></td><td>error</td><td>future.keepAlive does not take arguments</td></tr>
+        <tr id="E-ASYNC-0024"><td><code>E-ASYNC-0024</code></td><td>error</td><td>future.cancel expects 0 or 1 arguments, got <span class="diag-hole">%d</span></td></tr>
+        <tr id="E-ASYNC-0025"><td><code>E-ASYNC-0025</code></td><td>error</td><td>future.cancel reason must be string, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-ASYNC-0026"><td><code>E-ASYNC-0026</code></td><td>error</td><td>future.timeout expects 1 argument, got <span class="diag-hole">%d</span></td></tr>
+        <tr id="E-ASYNC-0027"><td><code>E-ASYNC-0027</code></td><td>error</td><td>future.timeout expects duration, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-ASYNC-0028"><td><code>E-ASYNC-0028</code></td><td>error</td><td>future.scope expects 1 argument, got <span class="diag-hole">%d</span></td></tr>
+        <tr id="E-ASYNC-0029"><td><code>E-ASYNC-0029</code></td><td>error</td><td>future.scope expects an AsyncScope, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-ASYNC-0030"><td><code>E-ASYNC-0030</code></td><td>error</td><td>async prefix is not supported on component instantiation</td></tr>
+        <tr id="E-ASYNC-0031"><td><code>E-ASYNC-0031</code></td><td>error</td><td>fail is not allowed inside forall bodies</td></tr>
+        <tr id="E-ASYNC-0032"><td><code>E-ASYNC-0032</code></td><td>error</td><td>return is not allowed inside forall bodies</td></tr>
+        <tr id="E-ASYNC-0033"><td><code>E-ASYNC-0033</code></td><td>error</td><td>a generator ends with a bare return; it yields its values</td></tr>
+        <tr id="E-ASYNC-0034"><td><code>E-ASYNC-0034</code></td><td>error</td><td><span class="diag-hole">%s</span> cannot yield: a generator is a plain function that returns Iterator&lt;T&gt;</td></tr>
+        <tr id="E-ASYNC-0035"><td><code>E-ASYNC-0035</code></td><td>error</td><td>a generator cannot have <span class="diag-hole">%s</span> blocks</td></tr>
+        <tr id="E-ASYNC-0036"><td><code>E-ASYNC-0036</code></td><td>error</td><td>yield is only valid inside functions</td></tr>
+        <tr id="E-ASYNC-0037"><td><code>E-ASYNC-0037</code></td><td>error</td><td>yield needs a function that returns Iterator&lt;T&gt;</td></tr>
+        <tr id="E-ASYNC-0038"><td><code>E-ASYNC-0038</code></td><td>error</td><td>yield is not allowed inside forall bodies</td></tr>
+        <tr id="E-ASYNC-0039"><td><code>E-ASYNC-0039</code></td><td>error</td><td>yield is not allowed inside a transaction</td></tr>
+        <tr id="E-ASYNC-0040"><td><code>E-ASYNC-0040</code></td><td>error</td><td>a constructor cannot declare a result; <code>new</code> always yields the instance, so work that can fail belongs in a method or a factory function returning !T</td></tr>
+      </table>
+    </section>
+
+    <section class="docs-section" id="area-contract">
+      <h2>Contracts</h2>
+      <p>expects, provides and transactions. 17 codes.</p>
+      <table class="docs-table diag-table">
+        <tr id="E-CONTRACT-0001"><td><code>E-CONTRACT-0001</code></td><td>error</td><td>expects block cannot be guarded</td></tr>
+        <tr id="E-CONTRACT-0002"><td><code>E-CONTRACT-0002</code></td><td>error</td><td>provides block cannot be guarded</td></tr>
+        <tr id="E-CONTRACT-0003"><td><code>E-CONTRACT-0003</code></td><td>error</td><td>begin block cannot be guarded</td></tr>
+        <tr id="E-CONTRACT-0004"><td><code>E-CONTRACT-0004</code></td><td>error</td><td>rollback block cannot be guarded</td></tr>
+        <tr id="E-CONTRACT-0005"><td><code>E-CONTRACT-0005</code></td><td>error</td><td>expects block must appear at start of function body</td></tr>
+        <tr id="E-CONTRACT-0006"><td><code>E-CONTRACT-0006</code></td><td>error</td><td>provides block must appear at end of function body</td></tr>
+        <tr id="E-CONTRACT-0007"><td><code>E-CONTRACT-0007</code></td><td>error</td><td>begin block must appear before rollback block</td></tr>
+        <tr id="E-CONTRACT-0008"><td><code>E-CONTRACT-0008</code></td><td>error</td><td><span class="diag-hole">%s</span> block must be declared at function top level</td></tr>
+        <tr id="E-CONTRACT-0009"><td><code>E-CONTRACT-0009</code></td><td>error</td><td>expects block already declared in this function</td></tr>
+        <tr id="E-CONTRACT-0010"><td><code>E-CONTRACT-0010</code></td><td>error</td><td>provides block already declared in this function</td></tr>
+        <tr id="E-CONTRACT-0011"><td><code>E-CONTRACT-0011</code></td><td>error</td><td>begin block must be declared at function top level</td></tr>
+        <tr id="E-CONTRACT-0012"><td><code>E-CONTRACT-0012</code></td><td>error</td><td>begin block already declared in this function</td></tr>
+        <tr id="E-CONTRACT-0013"><td><code>E-CONTRACT-0013</code></td><td>error</td><td>rollback block must be declared at function top level</td></tr>
+        <tr id="E-CONTRACT-0014"><td><code>E-CONTRACT-0014</code></td><td>error</td><td>rollback block already declared in this function</td></tr>
+        <tr id="E-CONTRACT-0015"><td><code>E-CONTRACT-0015</code></td><td>error</td><td><span class="diag-hole">%s</span> block cannot reference outer local <span class="diag-hole">%q</span>; use parameters or heap/module state instead</td></tr>
+        <tr id="E-CONTRACT-0016"><td><code>E-CONTRACT-0016</code></td><td>error</td><td><span class="diag-hole">%s</span> blocks can only contain assert statements</td></tr>
+        <tr id="E-CONTRACT-0017"><td><code>E-CONTRACT-0017</code></td><td>error</td><td>rollback statement requires enclosing transaction</td></tr>
+      </table>
+    </section>
+
+    <section class="docs-section" id="area-service">
+      <h2>Services</h2>
+      <p>Services, events and <code>@remote</code>. 30 codes.</p>
+      <table class="docs-table diag-table">
+        <tr id="E-SERVICE-0001"><td><code>E-SERVICE-0001</code></td><td>error</td><td>service <span class="diag-hole">%q</span> does not satisfy ServiceDescriptor<span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SERVICE-0002"><td><code>E-SERVICE-0002</code></td><td>error</td><td>service <span class="diag-hole">%q</span> must declare <span class="diag-hole">%s</span> <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SERVICE-0003"><td><code>E-SERVICE-0003</code></td><td>error</td><td>services cannot declare <span class="diag-hole">%q</span>; service lifecycle is managed by the runtime</td></tr>
+        <tr id="E-SERVICE-0004"><td><code>E-SERVICE-0004</code></td><td>error</td><td>@emit methods cannot be async</td></tr>
+        <tr id="E-SERVICE-0005"><td><code>E-SERVICE-0005</code></td><td>error</td><td>@emit is only valid inside a service body or a component&#x27;s type</td></tr>
+        <tr id="E-SERVICE-0006"><td><code>E-SERVICE-0006</code></td><td>error</td><td>@<span class="diag-hole">%s</span> is only valid inside a service body</td></tr>
+        <tr id="E-SERVICE-0007"><td><code>E-SERVICE-0007</code></td><td>error</td><td>@emit immediate must be a bool literal</td></tr>
+        <tr id="E-SERVICE-0008"><td><code>E-SERVICE-0008</code></td><td>error</td><td>@query methods cannot be async</td></tr>
+        <tr id="E-SERVICE-0009"><td><code>E-SERVICE-0009</code></td><td>error</td><td>@on requires a service method reference (e.g. @on(Storage.open))</td></tr>
+        <tr id="E-SERVICE-0010"><td><code>E-SERVICE-0010</code></td><td>error</td><td>@on target must be a service or a component (e.g. Storage.open, Button.clicked)</td></tr>
+        <tr id="E-SERVICE-0011"><td><code>E-SERVICE-0011</code></td><td>error</td><td>@on target must name a method</td></tr>
+        <tr id="E-SERVICE-0012"><td><code>E-SERVICE-0012</code></td><td>error</td><td>@on target <span class="diag-hole">%q</span> has no method <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-SERVICE-0013"><td><code>E-SERVICE-0013</code></td><td>error</td><td>@on cannot observe @query methods (queries do not emit events)</td></tr>
+        <tr id="E-SERVICE-0014"><td><code>E-SERVICE-0014</code></td><td>error</td><td>@on target must be a @commit or @emit method</td></tr>
+        <tr id="E-SERVICE-0015"><td><code>E-SERVICE-0015</code></td><td>error</td><td>@on(<span class="diag-hole">%s</span>.<span class="diag-hole">%s</span>) hears a service: its handler takes <span class="diag-hole">%s</span>, not ComponentEvent (the envelope of a component&#x27;s events)</td></tr>
+        <tr id="E-SERVICE-0016"><td><code>E-SERVICE-0016</code></td><td>error</td><td>cannot instantiate service <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SERVICE-0017"><td><code>E-SERVICE-0017</code></td><td>error</td><td><code>@persist</code> cannot mark a field of service <span class="diag-hole">%s</span>: kept values are read from the vault, and <span class="diag-hole">%s</span> needs <span class="diag-hole">%s</span> started first</td></tr>
+        <tr id="E-SERVICE-0018"><td><code>E-SERVICE-0018</code></td><td>error</td><td><code>@persist</code> cannot mark a field of service <span class="diag-hole">%s</span>: it is the service that keeps the values</td></tr>
+        <tr id="E-SERVICE-0019"><td><code>E-SERVICE-0019</code></td><td>error</td><td>@remote applies to a type or struct that implements the interface</td></tr>
+        <tr id="E-SERVICE-0020"><td><code>E-SERVICE-0020</code></td><td>error</td><td>@remote names the interface it serves: @remote&lt;Interface&gt;</td></tr>
+        <tr id="E-SERVICE-0021"><td><code>E-SERVICE-0021</code></td><td>error</td><td>@remote&lt;<span class="diag-hole">%s</span>&gt;: <span class="diag-hole">%s</span> is not an interface</td></tr>
+        <tr id="E-SERVICE-0022"><td><code>E-SERVICE-0022</code></td><td>error</td><td>@remote&lt;<span class="diag-hole">%s</span>&gt;: <span class="diag-hole">%s</span> does not implement <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SERVICE-0023"><td><code>E-SERVICE-0023</code></td><td>error</td><td><span class="diag-hole">%s</span>: <span class="diag-hole">%s</span> is not an interface</td></tr>
+        <tr id="E-SERVICE-0025"><td><code>E-SERVICE-0025</code></td><td>error</td><td>method <span class="diag-hole">%s</span> is generic; a remote method takes and returns types both sides know</td></tr>
+        <tr id="E-SERVICE-0026"><td><code>E-SERVICE-0026</code></td><td>error</td><td>method <span class="diag-hole">%s</span> must be errorable (!<span class="diag-hole">%s</span>): a call that crosses to another process can always fail</td></tr>
+        <tr id="E-SERVICE-0027"><td><code>E-SERVICE-0027</code></td><td>error</td><td>method <span class="diag-hole">%s</span>: parameter <span class="diag-hole">%d</span> (<span class="diag-hole">%s</span>) cannot cross to another process: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SERVICE-0028"><td><code>E-SERVICE-0028</code></td><td>error</td><td>method <span class="diag-hole">%s</span>: its result <span class="diag-hole">%s</span> cannot cross to another process: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SERVICE-0029"><td><code>E-SERVICE-0029</code></td><td>error</td><td>IPC.connect&lt;<span class="diag-hole">%s</span>&gt;: <span class="diag-hole">%s</span> is not an interface</td></tr>
+        <tr id="E-SERVICE-0030"><td><code>E-SERVICE-0030</code></td><td>error</td><td>IPC.<span class="diag-hole">%s</span>: <span class="diag-hole">%s</span> is not marked @remote&lt;Interface&gt;; mark it for each interface it serves</td></tr>
+        <tr id="E-SERVICE-0031"><td><code>E-SERVICE-0031</code></td><td>error</td><td>service dependency cycle: <span class="diag-hole">%s</span></td></tr>
+      </table>
+    </section>
+
+    <section class="docs-section" id="area-ui">
+      <h2>UI</h2>
+      <p>Components, views and styles. 67 codes.</p>
+      <table class="docs-table diag-table">
+        <tr id="E-UI-0001"><td><code>E-UI-0001</code></td><td>error</td><td>component <span class="diag-hole">%q</span> must define a view block (inline or referenced)</td></tr>
+        <tr id="E-UI-0002"><td><code>E-UI-0002</code></td><td>error</td><td>component <span class="diag-hole">%q</span> must define a style block (inline or referenced)</td></tr>
+        <tr id="E-UI-0003"><td><code>E-UI-0003</code></td><td>error</td><td>component controller must be a type marked with @controller(), got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-UI-0004"><td><code>E-UI-0004</code></td><td>error</td><td>component controller type <span class="diag-hole">%q</span> must be marked with @controller()</td></tr>
+        <tr id="E-UI-0005"><td><code>E-UI-0005</code></td><td>error</td><td>controller <span class="diag-hole">%s</span> has the type parameters &lt;<span class="diag-hole">%s</span>&gt; and component <span class="diag-hole">%s</span> has &lt;<span class="diag-hole">%s</span>&gt;: a component&#x27;s controller declares the component&#x27;s own, in its order</td></tr>
+        <tr id="E-UI-0006"><td><code>E-UI-0006</code></td><td>error</td><td>weak field target must be a struct, type, service or component: a field of the kind <code>style</code> holds its style and has no weak form</td></tr>
+        <tr id="E-UI-0007"><td><code>E-UI-0007</code></td><td>error</td><td>weak field target must be a struct, type, service or component, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-UI-0008"><td><code>E-UI-0008</code></td><td>error</td><td>children() is reached a second time on the same run: the caller&#x27;s components have one place; put the two under the arms of one <code>if</code></td></tr>
+        <tr id="E-UI-0009"><td><code>E-UI-0009</code></td><td>error</td><td>children() stands in a loop: the caller&#x27;s components have one place; call it once, outside the loop</td></tr>
+        <tr id="E-UI-0010"><td><code>E-UI-0010</code></td><td>error</td><td>component <span class="diag-hole">%q</span> takes no block of components: its view never calls children(); add <code>children()</code> where they go in its view, or remove the block</td></tr>
+        <tr id="E-UI-0011"><td><code>E-UI-0011</code></td><td>error</td><td>an input of function type cannot be <code>bind = true</code>: a handler is called by the component, not assigned</td></tr>
+        <tr id="E-UI-0012"><td><code>E-UI-0012</code></td><td>error</td><td>a component has one value input: <span class="diag-hole">%q</span> is marked <code>@input(value = true)</code> too</td></tr>
+        <tr id="E-UI-0013"><td><code>E-UI-0013</code></td><td>error</td><td><code>@state</code> marks a field in the <code>type { ... }</code> of a component or in its <code>@controller()</code> type: a change of it is emitted as that component&#x27;s <code>UI.stateChange</code></td></tr>
+        <tr id="E-UI-0014"><td><code>E-UI-0014</code></td><td>error</td><td><code>@persist</code> marks a field of a <code>type</code>, a <code>service</code> or a component, and <span class="diag-hole">%s</span> is a struct: declare it <code>type <span class="diag-hole">%s</span></code> for its objects to start with the kept value</td></tr>
+        <tr id="E-UI-0015"><td><code>E-UI-0015</code></td><td>error</td><td><code>@persist</code> marks a field of a <code>type</code>, a <code>service</code> or a component: its value is kept between runs and is what the next object made starts with</td></tr>
+        <tr id="E-UI-0016"><td><code>E-UI-0016</code></td><td>error</td><td>children() takes no block: it places what the caller of the component wrote in its own</td></tr>
+        <tr id="E-UI-0017"><td><code>E-UI-0017</code></td><td>error</td><td>a placed view takes no block: what it shows is the view itself</td></tr>
+        <tr id="E-UI-0018"><td><code>E-UI-0018</code></td><td>error</td><td><span class="diag-hole">%q</span> is not a style property of <span class="diag-hole">%s</span>; mark it @styleProperty to use it outside the style</td></tr>
+        <tr id="E-UI-0019"><td><code>E-UI-0019</code></td><td>error</td><td>missing type StyleNode for style context: style blocks need std.ui (<code>use std.ui</code>)</td></tr>
+        <tr id="E-UI-0020"><td><code>E-UI-0020</code></td><td>error</td><td>missing type StyleClass for style context: style blocks need std.ui (<code>use std.ui</code>)</td></tr>
+        <tr id="E-UI-0021"><td><code>E-UI-0021</code></td><td>error</td><td><code>ref = <span class="diag-hole">%s</span></code> declares a member of a component: write the call in the <code>view { ... }</code> of a component that has a <code>type { ... }</code> of its own, not in a view declared by name or shared through <code>type Name</code></td></tr>
+        <tr id="E-UI-0022"><td><code>E-UI-0022</code></td><td>error</td><td>cannot instantiate controller <span class="diag-hole">%s</span>: it is the body of the components that name it as their <code>type</code>; make one of those</td></tr>
+        <tr id="E-UI-0023"><td><code>E-UI-0023</code></td><td>error</td><td>@on target <span class="diag-hole">%s</span>.<span class="diag-hole">%s</span> is not an event: mark the method @emit() in the component</td></tr>
+        <tr id="E-UI-0024"><td><code>E-UI-0024</code></td><td>error</td><td>@on(<span class="diag-hole">%s</span>.<span class="diag-hole">%s</span>) hears a component: its handler takes <span class="diag-hole">%s</span>, not Event (the envelope of a service&#x27;s events)</td></tr>
+        <tr id="E-UI-0025"><td><code>E-UI-0025</code></td><td>error</td><td>@on expects 1 or 2 arguments (the component&#x27;s event, optionally which components to hear)</td></tr>
+        <tr id="E-UI-0026"><td><code>E-UI-0026</code></td><td>error</td><td>@on(<span class="diag-hole">%s</span>, ...) takes a filter, <code>def(Event&lt;<span class="diag-hole">%s</span>&gt;) bool</code>, or a matcher, a value with <code>def matchesEvent(result <span class="diag-hole">%s</span>, listener ?component) bool</code>; got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-UI-0027"><td><code>E-UI-0027</code></td><td>error</td><td>an @on filter held in a value must be a function, not <span class="diag-hole">%s</span> (it may be none): give it the type of the function</td></tr>
+        <tr id="E-UI-0028"><td><code>E-UI-0028</code></td><td>error</td><td>component <span class="diag-hole">%q</span> takes no type arguments</td></tr>
+        <tr id="E-UI-0029"><td><code>E-UI-0029</code></td><td>error</td><td>component <span class="diag-hole">%q</span> expects <span class="diag-hole">%d</span> type arguments, got <span class="diag-hole">%d</span></td></tr>
+        <tr id="E-UI-0030"><td><code>E-UI-0030</code></td><td>error</td><td>cannot infer the type argument <span class="diag-hole">%s</span> of component <span class="diag-hole">%q</span> from this call; write it: <span class="diag-hole">%s</span>&lt;...&gt;(...)</td></tr>
+        <tr id="E-UI-0031"><td><code>E-UI-0031</code></td><td>error</td><td>the style of component <span class="diag-hole">%q</span> holds no value typed with its type parameter (<span class="diag-hole">%s</span> is <span class="diag-hole">%s</span>): one style object serves every instance of the component; keep the value in the component&#x27;s type</td></tr>
+        <tr id="E-UI-0032"><td><code>E-UI-0032</code></td><td>error</td><td><code>style = {...}</code> gives properties to the style of the component a call makes, or of the kind the selector of a rule names (<code>rule(kind&lt;Button&gt;(), style = {...})</code>); this call makes no component and names no kind</td></tr>
+        <tr id="E-UI-0033"><td><code>E-UI-0033</code></td><td>error</td><td>onerror handlers are not supported on component instantiation</td></tr>
+        <tr id="E-UI-0034"><td><code>E-UI-0034</code></td><td>error</td><td>a component takes at most one unnamed argument, for its <code>@input(value = true)</code> field; name the others</td></tr>
+        <tr id="E-UI-0035"><td><code>E-UI-0035</code></td><td>error</td><td>component <span class="diag-hole">%q</span> takes no unnamed argument: none of its inputs is marked <code>@input(value = true)</code>; pass it by name</td></tr>
+        <tr id="E-UI-0036"><td><code>E-UI-0036</code></td><td>error</td><td>component <span class="diag-hole">%q</span> has no member <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-UI-0037"><td><code>E-UI-0037</code></td><td>error</td><td><span class="diag-hole">%q</span> is a field of component <span class="diag-hole">%q</span>, not an input: a call passes the fields marked <code>@input</code>; mark the field, or assign it after the call</td></tr>
+        <tr id="E-UI-0038"><td><code>E-UI-0038</code></td><td>error</td><td>component <span class="diag-hole">%q</span> needs its input <span class="diag-hole">%q</span>: the input has no initial value, so every call passes it (<span class="diag-hole">%s</span> = ...)</td></tr>
+        <tr id="E-UI-0039"><td><code>E-UI-0039</code></td><td>error</td><td>no style of <span class="diag-hole">%s</span> or of this module has the property <span class="diag-hole">%q</span>; a rule for another style names its kind: <code>rule(kind&lt;Card&gt;(), style = {...})</code></td></tr>
+        <tr id="E-UI-0040"><td><code>E-UI-0040</code></td><td>error</td><td><span class="diag-hole">%q</span> is <code><span class="diag-hole">%s</span></code> in <span class="diag-hole">%s</span> and <code><span class="diag-hole">%s</span></code> in <span class="diag-hole">%s</span>; a rule that sets it names the kind: <code>rule(kind&lt;Card&gt;(), style = {...})</code></td></tr>
+        <tr id="E-UI-0041"><td><code>E-UI-0041</code></td><td>error</td><td><code>style = {...}</code> gives properties to the style of the component a call makes, or of the components a rule of <code>std.ui</code> selects (<code>rule(role(Role.Button), style = {...})</code>); this call is neither</td></tr>
+        <tr id="E-UI-0042"><td><code>E-UI-0042</code></td><td>error</td><td>state <span class="diag-hole">%q</span> is also <span class="diag-hole">%s</span>: the states of a component share one set of names</td></tr>
+        <tr id="E-UI-0043"><td><code>E-UI-0043</code></td><td>error</td><td><span class="diag-hole">%q</span> is not a variant of the style: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-UI-0044"><td><code>E-UI-0044</code></td><td>error</td><td><span class="diag-hole">%q</span> is not a state of component <span class="diag-hole">%s</span>: a state is one of <span class="diag-hole">%s</span>, a <code>@state</code> bool field of the component, or a case of a <code>@state</code> enum field</td></tr>
+        <tr id="E-UI-0045"><td><code>E-UI-0045</code></td><td>error</td><td>style <span class="diag-hole">%s</span> names the state <span class="diag-hole">%q</span> in its <code>on</code>, which component <span class="diag-hole">%s</span> does not have: a state is one of <span class="diag-hole">%s</span>, a <code>@state</code> bool field of the component, or a case of a <code>@state</code> enum field</td></tr>
+        <tr id="E-UI-0046"><td><code>E-UI-0046</code></td><td>error</td><td><span class="diag-hole">%q</span> is not a variant of component <span class="diag-hole">%s</span>: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-UI-0047"><td><code>E-UI-0047</code></td><td>error</td><td>unknown <span class="diag-hole">%s</span> <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-UI-0048"><td><code>E-UI-0048</code></td><td>error</td><td>component <span class="diag-hole">%s</span> must reference a <span class="diag-hole">%s</span>, got <span class="diag-hole">%s</span> <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-UI-0049"><td><code>E-UI-0049</code></td><td>error</td><td>embedded style <span class="diag-hole">%q</span> redeclares property <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-UI-0050"><td><code>E-UI-0050</code></td><td>error</td><td>a component declares no member named <code>ref</code>: on a call of the component, <code>ref = name</code> is how the calling view names it; rename the member</td></tr>
+        <tr id="E-UI-0051"><td><code>E-UI-0051</code></td><td>error</td><td>every component has a field <span class="diag-hole">%q</span>: rename this one</td></tr>
+        <tr id="E-UI-0052"><td><code>E-UI-0052</code></td><td>error</td><td><code>ref</code> names a component a view places: it is given on a component call that is a statement of a view</td></tr>
+        <tr id="E-UI-0053"><td><code>E-UI-0053</code></td><td>error</td><td><code>ref</code> takes a new name: it declares that name as a member of the component, holding the child the call places</td></tr>
+        <tr id="E-UI-0054"><td><code>E-UI-0054</code></td><td>error</td><td>ref <span class="diag-hole">%q</span> is given twice in this view: a ref names one component; rename one of them</td></tr>
+        <tr id="E-UI-0055"><td><code>E-UI-0055</code></td><td>error</td><td>ref <span class="diag-hole">%q</span>: the name is taken by a <span class="diag-hole">%s</span> in scope here, which hides the member the ref declares; rename one of them</td></tr>
+        <tr id="E-UI-0056"><td><code>E-UI-0056</code></td><td>error</td><td>ref <span class="diag-hole">%q</span> stands in a loop, where it would name the component of every round: give the round a component of its own and put the ref in its view</td></tr>
+        <tr id="E-UI-0057"><td><code>E-UI-0057</code></td><td>error</td><td>an optional slot may hold nothing: place it under <code>if !(<span class="diag-hole">%s</span> is none) { ... }</code></td></tr>
+        <tr id="E-UI-0058"><td><code>E-UI-0058</code></td><td>error</td><td>a view takes no arguments: a slot that receives something is a function returning a view (<code>def(T) view</code>)</td></tr>
+        <tr id="E-UI-0059"><td><code>E-UI-0059</code></td><td>error</td><td>this call may return no view: keep its result in a <code>let</code> and place it under <code>if !(name is none) { name() }</code></td></tr>
+        <tr id="E-UI-0060"><td><code>E-UI-0060</code></td><td>error</td><td>a view is placed by a statement of a view, not from a function</td></tr>
+        <tr id="E-UI-0061"><td><code>E-UI-0061</code></td><td>error</td><td><span class="diag-hole">%q</span> cannot be assigned here: only the block of a component call assigns, and only that component&#x27;s slots</td></tr>
+        <tr id="E-UI-0062"><td><code>E-UI-0062</code></td><td>error</td><td>component <span class="diag-hole">%q</span> has no slot <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-UI-0063"><td><code>E-UI-0063</code></td><td>error</td><td><span class="diag-hole">%q</span> is not a slot of <span class="diag-hole">%q</span>: a block assigns only inputs typed <code>view</code> (or a function returning one); pass this one in the parentheses, <span class="diag-hole">%s</span>(<span class="diag-hole">%s</span> = ...)</td></tr>
+        <tr id="E-UI-0064"><td><code>E-UI-0064</code></td><td>error</td><td><span class="diag-hole">%q</span> is a slot of <span class="diag-hole">%q</span> and also <span class="diag-hole">%s</span> in scope here, where the block is written: rename one of them</td></tr>
+        <tr id="E-UI-0065"><td><code>E-UI-0065</code></td><td>error</td><td>slot <span class="diag-hole">%q</span> needs a fallback or to be optional: write <code><span class="diag-hole">%s</span> view = view { ... }</code>, or <code><span class="diag-hole">%s</span> ?view = none</code> and place it under <code>if !(<span class="diag-hole">%s</span> is none)</code></td></tr>
+        <tr id="E-UI-0066"><td><code>E-UI-0066</code></td><td>error</td><td>a @scoped component names no style: it is not laid out or drawn, its children are placed as its parent&#x27;s; remove the style, or the annotation</td></tr>
+        <tr id="E-UI-0067"><td><code>E-UI-0067</code></td><td>error</td><td>a @scoped component declares no render: it is not drawn; remove the method, or the annotation</td></tr>
+      </table>
+    </section>
+
+    <section class="docs-section" id="area-meta">
+      <h2>Annotations</h2>
+      <p>Annotations and build-time metas. 58 codes.</p>
+      <table class="docs-table diag-table">
+        <tr id="E-META-0001"><td><code>E-META-0001</code></td><td>error</td><td>@<span class="diag-hole">%s</span> runs during the build, and the program that calls it did not build: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-META-0002"><td><code>E-META-0002</code></td><td>error</td><td>@<span class="diag-hole">%s</span> adds members during the build, before names are resolved, and was not found then: it annotates a <code>partial type</code> declared in a module, and the file names its module (<code>use <span class="diag-hole">%s</span></code>, or <code><span class="diag-hole">%s</span>.<span class="diag-hole">%s</span></code> after it)</td></tr>
+        <tr id="E-META-0003"><td><code>E-META-0003</code></td><td>error</td><td>@<span class="diag-hole">%s</span> is <span class="diag-hole">%s</span> here, but the build ran <span class="diag-hole">%s</span> for it, which the file&#x27;s imports also offer: write the annotation with its module&#x27;s name</td></tr>
+        <tr id="E-META-0004"><td><code>E-META-0004</code></td><td>error</td><td>@<span class="diag-hole">%s</span> runs during the build and sets one value: annotate a single name with a declared type</td></tr>
+        <tr id="E-META-0005"><td><code>E-META-0005</code></td><td>error</td><td>@<span class="diag-hole">%s</span> runs during the build and sets the value: the declaration takes no initializer</td></tr>
+        <tr id="E-META-0006"><td><code>E-META-0006</code></td><td>error</td><td>@<span class="diag-hole">%s</span> runs during the build, outside the program: its arguments are literals</td></tr>
+        <tr id="E-META-0007"><td><code>E-META-0007</code></td><td>error</td><td>@<span class="diag-hole">%s</span>: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-META-0008"><td><code>E-META-0008</code></td><td>error</td><td>@<span class="diag-hole">%s</span> set bytes: that takes a byte[] constant, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-META-0009"><td><code>E-META-0009</code></td><td>error</td><td>@<span class="diag-hole">%s</span> set <span class="diag-hole">%s</span>, and <span class="diag-hole">%s</span> is declared <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-META-0010"><td><code>E-META-0010</code></td><td>error</td><td>@<span class="diag-hole">%s</span> can only annotate methods</td></tr>
+        <tr id="E-META-0011"><td><code>E-META-0011</code></td><td>error</td><td><code>@persist</code> takes the key the value is kept under as a string written in place: <code>@persist(&quot;sidebar.width&quot;)</code></td></tr>
+        <tr id="E-META-0012"><td><code>E-META-0012</code></td><td>error</td><td><code>@persist</code> key <span class="diag-hole">%q</span> is not a name a value can be kept under: 1 to <span class="diag-hole">%d</span> letters <code>a</code> to <code>z</code> and <code>A</code> to <code>Z</code>, digits, &#x27;.&#x27;, &#x27;_&#x27; and &#x27;-&#x27;</td></tr>
+        <tr id="E-META-0013"><td><code>E-META-0013</code></td><td>error</td><td><code>@persist</code> marks one field: <span class="diag-hole">%d</span> fields declared together would be kept under the same key</td></tr>
+        <tr id="E-META-0014"><td><code>E-META-0014</code></td><td>error</td><td><code>@persist</code> cannot keep a field whose type names <span class="diag-hole">%s</span>, a type parameter of <span class="diag-hole">%s</span>: every instance of <span class="diag-hole">%s</span> keeps the field under the one key <span class="diag-hole">%q</span>, each as another type</td></tr>
+        <tr id="E-META-0015"><td><code>E-META-0015</code></td><td>error</td><td><code>@persist</code> cannot keep a <span class="diag-hole">%s</span>: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-META-0016"><td><code>E-META-0016</code></td><td>error</td><td>@embed requires a single const binding</td></tr>
+        <tr id="E-META-0017"><td><code>E-META-0017</code></td><td>error</td><td>@embed requires an explicit type</td></tr>
+        <tr id="E-META-0018"><td><code>E-META-0018</code></td><td>error</td><td>@embed requires a string literal path</td></tr>
+        <tr id="E-META-0019"><td><code>E-META-0019</code></td><td>error</td><td>@embed path <span class="diag-hole">%q</span> does not exist</td></tr>
+        <tr id="E-META-0020"><td><code>E-META-0020</code></td><td>error</td><td>@embed expects a byte[] constant, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-META-0021"><td><code>E-META-0021</code></td><td>error</td><td>@embed expects a file, got directory <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-META-0022"><td><code>E-META-0022</code></td><td>error</td><td>@embed constant cannot have an initializer</td></tr>
+        <tr id="E-META-0023"><td><code>E-META-0023</code></td><td>error</td><td>@embed gzip must be a bool literal</td></tr>
+        <tr id="E-META-0024"><td><code>E-META-0024</code></td><td>error</td><td>@builtin types must live in the builtin module</td></tr>
+        <tr id="E-META-0025"><td><code>E-META-0025</code></td><td>error</td><td>@builtin types cannot specify both primitive and for</td></tr>
+        <tr id="E-META-0026"><td><code>E-META-0026</code></td><td>error</td><td>invalid @builtin for constraint</td></tr>
+        <tr id="E-META-0027"><td><code>E-META-0027</code></td><td>error</td><td>cannot infer lambda parameter types; add parameter type annotations or use a typed context</td></tr>
+        <tr id="E-META-0028"><td><code>E-META-0028</code></td><td>error</td><td>@implicit applies to constructors (def new) only</td></tr>
+        <tr id="E-META-0029"><td><code>E-META-0029</code></td><td>error</td><td>@implicit requires a constructor with exactly one parameter</td></tr>
+        <tr id="E-META-0030"><td><code>E-META-0030</code></td><td>error</td><td>@implicit constructor must not fail: no fail, expects, try or onerror in its body</td></tr>
+        <tr id="E-META-0031"><td><code>E-META-0031</code></td><td>error</td><td>@implicit applies to constructors of types and structs only</td></tr>
+        <tr id="E-META-0032"><td><code>E-META-0032</code></td><td>error</td><td><span class="diag-hole">%s</span> already has an @implicit constructor</td></tr>
+        <tr id="E-META-0033"><td><code>E-META-0033</code></td><td>error</td><td><code>@persist</code> key <span class="diag-hole">%q</span> is kept as <span class="diag-hole">%s</span> here and as <span class="diag-hole">%s</span> at <span class="diag-hole">%s</span>: fields that share a key have one type</td></tr>
+        <tr id="E-META-0034"><td><code>E-META-0034</code></td><td>error</td><td>@on handler signature mismatch: got <span class="diag-hole">%s</span>, want <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-META-0035"><td><code>E-META-0035</code></td><td>error</td><td>@on expects 1 or 2 arguments (service method, optional filter)</td></tr>
+        <tr id="E-META-0036"><td><code>E-META-0036</code></td><td>error</td><td>meta functions cannot be infix</td></tr>
+        <tr id="E-META-0037"><td><code>E-META-0037</code></td><td>error</td><td>meta functions must declare a first parameter of a std.reflection.*MetaContext type</td></tr>
+        <tr id="E-META-0038"><td><code>E-META-0038</code></td><td>error</td><td>meta functions must declare a first parameter of a std.reflection.*MetaContext type, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-META-0039"><td><code>E-META-0039</code></td><td>error</td><td>meta functions targeting compile-time contexts cannot be async</td></tr>
+        <tr id="E-META-0040"><td><code>E-META-0040</code></td><td>error</td><td>unknown annotation @<span class="diag-hole">%s</span></td></tr>
+        <tr id="E-META-0041"><td><code>E-META-0041</code></td><td>error</td><td>@<span class="diag-hole">%s</span>: one of its arguments has no type; write a literal or an expression (a lone name is not looked up as a value in an annotation)</td></tr>
+        <tr id="E-META-0042"><td><code>E-META-0042</code></td><td>error</td><td>@<span class="diag-hole">%s</span> cannot use a templated argument: <span class="diag-hole">%s</span> is not annotated with a runtime meta context</td></tr>
+        <tr id="E-META-0043"><td><code>E-META-0043</code></td><td>error</td><td>@<span class="diag-hole">%s</span> cannot annotate <span class="diag-hole">%s</span> of type <span class="diag-hole">%s</span> (requires <span class="diag-hole">%s</span>)</td></tr>
+        <tr id="E-META-0044"><td><code>E-META-0044</code></td><td>error</td><td>@<span class="diag-hole">%s</span> does not refer to a meta function</td></tr>
+        <tr id="E-META-0045"><td><code>E-META-0045</code></td><td>error</td><td>@<span class="diag-hole">%s</span> cannot annotate <span class="diag-hole">%s</span> (supported contexts: <span class="diag-hole">%s</span>)</td></tr>
+        <tr id="E-META-0046"><td><code>E-META-0046</code></td><td>error</td><td>no overload of @<span class="diag-hole">%s</span> matches arguments (<span class="diag-hole">%s</span>)</td></tr>
+        <tr id="E-META-0047"><td><code>E-META-0047</code></td><td>error</td><td>ambiguous overload of @<span class="diag-hole">%s</span> for arguments (<span class="diag-hole">%s</span>)</td></tr>
+        <tr id="E-META-0048"><td><code>E-META-0048</code></td><td>error</td><td>@<span class="diag-hole">%s</span> takes a file here: a string literal path</td></tr>
+        <tr id="E-META-0049"><td><code>E-META-0049</code></td><td>error</td><td>@<span class="diag-hole">%s</span>: file <span class="diag-hole">%q</span> does not exist</td></tr>
+        <tr id="E-META-0050"><td><code>E-META-0050</code></td><td>error</td><td>@<span class="diag-hole">%s</span> expects a file, got directory <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-META-0051"><td><code>E-META-0051</code></td><td>error</td><td>cannot infer property type for <span class="diag-hole">%q</span>; add a type annotation or typed accessor/storage</td></tr>
+        <tr id="E-META-0052"><td><code>E-META-0052</code></td><td>error</td><td>@trackCaller function <span class="diag-hole">%s</span> cannot be used as a value: its call-site location is passed implicitly and only a direct call can supply it</td></tr>
+        <tr id="E-META-0053"><td><code>E-META-0053</code></td><td>error</td><td>@trackCaller method <span class="diag-hole">%s</span> cannot satisfy interface <span class="diag-hole">%s</span>: interface dispatch has no slot for the implicit call-site location</td></tr>
+        <tr id="E-META-0054"><td><code>E-META-0054</code></td><td>error</td><td>module <span class="diag-hole">%q</span> is provided by more than one package: <span class="diag-hole">%s</span>; a program uses one package per module prefix, keep one of them in adm.lock or list it under [deps] in adm.toml</td></tr>
+        <tr id="E-META-0055"><td><code>E-META-0055</code></td><td>error</td><td>@<span class="diag-hole">%s</span> adds members to <span class="diag-hole">%s</span> during the build, as another part of the type: declare it <code>partial type <span class="diag-hole">%s</span></code></td></tr>
+        <tr id="E-META-0056"><td><code>E-META-0056</code></td><td>error</td><td>@<span class="diag-hole">%s</span> runs during the build, and the program that calls it did not build (its module cannot import code that uses what it generates): <span class="diag-hole">%s</span></td></tr>
+        <tr id="W-META-0001"><td><code>W-META-0001</code></td><td>warning</td><td>@<span class="diag-hole">%s</span>: <span class="diag-hole">%s</span></td></tr>
+        <tr id="W-META-0002"><td><code>W-META-0002</code></td><td>warning</td><td>the members @<span class="diag-hole">%s</span> adds to <span class="diag-hole">%s</span> are not known here: build the program once (<code>adm build</code>, <code>adm test</code>) and they are</td></tr>
+      </table>
+    </section>
+
+    <section class="docs-section" id="area-plugin">
+      <h2>Plugins</h2>
+      <p>Plugin exports. 11 codes.</p>
+      <table class="docs-table diag-table">
+        <tr id="E-PLUGIN-0001"><td><code>E-PLUGIN-0001</code></td><td>error</td><td><span class="diag-hole">%q</span> is exported from both <span class="diag-hole">%s</span> and <span class="diag-hole">%s</span>; a plugin publishes each name once</td></tr>
+        <tr id="E-PLUGIN-0002"><td><code>E-PLUGIN-0002</code></td><td>error</td><td>name the functions of plugin <span class="diag-hole">%q</span> to export: <span class="diag-hole">%s</span>::(name, ...)</td></tr>
+        <tr id="E-PLUGIN-0003"><td><code>E-PLUGIN-0003</code></td><td>error</td><td>plugin <span class="diag-hole">%q</span> declares no function <span class="diag-hole">%q</span> to export</td></tr>
+        <tr id="E-PLUGIN-0004"><td><code>E-PLUGIN-0004</code></td><td>error</td><td>cannot export unknown module <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-PLUGIN-0005"><td><code>E-PLUGIN-0005</code></td><td>error</td><td>library <span class="diag-hole">%q</span> may only export modules under its own prefix; <span class="diag-hole">%q</span> is outside it</td></tr>
+        <tr id="E-PLUGIN-0006"><td><code>E-PLUGIN-0006</code></td><td>error</td><td>plugin does not use module <span class="diag-hole">%q</span>; add it to the use list before exporting it</td></tr>
+        <tr id="E-PLUGIN-0007"><td><code>E-PLUGIN-0007</code></td><td>error</td><td>module <span class="diag-hole">%q</span> has no symbol <span class="diag-hole">%q</span> to export</td></tr>
+        <tr id="E-PLUGIN-0008"><td><code>E-PLUGIN-0008</code></td><td>error</td><td><span class="diag-hole">%q</span> is internal to module <span class="diag-hole">%q</span> and cannot be exported</td></tr>
+        <tr id="E-PLUGIN-0009"><td><code>E-PLUGIN-0009</code></td><td>error</td><td>a plugin exports no service: <span class="diag-hole">%q</span> stays inside the plugin, and a host reaches it through an exported type or function</td></tr>
+        <tr id="E-PLUGIN-0010"><td><code>E-PLUGIN-0010</code></td><td>error</td><td>exported <span class="diag-hole">%q</span> uses unexported type <span class="diag-hole">%q</span>; export it as well</td></tr>
+        <tr id="E-PLUGIN-0011"><td><code>E-PLUGIN-0011</code></td><td>error</td><td><span class="diag-hole">%q</span> is generic and cannot be exported from a plugin: a host cannot instantiate it; export a function or type without type parameters</td></tr>
+      </table>
+    </section>
+
+    <section class="docs-section" id="area-policy">
+      <h2>Policy</h2>
+      <p>Policies and permissions. 14 codes.</p>
+      <table class="docs-table diag-table">
+        <tr id="E-POLICY-0001"><td><code>E-POLICY-0001</code></td><td>error</td><td>Permission needs a name</td></tr>
+        <tr id="E-POLICY-0002"><td><code>E-POLICY-0002</code></td><td>error</td><td>Permission name <span class="diag-hole">%q</span> must be one segment; the service&#x27;s prefix <span class="diag-hole">%q</span> is added by the compiler</td></tr>
+        <tr id="E-POLICY-0003"><td><code>E-POLICY-0003</code></td><td>error</td><td>duplicate permission <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-POLICY-0004"><td><code>E-POLICY-0004</code></td><td>error</td><td>Permission spec <span class="diag-hole">%s</span> is not a spec type: it needs <code>def validate(value T) !none</code></td></tr>
+        <tr id="E-POLICY-0005"><td><code>E-POLICY-0005</code></td><td>error</td><td>policy must be a string literal naming a permission</td></tr>
+        <tr id="E-POLICY-0006"><td><code>E-POLICY-0006</code></td><td>error</td><td>@requires takes a string literal naming a permission</td></tr>
+        <tr id="E-POLICY-0007"><td><code>E-POLICY-0007</code></td><td>error</td><td>unknown permission <span class="diag-hole">%q</span>; declared: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-POLICY-0008"><td><code>E-POLICY-0008</code></td><td>error</td><td>unknown permission <span class="diag-hole">%q</span>; no service declares permissions</td></tr>
+        <tr id="E-POLICY-0009"><td><code>E-POLICY-0009</code></td><td>error</td><td>@requires gates <span class="diag-hole">%q</span> on <span class="diag-hole">%q</span>, so it must return an errorable (!T)</td></tr>
+        <tr id="E-POLICY-0010"><td><code>E-POLICY-0010</code></td><td>error</td><td>@<span class="diag-hole">%s</span>(policy = <span class="diag-hole">%q</span>) gates <span class="diag-hole">%q</span>, so it must return an errorable (!T)</td></tr>
+        <tr id="E-POLICY-0011"><td><code>E-POLICY-0011</code></td><td>error</td><td>parameter <span class="diag-hole">%s</span> is constrained by <span class="diag-hole">%s</span>, but permission <span class="diag-hole">%q</span> declares spec <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-POLICY-0012"><td><code>E-POLICY-0012</code></td><td>error</td><td><span class="diag-hole">%s</span> binds C code in <span class="diag-hole">%s</span> that was not accepted at install (adm install --accept foreign)</td></tr>
+        <tr id="E-POLICY-0013"><td><code>E-POLICY-0013</code></td><td>error</td><td><span class="diag-hole">%s</span> observes <span class="diag-hole">%s</span>, which needs <span class="diag-hole">%s</span>; the package was not granted it (adm install --accept)</td></tr>
+        <tr id="W-POLICY-0001"><td><code>W-POLICY-0001</code></td><td>warning</td><td>parameter <span class="diag-hole">%s</span> is constrained but the <span class="diag-hole">%s</span> is not gated (no policy or @requires); nothing checks it</td></tr>
+      </table>
+    </section>
+
+    <section class="docs-section" id="area-sql">
+      <h2>SQL</h2>
+      <p><code>sql def</code> and its schema. 20 codes.</p>
+      <table class="docs-table diag-table">
+        <tr id="E-SQL-0001"><td><code>E-SQL-0001</code></td><td>error</td><td>the result <span class="diag-hole">%s</span> of this sql def does not read as a type</td></tr>
+        <tr id="E-SQL-0002"><td><code>E-SQL-0002</code></td><td>error</td><td>@routine names a stored routine in the database; this sql def&#x27;s body is a statement, not a routine (BEGIN ... END)</td></tr>
+        <tr id="E-SQL-0003"><td><code>E-SQL-0003</code></td><td>error</td><td>@routine takes the routine&#x27;s body and connection from its sql def; give it only <code>name</code> and <code>schema</code></td></tr>
+        <tr id="E-SQL-0004"><td><code>E-SQL-0004</code></td><td>error</td><td>this sql def names its connection with @db and with @migration(db = ...): keep one</td></tr>
+        <tr id="E-SQL-0005"><td><code>E-SQL-0005</code></td><td>error</td><td>a sql def step runs on one connection: @migration(db = &quot;main&quot;); a step on several is a plain function calling sql def functions in a transaction { } block</td></tr>
+        <tr id="E-SQL-0006"><td><code>E-SQL-0006</code></td><td>error</td><td>@migration names one connection of the database service with a plain string: @migration(db = &quot;main&quot;)</td></tr>
+        <tr id="E-SQL-0007"><td><code>E-SQL-0007</code></td><td>error</td><td>@db names one connection of the database service with a plain string: @db(&quot;reports&quot;)</td></tr>
+        <tr id="E-SQL-0008"><td><code>E-SQL-0008</code></td><td>error</td><td>type <span class="diag-hole">%s</span> marks <span class="diag-hole">%d</span> properties with @connection (<span class="diag-hole">%s</span>); its sql def methods run on one</td></tr>
+        <tr id="E-SQL-0009"><td><code>E-SQL-0009</code></td><td>error</td><td>sql def <span class="diag-hole">%s</span> names a connection with @db, and its type <span class="diag-hole">%s</span> marks the property <span class="diag-hole">%s</span> with @connection: keep one</td></tr>
+        <tr id="E-SQL-0010"><td><code>E-SQL-0010</code></td><td>error</td><td><span class="diag-hole">%s</span> (@sqlschema <span class="diag-hole">%s</span>)</td></tr>
+        <tr id="E-SQL-0011"><td><code>E-SQL-0011</code></td><td>error</td><td><code>{<span class="diag-hole">%s</span>}</code> is a <span class="diag-hole">%s</span>, and column <code><span class="diag-hole">%s</span></code> holds <span class="diag-hole">%s</span> values (<span class="diag-hole">%s</span>)</td></tr>
+        <tr id="E-SQL-0012"><td><code>E-SQL-0012</code></td><td>error</td><td>@sqlschema names the schema file with a plain string: @sqlschema(&quot;schema.sql&quot;)</td></tr>
+        <tr id="E-SQL-0013"><td><code>E-SQL-0013</code></td><td>error</td><td>@sqlschema cannot read <span class="diag-hole">%s</span>: <span class="diag-hole">%v</span></td></tr>
+        <tr id="E-SQL-0014"><td><code>E-SQL-0014</code></td><td>error</td><td>the query returns <span class="diag-hole">%d</span> columns, and the result <span class="diag-hole">%s</span> reads <span class="diag-hole">%d</span></td></tr>
+        <tr id="E-SQL-0015"><td><code>E-SQL-0015</code></td><td>error</td><td>column <span class="diag-hole">%d</span> (<code><span class="diag-hole">%s</span></code>) holds <span class="diag-hole">%s</span> values, which do not read as <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SQL-0016"><td><code>E-SQL-0016</code></td><td>error</td><td>the query returns <span class="diag-hole">%d</span> columns, and the result <span class="diag-hole">%s</span> reads one</td></tr>
+        <tr id="E-SQL-0017"><td><code>E-SQL-0017</code></td><td>error</td><td>column <code><span class="diag-hole">%s</span></code> holds <span class="diag-hole">%s</span> values, which do not read as <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SQL-0018"><td><code>E-SQL-0018</code></td><td>error</td><td>column <code><span class="diag-hole">%s</span></code> holds <span class="diag-hole">%s</span> values, which do not read into field <code><span class="diag-hole">%s</span>.<span class="diag-hole">%s</span></code> (<span class="diag-hole">%s</span>)</td></tr>
+        <tr id="E-SQL-0019"><td><code>E-SQL-0019</code></td><td>error</td><td>stored routine <code><span class="diag-hole">%s</span></code> is declared twice for <span class="diag-hole">%s</span>: <span class="diag-hole">%s</span> and <span class="diag-hole">%s</span>; give one another name with @db.routine(name = &quot;...&quot;)</td></tr>
+        <tr id="W-SQL-0001"><td><code>W-SQL-0001</code></td><td>warning</td><td>field <code><span class="diag-hole">%s</span>.<span class="diag-hole">%s</span></code> reads column <code><span class="diag-hole">%s</span></code>, which the query does not return; it keeps its zero value</td></tr>
+      </table>
+    </section>
+
+    <section class="docs-section" id="area-unit">
+      <h2>Units</h2>
+      <p>Quantities and units of measure. 18 codes.</p>
+      <table class="docs-table diag-table">
+        <tr id="E-UNIT-0001"><td><code>E-UNIT-0001</code></td><td>error</td><td>a derived dimension combines dimension types with *, / and ** (integer exponent)</td></tr>
+        <tr id="E-UNIT-0002"><td><code>E-UNIT-0002</code></td><td>error</td><td>a @dimension type has no body, alias or type parameters: @dimension(unit = &quot;m&quot;) type Length</td></tr>
+        <tr id="E-UNIT-0003"><td><code>E-UNIT-0003</code></td><td>error</td><td>unit <span class="diag-hole">%q</span> is already declared in this module</td></tr>
+        <tr id="E-UNIT-0004"><td><code>E-UNIT-0004</code></td><td>error</td><td>@unit takes a single-name symbol, optional prefixes and a numeric offset: @unit(&quot;g&quot;, prefixes = Prefixes.SI)</td></tr>
+        <tr id="E-UNIT-0005"><td><code>E-UNIT-0005</code></td><td>error</td><td>a unit&#x27;s value is a literal: const gram Mass = 0.001(kg)</td></tr>
+        <tr id="E-UNIT-0006"><td><code>E-UNIT-0006</code></td><td>error</td><td>a unit&#x27;s type is a dimension, or float for a plain ratio</td></tr>
+        <tr id="E-UNIT-0007"><td><code>E-UNIT-0007</code></td><td>error</td><td>a duration meets a quantity as a Time, but no dimension with base unit s is visible: import std.units</td></tr>
+        <tr id="E-UNIT-0008"><td><code>E-UNIT-0008</code></td><td>error</td><td>cannot <span class="diag-hole">%s</span> <span class="diag-hole">%s</span> and <span class="diag-hole">%s</span>: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-UNIT-0009"><td><code>E-UNIT-0009</code></td><td>error</td><td>a quantity&#x27;s exponent is an integer constant: side ** 2</td></tr>
+        <tr id="E-UNIT-0010"><td><code>E-UNIT-0010</code></td><td>error</td><td><span class="diag-hole">%s</span> takes no argument <span class="diag-hole">%q</span></td></tr>
+        <tr id="E-UNIT-0011"><td><code>E-UNIT-0011</code></td><td>error</td><td>to takes the unit to express the quantity in: v.to(km/h)</td></tr>
+        <tr id="E-UNIT-0012"><td><code>E-UNIT-0012</code></td><td>error</td><td>str takes an optional unit and digits: v.str(km, digits = 2)</td></tr>
+        <tr id="E-UNIT-0013"><td><code>E-UNIT-0013</code></td><td>error</td><td>(<span class="diag-hole">%s</span>) is not a unit of <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-UNIT-0014"><td><code>E-UNIT-0014</code></td><td>error</td><td>no base unit for <span class="diag-hole">%s</span>: its dimensions declare none</td></tr>
+        <tr id="E-UNIT-0015"><td><code>E-UNIT-0015</code></td><td>error</td><td>digits is an integer constant from 0 to 17</td></tr>
+        <tr id="E-UNIT-0016"><td><code>E-UNIT-0016</code></td><td>error</td><td>(<span class="diag-hole">%s</span>) measures no dimension: a unit argument names a quantity&#x27;s unit</td></tr>
+        <tr id="W-UNIT-0001"><td><code>W-UNIT-0001</code></td><td>warning</td><td>(<span class="diag-hole">%s</span>) is logarithmic and stored linear, so this <span class="diag-hole">%s</span> adds the linear values; levels in <span class="diag-hole">%s</span> combine with *</td></tr>
+        <tr id="W-UNIT-0002"><td><code>W-UNIT-0002</code></td><td>warning</td><td>(<span class="diag-hole">%s</span>) has an offset, so this <span class="diag-hole">%s</span> works on absolute values in the base unit; write a difference in the base unit</td></tr>
+      </table>
+    </section>
+
+    <section class="docs-section" id="area-ffi">
+      <h2>Foreign code</h2>
+      <p>Foreign functions and headers, the C, Zig, Rust and Go sources a build compiles, and the linker. 34 codes.</p>
+      <table class="docs-table diag-table">
+        <tr id="E-FFI-0001"><td><code>E-FFI-0001</code></td><td>error</td><td>only structs can be embedded; <span class="diag-hole">%s</span> is not a struct</td></tr>
+        <tr id="E-FFI-0002"><td><code>E-FFI-0002</code></td><td>error</td><td>cannot embed type parameter <span class="diag-hole">%s</span>; only structs can be embedded</td></tr>
+        <tr id="E-FFI-0003"><td><code>E-FFI-0003</code></td><td>error</td><td>only structs can be embedded; <span class="diag-hole">%s</span> is a <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-FFI-0004"><td><code>E-FFI-0004</code></td><td>error</td><td>field <span class="diag-hole">%q</span> is embedded from both <span class="diag-hole">%s</span> and <span class="diag-hole">%s</span>; declare <span class="diag-hole">%s</span> in the struct to choose one</td></tr>
+        <tr id="E-FFI-0005"><td><code>E-FFI-0005</code></td><td>error</td><td>@callback marks a function parameter of a C declaration (a body-less def in an @c/@link/@native module), which C keeps and calls later</td></tr>
+        <tr id="E-FFI-0006"><td><code>E-FFI-0006</code></td><td>error</td><td>C function <span class="diag-hole">%s</span> cannot take optional function parameter <span class="diag-hole">%q</span>: pass a function, or declare the parameter uint and pass 0 for none</td></tr>
+        <tr id="E-FFI-0007"><td><code>E-FFI-0007</code></td><td>error</td><td>@callback needs a function parameter, not <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-FFI-0008"><td><code>E-FFI-0008</code></td><td>error</td><td>C function <span class="diag-hole">%s</span> cannot take parameter <span class="diag-hole">%q</span> of type <span class="diag-hole">%s</span>: C has no <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-FFI-0009"><td><code>E-FFI-0009</code></td><td>error</td><td>C function <span class="diag-hole">%s</span> cannot take function parameter <span class="diag-hole">%q</span>: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-FFI-0010"><td><code>E-FFI-0010</code></td><td>error</td><td>C function <span class="diag-hole">%s</span> cannot return a function value: C function pointers are not ADM functions</td></tr>
+        <tr id="E-FFI-0011"><td><code>E-FFI-0011</code></td><td>error</td><td>C function <span class="diag-hole">%s</span> cannot return <span class="diag-hole">%s</span>: C has no <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-FFI-0012"><td><code>E-FFI-0012</code></td><td>error</td><td>C keeps this callback after the call returns, but a lambda that captures dies with it: keep it in a variable or field for as long as C may call it</td></tr>
+        <tr id="E-FFI-0013"><td><code>E-FFI-0013</code></td><td>error</td><td>unknown calling convention <span class="diag-hole">%q</span>: use &quot;cdecl&quot;, &quot;stdcall&quot;, &quot;fastcall&quot; or &quot;vectorcall&quot;</td></tr>
+        <tr id="E-FFI-0014"><td><code>E-FFI-0014</code></td><td>error</td><td>C function <span class="diag-hole">%s</span> takes variable arguments, so it cannot take or return a struct</td></tr>
+        <tr id="E-FFI-0015"><td><code>E-FFI-0015</code></td><td>error</td><td>C function <span class="diag-hole">%s</span> cannot pass its structs: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-FFI-0016"><td><code>E-FFI-0016</code></td><td>error</td><td>C function <span class="diag-hole">%s</span> does not match <span class="diag-hole">%s</span>: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-FFI-0017"><td><code>E-FFI-0017</code></td><td>error</td><td>@<span class="diag-hole">%s</span> names no source file, and neither does the module of <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-FFI-0018"><td><code>E-FFI-0018</code></td><td>error</td><td>@<span class="diag-hole">%s</span> names no source file, and the module of <span class="diag-hole">%s</span> is a @<span class="diag-hole">%s</span> unit</td></tr>
+        <tr id="E-FFI-0019"><td><code>E-FFI-0019</code></td><td>error</td><td>@portable applies to a type: a struct crosses to another process without it</td></tr>
+        <tr id="E-FFI-0020"><td><code>E-FFI-0020</code></td><td>error</td><td>@portable applies to a type only</td></tr>
+        <tr id="E-FFI-0021"><td><code>E-FFI-0021</code></td><td>error</td><td>@portable applies to a type with fields: an alias crosses as the type it names</td></tr>
+        <tr id="E-FFI-0022"><td><code>E-FFI-0022</code></td><td>error</td><td>@portable type <span class="diag-hole">%s</span>: its field <span class="diag-hole">%s</span> cannot cross to another process: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-FFI-0023"><td><code>E-FFI-0023</code></td><td>error</td><td>C compiler: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-FFI-0024"><td><code>E-FFI-0024</code></td><td>error</td><td>Zig compiler: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-FFI-0025"><td><code>E-FFI-0025</code></td><td>error</td><td>Rust compiler: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-FFI-0026"><td><code>E-FFI-0026</code></td><td>error</td><td>Go compiler: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-FFI-0027"><td><code>E-FFI-0027</code></td><td>error</td><td><span class="diag-hole">%s</span> is declared without a body, and nothing linked defines its symbol <span class="diag-hole">%s</span>: add the source that defines it, or name its library with @c or @link</td></tr>
+        <tr id="E-FFI-0028"><td><code>E-FFI-0028</code></td><td>error</td><td>the linker found no definition of <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-FFI-0029"><td><code>E-FFI-0029</code></td><td>error</td><td>linker: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-FFI-0030"><td><code>E-FFI-0030</code></td><td>error</td><td><span class="diag-hole">%s</span> binds <span class="diag-hole">%q</span>, which the program&#x27;s foreign sources do not export</td></tr>
+        <tr id="E-FFI-0031"><td><code>E-FFI-0031</code></td><td>error</td><td><span class="diag-hole">%s</span> does not match the exported function <span class="diag-hole">%s</span>: <span class="diag-hole">%s</span></td></tr>
+        <tr id="W-FFI-0001"><td><code>W-FFI-0001</code></td><td>warning</td><td>C compiler: <span class="diag-hole">%s</span></td></tr>
+        <tr id="W-FFI-0002"><td><code>W-FFI-0002</code></td><td>warning</td><td>Zig compiler: <span class="diag-hole">%s</span></td></tr>
+        <tr id="W-FFI-0003"><td><code>W-FFI-0003</code></td><td>warning</td><td>Rust compiler: <span class="diag-hole">%s</span></td></tr>
+      </table>
+    </section>
+
+    <section class="docs-section" id="area-gpu">
+      <h2>GPU</h2>
+      <p><code>cuda def</code> kernels. 8 codes.</p>
+      <table class="docs-table diag-table">
+        <tr id="E-GPU-0001"><td><code>E-GPU-0001</code></td><td>error</td><td>@kernelOnly cuda def returns <span class="diag-hole">%s</span>; a helper returns a numeric scalar or nothing</td></tr>
+        <tr id="E-GPU-0002"><td><code>E-GPU-0002</code></td><td>error</td><td>cuda def must return !none; results come back through array parameters</td></tr>
+        <tr id="E-GPU-0003"><td><code>E-GPU-0003</code></td><td>error</td><td>@kernelOnly cuda def cannot take a gpu.Stream; streams pick where a launch is queued</td></tr>
+        <tr id="E-GPU-0004"><td><code>E-GPU-0004</code></td><td>error</td><td>cuda def takes at most one gpu.Stream</td></tr>
+        <tr id="E-GPU-0005"><td><code>E-GPU-0005</code></td><td>error</td><td>cuda def parameter <span class="diag-hole">%s</span> has type <span class="diag-hole">%s</span>; a kernel takes numeric scalars, arrays of them, DeviceBuffers and a gpu.Stream</td></tr>
+        <tr id="E-GPU-0006"><td><code>E-GPU-0006</code></td><td>error</td><td><span class="diag-hole">%s</span> is @kernelOnly: call it from a cuda def body, not from ADM code</td></tr>
+        <tr id="E-GPU-0007"><td><code>E-GPU-0007</code></td><td>error</td><td>CUDA C: <span class="diag-hole">%s</span></td></tr>
+        <tr id="W-GPU-0001"><td><code>W-GPU-0001</code></td><td>warning</td><td>CUDA C: <span class="diag-hole">%s</span></td></tr>
+      </table>
+    </section>
+
+    <section class="docs-section" id="area-shader">
+      <h2>Shaders</h2>
+      <p><code>@fragment</code> code. 52 codes.</p>
+      <table class="docs-table diag-table">
+        <tr id="E-SHADER-0001"><td><code>E-SHADER-0001</code></td><td>error</td><td>missing uniform <span class="diag-hole">%s</span> of <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SHADER-0002"><td><code>E-SHADER-0002</code></td><td>error</td><td>@fragment functions cannot be overloaded: <span class="diag-hole">%s</span> is declared twice</td></tr>
+        <tr id="E-SHADER-0003"><td><code>E-SHADER-0003</code></td><td>error</td><td>a @fragment function cannot be <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SHADER-0004"><td><code>E-SHADER-0004</code></td><td>error</td><td>a @fragment function cannot be generic</td></tr>
+        <tr id="E-SHADER-0005"><td><code>E-SHADER-0005</code></td><td>error</td><td>a @fragment function cannot be variadic</td></tr>
+        <tr id="E-SHADER-0006"><td><code>E-SHADER-0006</code></td><td>error</td><td>a @fragment parameter is <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SHADER-0007"><td><code>E-SHADER-0007</code></td><td>error</td><td>a @fragment function returns <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SHADER-0008"><td><code>E-SHADER-0008</code></td><td>error</td><td>break outside a loop</td></tr>
+        <tr id="E-SHADER-0009"><td><code>E-SHADER-0009</code></td><td>error</td><td>continue outside a loop</td></tr>
+        <tr id="E-SHADER-0010"><td><code>E-SHADER-0010</code></td><td>error</td><td><span class="diag-hole">%s</span> is not available in fragment code</td></tr>
+        <tr id="E-SHADER-0011"><td><code>E-SHADER-0011</code></td><td>error</td><td>a fragment local is <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SHADER-0012"><td><code>E-SHADER-0012</code></td><td>error</td><td>declare one fragment local at a time</td></tr>
+        <tr id="E-SHADER-0013"><td><code>E-SHADER-0013</code></td><td>error</td><td>a fragment local needs a type or a value</td></tr>
+        <tr id="E-SHADER-0014"><td><code>E-SHADER-0014</code></td><td>error</td><td><span class="diag-hole">%s</span> applies to int and float</td></tr>
+        <tr id="E-SHADER-0015"><td><code>E-SHADER-0015</code></td><td>error</td><td>a fragment statement assigns, declares or controls flow; this value is unused</td></tr>
+        <tr id="E-SHADER-0016"><td><code>E-SHADER-0016</code></td><td>error</td><td><span class="diag-hole">%s</span> is not a fragment local</td></tr>
+        <tr id="E-SHADER-0017"><td><code>E-SHADER-0017</code></td><td>error</td><td><span class="diag-hole">%s</span> has no component <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SHADER-0018"><td><code>E-SHADER-0018</code></td><td>error</td><td>only fragment locals and their vector components can be assigned</td></tr>
+        <tr id="E-SHADER-0019"><td><code>E-SHADER-0019</code></td><td>error</td><td><span class="diag-hole">%s</span> <span class="diag-hole">%s</span> <span class="diag-hole">%s</span> does not fit <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SHADER-0020"><td><code>E-SHADER-0020</code></td><td>error</td><td>an if with an initializer is not available in fragment code</td></tr>
+        <tr id="E-SHADER-0021"><td><code>E-SHADER-0021</code></td><td>error</td><td>fragment code guards only return, break and continue</td></tr>
+        <tr id="E-SHADER-0022"><td><code>E-SHADER-0022</code></td><td>error</td><td>every, empty, break and finish blocks are not available in fragment code</td></tr>
+        <tr id="E-SHADER-0023"><td><code>E-SHADER-0023</code></td><td>error</td><td>fragment loops count explicitly: for let i = a; i &lt; b; i++</td></tr>
+        <tr id="E-SHADER-0024"><td><code>E-SHADER-0024</code></td><td>error</td><td>fail is not available in fragment code</td></tr>
+        <tr id="E-SHADER-0025"><td><code>E-SHADER-0025</code></td><td>error</td><td>a fragment function returns a <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SHADER-0026"><td><code>E-SHADER-0026</code></td><td>error</td><td>expected <span class="diag-hole">%s</span>, got <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SHADER-0027"><td><code>E-SHADER-0027</code></td><td>error</td><td><span class="diag-hole">%s</span> has no field <span class="diag-hole">%s</span> in fragment code</td></tr>
+        <tr id="E-SHADER-0028"><td><code>E-SHADER-0028</code></td><td>error</td><td><span class="diag-hole">%s</span> does not fit a 32-bit int</td></tr>
+        <tr id="E-SHADER-0029"><td><code>E-SHADER-0029</code></td><td>error</td><td><span class="diag-hole">%s</span> is not a number</td></tr>
+        <tr id="E-SHADER-0030"><td><code>E-SHADER-0030</code></td><td>error</td><td>const <span class="diag-hole">%s</span> is not a number fragment code can use</td></tr>
+        <tr id="E-SHADER-0031"><td><code>E-SHADER-0031</code></td><td>error</td><td><span class="diag-hole">%s</span> is not available in fragment code: only locals, parameters and const numbers are</td></tr>
+        <tr id="E-SHADER-0032"><td><code>E-SHADER-0032</code></td><td>error</td><td>the arms are <span class="diag-hole">%s</span> and <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SHADER-0033"><td><code>E-SHADER-0033</code></td><td>error</td><td><span class="diag-hole">%s</span> <span class="diag-hole">%s</span> <span class="diag-hole">%s</span> is not available in fragment code</td></tr>
+        <tr id="E-SHADER-0034"><td><code>E-SHADER-0034</code></td><td>error</td><td><span class="diag-hole">%s</span><span class="diag-hole">%s</span> is not available in fragment code</td></tr>
+        <tr id="E-SHADER-0035"><td><code>E-SHADER-0035</code></td><td>error</td><td><span class="diag-hole">%s</span> cannot convert to <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SHADER-0036"><td><code>E-SHADER-0036</code></td><td>error</td><td>only float, float32 and int conversions are available in fragment code</td></tr>
+        <tr id="E-SHADER-0037"><td><code>E-SHADER-0037</code></td><td>error</td><td>fragment code constructs only Vec2, Vec3 and Vec4</td></tr>
+        <tr id="E-SHADER-0038"><td><code>E-SHADER-0038</code></td><td>error</td><td>pass vector components by position</td></tr>
+        <tr id="E-SHADER-0039"><td><code>E-SHADER-0039</code></td><td>error</td><td>new <span class="diag-hole">%s</span> takes <span class="diag-hole">%d</span> components</td></tr>
+        <tr id="E-SHADER-0040"><td><code>E-SHADER-0040</code></td><td>error</td><td>generic calls are not available in fragment code</td></tr>
+        <tr id="E-SHADER-0041"><td><code>E-SHADER-0041</code></td><td>error</td><td>onerror is not available in fragment code</td></tr>
+        <tr id="E-SHADER-0042"><td><code>E-SHADER-0042</code></td><td>error</td><td><span class="diag-hole">%s</span>.<span class="diag-hole">%s</span> is not available in fragment code</td></tr>
+        <tr id="E-SHADER-0043"><td><code>E-SHADER-0043</code></td><td>error</td><td>only named calls are available in fragment code</td></tr>
+        <tr id="E-SHADER-0044"><td><code>E-SHADER-0044</code></td><td>error</td><td>a conversion takes one value</td></tr>
+        <tr id="E-SHADER-0045"><td><code>E-SHADER-0045</code></td><td>error</td><td><span class="diag-hole">%s</span> takes <span class="diag-hole">%d</span> value(s)</td></tr>
+        <tr id="E-SHADER-0046"><td><code>E-SHADER-0046</code></td><td>error</td><td>recursion is not available in fragment code</td></tr>
+        <tr id="E-SHADER-0047"><td><code>E-SHADER-0047</code></td><td>error</td><td><span class="diag-hole">%s</span> takes <span class="diag-hole">%d</span> values</td></tr>
+        <tr id="E-SHADER-0048"><td><code>E-SHADER-0048</code></td><td>error</td><td><span class="diag-hole">%s</span> has no parameter <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SHADER-0049"><td><code>E-SHADER-0049</code></td><td>error</td><td>missing value for <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SHADER-0050"><td><code>E-SHADER-0050</code></td><td>error</td><td>pass method arguments by position in fragment code</td></tr>
+        <tr id="E-SHADER-0051"><td><code>E-SHADER-0051</code></td><td>error</td><td>no <span class="diag-hole">%s</span>.<span class="diag-hole">%s</span> takes (<span class="diag-hole">%s</span>)</td></tr>
+        <tr id="E-SHADER-0052"><td><code>E-SHADER-0052</code></td><td>error</td><td>recursion is not available in fragment code: <span class="diag-hole">%s</span> calls itself through other functions</td></tr>
+      </table>
+    </section>
+
+    <section class="docs-section" id="area-internal">
+      <h2>Internal</h2>
+      <p>A tool refused code adm generated: a compiler bug. Please report it with the message. 2 codes.</p>
+      <table class="docs-table diag-table">
+        <tr id="E-INTERNAL-0001"><td><code>E-INTERNAL-0001</code></td><td>error</td><td>the <span class="diag-hole">%s</span> refused code adm generated, a compiler bug; please report it: <span class="diag-hole">%s</span>: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-INTERNAL-0002"><td><code>E-INTERNAL-0002</code></td><td>error</td><td>LLVM rejected the code adm generated for <span class="diag-hole">%s</span>, a compiler bug; please report it: <span class="diag-hole">%s</span></td></tr>
+      </table>
+    </section>
+
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>adm programming language</span>
+    <span class="footer-muted">Statically typed &middot; multi-paradigm</span>
+  </div>
+</footer>
+
+<script src="docs.js"></script>
+<script src="highlight.js"></script>
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "f0b264e327ed4ca4b04c4182c930c88c"}'></script><!-- End Cloudflare Web Analytics -->
+</body>
+</html>

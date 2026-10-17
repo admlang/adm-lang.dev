@@ -59,6 +59,7 @@
         <a class="docs-page-link" href="plugins.html">Plugins</a>
         <a class="docs-page-link" href="libraries.html">Libraries</a>
         <a class="docs-page-link" href="cli.html">Command line</a>
+        <a class="docs-page-link" href="diagnostics.html">Diagnostics</a>
       </div>
 
       <div class="docs-nav-group">
@@ -198,6 +199,8 @@ type Remote {
 <p>On a method that changes its receiver in place: calling it on a constant's frozen value is refused.</p>
       <h4><code>@portable</code></h4>
 <p>On a <code>type</code> whose fields are its whole state: a value of it may be sent to another process, where it is rebuilt field by field without running <code>new</code>. Every field must be able to cross itself (numbers, text, enums, quantities, structs, arrays, maps, optionals, tuples, unions and other portable types); a <code>weak</code> field is exempt. A struct needs no mark. A type that should send only part of itself, or another form of itself, declares <code>toWire() W</code> and <code>fromWire(wire W) !none</code> instead (the interface <code>Portable&lt;W&gt;</code> of <code>std.services.ipc</code>): it crosses as the <code>W</code> it returns. Leave it off a type that holds a descriptor, a handle or a cache.</p>
+      <h4><code>@remote&lt;Interface&gt;</code></h4>
+<p>From <code>std.services.ipc</code>: on a <code>type</code> or <code>struct</code> that implements the interface, so that an instance handed to <code>IPC.provide</code> answers the calls other processes make through <code>IPC.connect&lt;Interface&gt;</code>. Only the interface's methods are reachable from outside. The build checks the interface where it is named: every method errorable and not generic, everything it takes and returns able to cross to another process. A type may carry it once per interface. See <a href="services.html#svc-ipc">IPC</a>.</p>
       <h4><code>@requires(permission)</code></h4>
 <p>Gates a function or method on a permission a service declares; every package on the calling chain must hold it, or the call fails with <code>PolicyDenied</code>. See <a href="policy.html">Policy &amp; permissions</a>.</p>
       <h4><code>@js(file)  @lua(file)  @python(file)  @java(className, method = &quot;&quot;)  @dotnet(typeName, method = &quot;&quot;)</code></h4>

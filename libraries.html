@@ -59,6 +59,7 @@
         <a class="docs-page-link" href="plugins.html">Plugins</a>
         <a class="docs-page-link current" href="libraries.html">Libraries</a>
         <a class="docs-page-link" href="cli.html">Command line</a>
+        <a class="docs-page-link" href="diagnostics.html">Diagnostics</a>
       </div>
 
       <div class="docs-nav-group">
@@ -124,7 +125,7 @@ partial module humanize {
 }</code></pre>
       </div>
 
-      <p><code>@manifest(version = ...)</code> is the library's version, semver; without it the version is <code>0.1</code>. The compiler checks the export list the same way it does for plugins: every module named is one the library uses, it sits under the library's prefix, and no exported signature mentions a type that is not exported.</p>
+      <p><code>@manifest(version = ...)</code> is the library's version, semver; without it the version is <code>0.1</code>. <code>adm publish</code> holds it to that: it compares the exported API with the previous release and, when a break ships as a minor or patch release (or an addition as a patch), warns and suggests the right version (<a href="cli.html#publish">adm publish</a>). The compiler checks the export list the same way it does for plugins: every module named is one the library uses, it sits under the library's prefix, and no exported signature mentions a type that is not exported.</p>
 
       <div class="docs-subsection" id="what-ships">
         <h3>What ships, what a consumer sees</h3>
