@@ -1270,6 +1270,12 @@ Meter(0.6)</code></pre>
           <code>redraw()</code>; it does not run on every frame. Something that moves by itself asks
           for its next frame from inside <code>render</code>.
         </p>
+        <p>
+          A frame shows only what its drawing changed since the last one: the rest of the window
+          stays as it was, and a frame that changed nothing shows nothing. A <code>render</code>
+          that draws an object it changes in place (a picture, a path kept in a field) calls
+          <code>redraw()</code> after changing it, so its drawing counts as changed.
+        </p>
       </div>
 
       <div class="docs-sub" id="render-context">
@@ -1646,7 +1652,7 @@ def keep(evt Event&lt;CloseRequest&gt;) {
             <div class="component-shot"><img src="assets/components/text.png" width="420" height="72" alt="Text" loading="lazy"></div>
             <div class="component-text">
               <h4><code>Text</code></h4>
-              <p>A run of text: as large as its words, wrapping in the width it is given. <code>runs</code> style ranges of it apart.</p>
+              <p>A run of text: as large as its words, wrapping in the width it is given. <code>runs</code> style ranges of it apart; a run with a <code>link</code> goes there when clicked, through the window's router or, for an address with a scheme, the desktop's browser.</p>
               <pre><code>Text("Hello {name}")</code></pre>
             </div>
           </div>

@@ -261,6 +261,16 @@
         <code>mips64</code> (defaulting to the host's own when left unset). Cross-compiling to one of
         these just picks the matching LLVM target triple.
       </p>
+      <p>
+        <code>--os wasm</code> builds for the web: a page, a small JavaScript loader and a WebAssembly
+        module that any web server serves, with the C library and the fonts it needs carried by the
+        compiler. <code>adm run --os wasm</code> opens it in the browser and <code>adm test --os wasm</code>
+        runs the suites in a headless one. Tasks run concurrently on the page's one thread; files live in
+        the browser's storage; HTTP goes through <code>fetch</code> and WebSockets through the browser's;
+        a UI program draws in the page's canvas through WebGL 2. The <code>Browser</code> service
+        reaches what only a page has: the address and history, metadata, cookies, storage. Raw sockets,
+        processes, plugins and devices are not there.
+      </p>
 
       <p>
         Every command and subcommand, with its flags, is on the <a href="cli.html">Command line</a>
@@ -1455,6 +1465,10 @@ internal interface Dog {
           requires, plus its own <code>Bark()</code> - and generics in method signatures
           (<code>Eat&lt;W&gt;</code>).
         </p>
+        <p>
+          <code>==</code> on two interface values compares what they hold: the same object held
+          twice is equal, two different objects are not.
+        </p>
 
         <p>
           A <code>datatype</code> is the same idea applied to data instead of behavior: it describes a
@@ -2324,6 +2338,11 @@ match width {
           members. What is left of an <code>A | B | C</code> once <code>is A</code> was ruled out is a
           <code>B | C</code>, and it is still returned, assigned and passed as the union it came from.
           An optional or an errorable is unwrapped first.
+        </p>
+        <p>
+          <code>==</code> on two union values compares what they hold: <code>13(px)</code> stored in
+          two <code>Extent</code>s is one value, two strings compare by their text, two objects only
+          when they are the same object, and members of different types are never equal.
         </p>
 
         <p>
@@ -3951,7 +3970,7 @@ internal const region string</code></pre>
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">cfg.adm</span>
           </div>
-          <pre><code>@os("linux")
+          <pre><code>@os("linux", "darwin")
 const SEPARATOR = "/"
 
 @os("windows")
@@ -3960,11 +3979,20 @@ const SEPARATOR = "\\"</code></pre>
         <p>
           <code>@os</code>, <code>@arch</code>, <code>@build</code>, <code>@feature</code>, and
           <code>@version</code> are sugar over the full <code>@cfg(os=, arch=, build=, features=, version=)</code>
-          form. Keys within one <code>@cfg</code> all have to match (AND); stacking more than one
+          form; <code>@os</code> and <code>@arch</code> take several values, any one of which keeps the
+          declaration. Keys within one <code>@cfg</code> all have to match (AND); stacking more than one
           <code>@cfg</code> on the same declaration means any one of them matching is enough (OR).
           <code>os</code>/<code>arch</code> come from <code>ADM_OS</code>/<code>ADM_ARCH</code> (or the
           host by default); <code>build</code>/<code>features</code> come from <code>adm build</code>
           flags like <code>--release --features simd,fastmath</code>.
+        </p>
+        <p>
+          A file can say the same with its name: <code>platform_linux.adm</code> belongs to Linux
+          alone, as if every declaration in it carried <code>@os("linux")</code>. The names are the
+          targets of <code>adm build --os</code> (<code>linux</code>, <code>darwin</code>,
+          <code>windows</code>, <code>android</code>, <code>ios</code>, <code>wasm</code>), tests
+          included (<code>keys_wasm_test.adm</code>). A build for another system never reads such a
+          file, so web code costs a Linux build nothing.
         </p>
         <p>
           <code>@embed(path)</code> is the other built-in: it bakes the file at <code>path</code>

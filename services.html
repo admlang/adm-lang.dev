@@ -57,6 +57,7 @@
         <a class="docs-nav-top" href="#builtin">Builtin services</a>
         <ul class="docs-sub-list">
           <li><a class="docs-nav-sub" href="#svc-application"><code>Application</code></a></li>
+          <li><a class="docs-nav-sub" href="#svc-browser"><code>Browser</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-cache"><code>Cache</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-database"><code>Database</code></a></li>
           <li><a class="docs-nav-sub" href="#svc-clipboard"><code>Clipboard</code></a></li>
@@ -418,6 +419,80 @@ Depot.lab.conditions.fullAt = 0.6</code></pre>
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def exit(code int)</code></div>
             <p class="api-doc">Terminates the application using the specified exit code.</p>
 
+          </li>
+        </ul>
+      </div>
+      <div class="docs-sub" id="svc-browser">
+        <h3><code>Browser</code></h3>
+        <p>The page a web build (<code>adm build --os wasm</code>) runs in: its address and history, the document&#39;s metadata, cookies, storage, permissions, installing the site as an app and its service worker. Off the web every call but <code>available()</code> fails with <code>BrowserError.Unavailable</code>; a refusal says which: <code>Unsupported</code>, <code>Denied</code>, or <code>NeedsUserGesture</code> for a call that must follow a click or key press. Module <code>std.services.browser</code>.</p>
+        <ul class="api-list">
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def available() bool</code></div>
+            <p class="api-doc">Whether the program runs in a browser.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def info() !BrowserInfo</code></div>
+            <p class="api-doc">The browser, its version and engine, the platform it runs on and the user&#39;s languages, preferred first.</p>
+            <p class="api-doc">Fails off the web.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def location() !url.URL</code></div>
+            <p class="api-doc">The page&#39;s address.</p>
+            <p class="api-doc">Fails off the web.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def navigate(to url.URL, replace bool = false) !none</code></div>
+            <p class="api-doc">Goes to another address, leaving the program; <code>replace</code> leaves no history entry behind. In-app navigation is the Router&#39;s.</p>
+            <p class="api-doc">Fails off the web.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def back() !none</code></div>
+            <p class="api-doc">Goes one entry back in the tab&#39;s history; <code>forward()</code> one forward, <code>reload()</code> loads the page again, which starts the program afresh.</p>
+            <p class="api-doc">Fails off the web.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def locationChange(to url.URL) url.URL</code></div>
+            <p class="api-doc">The history entry changed: back or forward, or in-app navigation.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def metadata() !PageMetadata</code></div>
+            <p class="api-doc">What the document&#39;s head holds: title, description, canonical address, sharing picture, language, robots, theme colour and further <code>&lt;meta&gt;</code> pairs. <code>setMetadata</code> writes them; an empty field removes what the head had for it.</p>
+            <p class="api-doc">Fails off the web.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def confirmLeave(on bool) !none</code></div>
+            <p class="api-doc">Makes the browser ask before the tab is closed or navigated away (unsaved changes), or stop asking.</p>
+            <p class="api-doc">Fails off the web.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def cookies() !Cookie[]</code></div>
+            <p class="api-doc">The site&#39;s cookies the page can read (not the HttpOnly ones); <code>cookie(name)</code> one of them, <code>setCookie</code> and <code>removeCookie</code> write. Needs the <code>adm.browser.cookies</code> permission.</p>
+            <p class="api-doc">Fails off the web, or when the policy denies <code>cookies</code>.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def storage(key string, session bool = false) !?string</code></div>
+            <p class="api-doc">The value under <code>key</code> in the site&#39;s storage (localStorage, or sessionStorage with <code>session</code>); <code>setStorage</code> and <code>removeStorage</code> write. Needs <code>adm.browser.storage</code>.</p>
+            <p class="api-doc">Fails off the web, or when the policy denies <code>storage</code>.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def permission(name string) !PermissionState</code></div>
+            <p class="api-doc">The browser&#39;s answer for a permission: <code>"camera"</code>, <code>"notifications"</code>, <code>"clipboard-read"</code>, ...</p>
+            <p class="api-doc">Fails off the web, or when the browser does not know the permission.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def install() !bool</code></div>
+            <p class="api-doc">Offers to install the site as an app when <code>installable()</code>; true when the user accepted.</p>
+            <p class="api-doc">Fails off the web, when the policy denies <code>install</code>, when the browser offers no install now, or when the call does not follow a click or key press.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def registerWorker(script url.URL) !none</code></div>
+            <p class="api-doc">Registers the service worker that serves the site offline; <code>updateReady</code> is emitted when a new version waits, and <code>applyUpdate()</code> makes it take over.</p>
+            <p class="api-doc">Fails off the web, or when the browser refuses the worker.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def evaluate(script string) !string</code></div>
+            <p class="api-doc">Runs JavaScript in the page and returns its result as JSON, for what the calls above do not cover. Needs <code>adm.browser.script</code>.</p>
+            <p class="api-doc">Fails off the web, when the policy denies <code>script</code>, or when the script throws.</p>
           </li>
         </ul>
       </div>
@@ -1893,7 +1968,7 @@ Network.lab.conditions.unreachable = "*"         // offline</code></pre>
       </div>
       <div class="docs-sub" id="svc-notifications">
         <h3><code>Notifications</code></h3>
-        <p>Desktop notifications through the platform's notification server. On Linux this is the freedesktop server on the D-Bus session bus; other platforms report nothing available yet. Showing one needs the <code>adm.notifications.show</code> permission.</p>
+        <p>Desktop notifications through the platform's notification server. On Linux this is the freedesktop server on the D-Bus session bus; on the web the browser's notifications, where the first <code>show</code> asks the user's permission, a click on a notification is its <code>"default"</code> action and notifications have no buttons; other platforms report nothing available yet. Showing one needs the <code>adm.notifications.show</code> permission.</p>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def show(notification Notification) !NotificationId</code></div>

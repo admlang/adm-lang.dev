@@ -177,10 +177,11 @@
         <tr><td><code>--apps / --libs / --plugins</code></td><td>Build only that kind of unit.</td></tr>
         <tr><td><code>--path DIR</code></td><td>Build only targets under the directory (default <code>.</code>).</td></tr>
         <tr><td><code>--out DIR</code></td><td>Output directory for built binaries (default: the current directory).</td></tr>
+        <tr><td><code>--base PATH</code></td><td>With <code>--os wasm</code>: the path the page is served under (<code>/</code>, <code>/app/</code>), written as the page's <code>&lt;base&gt;</code> so the application's locations open directly and survive a reload on a server that answers them with <code>index.html</code>. Default: none, the folder works under any path from its own page. <code>adm run --os wasm</code> builds with <code>/</code> and answers its locations itself.</td></tr>
         <tr><td><code>--release</code></td><td>Fully optimized (<code>-O3 -DNDEBUG</code>, drops debug-only runtime diagnostics); the default is <code>-O2</code>.</td></tr>
         <tr><td><code>--debug</code></td><td>Unoptimized with debug info (<code>-O0 -g</code>).</td></tr>
         <tr><td><code>--backend llvm</code></td><td>Compiler backend; <code>llvm</code> is the only one.</td></tr>
-        <tr><td><code>--os, --arch</code></td><td>Target platform (defaults to the host).</td></tr>
+        <tr><td><code>--os, --arch</code></td><td>Target platform (defaults to the host). <code>--os wasm</code> builds for the web: a folder per application with <code>index.html</code>, the loader <code>&lt;app&gt;.js</code>, the module <code>&lt;app&gt;.wasm</code>, and the fonts a program that draws text carries. Any web server serves it; the compiler carries the C library and the fonts it needs, so nothing else is installed.</td></tr>
         <tr><td><code>--platforms a,b</code></td><td>Build several <code>&lt;os&gt;-&lt;arch&gt;</code> at once; plugins merge into one <code>.admplugin</code>. A cross target needs <code>ADM_SYSROOT_&lt;OS&gt;_&lt;ARCH&gt;</code>.</td></tr>
         <tr><td><code>--runtime static|shared</code></td><td>Runtime linkage; <code>shared</code> is required to load plugins.</td></tr>
         <tr><td><code>--features a,b</code></td><td>Comma-separated feature list.</td></tr>
@@ -196,7 +197,8 @@
         </div>
         <pre><code data-hl="off" class="nohighlight">adm build App1 acme.imaging
 adm build --libs samples/imaging
-adm build App1 --release --os linux --arch arm64</code></pre>
+adm build App1 --release --os linux --arch arm64
+adm build App1 --os wasm --out site</code></pre>
       </div>
       <p>
         Builds are incremental. The compiler caches each module's checked and lowered form and its
@@ -311,7 +313,8 @@ adm fmt --check src/</code></pre>
         <tr><td><code>--path DIR</code></td><td>Build targets under the directory.</td></tr>
         <tr><td><code>--release / --debug</code></td><td>Optimization level, as for <code>build</code>.</td></tr>
         <tr><td><code>--quiet</code></td><td>Do not show the build's stages before the program runs, as for <code>build</code>; the view closes before the program starts, which then owns the terminal.</td></tr>
-        <tr><td><code>--backend, --os, --arch, --features, --no-cache</code></td><td>As for <code>build</code>.</td></tr>
+        <tr><td><code>--env KEY=value</code></td><td>Set a variable in the program's environment (repeatable), on top of the one <code>adm</code> runs in. A web program (<code>--os wasm</code>) has no environment of its own: these entries are all it gets.</td></tr>
+        <tr><td><code>--backend, --os, --arch, --features, --no-cache</code></td><td>As for <code>build</code>. With <code>--os wasm</code> the page is served on a free port of 127.0.0.1 and opened in the browser (<code>ADM_BROWSER</code>, else the desktop's); what the program prints shows in the terminal too, arguments and environment travel in the page's address, and the run ends when the program exits or its tab closes. <code>--hot</code> and <code>--watch</code> are not available on the web.</td></tr>
       </table>
       <div class="code-window">
         <div class="code-titlebar">
@@ -320,7 +323,8 @@ adm fmt --check src/</code></pre>
         </div>
         <pre><code data-hl="off" class="nohighlight">adm run
 adm run MyApp -- --help
-adm run examples/listen.adm</code></pre>
+adm run examples/listen.adm
+adm run MyApp --os wasm</code></pre>
       </div>
       <h3 id="test"><code>adm test</code></h3>
       <div class="code-window">
@@ -334,6 +338,8 @@ adm run examples/listen.adm</code></pre>
       <table class="docs-table">
         <tr><th>Flag</th><th>Meaning</th></tr>
         <tr><td><code>--run TEXT</code></td><td>Only tests whose name contains the text (repeatable; <code>=</code> prefix for an exact match).</td></tr>
+        <tr><td><code>--os wasm</code></td><td>Build the suites for the web and run them in a headless browser: <code>ADM_BROWSER</code>, else the first of Chrome, Chromium, Edge and Firefox found. Results print as for a native run. <code>--fuzz</code> and coverage are not available on the web.</td></tr>
+        <tr><td><code>--env KEY=value</code></td><td>Set a variable in the suites' environment (repeatable); on the web (<code>--os wasm</code>) these entries are all the page's environment holds.</td></tr>
         <tr><td><code>--file TEXT</code></td><td>Only tests whose source file contains the text.</td></tr>
         <tr><td><code>--timeout LIMIT</code></td><td>Fail a test that runs longer than the limit (<code>30s</code>, <code>500ms</code>, <code>2min</code>) and go on with the next one; a test's own <code>@timeout</code> takes precedence.</td></tr>
         <tr><td><code>--update-golden</code></td><td>Write the file of each <code>@golden(file)</code> test that differs from it, or has none yet, from what the test returns; those tests then pass.</td></tr>
@@ -1180,8 +1186,9 @@ adm lint --list</code></pre>
         <tr><td><code>ADM_CACHE</code></td><td>Root of every build cache (default <code>~/.adm/cache</code>).</td></tr>
         <tr><td><code>ADM_CATALOG</code></td><td>Directory holding the registry clones <code>search</code>, <code>get</code> and <code>publish</code> pull (default <code>~/.adm/catalog</code>).</td></tr>
         <tr><td><code>ADM_CATALOG_MAX_AGE</code></td><td>How old a registry clone may be before it is pulled again, a Go duration (default one hour).</td></tr>
+        <tr><td><code>ADM_BROWSER</code></td><td>The browser command <code>adm run --os wasm</code> opens the page with and <code>adm test --os wasm</code> runs the suites in (<code>firefox</code>, <code>google-chrome --headless=new</code>), the page's address appended last.</td></tr>
         <tr><td><code>ADM_CLANG</code></td><td>C compiler driver that links the program (default: the bundled <code>tools/clang</code>, else <code>clang</code> on <code>PATH</code>).</td></tr>
-        <tr><td><code>ADM_OS, ADM_ARCH</code></td><td>Target operating system and architecture (default: the host).</td></tr>
+        <tr><td><code>ADM_OS, ADM_ARCH</code></td><td>Target operating system and architecture (default: the host); <code>wasm</code> is the web.</td></tr>
         <tr><td><code>ADM_SYSROOT_&lt;OS&gt;_&lt;ARCH&gt;</code></td><td>Sysroot for a target. Unset: <code>adm build</code> links a Linux program against the baseline sysroot shipped in <code>lib/sysroots/</code> (glibc 2.35) when it holds every library the program links, so the program runs on systems from that glibc on; when a library is missing there it links against the build machine's files and says so. <code>adm run</code> and <code>adm test</code> link against the build machine's files; another platform needs the variable. A path: that sysroot, for every command. <code>host</code>: the build machine's files.</td></tr>
         <tr><td><code>ADM_SIGNING_KEY</code></td><td>Base64 Ed25519 publisher private key used for signing, instead of the key file <code>adm app init</code> wrote.</td></tr>
         <tr><td><code>ADM_DIST_REPO</code></td><td>GitHub <code>owner/name</code> whose releases <code>adm version</code> and <code>adm update</code> read (default <code>admlang/adm</code>).</td></tr>

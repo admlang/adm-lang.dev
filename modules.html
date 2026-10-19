@@ -617,7 +617,8 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.services</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Application</code>, <code>ServiceStatus</code>, <code>StartMode</code>, <code>RestartMode</code>, <code>Lifecycle</code>, <code>Dependencies</code>, <code>ServiceInfo</code>, <code>ServiceStatusChange</code></td><td>the application service and the types every service shares</td></tr>
-          <tr><td><code>Storage</code>, <code>Config</code>, <code>Logging</code>, <code>Cache</code>, <code>Scheduler</code>, <code>Messaging</code>, <code>Telemetry</code>, <code>Runtime</code>, <code>Network</code>, <code>Diagnostics</code>, <code>Policy</code>, <code>Notifications</code>, <code>Clipboard</code>, …</td><td>builtin services, each in its own module <code>std.services.&lt;name&gt;</code> (<code>use std.services.cache::(Cache)</code>)</td></tr>
+          <tr><td><code>Storage</code>, <code>Config</code>, <code>Logging</code>, <code>Cache</code>, <code>Scheduler</code>, <code>Messaging</code>, <code>Telemetry</code>, <code>Runtime</code>, <code>Network</code>, <code>Diagnostics</code>, <code>Policy</code>, <code>Notifications</code>, <code>Clipboard</code>, <code>Browser</code>, …</td><td>builtin services, each in its own module <code>std.services.&lt;name&gt;</code> (<code>use std.services.cache::(Cache)</code>)</td></tr>
+          <tr><td><code>std.services.browser</code>: <code>Browser</code>, <code>BrowserInfo</code>, <code>PageMetadata</code>, <code>Cookie</code>, <code>SameSite</code>, <code>PermissionState</code>, <code>BrowserError</code>, <code>BrowserFailure</code>, <code>browserFailure</code></td><td>the page of a web build: address and history, metadata, cookies, storage, permissions, installing, the service worker</td></tr>
         </table>
         <p class="exports-note">Every method and annotation: <a href="services.html">services reference</a>.</p>
       </div>
@@ -935,7 +936,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.formats.docs</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Document</code>, <code>Block</code>, <code>Inline</code>, <code>load</code></td><td>document model</td></tr>
-          <tr><td><code>Markdown</code>, <code>PlainText</code>, <code>Rtf</code>, <code>Html</code>, <code>Pdf</code>, <code>Docx</code>, <code>Odt</code>, <code>Epub</code></td><td>codecs; <code>PlainText.marks</code> (<code>PlainTextMarks</code>) says what its layout writes around styled text</td></tr>
+          <tr><td><code>Markdown</code>, <code>PlainText</code>, <code>Rtf</code>, <code>Html</code>, <code>Pdf</code>, <code>Docx</code>, <code>Odt</code>, <code>Epub</code></td><td>codecs; <code>PlainText.marks</code> (<code>PlainTextMarks</code>) says what its layout writes around styled text; <code>Html.tree</code> gives a page's element tree as a browser reads it</td></tr>
           <tr><td><code>PdfFile</code>, <code>PdfObject</code></td><td>PDF objects</td></tr>
         </table>
       </div>
@@ -1267,7 +1268,7 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-websocket">
         <h3><code>std.net.http.websocket</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>Conn</code>, <code>dial</code>, <code>Upgrader</code></td><td>WebSocket</td></tr>
+          <tr><td><code>Conn</code>, <code>dial</code>, <code>Upgrader</code></td><td>WebSocket; on the web <code>dial</code> opens the browser&#39;s</td></tr>
           <tr><td><code>ReconnectingConn</code>, <code>Hub</code></td><td>reconnects, broadcast</td></tr>
         </table>
       </div>
@@ -1648,8 +1649,8 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-ui-navigation">
         <h3><code>std.ui.navigation</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>route</code>, <code>Routes</code>, <code>Outlet</code></td><td>a component as the page at a path; the page for the current location, inside the pages around it that place an <code>Outlet</code>; <code>notFound</code></td></tr>
-          <tr><td><code>Router</code>, <code>History</code>, <code>MemoryHistory</code></td><td>where a window is: <code>go</code>, <code>back</code>, <code>forward</code>, <code>location</code>, <code>canGoBack</code>; the entries behind it, each keeping how far its <code>ScrollView(persist = ...)</code>s were scrolled (<code>scrollOf</code>, <code>keepScroll</code>)</td></tr>
+          <tr><td><code>route</code>, <code>Routes</code>, <code>Outlet</code></td><td>a component as the page at a path; the page for the current location, inside the pages around it that place an <code>Outlet</code>; <code>notFound</code>; the event <code>located</code> after each change (a link to a part of the page shown, <code>#name</code>, keeps the page)</td></tr>
+          <tr><td><code>Router</code>, <code>History</code>, <code>MemoryHistory</code></td><td>where a window is: <code>go</code>, <code>back</code>, <code>forward</code>, <code>location</code>, <code>canGoBack</code>; the entries behind it, each keeping how far its <code>ScrollView(persist = ...)</code>s were scrolled (<code>scrollOf</code>, <code>keepScroll</code>). Without a history given, <code>Routes</code> uses the browser's on the web (the address bar shows the location; back and forward walk it) and a <code>MemoryHistory</code> elsewhere</td></tr>
           <tr><td><code>Page</code></td><td>what describes the page it holds: <code>title</code> (the window's title while it is shown), <code>description</code>, <code>canonical</code>, <code>image</code>, <code>language</code>, <code>robots</code>, <code>themeColor</code></td></tr>
           <tr><td><code>Location</code>, <code>parseLocation</code>, <code>locationText</code>, <code>RoutePattern</code>, <code>parsePattern</code>, <code>matchPattern</code>, <code>declaredRoutes</code></td><td>a path with its query and fragment; a route's path and the values a location gives it; the pages the build found</td></tr>
         </table>
@@ -1715,7 +1716,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.gfx.canvas</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Canvas</code></td><td>CPU drawing surface, implements <code>gfx.Raster</code></td></tr>
-          <tr><td><code>Painter</code>, <code>DrawContext</code>, <code>Picture</code>, <code>record</code></td><td>drawing interface, recording, replay, picking, SVG and PDF export; <code>drawAtlas</code> for sprites, mesh warps</td></tr>
+          <tr><td><code>Painter</code>, <code>DrawContext</code>, <code>Picture</code>, <code>record</code></td><td>drawing interface, recording, replay, picking, SVG and PDF export, comparing recordings call by call; <code>drawAtlas</code> for sprites, mesh warps</td></tr>
           <tr><td><code>Paint</code>, <code>LinearGradient</code>, <code>RadialGradient</code>, <code>ConicGradient</code>, <code>Pattern</code>, <code>Noise</code>, <code>MeshGradient</code>, <code>linear</code>, <code>radial</code>, <code>noise</code></td><td>colors, gradients (OKLab, linear light, sRGB), image and picture patterns, noise, mesh gradients</td></tr>
           <tr><td><code>ColorStop</code>, <code>Spread</code>, <code>ColorSpace</code></td><td>gradient stops, spread and interpolation space</td></tr>
           <tr><td><code>ShaderPaint</code></td><td>paint from a <code>@fragment</code> shader, on the GPU or the CPU</td></tr>
@@ -1730,7 +1731,7 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-gfx-render">
         <h3><code>std.gfx.render</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>DrawCommand</code>, <code>CommandKind</code></td><td>render commands a recording keeps for GPU renderers (clears, blits, video)</td></tr>
+          <tr><td><code>DrawCommand</code>, <code>CommandKind</code></td><td>render commands a recording keeps for GPU renderers (clears, blits, video, moves of the pixels a frame already shows)</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-gfx-scene">

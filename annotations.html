@@ -127,8 +127,8 @@
       <p>Prelude annotations read at build time. They shape what gets compiled rather than what happens at run time.</p>
       <h4><code>@cfg(os = &quot;&quot;, arch = &quot;&quot;, build = &quot;&quot;, features = [], version = &quot;&quot;)</code></h4>
 <p>Compiles the declaration only when every given key matches the build. Several <code>@cfg</code> on one declaration are alternatives: any one matching keeps it.</p>
-      <h4><code>@os(value)  @arch(value)  @build(value)  @feature(values)  @version(value)</code></h4>
-<p>Sugar for a single-key <code>@cfg</code>.</p>
+      <h4><code>@os(values...)  @arch(values...)  @build(value)  @feature(values)  @version(value)</code></h4>
+<p>Sugar for a single-key <code>@cfg</code>; <code>@os("linux", "darwin")</code> keeps the declaration for either system. A file named <code>name_&lt;os&gt;.adm</code> (<code>platform_wasm.adm</code>) is <code>@os("&lt;os&gt;")</code> for all of it, and a build for another system does not read it.</p>
       <h4><code>@embed(path, gzip = false)</code></h4>
 <p>On a <code>byte[]</code> constant with no initializer: bakes the file at <code>path</code> (relative to the source file) into it, gzip-compressed when asked; inflate with <code>std.data.compress.gzip.Reader</code>. <code>string(data)</code> turns a text asset back into text.</p>
       <h4><code>@icons(dir, name = &quot;&quot;, tinted = true)</code></h4>
