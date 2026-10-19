@@ -253,7 +253,11 @@ component Counter {
         </figure>
         <p>
           Every component also takes the inputs all components have: <code>enabled</code>,
-          <code>tooltip</code>, <code>focusable</code>, <code>tabStop</code>, <code>autofocus</code>.
+          <code>tooltip</code>, <code>onClick</code>, <code>onDoubleClick</code>, <code>onLongPress</code>,
+          <code>focusable</code>, <code>tabStop</code>, <code>autofocus</code>. A component given
+          <code>onClick</code> is clicked with the pointer, or with Space or Enter once it has the
+          focus, which it takes unless <code>focusable = false</code>; a controller that declares
+          <code>def clicked() { ... }</code> takes clicks itself, before its caller's <code>onClick</code>.
           Two arguments belong to the call and are no inputs: <code>key = value</code> says which child
           of a loop this is, and <code>ref = name</code> names the child (below).
         </p>
@@ -547,6 +551,15 @@ view {
           (<a href="#style-states">below</a>). An equal value emits nothing, nor do the values a component
           is built with.
         </p>
+        <p>
+          Any task may write a state, and the write takes effect at once. The UI loop holds the
+          program's state lock for each pass, and a statement elsewhere that reads or writes a
+          <code>@state</code> field holds it for that statement: <code>files.push(f)</code> from a worker
+          is one step the next frame sees whole. A task gives the lock up while it waits
+          (<code>await</code>, a channel, a sleep). A reference copied out of a state
+          (<code>let list = files</code>) is not guarded after its statement, so compute first and
+          assign the result.
+        </p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -592,7 +605,10 @@ def tabChanged(evt Event&lt;StateChange&gt;) {
         </div>
         <ul>
           <li>The key is a string literal of letters, digits, <code>.</code>, <code>_</code> and <code>-</code>,
-            and is the application's: every component that names it shares the value.</li>
+            and is the application's: every component that names it shares the value. Under
+            <code>PersistScope("left") { Editor() }</code> it is <code>left.&lt;key&gt;</code>, so two editors keep two
+            values; a scope inside another adds its name after the outer one's. The <code>persist</code> names of
+            <code>ScrollView</code>, <code>List</code>, <code>DataGrid</code> and <code>SplitPane</code> go under the scopes too.</li>
           <li>The type is one a vault value can be: numbers, strings, enums, arrays, maps, optionals,
             tuples, structs.</li>
           <li>A value changed in place is kept when the field is next assigned:
@@ -607,7 +623,8 @@ def tabChanged(evt Event&lt;StateChange&gt;) {
           A method marked <code>@emit()</code> is an event of the component: calling it runs the body and
           then tells the listeners. A listener is a function or a method marked <code>@on</code> that
           takes <code>ComponentEvent&lt;T&gt;</code> (<code>source</code>, <code>name</code>,
-          <code>result</code>), <code>T</code> being what the event method returns.
+          <code>result</code>), <code>T</code> being what the event method returns (<code>none</code> for
+          one that returns nothing, as <code>Button.clicked</code>).
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -670,6 +687,7 @@ def onRated(evt ComponentEvent&lt;int&gt;) {
           <tbody>
             <tr><td><code>def new()</code></td><td>Runs when the component is built: fields hold their defaults, inputs what the call passed.</td></tr>
             <tr><td><code>def attached()</code>, <code>def detached()</code></td><td>Run when the component enters the tree of a window and when it leaves it.</td></tr>
+            <tr><td><code>tasks</code></td><td>An <code>AsyncScope</code> for the work it starts while it is in a window (<code>async&lt;tasks&gt; watch()</code>): cancelled when it leaves the tree, before <code>detached()</code>.</td></tr>
             <tr><td><code>def render(ctx RenderContext)</code></td><td>Draws it. The default draws its shadows, background, borders and children. Runs when its inputs, style or place changed, or after <code>redraw()</code>.</td></tr>
             <tr><td><code>def measure(limit Limit) Size&lt;Pixels&gt;</code></td><td>The size of its own content, for a component that draws text or a picture.</td></tr>
             <tr><td><code>def pointer(e PointerEvent) bool</code>, <code>def key(e KeyEvent) bool</code></td><td>What a pointer and the keyboard do: offered to the component concerned, then to its ancestors until one returns true.</td></tr>
@@ -677,7 +695,7 @@ def onRated(evt ComponentEvent&lt;int&gt;) {
             <tr><td><code>parent()</code>, <code>children</code>, <code>next()</code>, <code>prev()</code></td><td>The tree around it.</td></tr>
             <tr><td><code>closest&lt;C&gt;()</code>, <code>find&lt;C&gt;(ref = "")</code></td><td>The nearest ancestor, or a descendant, of a component type.</td></tr>
             <tr><td><code>redraw()</code>, <code>rerun()</code>, <code>focus()</code>, <code>reveal()</code></td><td>Asks for a frame, runs the view again, takes the keyboard focus, scrolls itself into sight.</td></tr>
-            <tr><td><code>setChildren(given)</code></td><td>Makes the components of <code>given</code> what its view places with <code>children()</code>: for a component made in code that is to hold others, as a window's chrome holds the window's root.</td></tr>
+            <tr><td><code>setChildren(given)</code></td><td>Makes the components of <code>given</code> what its view places with <code>children()</code>: for a component that holds others made in code, as a window's chrome holds the window's root and a <code>ViewHost</code> its views. They stay while its caller's call has no block.</td></tr>
             <tr><td><code>enabled</code>, <code>disabled</code></td><td><code>enabled</code> is an input; <code>disabled</code> also holds under a disabled ancestor.</td></tr>
           </tbody>
         </table>
@@ -1169,6 +1187,13 @@ view {
           assigning <code>transition</code>, <code>enter</code> or <code>exit</code> again. When the desktop
           asks for reduced motion the moves happen at once and the fades stay.
         </p>
+        <p>
+          A change of look travels over the <code>transition</code> too: a state's look
+          (<code>on = {hover: {...}}</code>), a value the controller assigns to its style, a new theme.
+          The opacity, transform, background colour, corners, border colours, drop shadows and the
+          box's size and spacing move from what is drawn to the new values, colours through OKLab;
+          the style itself holds the new value at once, and only what is drawn is on the way.
+        </p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -1595,7 +1620,7 @@ def keep(evt Event&lt;CloseRequest&gt;) {
         </div>
         <p>
           A component finds the window it is in with <code>context&lt;Window&gt;()</code>; <code>window.state</code> and <code>window.visible</code> are assigned to minimize, maximize or hide it, and <code>window.close()</code> asks to close it as the user does (a <code>UI.closeRequested</code> handler may cancel). <code>UI.window(title = "Notes")</code> or <code>UI.window(name = "main")</code> finds an open window.
-          Also on the service: <code>closeWindow</code>, <code>raiseWindow</code>, <code>setWindowTitle</code>,
+          Also on the service: <code>closeWindow</code>, <code>raiseWindow</code>, <code>setWindowTitle</code>, <code>setPageTitle</code>,
           <code>setWindowIcon</code>, <code>showTray(icon, tooltip, menu)</code> and <code>hideTray()</code>,
           <code>displays()</code>, <code>appearance()</code> and <code>theme()</code>,
           <code>addIcons(set)</code>, <code>redraw()</code>, <code>stop()</code>. The full list with every
@@ -1645,8 +1670,8 @@ def keep(evt Event&lt;CloseRequest&gt;) {
             <div class="component-shot"><img src="assets/components/link.png" width="200" height="46" alt="Link" loading="lazy"></div>
             <div class="component-text">
               <h4><code>Link</code></h4>
-              <p>Text that goes somewhere when pressed, in the theme's link colour.</p>
-              <pre><code>Link(label = "Open the docs", onClick = openDocs)</code></pre>
+              <p>Text that goes somewhere when pressed, in the theme's link colour: a location of the application through its <code>Router</code> (<code>to</code>, shown as its tooltip, with "Copy link" on the secondary button), or what <code>onClick</code> runs.</p>
+              <pre><code>Link("Units", to = "/docs/units")</code></pre>
             </div>
           </div>
           <div class="component-card" id="c-icon">
@@ -1691,7 +1716,7 @@ def keep(evt Event&lt;CloseRequest&gt;) {
             <div class="component-shot"><img src="assets/components/button.png" width="360" height="60" alt="Button" loading="lazy"></div>
             <div class="component-text">
               <h4><code>Button</code></h4>
-              <p>Runs something when pressed with the pointer, Space or Enter. Takes an <code>icon</code> and a <code>trailing</code> icon.</p>
+              <p>Runs something when pressed with the pointer, Space or Enter. Takes an <code>icon</code> and a <code>trailing</code> icon, or components beside its label: <code>Button("Sync") { start = view { Spinner() } }</code>.</p>
               <pre><code>Button(label = "Save", onClick = save)</code></pre>
             </div>
           </div>
@@ -1757,11 +1782,25 @@ def keep(evt Event&lt;CloseRequest&gt;) {
       <div class="docs-sub" id="builtin-fields">
         <h3>Fields</h3>
         <div class="component-gallery">
+          <div class="component-card" id="c-colorpicker">
+            <div class="component-text">
+              <h4><code>ColorPicker</code>, <code>ColorWell</code></h4>
+              <p>A colour picked on a square of saturation and value, a strip of hues and one of opacity, typed as hex or taken from swatches. A <code>ColorWell</code> is a square of the colour that opens a picker under it.</p>
+              <pre><code>ColorWell(value = background, onChange = setBackground)</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-stepper">
+            <div class="component-text">
+              <h4><code>Stepper</code>, <code>Step</code></h4>
+              <p>The steps of a task done in order: a line of their titles (done, current, with an error or optional) over the current step's page. With <code>onSelect</code> a click on a step asks to go there.</p>
+              <pre><code>Stepper(current = at, onSelect = go) { Step("Account") { … }; Step("Plan", optional = true) { … } }</code></pre>
+            </div>
+          </div>
           <div class="component-card" id="c-textfield">
             <div class="component-shot"><img src="assets/components/textfield.png" width="420" height="60" alt="TextField" loading="lazy"></div>
             <div class="component-text">
               <h4><code>TextField</code></h4>
-              <p>One line of text: caret, selection, clipboard, a placeholder, icons at its ends; <code>kind</code> (<code>TextKind</code>) makes it a password, an email or a number field.</p>
+              <p>One line of text: caret, selection, clipboard, a placeholder, icons at its ends (or components, the slots <code>start</code> and <code>end</code>); <code>kind</code> (<code>TextKind</code>) makes it a password, an email or a number field.</p>
               <pre><code>TextField(value = name, placeholder = "Name", leading = "search")</code></pre>
             </div>
           </div>
@@ -2005,7 +2044,6 @@ toasts.show("Deleted", action = "Undo", onAction = restore) unless toasts is non
         <table class="docs-table">
           <thead><tr><th>Component</th><th>What it is</th></tr></thead>
           <tbody>
-            <tr><td><code>Pressable</code></td><td>Makes what is inside it something to press, with the pointer or, focused, Space or Enter.</td></tr>
             <tr><td><code>Image</code></td><td>A picture; <code>fit</code> says how it fills a box of another shape.</td></tr>
             <tr><td><code>Layered</code></td><td>Puts its children on top of each other, the last on top.</td></tr>
             <tr><td><code>Tooltip</code>, <code>HoverCard</code></td><td>Content shown beside what the pointer rests on; a hover card can be entered and used. For plain text every component has <code>tooltip = "..."</code>.</td></tr>

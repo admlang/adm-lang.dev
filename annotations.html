@@ -133,6 +133,8 @@
 <p>On a <code>byte[]</code> constant with no initializer: bakes the file at <code>path</code> (relative to the source file) into it, gzip-compressed when asked; inflate with <code>std.data.compress.gzip.Reader</code>. <code>string(data)</code> turns a text asset back into text.</p>
       <h4><code>@icons(dir, name = &quot;&quot;, tinted = true)</code></h4>
 <p>From <code>std.ui.icons</code> (<code>use std.ui.icons::(icons)</code>). On a <code>partial type</code>: bakes the SVG files of the folder <code>dir</code> (relative to the source file) into the program as an icon set. The type gets <code>set() !IconSet</code>, to hand to <code>UI.addIcons</code>, and one read-only name per file in Pascal case (<code>arrow-left.svg</code> is <code>ArrowLeft</code>, holding <code>icons/arrow-left</code>) for inputs that take an icon. The set is called <code>name</code>, the folder's name when left out; <code>tinted = false</code> keeps the files' colours. A file that is not an SVG document is a build error.</p>
+      <h4><code>@route(path)</code></h4>
+<p>From <code>std.ui.navigation</code>. On a component: makes it the page at <code>path</code> (<code>"/docs/\{name\}?tab"</code>), which <code>Routes()</code> shows for a matching location. A <code>\{name\}</code> segment and each query parameter listed after <code>?</code> fill the <code>@input</code> of that name (<code>string</code>, <code>int</code>, <code>float</code>, <code>bool</code>); a value that does not convert matches nothing. It runs during the build and writes a function that makes the page.</p>
       <h4><code>@env(name, defaultValue = &quot;&quot;)</code></h4>
 <p>On a variable or constant: fills it from the environment variable <code>name</code>, or the default when unset.</p>
       <h4><code>@command(name = &quot;&quot;, description = &quot;&quot;, aliases = &quot;&quot;, hidden = false)</code></h4>
@@ -262,6 +264,21 @@ type Remote {
         placed as if they were its parent's. A scoped component names no style and declares no
         <code>render</code>, and <code>isScoped</code> reads true on it.
       </p>
+      <h4><code>@action(label, shortcut = "", icon = "", enabled = none)</code></h4>
+      <p>
+        From <code>std.ui</code>: the method of a component's controller is an action, run by a button,
+        a menu line, a shortcut or a command palette. Named where an <code>Action</code> is expected
+        (<code>Button(action = save)</code>, <code>MenuItem(action = editor.close)</code>,
+        <code>let a Action = save</code>) it is that action on the component it was read from, with the
+        annotation's label, keys and icon; <code>enabled</code> names a method of the same controller
+        that takes nothing and returns <code>bool</code>, asked whenever the action shows or runs.
+        The keys run the action while the focus is in its component, the innermost first, and may be
+        two chords pressed one after the other (<code>"Ctrl+K Ctrl+C"</code>). The method takes no
+        arguments; a shortcut that names no key, a function that is no method, or a method without
+        <code>@action</code> where an <code>Action</code> is expected is a compile error.
+        <code>actionsOf(c)</code> lists a component's actions, <code>UI.actions()</code> every one the
+        program declares.
+      </p>
       <h4><code>@state</code></h4>
       <p>
         On a field written in a component's <code>type { }</code>: the field is a state of the
@@ -290,7 +307,8 @@ type Remote {
         The key is a string written in place, 1 to 244 letters <code>a-z</code> and
         <code>A-Z</code>, digits, <code>.</code>, <code>_</code> and <code>-</code>, and is the
         application's: every object of the type, and every type, service or component that
-        names the same key, shares the value. Fields that share a key have one type: two
+        names the same key, shares the value, except that a component under std.ui's
+        <code>PersistScope(name)</code> keeps it under <code>name.key</code>. Fields that share a key have one type: two
         <code>@persist</code> fields of a program that name a key with different types are a
         compile error at both. Each object gets a value of its own, so an
         array changed in place in one object changes no other. The field's type is one a vault

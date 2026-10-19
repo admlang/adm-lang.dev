@@ -640,7 +640,7 @@
 
     <section class="docs-section" id="area-ui">
       <h2>UI</h2>
-      <p>Components, views and styles. 67 codes.</p>
+      <p>Components, views and styles. 73 codes.</p>
       <table class="docs-table diag-table">
         <tr id="E-UI-0001"><td><code>E-UI-0001</code></td><td>error</td><td>component <span class="diag-hole">%q</span> must define a view block (inline or referenced)</td></tr>
         <tr id="E-UI-0002"><td><code>E-UI-0002</code></td><td>error</td><td>component <span class="diag-hole">%q</span> must define a style block (inline or referenced)</td></tr>
@@ -709,15 +709,21 @@
         <tr id="E-UI-0065"><td><code>E-UI-0065</code></td><td>error</td><td>slot <span class="diag-hole">%q</span> needs a fallback or to be optional: write <code><span class="diag-hole">%s</span> view = view { ... }</code>, or <code><span class="diag-hole">%s</span> ?view = none</code> and place it under <code>if !(<span class="diag-hole">%s</span> is none)</code></td></tr>
         <tr id="E-UI-0066"><td><code>E-UI-0066</code></td><td>error</td><td>a @scoped component names no style: it is not laid out or drawn, its children are placed as its parent&#x27;s; remove the style, or the annotation</td></tr>
         <tr id="E-UI-0067"><td><code>E-UI-0067</code></td><td>error</td><td>a @scoped component declares no render: it is not drawn; remove the method, or the annotation</td></tr>
+        <tr id="E-UI-0068"><td><code>E-UI-0068</code></td><td>error</td><td>an @action runs with no arguments: <span class="diag-hole">%s</span> takes <span class="diag-hole">%d</span></td></tr>
+        <tr id="E-UI-0069"><td><code>E-UI-0069</code></td><td>error</td><td>enabled must name a method of the same type that takes nothing and returns bool</td></tr>
+        <tr id="E-UI-0070"><td><code>E-UI-0070</code></td><td>error</td><td>shortcut <span class="diag-hole">%q</span>: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-UI-0071"><td><code>E-UI-0071</code></td><td>error</td><td><span class="diag-hole">%s</span> is a function, not an action: an Action is a method its controller declares with @action</td></tr>
+        <tr id="E-UI-0072"><td><code>E-UI-0072</code></td><td>error</td><td><span class="diag-hole">%s</span> has no @action: declare it with @action(&quot;Label&quot;) to use it as an Action</td></tr>
+        <tr id="E-UI-0073"><td><code>E-UI-0073</code></td><td>error</td><td><span class="diag-hole">%s</span> is a component: make it with a call, <code><span class="diag-hole">%s</span>() { ... }</code></td></tr>
       </table>
     </section>
 
     <section class="docs-section" id="area-meta">
       <h2>Annotations</h2>
-      <p>Annotations and build-time metas. 58 codes.</p>
+      <p>Annotations and build-time metas. 59 codes.</p>
       <table class="docs-table diag-table">
         <tr id="E-META-0001"><td><code>E-META-0001</code></td><td>error</td><td>@<span class="diag-hole">%s</span> runs during the build, and the program that calls it did not build: <span class="diag-hole">%s</span></td></tr>
-        <tr id="E-META-0002"><td><code>E-META-0002</code></td><td>error</td><td>@<span class="diag-hole">%s</span> adds members during the build, before names are resolved, and was not found then: it annotates a <code>partial type</code> declared in a module, and the file names its module (<code>use <span class="diag-hole">%s</span></code>, or <code><span class="diag-hole">%s</span>.<span class="diag-hole">%s</span></code> after it)</td></tr>
+        <tr id="E-META-0002"><td><code>E-META-0002</code></td><td>error</td><td>@<span class="diag-hole">%s</span> adds members during the build, before names are resolved, and was not found then: it annotates a <code>partial type</code> or a component declared in a module, and the file names its module (<code>use <span class="diag-hole">%s</span></code>, or <code><span class="diag-hole">%s</span>.<span class="diag-hole">%s</span></code> after it)</td></tr>
         <tr id="E-META-0003"><td><code>E-META-0003</code></td><td>error</td><td>@<span class="diag-hole">%s</span> is <span class="diag-hole">%s</span> here, but the build ran <span class="diag-hole">%s</span> for it, which the file&#x27;s imports also offer: write the annotation with its module&#x27;s name</td></tr>
         <tr id="E-META-0004"><td><code>E-META-0004</code></td><td>error</td><td>@<span class="diag-hole">%s</span> runs during the build and sets one value: annotate a single name with a declared type</td></tr>
         <tr id="E-META-0005"><td><code>E-META-0005</code></td><td>error</td><td>@<span class="diag-hole">%s</span> runs during the build and sets the value: the declaration takes no initializer</td></tr>
@@ -772,6 +778,7 @@
         <tr id="E-META-0054"><td><code>E-META-0054</code></td><td>error</td><td>module <span class="diag-hole">%q</span> is provided by more than one package: <span class="diag-hole">%s</span>; a program uses one package per module prefix, keep one of them in adm.lock or list it under [deps] in adm.toml</td></tr>
         <tr id="E-META-0055"><td><code>E-META-0055</code></td><td>error</td><td>@<span class="diag-hole">%s</span> adds members to <span class="diag-hole">%s</span> during the build, as another part of the type: declare it <code>partial type <span class="diag-hole">%s</span></code></td></tr>
         <tr id="E-META-0056"><td><code>E-META-0056</code></td><td>error</td><td>@<span class="diag-hole">%s</span> runs during the build, and the program that calls it did not build (its module cannot import code that uses what it generates): <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-META-0057"><td><code>E-META-0057</code></td><td>error</td><td>@<span class="diag-hole">%s</span> on component <span class="diag-hole">%s</span> can only add declarations beside it: <span class="diag-hole">%s</span></td></tr>
         <tr id="W-META-0001"><td><code>W-META-0001</code></td><td>warning</td><td>@<span class="diag-hole">%s</span>: <span class="diag-hole">%s</span></td></tr>
         <tr id="W-META-0002"><td><code>W-META-0002</code></td><td>warning</td><td>the members @<span class="diag-hole">%s</span> adds to <span class="diag-hole">%s</span> are not known here: build the program once (<code>adm build</code>, <code>adm test</code>) and they are</td></tr>
       </table>

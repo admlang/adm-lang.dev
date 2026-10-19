@@ -867,6 +867,10 @@ let letter = string('Z')    // char    -> string
 let held any = 7
 let seven = int(held)       // any     -> the type it holds; another type panics</code></pre>
         </div>
+        <p>
+          A type name is not reserved: a <code>let</code> or parameter named <code>byte</code> shadows
+          it, and <code>byte(x)</code> then calls that value.
+        </p>
 
         <p>
           Primitives aren't bare values either - they carry methods, so common operations read as
@@ -3757,7 +3761,8 @@ Card(title = "Profile") {
           A method of a component's <code>type { }</code> marked <code>@emit()</code> is an event of
           the component. A listener is a function or method marked <code>@on</code> that takes
           <code>ComponentEvent&lt;T&gt;</code> (<code>source</code>, <code>name</code>,
-          <code>result</code>): <code>@on(Button.clicked)</code> hears every button,
+          <code>result</code>; <code>T</code> is <code>none</code> for an event without a result):
+          <code>@on(Button.clicked)</code> hears every button,
           <code>@on(save.clicked)</code> the one the ref <code>save</code> holds, and
           <code>@on(Button.clicked, ref("save"))</code> those a selector matches. A listening method
           runs for each live instance of its type.
@@ -3777,7 +3782,9 @@ Card(title = "Profile") {
           component, the field's name, the new value and the one it replaced. Listeners
           (<code>@on(UI.stateChange)</code>, taking <code>Event&lt;StateChange&gt;</code>) run at the
           assignment, whoever makes it: a method, other code, the parent's view passing the input
-          another value, a bound input assigned by the child. Numbers, strings and enums compare by
+          another value, a bound input assigned by the child. Any task may assign a state: a statement
+          that reads or assigns one holds the program's state lock, which the UI loop holds for each
+          pass and a task gives up while it waits. Numbers, strings and enums compare by
           value, objects, arrays and maps by identity (a change in place is no assignment); an equal
           value emits nothing, nor do the values a component is built with. A selector picks the changes
           a listener hears: <code>@on(UI.stateChange, ref("mainTabs").state("selected"))</code>, or
@@ -3827,7 +3834,8 @@ def hide(c component) {
         </div>
         <p>
           <code>look is Card</code>, with a style declaration, tests that the value is that style
-          and narrows it to it. <code>style.clone()</code> returns a copy of a style with the same
+          or a style that embeds it, and narrows it to a view of <code>Card</code>: its properties
+          are read and written on the style itself. <code>style.clone()</code> returns a copy of a style with the same
           property values, which no component has as its <code>style</code>.
         </p>
         <h3>Enter and exit</h3>

@@ -2023,6 +2023,10 @@ Network.lab.conditions.unreachable = "*"         // offline</code></pre>
         <p>The ADM runtime itself - host info, memory, environment, service registry, and the one door to other programs: <code>run</code> starts a command through the system shell behind the <code>adm.runtime.spawn</code> permission, whose description says what granting it means: trusting the package completely. Foreign code (<code>@c</code>, <code>@link</code>, <code>@native</code>, <code>@extern</code>) is not a permission: a dependency binding it is accepted by the developer at install and refused by the build otherwise, see <a href="policy.html#foreign">Policy</a>.</p>
         <ul class="api-list">
           <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def open(address string) !none</code></div>
+            <p class="api-doc">Opens an address in the program the desktop chooses for it: a web page in the browser, a <code>mailto:</code> address in the mail program, a file in its viewer. The desktop's opener gets the address as its one argument, with no shell in between. Needs <code>adm.runtime.open</code>, which is narrower than <code>adm.runtime.spawn</code>. Fails when the policy denies it, the address is empty or starts with <code>-</code>, or the opener cannot open it.</p>
+          </li>
+          <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def systemInfo() SystemInfo</code></div>
             <p class="api-doc">Returns information about the host system running the ADM runtime.</p>
 
@@ -2597,7 +2601,7 @@ step.end()</code></pre>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def openWindow&lt;T: component&gt;(root T, cfg r.WindowConfig) !r.Window</code></div>
-            <p class="api-doc">Opens a window that shows root: the component that stands for the window. Call it again for each further window; run serves them all. With <code>cfg.persist = "main"</code> the window opens with the size, place and state (maximized, fullscreen) it had when it was last open, on a display that still shows that place, and keeps them as the user changes them; the name is a key of the <code>@persist</code> store (<a href="#svc-vault"><code>Vault</code></a>, <code>persist.&lt;name&gt;</code>).</p>
+            <p class="api-doc">Opens a window that shows root: the component that stands for the window. Call it again for each further window; run serves them all. With <code>cfg.persist = "main"</code> the window opens with the size, place and state (maximized, fullscreen) it had when it was last open, on a display that still shows that place, and keeps them as the user changes them; the name is a key of the <code>@persist</code> store (<a href="#svc-vault"><code>Vault</code></a>, <code>persist.&lt;name&gt;</code>). A second window opened under a name an open window already keeps opens as written and is not kept.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def openDefaultWindow&lt;T: component&gt;(root T) !r.Window</code></div>
@@ -2618,8 +2622,12 @@ step.end()</code></pre>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setWindowTitle(win r.Window, title string) !none</code></div>
-            <p class="api-doc">Sets a window's title.</p>
+            <p class="api-doc">Sets a window's title. While a <code>Page</code> shown in it declares a title, the page's is shown and this one comes back when no page declares one any more.</p>
 
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setPageTitle(win r.Window, page component, title ?string) !none</code></div>
+            <p class="api-doc">Declares the title of <code>page</code>, shown in <code>win</code>, in place of the window's own; none takes it back. The title of the page that declared last is shown: the innermost of pages that hold others. What <code>Page</code> calls.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setWindowIcon(win r.Window, icon image.Image) !none</code></div>

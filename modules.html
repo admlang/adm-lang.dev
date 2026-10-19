@@ -1596,7 +1596,7 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>UI</code>, <code>UIConfig</code></td><td>UI service</td></tr>
           <tr><td><code>StyleSheet</code>, <code>StyleRule</code>, <code>rule</code></td><td>rules that restyle components by selector; <code>UI.addStyles(sheet)</code>, <code>UI.removeStyles(sheet)</code>, <code>components.Styled(sheet)</code>, <code>StyleSheet.add</code>, <code>changed</code></td></tr>
-          <tr><td><code>ComponentRenderer</code>, <code>RenderContext</code>, <code>RenderPasses</code>, <code>Geometry</code>, <code>TextKind</code>, <code>WindowState</code>, <code>WindowKind</code>, <code>CloseRequest</code>, <code>MenuEntry</code>, <code>PointerEvent</code>, <code>PointerPhase</code>, <code>Modifiers</code>, <code>Limit</code>, <code>TextInputClient</code>, <code>TextRange</code>, <code>StateChange</code>, <code>@action</code>, <code>Viewport</code>, <code>Theme</code>, <code>Palette</code></td><td>component drawing, resolved layout, state events, actions</td></tr>
+          <tr><td><code>ComponentRenderer</code>, <code>RenderContext</code>, <code>RenderPasses</code>, <code>Geometry</code>, <code>TextKind</code>, <code>WindowState</code>, <code>WindowKind</code>, <code>CloseRequest</code>, <code>MenuEntry</code>, <code>PointerEvent</code>, <code>PointerPhase</code>, <code>Modifiers</code>, <code>Limit</code>, <code>TextInputClient</code>, <code>TextRange</code>, <code>StateChange</code>, <code>@action</code>, <code>Action</code>, <code>ActionInfo</code>, <code>actionsOf</code>, <code>Viewport</code>, <code>Theme</code>, <code>Palette</code></td><td>component drawing, resolved layout, state events, actions</td></tr>
           <tr><td><code>Theme</code>, <code>themeOf</code></td><td>the values styles read as <code>theme</code>; <code>themeOf(component)</code> is the theme that component's style reads: the nearest one provided, else <code>UI.theme()</code></td></tr>
           <tr><td><code>DragData</code>, <code>DropEffect</code></td><td>what is dragged: a value of the application's own, text, file paths, other forms by MIME type; what a drop would do (none, copy, move, link)</td></tr>
           <tr><td><code>StyleNode</code>, <code>StyleClass</code>, <code>BoxStyle</code>, <code>FontStyle</code>, <code>Selector</code></td><td>style model</td></tr>
@@ -1625,12 +1625,44 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Align</code>, <code>Alignment</code>, <code>Direction</code>, <code>Arrange</code>, <code>Distribute</code>, <code>Position</code>, <code>Layer</code></td><td>alignment, direction, arrangement and positioning</td></tr>
         </table>
       </div>
+      <div class="docs-sub" id="std-ui-charts">
+        <h3><code>std.ui.charts</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>Chart</code>, <code>ChartViewport</code>, <code>ChartPoint</code></td><td>a plot of the series in its block: bound <code>viewport</code> (an empty axis fits the data), wheel zoom and drag pan, <code>onPointSelected</code> and event <code>pointSelected</code>, <code>drawTo(painter, width, height)</code></td></tr>
+          <tr><td><code>LineSeries</code>, <code>AreaSeries</code>, <code>BarSeries</code>, <code>ScatterSeries</code></td><td>series of <code>ys</code> over <code>xs</code> (the indices without); long lines are thinned per pixel column keeping every peak</td></tr>
+          <tr><td><code>Axis</code>, <code>AxisSide</code>, <code>Legend</code></td><td>marks of round steps on a side of the plot, with <code>label</code>, <code>grid</code> and <code>format</code>; the series and their colours</td></tr>
+          <tr><td><code>ChartTransform</code>, <code>ChartPart</code>, <code>ChartSeries</code>, <code>niceTicks</code>, <code>tickText</code></td><td>from data to pixels and back; what a part and a series of a chart answer; round axis steps and their text</td></tr>
+        </table>
+      </div>
+
+      <div class="docs-sub" id="std-ui-maps">
+        <h3><code>std.ui.maps</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>MapView</code></td><td>a map of raster tiles: bound <code>center</code> and <code>zoom</code>, <code>tiles</code>, drag pan, wheel and double-click zoom; tiles fetched on its tasks and kept</td></tr>
+          <tr><td><code>Marker</code>, <code>Polyline</code>, <code>Polygon</code></td><td>what its block puts on it: something at a coordinate (a pin without content), a line, an area</td></tr>
+          <tr><td><code>TileSource</code>, <code>XyzTiles</code>, <code>MapError</code></td><td>where tiles come from; tiles at an XYZ address over HTTP, kept in <code>cacheDir</code>; a tile the server did not give</td></tr>
+          <tr><td><code>MapTransform</code>, <code>MapPart</code>, <code>worldPixel</code>, <code>worldCoordinate</code></td><td>from coordinates to the view's pixels and back; what a part answers; a coordinate's pixel of the world map at a zoom and back</td></tr>
+        </table>
+      </div>
+
+      <div class="docs-sub" id="std-ui-navigation">
+        <h3><code>std.ui.navigation</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>route</code>, <code>Routes</code>, <code>Outlet</code></td><td>a component as the page at a path; the page for the current location, inside the pages around it that place an <code>Outlet</code>; <code>notFound</code></td></tr>
+          <tr><td><code>Router</code>, <code>History</code>, <code>MemoryHistory</code></td><td>where a window is: <code>go</code>, <code>back</code>, <code>forward</code>, <code>location</code>, <code>canGoBack</code>; the entries behind it, each keeping how far its <code>ScrollView(persist = ...)</code>s were scrolled (<code>scrollOf</code>, <code>keepScroll</code>)</td></tr>
+          <tr><td><code>Page</code></td><td>what describes the page it holds: <code>title</code> (the window's title while it is shown), <code>description</code>, <code>canonical</code>, <code>image</code>, <code>language</code>, <code>robots</code>, <code>themeColor</code></td></tr>
+          <tr><td><code>Location</code>, <code>parseLocation</code>, <code>locationText</code>, <code>RoutePattern</code>, <code>parsePattern</code>, <code>matchPattern</code>, <code>declaredRoutes</code></td><td>a path with its query and fragment; a route's path and the values a location gives it; the pages the build found</td></tr>
+        </table>
+      </div>
+
       <div class="docs-sub" id="std-ui-components">
         <h3><code>std.ui.components</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Row</code>, <code>Column</code>, <code>HBox</code>, <code>VBox</code>, <code>Grid</code>, <code>Layered</code>, <code>Panel</code>, <code>ScrollView</code>, <code>SplitPane</code>, <code>Spacer</code>, <code>Divider</code>, <code>WindowDrag</code></td><td>layout: rows, columns, grids, stacked layers, scrolling, panes a divider resizes, the bar an undecorated window is moved by</td></tr>
           <tr><td><code>TabMove</code></td><td>a tab of a <code>TabStrip</code> dragged from one place to another (<code>onMove</code>, event <code>moved</code>); <code>onClose</code> gives each tab a cross</td></tr>
           <tr><td><code>FocusScope</code></td><td>remembers which component in it had the keyboard focus and gives it back when Tab returns; <code>trap</code> keeps Tab inside</td></tr>
+          <tr><td><code>PersistScope</code></td><td>puts the kept values of what it holds under its name: <code>PersistScope("left") { Editor() }</code></td></tr>
+          <tr><td><code>ViewHost</code>, <code>TakenView</code></td><td>views placed by key from code (<code>insert</code>, <code>remove</code>, <code>move</code>, <code>replace</code>); <code>take</code> moves a live view to another host</td></tr>
           <tr><td><code>List</code>, <code>RowItem</code>, <code>Source</code>, <code>SourceChange</code>, <code>SourceChangeKind</code>, <code>SelectionMode</code>, <code>ListStyle</code>, <code>ListRowStyle</code></td><td>a virtualised list <code>List&lt;T, I = T&gt;</code> (an item is its own id unless <code>id</code> returns another) over an array or a <code>Source&lt;T&gt;</code> (<code>count()</code>, <code>at(i)</code>, <code>changes()</code>): <code>id</code>, <code>selected</code>, <code>selection</code>, <code>rowHeight</code>, <code>rowRenderer</code> (takes a <code>RowItem&lt;T&gt;</code>: <code>content</code>, <code>index</code>, <code>selected</code>, <code>current</code>, and in a tree <code>depth</code> and <code>expanded</code>), <code>onChange</code>, <code>onOpen</code>, events <code>changed</code> and <code>opened</code>, <code>reveal(id)</code>, <code>current()</code></td></tr>
           <tr><td><code>Tree</code>, <code>NodeToggle</code>, <code>TreeStyle</code></td><td>a tree <code>Tree&lt;T, I = T&gt;</code> on a <code>List</code> of the rows that show: <code>roots</code>, <code>id</code>, <code>expand</code> (a node's children, asked when it first opens), <code>leaf</code>, <code>expanded</code>, <code>selected</code>, <code>selection</code>, <code>rowHeight</code>, <code>rowRenderer</code>, <code>onChange</code>, <code>onOpen</code>, <code>onToggle</code>, events <code>changed</code>, <code>opened</code> and <code>toggled</code> (a <code>NodeToggle&lt;T&gt;</code>), <code>reveal(id)</code>, <code>current()</code></td></tr>
           <tr><td><code>DataGrid</code>, <code>GridColumn</code>, <code>GridSort</code>, <code>DataGridStyle</code></td><td>a grid <code>DataGrid&lt;T, I = T&gt;</code> on a <code>List</code>: <code>rows</code> or <code>source</code>, <code>columns</code> (<code>GridColumn&lt;T&gt;</code>: <code>title</code>, <code>cell</code>, <code>width</code>, <code>order</code>, <code>sortable</code>, <code>key</code>, <code>resizable</code>), <code>id</code>, <code>selected</code>, <code>selection</code>, <code>rowHeight</code>, <code>sortBy</code>, <code>descending</code>, <code>persist</code>, <code>onChange</code>, <code>onOpen</code>, <code>onSort</code>, events <code>changed</code>, <code>opened</code> and <code>sorted</code> (a <code>GridSort</code>), <code>reveal(id)</code>, <code>current()</code></td></tr>
@@ -1640,16 +1672,18 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Draggable</code>, <code>DropTarget</code></td><td>something dragged inside a window, with a preview that follows the pointer; a place it, or files and text dragged in from another application, are dropped on</td></tr>
           <tr><td><code>Text</code>, <code>Heading</code>, <code>Label</code>, <code>Link</code>, <code>Image</code>, <code>Icon</code>, <code>Badge</code>, <code>Chip</code>, <code>Avatar</code></td><td>text, pictures, icons by name, short notes and tokens</td></tr>
           <tr><td><code>Canvas</code></td><td>a box the application draws in itself</td></tr>
-          <tr><td><code>Button</code>, <code>ToggleButton</code>, <code>SplitButton</code>, <code>Pressable</code></td><td>buttons; anything made pressable</td></tr>
-          <tr><td><code>Checkbox</code>, <code>Radio</code>, <code>Switch</code>, <code>Slider</code>, <code>Dropdown</code>, <code>ComboBox</code></td><td>choices</td></tr>
+          <tr><td><code>Button</code>, <code>ToggleButton</code>, <code>SplitButton</code></td><td>buttons (any component takes <code>onClick</code>)</td></tr>
+          <tr><td><code>Checkbox</code>, <code>Radio</code>, <code>Switch</code>, <code>Slider</code>, <code>Dropdown</code>, <code>ComboBox</code></td><td>choices; a dropdown and a combo box take options of any type, read through <code>text</code></td></tr>
           <tr><td><code>TextField</code>, <code>TextArea</code>, <code>SearchField</code>, <code>NumberField</code></td><td>text and number entry</td></tr>
+          <tr><td><code>ColorPicker</code>, <code>ColorWell</code></td><td>a colour picked on a square of saturation and value, strips of hue and opacity, hex or swatches; a well opens a picker from a square of the colour</td></tr>
+          <tr><td><code>Stepper</code>, <code>Step</code></td><td>the steps of a task done in order, one page shown at a time under a line of their titles</td></tr>
           <tr><td><code>MenuBar</code>, <code>Menu</code>, <code>MenuItem</code>, <code>SubMenu</code>, <code>MenuSeparator</code>, <code>ContextMenu</code></td><td>menus</td></tr>
           <tr><td><code>Tabs</code>, <code>Tab</code>, <code>TabStrip</code>, <code>Breadcrumbs</code>, <code>Accordion</code>, <code>AccordionItem</code>, <code>Toolbar</code>, <code>StatusBar</code></td><td>pages, sections, bars</td></tr>
           <tr><td><code>Popover</code>, <code>Dialog</code>, <code>Drawer</code>, <code>HoverCard</code>, <code>Tooltip</code>, <code>Toast</code>, <code>Side</code></td><td>content that floats over the window; the side it opens on</td></tr>
           <tr><td><code>Toasts</code>, <code>ToastHost</code>, <code>ToastKind</code></td><td>notices asked for in code: <code>Toasts</code> is an interface (<code>show(text, kind, lasts, action, onAction)</code>, <code>dismiss(number)</code>, <code>clear()</code>) found with <code>context&lt;Toasts&gt;()</code>; <code>ToastHost(limit = 3) { ... }</code> provides the standard one and stacks its notices; <code>Toast</code> has <code>kind</code>, <code>action</code> and <code>onAction</code></td></tr>
           <tr><td><code>WindowChrome</code></td><td>the frame of a window drawn by the application, given as <code>WindowConfig.chrome</code>: <code>title</code>, <code>icon</code>, <code>header</code>, <code>minimize</code>, <code>maximize</code>, <code>close</code></td></tr>
           <tr><td><code>ProgressBar</code>, <code>Spinner</code></td><td>progress</td></tr>
-          <tr><td><code>ButtonStyle</code>, <code>ToggleButtonStyle</code>, <code>TextStyle</code>, <code>TextFieldStyle</code>, <code>MenuItemStyle</code>, <code>PanelStyle</code>, <code>RowStyle</code>, <code>ColumnStyle</code>, <code>GridStyle</code>, <code>ScrollViewStyle</code>, <code>DialogStyle</code>, <code>PopoverStyle</code>, <code>DropdownStyle</code>, <code>MenuBarStyle</code>, <code>AccordionItemStyle</code>, <code>PressableStyle</code>, <code>ControlStyle</code>, <code>MarkedStyle</code>, <code>MarkStyle</code>, <code>BarStyle</code>, <code>FigureStyle</code>, <code>BoxStyle</code></td><td>the components' styles</td></tr>
+          <tr><td><code>ButtonStyle</code>, <code>ToggleButtonStyle</code>, <code>TextStyle</code>, <code>TextFieldStyle</code>, <code>MenuItemStyle</code>, <code>PanelStyle</code>, <code>RowStyle</code>, <code>ColumnStyle</code>, <code>GridStyle</code>, <code>ScrollViewStyle</code>, <code>DialogStyle</code>, <code>PopoverStyle</code>, <code>DropdownStyle</code>, <code>MenuBarStyle</code>, <code>AccordionItemStyle</code>, <code>ControlStyle</code>, <code>MarkedStyle</code>, <code>MarkStyle</code>, <code>BarStyle</code>, <code>FigureStyle</code>, <code>BoxStyle</code></td><td>the components' styles</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-ui-renderer">
@@ -1690,7 +1724,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Effect</code>, <code>DropShadow</code>, <code>InnerShadow</code>, <code>OuterGlow</code>, <code>InnerGlow</code>, <code>Blur</code>, <code>Outline</code>, <code>ColorAdjust</code>, <code>ColorMatrix</code></td><td>group effects</td></tr>
           <tr><td><code>Layers</code>, <code>Layer</code>, <code>LayerGroup</code>, <code>LayerItem</code></td><td>layer stacks with masks, clipping layers and folders</td></tr>
           <tr><td><code>TextStyle</code>, <code>TextAlign</code>, <code>TextBaseline</code>, <code>TextOrientation</code>, <code>TextMetrics</code>, <code>GlyphBox</code></td><td>shaped, hinted text, horizontal or vertical</td></tr>
-          <tr><td><code>Paragraph</code>, <code>TextSpan</code>, <code>TextLine</code></td><td>wrapped, aligned paragraphs of styled spans</td></tr>
+          <tr><td><code>Paragraph</code>, <code>ParagraphStyle</code>, <code>TextSpan</code>, <code>TextLine</code></td><td>wrapped paragraphs of styled spans in both directions (Unicode bidi): aligned or justified lines, indents, tab stops, word spacing, a line limit with an ellipsis, balanced lines</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-gfx-render">
