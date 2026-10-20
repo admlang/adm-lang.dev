@@ -204,8 +204,9 @@ component Counter {
         </figure>
         <p>
           The view names the controller's fields and methods directly: <code>count</code> in the text,
-          <code>add</code> as the button's handler. A view runs again on every frame that is drawn, and
-          an argument whose value changed is given to the child, so the text follows the count.
+          <code>add</code> as the button's handler. A view runs again when its component changed (here
+          <code>add</code> changes <code>count</code>), and an argument whose value changed is given to
+          the child, so the text follows the count.
           The three pieces can be written in place, as here, or declared apart and named
           (<code>view CounterView</code>, <code>style Frame</code>, <code>type Counting</code>).
           The examples below name a style <code>Frame</code> where the look does not matter: a
@@ -455,13 +456,25 @@ FileList(["main.adm", "lib.adm", "notes.md"]) {
       <div class="docs-sub" id="view-runs">
         <h3>When a view runs</h3>
         <p>
-          A view runs when its component is built and again on every frame that is drawn. On a run after
-          the first, each argument is compared with what was passed the last time and assigned to the
-          child's input when it differs; numbers, strings and enums compare by value, objects, arrays and
-          maps by identity. Literals and handlers are bound once, when the child is built.
+          A view runs when its component is built, and again in the next frame once the component
+          changed: a field of its own (an input, a state or any other field) took another value, it
+          called <code>redraw()</code>, a component its view names with <code>ref</code> changed, or the
+          runtime changed what it gives it (<code>hover</code> and the other states, <code>em</code>,
+          <code>disabled</code>, the window's size, the theme). On a run after the first, each argument
+          is compared with what was passed the last time and assigned to the child's input when it
+          differs; numbers, strings and enums compare by value, objects, arrays and maps by identity.
+          Literals and handlers are bound once, when the child is built. The same goes for the
+          component's style and <code>render</code>: a frame in which nothing changed runs no view, no
+          style, no layout and draws nothing.
         </p>
         <ul>
-          <li>A view body is cheap and has no effects: it is run often.</li>
+          <li>A view body is cheap and has no effects.</li>
+          <li>What a view reads through another reference (a model object changed in place, a
+            service, a global) shows after the user's next press, key, text or drop, or a drag of a
+            component given a handler, which runs every view of the window again since a handler
+            may have changed it. A task, a timer or
+            the wheel that changes such a value calls <code>redraw()</code> on the component, or one
+            above it, which runs the views under it again too. <code>UI.redraw()</code> runs every view.</li>
           <li>An argument that builds an array or an object on every run is a new value on every run.
             Keep it in a field and pass the field.</li>
           <li>Frames are drawn when something happened in the window (an event, a state that changed,
@@ -694,7 +707,7 @@ def onRated(evt ComponentEvent&lt;int&gt;) {
             <tr><td><code>style</code></td><td>Its style object: <code>style.width = 300(px)</code>. <code>style.geom</code> is where layout put it.</td></tr>
             <tr><td><code>parent()</code>, <code>children</code>, <code>next()</code>, <code>prev()</code></td><td>The tree around it.</td></tr>
             <tr><td><code>closest&lt;C&gt;()</code>, <code>find&lt;C&gt;(ref = "")</code></td><td>The nearest ancestor, or a descendant, of a component type.</td></tr>
-            <tr><td><code>redraw()</code>, <code>rerun()</code>, <code>focus()</code>, <code>reveal()</code></td><td>Asks for a frame, runs the view again, takes the keyboard focus, scrolls itself into sight.</td></tr>
+            <tr><td><code>redraw()</code>, <code>rerun()</code>, <code>focus()</code>, <code>reveal()</code></td><td>Shows what it and the components under it read that changed in place (from <code>render</code>: draws it again), runs the view again now, takes the keyboard focus, scrolls itself into sight.</td></tr>
             <tr><td><code>setChildren(given)</code></td><td>Makes the components of <code>given</code> what its view places with <code>children()</code>: for a component that holds others made in code, as a window's chrome holds the window's root and a <code>ViewHost</code> its views. They stay while its caller's call has no block.</td></tr>
             <tr><td><code>enabled</code>, <code>disabled</code></td><td><code>enabled</code> is an input; <code>disabled</code> also holds under a disabled ancestor.</td></tr>
           </tbody>

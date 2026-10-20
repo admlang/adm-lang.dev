@@ -3821,9 +3821,14 @@ Card(title = "Profile") {
         </p>
         <p>
           A view names its controller's fields, properties and methods directly in the arguments of the
-          components it places (<code>Text(text = title)</code>). The view runs again on every frame
-          that runs: an argument whose value differs from what was passed the last time is assigned to
-          the child's input. An <code>if</code>, <code>match</code> or <code>when</code> in a view is
+          components it places (<code>Text(text = title)</code>). The view runs again in the next frame
+          once its component changed: one of its fields (an input, a state or any other) took another
+          value, it called <code>redraw()</code>, a component it names with <code>ref</code> changed, or
+          the window, the theme or a state such as <code>hover</code> did. An argument whose value
+          differs from what was passed the last time is then assigned to the child's input, which
+          changes the child in turn. What a view reads through any other reference (a model object
+          changed in place, a service, a global) shows once the component, or one above it, calls
+          <code>redraw()</code>. An <code>if</code>, <code>match</code> or <code>when</code> in a view is
           evaluated again too, so components enter and leave with their branch, and a loop is iterated
           again, keeping its children by position. A view body must therefore be cheap and without
           effects. Literals and handlers (<code>onClick = f</code>) are bound when the component is built; a handler names a function, a method of the controller, or is a function literal closing over the controller and the view's locals (each child of a loop gets the values of its own pass). Optional and tuple arguments are compared member by member. <code>new Name(...)</code> on a component is the call <code>Name(...)</code>: the view is mounted.
