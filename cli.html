@@ -1190,6 +1190,7 @@ adm lint --list</code></pre>
         <tr><td><code>ADM_CLANG</code></td><td>C compiler driver that links the program (default: the bundled <code>tools/clang</code>, else <code>clang</code> on <code>PATH</code>).</td></tr>
         <tr><td><code>ADM_OS, ADM_ARCH</code></td><td>Target operating system and architecture (default: the host); <code>wasm</code> is the web.</td></tr>
         <tr><td><code>ADM_SYSROOT_&lt;OS&gt;_&lt;ARCH&gt;</code></td><td>Sysroot for a target. Unset: <code>adm build</code> links a Linux program against the baseline sysroot shipped in <code>lib/sysroots/</code> (glibc 2.35) when it holds every library the program links, so the program runs on systems from that glibc on; when a library is missing there it links against the build machine's files and says so. <code>adm run</code> and <code>adm test</code> link against the build machine's files; another platform needs the variable. A path: that sysroot, for every command. <code>host</code>: the build machine's files.</td></tr>
+        <tr><td><code>MACOSX_DEPLOYMENT_TARGET</code></td><td>Oldest macOS a Darwin build runs on (default <code>12.0</code>): the version in the objects' target triple and in clang's <code>-mmacosx-version-min</code> for C compiles and links.</td></tr>
         <tr><td><code>ADM_SIGNING_KEY</code></td><td>Base64 Ed25519 publisher private key used for signing, instead of the key file <code>adm app init</code> wrote.</td></tr>
         <tr><td><code>ADM_DIST_REPO</code></td><td>GitHub <code>owner/name</code> whose releases <code>adm version</code> and <code>adm update</code> read (default <code>admlang/adm</code>).</td></tr>
         <tr><td><code>ADM_LLVM_WORKERS</code></td><td>Processes a cold build compiles modules in, the compiler itself counted (n-1 worker processes start; default: one per core, at most 24, bounded by free memory); <code>0</code> or <code>1</code> compiles in-process.</td></tr>
@@ -1212,7 +1213,7 @@ adm lint --list</code></pre>
         <tr><td><code>ADM_TASK_STACK</code></td><td>Stack reserved per task (default <code>32M</code>; pages become resident only when touched).</td></tr>
         <tr><td><code>ADM_TASK_GUARD</code></td><td><code>1</code> (default) gives each task a guard page; <code>0</code> allocates stacks in slabs with canaries, for millions of tasks.</td></tr>
         <tr><td><code>ADM_SCHED_MAX_WORKERS</code></td><td>Cap on carrier threads for tasks blocked in system calls (default 10000).</td></tr>
-        <tr><td><code>ADM_PREEMPT</code></td><td><code>1</code> preempts a task that runs 10 ms without yielding (Linux x86-64); default is cooperative only.</td></tr>
+        <tr><td><code>ADM_PREEMPT</code></td><td><code>1</code> preempts a task that runs 10 ms without yielding (Linux x86-64 and arm64, macOS arm64); default is cooperative only.</td></tr>
         <tr><td><code>ADM_SCHED_DEBUG</code></td><td>Traces scheduling decisions to stderr.</td></tr>
         <tr><td><code>ADM_AFFINITY_CHECK</code></td><td><code>1</code>: panics when a thread-affine call runs on an unpinned task, or on a pinned task that is not on its own thread.</td></tr>
         <tr><td><code>ADM_CPU</code></td><td><code>baseline</code> runs the SSE2 copies of SIMD functions; by default the AVX2/FMA copies run on CPUs that have them.</td></tr>

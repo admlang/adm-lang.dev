@@ -4459,7 +4459,7 @@ let results = try instance.invoke("add", wasm.Value[
         <tr><th>Constant</th><th>Description</th></tr>
         <tr><td><code>__compiler_version__</code></td><td>The compiler's semantic version string.</td></tr>
         <tr><td><code>__target__</code></td><td>Full target triple: CPU-Vendor-OS (e.g. <code>"x86_64-unknown-linux-gnu"</code>).</td></tr>
-        <tr><td><code>__os__</code></td><td>OS of the active compilation target (<code>"linux"</code>, <code>"windows"</code>, <code>"macos"</code>, <code>"android"</code>, <code>"wasm"</code>).</td></tr>
+        <tr><td><code>__os__</code></td><td>OS of the active compilation target (<code>"linux"</code>, <code>"windows"</code>, <code>"darwin"</code>, <code>"android"</code>, <code>"wasm"</code>).</td></tr>
         <tr><td><code>__arch__</code></td><td>Architecture of the active target (<code>"x86_64"</code>, <code>"arm64"</code>, <code>"wasm32"</code>).</td></tr>
         <tr><td><code>__build_timestamp__</code></td><td>ISO-8601 timestamp of when the build ran.</td></tr>
         <tr><td><code>__app_name__</code></td><td>The application's name: from <code>adm.toml</code>, else <code>@manifest</code>, else the declared <code>application</code> name.</td></tr>

@@ -539,8 +539,8 @@ application Launch {
     <div class="wrap get-started-inner">
       <h2 class="section-title">Download</h2>
       <p class="lede">
-        ADM ships as a single self-contained package: the compiler, the standard library and a
-        bundled C toolchain.
+        ADM ships as a single package: the compiler and the standard library, with a bundled C
+        toolchain on Linux and the Xcode Command Line Tools' clang on macOS.
       </p>
 
       <div class="dl" id="download">
@@ -560,7 +560,26 @@ application Launch {
         </div>
 
         <div class="dl-panel" data-os="mac" hidden>
-          <p class="dl-soon">Not yet. The macOS package is coming; Linux is the only platform released today.</p>
+          <p class="dl-label">Install with one command (current user, no sudo):</p>
+          <div class="dl-cmd-wrap">
+            <pre class="dl-cmd"><code class="nohighlight" data-hl="off">curl -fsSL https://raw.githubusercontent.com/admlang/adm/main/install.sh | sh</code></pre>
+            <button class="dl-copy" type="button" aria-label="Copy command" title="Copy" data-copy="curl -fsSL https://raw.githubusercontent.com/admlang/adm/main/install.sh | sh">
+              <svg class="dl-copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <svg class="dl-copied-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            </button>
+          </div>
+          <p class="dl-note">
+            For macOS 12 or newer on Apple Silicon. Needs the Xcode Command Line Tools
+            (<code>xcode-select --install</code>), whose clang builds your programs. Installs into
+            <code>~/.adm</code> and adds <code>~/.adm/bin</code> to your PATH; later,
+            <code>adm update</code> fetches new releases. Not on macOS yet: programs that open UI
+            windows, web builds (<code>--os wasm</code>), file watching, the sandbox and
+            <code>--hot</code>. Prefer to do it by hand? Grab the
+            <code>adm-&lt;version&gt;-darwin-arm64.tar.gz</code> from the
+            <a href="https://github.com/admlang/adm/releases/latest">latest release</a>, unpack it,
+            run <code>xattr -dr com.apple.quarantine</code> on the folder (a browser download is
+            quarantined) and put its <code>bin/</code> on PATH.
+          </p>
         </div>
 
         <div class="dl-panel" data-os="linux">
@@ -582,7 +601,7 @@ application Launch {
         </div>
 
         <div class="dl-panel" data-os="windows" hidden>
-          <p class="dl-soon">Not yet. The Windows package is coming; Linux is the only platform released today.</p>
+          <p class="dl-soon">Not yet. The Windows package is coming; Linux and macOS are released today.</p>
         </div>
       </div>
 
@@ -641,6 +660,14 @@ application Launch {
       });
     });
   });
+
+  // Open the visitor's own system; Linux stays the default for the rest.
+  (function () {
+    var platform = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
+    var os = /mac/i.test(platform) ? 'mac' : /win/i.test(platform) ? 'windows' : '';
+    var tab = os && document.querySelector('.dl-tab[data-os="' + os + '"]');
+    if (tab) tab.click();
+  })();
 
   document.querySelectorAll('.dl-copy').forEach(function (btn) {
     btn.addEventListener('click', function () {
