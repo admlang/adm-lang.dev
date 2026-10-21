@@ -570,9 +570,9 @@ application Launch {
           </div>
           <p class="dl-note">
             For macOS 12 or newer on Apple Silicon. Needs the Xcode Command Line Tools
-            (<code>xcode-select --install</code>), whose clang builds your programs. Installs into
-            <code>~/.adm</code> and adds <code>~/.adm/bin</code> to your PATH; later,
-            <code>adm update</code> fetches new releases. Not on macOS yet: programs that open UI
+            (<code>xcode-select --install</code>). Installs into
+            <code>~/.adm</code> and adds <code>~/.adm/bin</code> to your PATH. <code>adm update</code> fetches
+            new releases. Not on macOS yet: programs that open UI
             windows, web builds (<code>--os wasm</code>), file watching, the sandbox and
             <code>--hot</code>. Prefer to do it by hand? Grab the
             <code>adm-&lt;version&gt;-darwin-arm64.tar.gz</code> from the
@@ -610,15 +610,12 @@ application Launch {
             </button>
           </div>
           <p class="dl-note">
-            New in 0.1.2416 and tested on Windows 11 x64; built for Windows 10 version 1903 or newer
-            (Windows 11 on Arm runs it emulated). The
-            package carries clang, lld and the C library, so nothing else is needed to build
-            programs. Installs into <code>%LOCALAPPDATA%\adm</code> and adds its <code>bin</code> to
-            your user PATH; later, <code>adm update</code> fetches new releases, and
-            <code>uninstall.ps1</code> in that folder removes it. Not on Windows yet: web builds (<code>--os wasm</code>), the devices service and the OS
-            sandbox. Prefer to do it by hand? Grab the
-            <code>adm-&lt;version&gt;-windows-amd64.zip</code> from the
-            <a href="https://github.com/admlang/adm/releases/latest">latest release</a>, unpack it
+            Windows 10 version 1903 or newer, x64. It goes into
+            <code>%LOCALAPPDATA%\adm</code> and adds its <code>bin</code> to your user PATH.
+            <code>adm update</code> fetches new releases; to remove it, run
+            <code>powershell -ExecutionPolicy Bypass -File "$env:LOCALAPPDATA\adm\uninstall.ps1"</code>.
+            By hand: unpack <code>adm-&lt;version&gt;-windows-amd64.zip</code> from the
+            <a href="https://github.com/admlang/adm/releases/latest">latest release</a>
             anywhere and put its <code>bin</code> on PATH.
           </p>
         </div>
