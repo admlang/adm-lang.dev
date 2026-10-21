@@ -540,7 +540,7 @@ application Launch {
       <h2 class="section-title">Download</h2>
       <p class="lede">
         ADM ships as a single package: the compiler and the standard library, with a bundled C
-        toolchain on Linux and the Xcode Command Line Tools' clang on macOS.
+        toolchain on Linux and Windows and the Xcode Command Line Tools' clang on macOS.
       </p>
 
       <div class="dl" id="download">
@@ -601,7 +601,26 @@ application Launch {
         </div>
 
         <div class="dl-panel" data-os="windows" hidden>
-          <p class="dl-soon">Not yet. The Windows package is coming; Linux and macOS are released today.</p>
+          <p class="dl-label">Install with one command in PowerShell (current user, no administrator):</p>
+          <div class="dl-cmd-wrap">
+            <pre class="dl-cmd"><code class="nohighlight" data-hl="off">irm https://raw.githubusercontent.com/admlang/adm/main/install.ps1 | iex</code></pre>
+            <button class="dl-copy" type="button" aria-label="Copy command" title="Copy" data-copy="irm https://raw.githubusercontent.com/admlang/adm/main/install.ps1 | iex">
+              <svg class="dl-copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <svg class="dl-copied-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            </button>
+          </div>
+          <p class="dl-note">
+            New in 0.1.2416 and tested on Windows 11 x64; built for Windows 10 version 1903 or newer
+            (Windows 11 on Arm runs it emulated). The
+            package carries clang, lld and the C library, so nothing else is needed to build
+            programs. Installs into <code>%LOCALAPPDATA%\adm</code> and adds its <code>bin</code> to
+            your user PATH; later, <code>adm update</code> fetches new releases, and
+            <code>uninstall.ps1</code> in that folder removes it. Not on Windows yet: web builds (<code>--os wasm</code>), the devices service and the OS
+            sandbox. Prefer to do it by hand? Grab the
+            <code>adm-&lt;version&gt;-windows-amd64.zip</code> from the
+            <a href="https://github.com/admlang/adm/releases/latest">latest release</a>, unpack it
+            anywhere and put its <code>bin</code> on PATH.
+          </p>
         </div>
       </div>
 

@@ -569,7 +569,7 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>File</code></td><td>open file</td></tr>
           <tr><td><code>readFile</code>, <code>writeFile</code>, <code>open</code>, <code>stat</code>, <code>readDir</code>, <code>exists</code>, <code>remove</code>, <code>rename</code>, <code>mkdir</code>, <code>rmdir</code>, <code>chmod</code>, <code>touch</code></td><td>file operations</td></tr>
-          <tr><td><code>join</code>, <code>dir</code>, <code>base</code>, <code>extension</code>, <code>split</code>, <code>clean</code>, <code>isAbs</code></td><td>paths</td></tr>
+          <tr><td><code>join</code>, <code>dir</code>, <code>base</code>, <code>extension</code>, <code>split</code>, <code>clean</code>, <code>isAbs</code>, <code>absolute</code></td><td>paths, in the system's form (on Windows with drives and shares, <code>\</code> and <code>/</code>)</td></tr>
           <tr><td><code>run</code>, <code>output</code></td><td>start a program (needs <code>adm.runtime.spawn</code>)</td></tr>
           <tr><td><code>Process</code>, <code>Pipe</code></td><td>a program started by <code>Runtime.start</code> that runs beside this one: <code>input</code>, <code>output</code> and <code>errors</code> pipes (<code>io.Reader</code>/<code>io.Writer</code>), <code>wait()</code>, <code>wait(timeout)</code>, <code>terminate()</code>, <code>kill()</code>, <code>id()</code></td></tr>
           <tr><td><code>mapFile</code>, <code>Mapping</code></td><td>memory-mapped files: <code>read</code> copies a range, <code>pages</code> is an array over the mapping's own pages (no copy; a file larger than memory)</td></tr>
@@ -578,6 +578,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>symlink</code>, <code>freeSpace</code>, <code>totalSpace</code>, <code>unixMode</code>, <code>fromUnixMode</code></td><td>links, disk space, Unix mode bits</td></tr>
           <tr><td><code>watch</code>, <code>Watcher</code>, <code>Change</code>, <code>ChangeKind</code></td><td>changes to files and directories</td></tr>
           <tr><td><code>appHome</code></td><td>the application's own folder</td></tr>
+          <tr><td><code>tempDir</code>, <code>tempFile</code></td><td>the folder for temporary files (<code>TMPDIR</code> or <code>/tmp</code>, <code>%TMP%</code> on Windows); a new file there, or in a folder given, with a name no one else has, open for reading and writing</td></tr>
           <tr><td><code>homeDir</code>, <code>resolve</code></td><td>the user's home folder; the absolute, shortest form of a path, where <code>~</code> is that folder and a relative path starts at the working directory</td></tr>
         </table>
       </div>
@@ -596,6 +597,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>DiskStore</code></td><td>the disk, optionally confined to a folder</td></tr>
           <tr><td><code>MemoryStore</code></td><td>file tree in memory</td></tr>
           <tr><td><code>copy</code></td><td>file or tree between any two stores</td></tr>
+          <tr><td><code>cleanPath</code></td><td>a store path in its shortest <code>/</code> form, on every system</td></tr>
           <tr><td><code>FileEntry</code>, <code>FileKind</code></td><td>listing entries</td></tr>
         </table>
       </div>

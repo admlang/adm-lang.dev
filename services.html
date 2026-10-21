@@ -705,7 +705,7 @@ Cache.lab.conditions.missRate = 0.25       // one read in four misses</code></pr
       </div>
       <div class="docs-sub" id="svc-clipboard">
         <h3><code>Clipboard</code></h3>
-        <p>Text copy and paste through the system clipboard. The service drives the desktop's clipboard program: wl-copy and wl-paste on Wayland, xclip or xsel on X11, pbcopy and pbpaste on macOS. A machine without one reports nothing available and the calls fail. Reading needs <code>adm.clipboard.read</code>, writing <code>adm.clipboard.write</code>, and both run the program through <code>Runtime.run</code>, so <code>adm.runtime.spawn</code> as well. <code>copy</code>, <code>paste</code> and <code>clear</code> are commits, so <code>@on(Clipboard.copy)</code>, <code>@on(Clipboard.paste)</code> and <code>@on(Clipboard.clear)</code> observe them. The programs run through the shell, which the OS sandbox refuses. A program with a window open uses the window system's clipboard instead: <code>std.ui</code> answers the <code>reading</code> and <code>writing</code> events for calls made on the task that runs the windows.</p>
+        <p>Text copy and paste through the system clipboard. The service drives the desktop's clipboard program: wl-copy and wl-paste on Wayland, xclip or xsel on X11, pbcopy and pbpaste on macOS; on Windows it uses the system clipboard itself. A machine without one reports nothing available and the calls fail. Reading needs <code>adm.clipboard.read</code>, writing <code>adm.clipboard.write</code>, and a clipboard program runs through <code>Runtime.run</code>, so <code>adm.runtime.spawn</code> as well. <code>copy</code>, <code>paste</code> and <code>clear</code> are commits, so <code>@on(Clipboard.copy)</code>, <code>@on(Clipboard.paste)</code> and <code>@on(Clipboard.clear)</code> observe them. The programs run through the shell, which the OS sandbox refuses. A program with a window open uses the window system's clipboard instead: <code>std.ui</code> answers the <code>reading</code> and <code>writing</code> events for calls made on the task that runs the windows.</p>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def copy(text string) !none</code></div>
@@ -727,7 +727,7 @@ Cache.lab.conditions.missRate = 0.25       // one read in four misses</code></pr
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def capabilities() ClipboardCapabilities</code></div>
-            <p class="api-doc">Reports whether this machine has a clipboard program and which one: <code>wl-clipboard</code>, <code>xclip</code>, <code>xsel</code> or <code>pbcopy</code>.</p>
+            <p class="api-doc">Reports whether this machine has a clipboard program and which one: <code>wl-clipboard</code>, <code>xclip</code>, <code>xsel</code> or <code>pbcopy</code>; <code>windows</code> for the Windows clipboard, <code>browser</code> on the web.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def watch(period duration = 500ms) !none</code></div>
@@ -1778,11 +1778,11 @@ Network.lab.conditions.unreachable = "*"         // offline</code></pre>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def resolverConfig() string</code></div>
-            <p class="api-doc">The text of the system's resolver configuration (<code>/etc/resolv.conf</code>), "" when it cannot be read. Read without a storage permission: name resolution is part of connecting.</p>
+            <p class="api-doc">The system's resolver configuration in the <code>resolv.conf</code> format (<code>/etc/resolv.conf</code>; on Windows the DNS servers of the adapters that are up and the search list), "" when there is none. Read without a storage permission: name resolution is part of connecting.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def hostsFile() string</code></div>
-            <p class="api-doc">The text of the system's hosts file (<code>/etc/hosts</code>), "" when it cannot be read. Read without a storage permission, as <code>resolverConfig</code> is.</p>
+            <p class="api-doc">The text of the system's hosts file (<code>/etc/hosts</code>; on Windows <code>System32\drivers\etc\hosts</code>), "" when it cannot be read. Read without a storage permission, as <code>resolverConfig</code> is.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def sendToNameServer(fd int, query byte[], server string, timeout duration = 5s) !int</code></div>
