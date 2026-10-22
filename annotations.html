@@ -395,7 +395,7 @@ component Shell {
       <h4><code>@parallel()</code></h4>
 <p>Lets the test run at the same time as the other <code>@parallel()</code> tests of its suite, each on its own task, after the suite's other tests and nested suites. They share one time limit, the longest of theirs, and what they print is not kept apart. No effect on a benchmark or a fuzz target.</p>
       <h4><code>@skip(reason = &quot;&quot;)</code></h4>
-<p>Skips the test, reporting the reason. On a <code>check</code> suite: skips all its tests and benchmarks, nested suites included.</p>
+<p>Skips the test, reporting the reason. On a <code>check</code> suite: skips all its tests and benchmarks, nested suites included. A test that can only tell while it runs (a device missing, a permission refused) returns <code>testing.skip(reason)</code> instead.</p>
       <h4><code>@only()</code></h4>
 <p>Runs just the tests carrying it while it is present. On a <code>check</code> suite: all its tests carry it.</p>
       <h4><code>@golden(file)</code></h4>

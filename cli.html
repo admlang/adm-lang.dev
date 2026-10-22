@@ -1221,6 +1221,7 @@ adm lint --list</code></pre>
         <tr><td><code>ADM_CPU</code></td><td><code>baseline</code> runs the SSE2 copies of SIMD functions; by default the AVX2/FMA copies run on CPUs that have them.</td></tr>
         <tr><td><code>ADM_CUDA</code></td><td>Launch path of a <code>cuda def</code>: unset picks the GPU when available, <code>gpu</code> requires it, <code>cpu</code> forces the CPU emulation. <code>ADM_CUDA_DEVICE</code> picks the device ordinal (default <code>0</code>).</td></tr>
         <tr><td><code>ADM_VIDEO_HW</code></td><td>GPU video decoding in <code>std.formats.video</code>: <code>auto</code> (default), <code>nvdec</code>, <code>vaapi</code> or <code>off</code>.</td></tr>
+        <tr><td><code>SDL_GAMECONTROLLERCONFIG</code></td><td>Game pad mappings <code>std.devices.openGamepad</code> reads after the ones it is given, as lines of SDL's game controller database, the way SDL reads them</td></tr>
         <tr><td><code>ADM_APP_HOME</code></td><td>Overrides the application's home folder; see <a href="app-home.html">Application home</a>.</td></tr>
         <tr><td><code>ADM_SANDBOX</code></td><td><code>1</code> applies the OS sandbox at startup from the compiled policy; <code>0</code> turns off one the manifest compiled in. See <a href="policy.html">Policy</a>.</td></tr>
         <tr><td><code>ADM_POLICY_PROMPT</code></td><td><code>0</code> turns off the desktop prompt a policy <code>ask</code> rule raises; the ask then denies.</td></tr>

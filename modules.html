@@ -627,7 +627,7 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-proto">
         <h3><code>std.proto</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>DBusConnection</code>, <code>dbusConnect</code></td><td>D-Bus session bus client (Linux)</td></tr>
+          <tr><td><code>DBusConnection</code>, <code>dbusConnect</code>, <code>dbusSessionBusAddress</code>, <code>dbusSystemBusAddress</code></td><td>D-Bus client for the session and system buses (Linux)</td></tr>
           <tr><td><code>DBusMessage</code>, <code>DBusWriter</code>, <code>DBusReader</code></td><td>D-Bus wire format</td></tr>
         </table>
       </div>
@@ -1512,10 +1512,21 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-devices">
         <h3><code>std.devices</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>Camera</code>, <code>cameras</code>, <code>openCamera</code></td><td>cameras (V4L2)</td></tr>
-          <tr><td><code>Speaker</code>, <code>speakers</code>, <code>defaultSpeaker</code>, <code>openSpeaker</code></td><td>sound output</td></tr>
-          <tr><td><code>Microphone</code>, <code>microphones</code>, <code>defaultMicrophone</code>, <code>openMicrophone</code></td><td>sound input</td></tr>
+          <tr><td><code>Camera</code>, <code>cameras</code>, <code>openCamera</code></td><td>cameras (V4L2): frames at a chosen size, rate and format; the camera's modes, controls (exposure, focus, white balance) and <code>configure</code></td></tr>
+          <tr><td><code>Frame</code>, <code>PixelFormat</code>, <code>toImage</code>, <code>toVideoFrame</code></td><td>a captured frame (MJPEG, YUYV, UYVY, NV12, YUV 4:2:0, grey) as an RGBA image or as YUV planes</td></tr>
+          <tr><td><code>CameraMode</code>, <code>CameraControl</code>, <code>ControlKind</code></td><td>what <code>modes()</code> and <code>controls()</code> report</td></tr>
+          <tr><td><code>Speaker</code>, <code>speakers</code>, <code>defaultSpeaker</code>, <code>openSpeaker</code></td><td>sound output through the desktop's sound server (shared memory where it allows) or the sound card; an empty id follows the desktop's default; the speaker's own <code>volume</code>, <code>mute</code>, <code>unmute</code>, <code>muted</code></td></tr>
+          <tr><td><code>Microphone</code>, <code>microphones</code>, <code>defaultMicrophone</code>, <code>openMicrophone</code></td><td>sound input, the same way, with its own volume and mute</td></tr>
+          <tr><td><code>volume</code>, <code>muted</code>, <code>mute</code>, <code>unmute</code></td><td>a speaker's or microphone's own volume and mute, shared by every program using it: through the sound server or on the card's mixer</td></tr>
+          <tr><td><code>soundChanges</code>, <code>SoundChange</code>, <code>SoundChangeKind</code></td><td>speakers and microphones added, removed, changing volume or mute, and the desktop's default changing, as they happen</td></tr>
+          <tr><td><code>InputDevice</code>, <code>inputDevices</code>, <code>openInput</code>, <code>InputEvent</code>, <code>InputKind</code>, <code>Axis</code></td><td>keyboards, mice and game pads read event by event outside any window: reports, axes, keys down, exclusive grab, rumble</td></tr>
+          <tr><td><code>Gamepad</code>, <code>gamepads</code>, <code>openGamepad</code>, <code>GamepadControl</code>, <code>GamepadState</code>, <code>GamepadEvent</code></td><td>game pads by the names games use (A, B, X, Y, shoulders, triggers from 0 to 1, sticks with a dead zone, D-pad, Start, Back, Guide), rumble</td></tr>
+          <tr><td><code>GamepadMapping</code>, <code>parseGamepadMappings</code></td><td>which of a pad's buttons and axes make each control, as lines of SDL's game controller database; pads that follow the kernel's layout need none</td></tr>
+          <tr><td><code>PowerSource</code>, <code>powerSources</code>, <code>powerChanges</code>, <code>PowerChange</code>, <code>PowerKind</code>, <code>ChargeState</code>, <code>BatteryHealth</code></td><td>batteries, AC adapters and UPSs: charge, charging state, time to empty or full, health, wear, cycle count, a peripheral's battery; from UPower, the kernel or a UPS's HID reports, with their changes as they happen</td></tr>
           <tr><td><code>HidDevice</code>, <code>hidDevices</code>, <code>openHid</code></td><td>raw HID devices: input, output and feature reports, report descriptors</td></tr>
+          <tr><td><code>SerialPort</code>, <code>serialPorts</code>, <code>openSerial</code>, <code>Parity</code>, <code>FlowControl</code>, <code>ModemLines</code></td><td>serial ports in raw mode at any baud rate: timed reads and writes (a <code>net.Stream</code>), framing, flow control, drain, break, the modem lines</td></tr>
+          <tr><td><code>Gps</code>, <code>gpsDevices</code>, <code>openGps</code>, <code>GpsFix</code>, <code>Satellite</code>, <code>GnssSystem</code>, <code>FixQuality</code>, <code>FixMode</code></td><td>GPS receivers on a serial port (NMEA 0183, the baud rate found) or through gpsd: position, altitudes, speed, course, time, fix quality, DOPs and the satellites in view and used</td></tr>
+          <tr><td><code>NmeaSentence</code>, <code>parseNmea</code></td><td>one NMEA 0183 sentence taken apart, its checksum checked, and written back</td></tr>
         </table>
         <p class="exports-note">Linux only for now.</p>
       </div>
@@ -1779,6 +1790,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>@test</code>, <code>@benchmark</code>, <code>@fuzz</code>, <code>@skip</code>, <code>@only</code>, <code>@timeout</code>, <code>@parallel</code>, <code>@golden</code></td><td>annotations for <a href="docs.html#testing">check suites</a></td></tr>
           <tr><td><code>beforeAll</code>, <code>beforeEach</code>, <code>afterEach</code>, <code>afterAll</code></td><td>lifecycle hooks of a suite</td></tr>
           <tr><td><code>expect</code>, <code>expectEqual</code>, <code>expectTrue</code>, <code>expectError</code>, …</td><td>assertions</td></tr>
+          <tr><td><code>skip</code></td><td>a test that finds it cannot run on this machine (no device, no permission) ends with <code>return testing.skip(reason)</code> and is reported skipped</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-reflection">

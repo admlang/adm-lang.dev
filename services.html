@@ -946,7 +946,7 @@ try Config.switchProfile(&quot;dev&quot;)                     // [profiles.dev.d
       </div>
       <div class="docs-sub" id="svc-devices">
         <h3><code>Devices</code></h3>
-        <p>Cameras, microphones, GPUs, USB, and other attached hardware. Linux only for now. Listing needs <code>adm.devices.list</code>.</p>
+        <p>Cameras, microphones, GPUs, USB, serial ports, GPS receivers and other attached hardware. Linux only for now. Listing needs <code>adm.devices.list</code>; the permissions <code>camera</code>, <code>microphone</code>, <code>input</code>, <code>volume</code>, <code>serial</code> and <code>location</code> are required by the <code>std.devices</code> functions that use them. A sound card's node is its control node (<code>/dev/snd/controlC4</code>), which holds its mixer. A serial port (<code>serial:ttyACM0</code>) is a <code>Gps</code> when its USB ids are a GPS maker's.</p>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def list(kind ?DeviceKind = none) !Device[]</code></div>
@@ -964,17 +964,17 @@ try Config.switchProfile(&quot;dev&quot;)                     // [profiles.dev.d
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def watch(period duration = 1s) !none</code></div>
-            <p class="api-doc">Starts polling for devices connecting and disconnecting every period; connected/disconnected fire for the changes. The devices already there when watching starts are not reported.</p>
+            <p class="api-doc">Starts watching for devices connecting and disconnecting; connected/disconnected fire for the changes. On Linux the kernel's device events trigger a new listing; without them the devices are listed again every period. The devices already there when watching starts are not reported.</p>
             <p class="api-doc">Fails when already watching or the period is not positive.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def unwatch() !none</code></div>
-            <p class="api-doc">Stops polling.</p>
+            <p class="api-doc">Stops watching.</p>
             <p class="api-doc">Fails when not watching.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def watching() bool</code></div>
-            <p class="api-doc">Whether the polling task runs.</p>
+            <p class="api-doc">Whether the watching task runs.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def connected(device Device) Device</code></div>
@@ -986,8 +986,12 @@ try Config.switchProfile(&quot;dev&quot;)                     // [profiles.dev.d
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def open(id string) !int</code></div>
-            <p class="api-doc">Opens the device's node for reading and writing and returns its descriptor for Storage.read/write/control/map/wait. Opening asks no permission of its own: the modules that drive a kind of device (<code>std.devices.openCamera</code>, <code>openMicrophone</code>) require the kind's permission themselves.</p>
+            <p class="api-doc">Opens the device's node for reading and writing and returns its descriptor for Storage.read/write/control/map/wait. Opening asks no permission of its own: the modules that drive a kind of device (<code>std.devices.openCamera</code>, <code>openMicrophone</code>) require the kind's permission themselves, and check its <code>device</code> rules (<code>DeviceSpec</code>) against the id. A speaker's or microphone's node never makes the open wait: one another program holds fails at once.</p>
             <p class="api-doc">Fails when there is no such device, it has no node, or the node cannot be opened.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def opened(fd int) ?Device</code></div>
+            <p class="api-doc">The device a descriptor <code>open</code> returned belongs to, none for one it did not return or that is closed. Holding the descriptor is what tells a program about the device, so this asks no permission.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def close(fd int) !none</code></div>
@@ -2238,6 +2242,11 @@ Network.lab.conditions.unreachable = "*"         // offline</code></pre>
       <div class="docs-sub" id="svc-storage">
         <h3><code>Storage</code></h3>
         <p>Files, directories, memory maps, and device control. A <code>Path</code> argument takes a plain string; the policy checks it before the method runs.</p>
+        <p>A failed call names the operation in its message (<code>open: No such file or directory</code>) and carries the errno's name as <code>error.code</code> on every system: <code>ENOENT</code>, <code>EEXIST</code>, <code>EACCES</code>, <code>EBUSY</code>, <code>ENOTEMPTY</code>, ... The lab's failures carry the same codes, so a handler tested under the lab works on a real disk.</p>
+<pre><code>let text = os.readFile(path) onerror (err error) {
+	recover [] when err.code == "ENOENT"   // first run: nothing saved yet
+	fail err
+}</code></pre>
         <p><strong>Lab conditions</strong> (<code>Storage.lab.conditions</code>, see <a href="#labs">Service labs</a>). The defaults change nothing.</p>
         <table class="docs-table">
           <tr>
@@ -2393,8 +2402,13 @@ Storage.lab.conditions.corruptReads = 0.01</code></pre>
             <p class="api-doc">Fails when the handle is not a mapping.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def control(fd int, request int, data byte[]) !byte[]</code></div>
-            <p class="api-doc">Sends a driver request on the descriptor with data as its argument, which the driver may write back; returns the buffer as it is afterwards.</p>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def control(fd int, request int, data byte[]) !int</code></div>
+            <p class="api-doc">Sends a driver request on the descriptor with data as its argument, which the driver writes its answer back into, and returns the request's result: 0 for most requests, a count for some (a feature report's length, a name's length, a new descriptor).</p>
+            <p class="api-doc">Fails when the driver refuses.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def control(fd int, request int, value int) !int</code></div>
+            <p class="api-doc">Sends a driver request whose argument is a number rather than a buffer (grabbing an input device, removing a force-feedback effect, flushing a terminal), and returns the request's result.</p>
             <p class="api-doc">Fails when the driver refuses.</p>
           </li>
           <li class="api-item">
