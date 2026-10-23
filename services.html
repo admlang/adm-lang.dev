@@ -946,7 +946,7 @@ try Config.switchProfile(&quot;dev&quot;)                     // [profiles.dev.d
       </div>
       <div class="docs-sub" id="svc-devices">
         <h3><code>Devices</code></h3>
-        <p>Cameras, microphones, GPUs, USB, serial ports, GPS receivers and other attached hardware. Linux only for now. Listing needs <code>adm.devices.list</code>; the permissions <code>camera</code>, <code>microphone</code>, <code>input</code>, <code>volume</code>, <code>serial</code> and <code>location</code> are required by the <code>std.devices</code> functions that use them. A sound card's node is its control node (<code>/dev/snd/controlC4</code>), which holds its mixer. A serial port (<code>serial:ttyACM0</code>) is a <code>Gps</code> when its USB ids are a GPS maker's.</p>
+        <p>Cameras, microphones, GPUs, USB, serial ports, GPS receivers and other attached hardware. Linux only for now. Listing needs <code>adm.devices.list</code>; the permissions <code>camera</code>, <code>microphone</code>, <code>input</code>, <code>volume</code>, <code>serial</code> and <code>location</code> are required by the <code>std.devices</code> functions that use them. A sound card's node is its control node (<code>/dev/snd/controlC4</code>), which holds its mixer. A serial port (<code>serial:ttyACM0</code>) is a <code>Gps</code> when its USB ids are a GPS maker's; reading a GPS takes <code>location</code> alone, whichever receiver or port.</p>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def list(kind ?DeviceKind = none) !Device[]</code></div>

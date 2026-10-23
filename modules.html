@@ -922,7 +922,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>H264</code>, <code>HEVC</code>, <code>AV1</code>, <code>VP9</code>, <code>Mpeg2</code>, <code>Mpeg4Part2</code>, <code>Msmpeg4v2</code>, <code>VP8</code>, <code>Theora</code>, <code>MJPEG</code></td><td>decoders</td></tr>
           <tr><td><code>VideoEncoder</code>, <code>VP8Encoder</code>, <code>H264Encoder</code></td><td>encoding pictures to packets at a bitrate (VP8, H.264 Constrained Baseline: key frames on request, temporal layers)</td></tr>
           <tr><td><code>WebMWriter</code>, <code>save</code>, <code>write</code></td><td>writing WebM: packets of VP8, VP9, AV1, Vorbis and Opus tracks, or pictures and sound encoded as VP8 and Opus</td></tr>
-          <tr><td><code>VideoHardware</code>, <code>HardwareDecoder</code>, <code>GpuPicture</code>, <code>download</code></td><td>GPU decoding (NVDEC, VA-API), frames kept on the GPU</td></tr>
+          <tr><td><code>VideoHardware</code>, <code>HardwareDecoder</code>, <code>GpuPicture</code>, <code>GpuImage</code>, <code>importGpuImage</code>, <code>download</code></td><td>GPU decoding (NVDEC, VA-API), frames kept on the GPU and drawn there by the OpenGL and Vulkan renderers</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-archive">
@@ -1703,10 +1703,10 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-ui-renderer">
         <h3><code>std.ui.renderer</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>Host</code>, <code>GLSurface</code></td><td>what a window system provides: windows, events, text input, clipboard, displays, tray; OpenGL surfaces</td></tr>
+          <tr><td><code>Host</code>, <code>GLSurface</code>, <code>VulkanSurface</code>, <code>PixelSurface</code></td><td>what a window system provides: windows, events, text input, clipboard, displays, tray; OpenGL or Vulkan surfaces, or windows that take pixels</td></tr>
           <tr><td><code>Renderer</code>, <code>getRenderer</code></td><td>renderer interface</td></tr>
           <tr><td><code>Window</code>, <code>WindowConfig</code>, <code>PlatformEvent</code>, <code>Frame</code></td><td>windows, low-level events, frames</td></tr>
-          <tr><td><code>opengl</code>, <code>cpu</code></td><td>renderers</td></tr>
+          <tr><td><code>opengl</code>, <code>vulkan</code>, <code>cpu</code></td><td>renderers: OpenGL, Vulkan 1.2 or newer (the same GPU canvas as SPIR-V, in floats on a device without doubles), the CPU canvas shown as pixels with no GPU (desktop windows and web canvases alike)</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-gfx">
