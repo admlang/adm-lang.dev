@@ -1470,6 +1470,12 @@ internal interface Dog {
           <code>==</code> on two interface values compares what they hold: the same object held
           twice is equal, two different objects are not.
         </p>
+        <p>
+          A method named on an interface value without a call (<code>host.greet</code>, with
+          <code>host Host</code>) is a function value bound to that value, as a method named on an
+          object is: <code>apply(host.greet, "x")</code> calls <code>greet</code> on the object the
+          interface holds. Methods from embedded interfaces work the same way.
+        </p>
 
         <p>
           A <code>datatype</code> is the same idea applied to data instead of behavior: it describes a
@@ -1696,8 +1702,9 @@ let u2 User&lt;string&gt; = new(name="alice")
         <h3>Constructors &amp; Destructors</h3>
         <p>
           <code>def new(...)</code> runs right after allocation; <code>def dispose()</code> runs when
-          the runtime disposes the instance. Neither one declares a return type. Construction accepts
-          named arguments the same way any call does:
+          the runtime disposes the instance. Neither one declares a return type, and
+          <code>dispose</code> takes no parameters: it is the destructor, so a method that takes
+          arguments has another name. Construction accepts named arguments the same way any call does:
         </p>
         <div class="code-window">
           <div class="code-titlebar">
@@ -2870,7 +2877,11 @@ let f File = try open("file")</code></pre>
         <p>
           <code>fail</code> mirrors <code>return</code>, but returns an error instead of a result.
           Failing with a string is shorthand for building the builtin <code>Error</code> struct;
-          failing with any struct that has the same shape works too, so you can attach extra fields:
+          failing with any struct that has the same shape works too, so you can attach extra fields.
+          A handler tells them apart with <code>is</code>: <code>err is MyCustomStruct</code> is true
+          for an error raised with that struct and reads its fields in the branch;
+          <code>err is Error</code> is true for the plain error a string or an
+          <code>Error</code> literal raises.
         </p>
         <p>
           A <code>return</code> without a value ends a function that has no result, one declared

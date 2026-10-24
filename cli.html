@@ -435,7 +435,7 @@ adm test --list --json std/io</code></pre>
         <tr><th>Flag</th><th>Meaning</th></tr>
         <tr><td><code>--dir DIR</code></td><td>Project directory (walks up to the nearest <code>adm.lock</code>).</td></tr>
         <tr><td><code>--no-pull</code></td><td>Use the local registry clone without pulling, however old it is.</td></tr>
-        <tr><td><code>--json</code></td><td>One object per package; the same shape as <code>adm lib --json</code>.</td></tr>
+        <tr><td><code>--json</code></td><td>One object per package; the same shape as <code>adm lib --json</code>. <code>root</code> is the folder an installed package's sources load from.</td></tr>
       </table>
       <h3 id="audit"><code>adm audit</code></h3>
       <div class="code-window">
@@ -672,10 +672,20 @@ adm app policy set adm.clipboard.read deny</code></pre>
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="code-filename">usage</span>
         </div>
-        <pre><code data-hl="off" class="nohighlight">adm new</code></pre>
+        <pre><code data-hl="off" class="nohighlight">adm new application|library|plugin &lt;folder&gt; [flags]</code></pre>
       </div>
-      <p>Generates boilerplate: modules, services, views.</p>
-      <p><em>Not implemented yet; prints a placeholder and exits.</em></p>
+      <p>Makes a project with its first unit, ready to build and test: <code>adm.toml</code>, the unit's declaration (<code>main.adm</code>, <code>library.adm</code> or <code>plugin.adm</code>), a module named after the unit with a function and its check suite, and a README with the build, run and test lines. The unit is named from the folder (<code>my-app</code> gives the application <code>MyApp</code>; a library gets dotted lower case, <code>image.tools</code>) unless <code>--name</code> says otherwise. The IDE's new-project screen makes the same project through it.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--kind ui|service|cli|empty</code></td><td>What an application is: a <code>std.ui</code> window, an HTTP server on :8080, a <code>std.cli</code> tool, or a program that prints and exits (the default).</td></tr>
+        <tr><td><code>--platform LIST</code></td><td>A ui application's platforms (<code>desktop</code>, <code>web</code>) or a plugin's (<code>windows</code>, <code>macos</code>, <code>linux</code>), recorded in the README. <code>android</code> and <code>ios</code> are refused until adm has those targets.</td></tr>
+        <tr><td><code>--name NAME</code></td><td>The unit's name instead of the one derived from the folder.</td></tr>
+        <tr><td><code>--into PROJECT</code></td><td>Add the unit to an existing project (a folder with <code>adm.toml</code>); the folder lies under it, no manifest is written, no repository made.</td></tr>
+        <tr><td><code>--host NS:NAME</code>, <code>--interface NAME</code></td><td>A plugin's host library, fetched into the project as <code>adm get</code> does (<code>--accept</code> as there), and the interface it implements: its methods are written as stubs on a <code>&lt;Plugin&gt;&lt;Interface&gt;</code> type.</td></tr>
+        <tr><td><code>--git</code></td><td>Initialise a git repository with a <code>.gitignore</code> (default on; <code>--git=false</code> leaves it out).</td></tr>
+        <tr><td><code>--dry-run</code></td><td>Report what would be written, write nothing.</td></tr>
+        <tr><td><code>--json</code></td><td>Print <code>{"project", "units": [{"kind", "name", "path"}], "files", "git", "platforms"}</code>, or <code>{"error": {"code", "message"}}</code> with exit 1; the codes (<code>folder-not-empty</code>, <code>invalid-name</code>, <code>unsupported-platform</code>, <code>unknown-interface</code>, ...) name the field at fault.</td></tr>
+      </table>
     </section>
 
     <section class="docs-section" id="packages">
@@ -880,7 +890,7 @@ adm get acme:imaging@^1.4 --accept adm.storage.*</code></pre>
         </div>
         <pre><code data-hl="off" class="nohighlight">adm lsp [--log-protocol]</code></pre>
       </div>
-      <p>Starts the language server on stdio (go to definition, references, hover, workspace symbols, diagnostics); <code>--log-protocol</code> traces every request to stderr. The server runs on at most 8 processors and limits its heap to a quarter of the machine's memory (at least 4 GiB); <code>GOMAXPROCS</code>, <code>GOGC</code> and <code>GOMEMLIMIT</code> override. The first analysis leaves the bodies of standard-library modules nobody has open unchecked and fills in their diagnostics and references from what an earlier session stored under <code>~/.adm/cache/ir/lspbodies</code> (<code>ADM_CACHE</code>); <code>adm clean</code> clears it.</p>
+      <p>Starts the language server on stdio (go to definition, references, hover, workspace symbols, diagnostics); <code>--log-protocol</code> traces every request to stderr. Every server also keeps a session journal, <code>~/.adm/cache/lsp/adm-lsp-&lt;pid&gt;.log</code> (<code>ADM_CACHE</code>): the root the editor gave it, the files it found, each analysis with its error count and the files holding the errors, its restarts; journals idle for a week are removed. The server runs on at most 8 processors and limits its heap to a quarter of the machine's memory (at least 4 GiB); <code>GOMAXPROCS</code>, <code>GOGC</code> and <code>GOMEMLIMIT</code> override. The first analysis leaves the bodies of standard-library modules nobody has open unchecked and fills in their diagnostics and references from what an earlier session stored under <code>~/.adm/cache/ir/lspbodies</code> (<code>ADM_CACHE</code>); <code>adm clean</code> clears it.</p>
       <h3 id="mcp"><code>adm mcp</code></h3>
       <div class="code-window">
         <div class="code-titlebar">
@@ -949,9 +959,13 @@ $ adm mcp install all            # every tool found</code></pre>
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="code-filename">usage</span>
         </div>
-        <pre><code data-hl="off" class="nohighlight">adm env</code></pre>
+        <pre><code data-hl="off" class="nohighlight">adm env [--json]</code></pre>
       </div>
-      <p>Prints environment information.</p>
+      <p>Prints the <code>ADM_HOME</code>, <code>ADM_BIN</code>, <code>ADM_CACHE</code>, <code>ADM_LIB</code> and <code>ADM_PATH</code> variables as set.</p>
+      <table class="docs-table">
+        <tr><th>Flag</th><th>Meaning</th></tr>
+        <tr><td><code>--json</code></td><td>The variables, plus what the compiler resolves from them: <code>version</code>, <code>lib</code> (the folder holding <code>prelude/</code> and <code>std/</code>), <code>cache</code>, and <code>prelude</code> and <code>std</code>, the folders a build started in the current directory loads.</td></tr>
+      </table>
       <h3 id="fix"><code>adm fix</code></h3>
       <div class="code-window">
         <div class="code-titlebar">
@@ -1020,14 +1034,14 @@ adm graph services [DIR] [flags]</code></pre>
       <p>Static checks over a program that type-checks, reported for the files under the given paths (default <code>.</code>); the standard library is loaded but never reported on. The text report groups findings by file and ends with a count per check. <code>--json</code> prints an array of <code>{file, line, column, code, severity, message, fix, edits}</code>, which the IDE's Lint tab reads. A finding with <code>edits</code> can be fixed mechanically: <code>--fix</code> applies every such edit on disk and names the files changed, and the Lint tab's Fix button does the same for one finding or a whole group. The language server runs the same checks on the open files, so editors show the findings inline (warnings and weak warnings, source <code>adm-lint</code>) with the fixes as code actions; <code>initializationOptions.lint</code> takes <code>enabled</code> and a <code>skip</code> list, and the <code>adm/lint</code> request returns every finding under a directory from the server's current analysis. On the command line an unchanged tree answers from a result cache under <code>~/.adm/cache/lint</code> (every file the last run loaded still hashes the same and the roots hold the same files); <code>ADM_NO_LINT_CACHE=1</code> bypasses it and <code>--fix</code> always runs.</p>
       <table class="docs-table">
         <tr><th>Check</th><th>Reports</th></tr>
-        <tr><td><code>unchecked-map-index</code></td><td>A read <code>m[k]</code> of a map where nothing before it established the key, which panics when the key is missing. An earlier <code>m[k] = v</code> or <code>m.set(k, v)</code> in the block, a <code>hasKey(k)</code>, <code>get(k)</code> or <code>k in m</code> check earlier or in an enclosing condition, a <code>for let (k, v) in m</code> loop around the read, or a map literal declaring the key all count as establishing it. <code>m[w] = m[w] + 1</code> still fires: it reads before it writes.</td></tr>
+        <tr><td><code>unchecked-map-index</code></td><td>A read <code>m[k]</code> of a map where nothing before it established the key, which panics when the key is missing. An earlier <code>m[k] = v</code> or <code>m.set(k, v)</code> in the block, a <code>hasKey(k)</code>, <code>get(k)</code> or <code>k in m</code> check earlier or in an enclosing condition, a <code>for let (k, v) in m</code> or <code>for let k in m.keys()</code> loop around the read, or a map literal declaring the key all count as establishing it. <code>m[w] = m[w] + 1</code> still fires: it reads before it writes.</td></tr>
         <tr><td><code>ref-cycle</code></td><td>Two types holding strong references to each other, or a type holding itself through two fields where one is named as a back reference (a tree's <code>parent</code> beside <code>children</code>, a list's <code>prev</code> beside <code>next</code>), so neither instance is ever freed. A node whose self links all point forward, such as <code>children</code> and <code>next</code>, is not reported, nor is one whose links all point up, and two types that hold arrays of each other are a tree of parts, not a cycle. The fix names the field to mark <code>weak</code>.</td></tr>
         <tr><td><code>closure-cycle</code></td><td>A field holding a function literal that captures <code>self</code>, by name or through a bare field or method: object and closure keep each other alive.</td></tr>
         <tr><td><code>observer-cycle</code></td><td>A type whose <code>@on</code> handler observes a service the type also holds in a strong field.</td></tr>
         <tr><td><code>needless-weak</code></td><td>A <code>weak</code> field whose target type never references the owner through the strong field graph.</td></tr>
         <tr><td><code>large-value-copy</code></td><td>A datatype value estimated above 64 bytes passed to a call inside a loop body, copied on every pass.</td></tr>
         <tr><td><code>missing-dispose</code></td><td>A type holding a field whose type declares <code>dispose</code>, without a <code>dispose</code> of its own to release it.</td></tr>
-        <tr><td><code>unsynchronised-field</code></td><td>A field written by a task (an <code>async</code> method, or one the type spawns) and used by other methods, without <code>atomic</code>.</td></tr>
+        <tr><td><code>unsynchronised-field</code></td><td>A field written by a task (an <code>async</code> method, or one the type spawns) and used by other methods, without <code>atomic</code>. In a component's controller only another task counts: a task's store and the frame's reads hold the UI's state lock.</td></tr>
         <tr><td><code>dropped-future</code></td><td>A task started as a statement whose result or error nothing awaits.</td></tr>
         <tr><td><code>blocking-observer</code></td><td>An <code>@on</code> handler that reaches <code>adm.storage.*</code> or <code>adm.network.*</code> I/O, which blocks the event dispatcher.</td></tr>
         <tr><td><code>deprecated-use</code></td><td>Every reference to a <code>@deprecated</code> declaration, with the replacement its annotation names.</td></tr>
@@ -1037,7 +1051,7 @@ adm graph services [DIR] [flags]</code></pre>
         <tr><td><code>redundant-internal</code></td><td><code>internal</code> on a service member; a service exposes only its datatypes, interfaces and <code>@commit</code>, <code>@emit</code> and <code>@query</code> members. The fix deletes the keyword.</td></tr>
         <tr><td><code>non-exhaustive-match</code></td><td>A <code>match</code> without <code>default</code> that leaves out members of a union type, an optional, an errorable or an enum. A value of a missing member takes no clause and falls through; the warning names the missing members.</td></tr>
         <tr><td><code>array-identity</code></td><td><code>==</code> or <code>!=</code> between an array and an array literal: it compares which array each side is, so it is always false (or true). The fix writes <code>a.equals(b)</code>.</td></tr>
-        <tr><td><code>bind-copy</code></td><td>A field that is not <code>@bindable</code> passed to a component's bound input (<code>@input(bind = true)</code>): the component edits a copy and the field never changes. Fix: mark the field <code>@bindable</code>.</td></tr>
+        <tr><td><code>bind-copy</code></td><td>A field that is not <code>@bindable</code> passed to a component's bound input (<code>@input(bind = true)</code>) with no change handler (<code>onChange</code>, <code>on&lt;Input&gt;</code>) beside it: the component edits a copy and the field never changes. Fix: mark the field <code>@bindable</code>, or pass the handler that stores the value.</td></tr>
         <tr><td><code>unmatched-path</code></td><td>A constant location given to <code>Link(to = ...)</code>, <code>Router.go</code> or <code>new MemoryHistory(...)</code> that no <code>@route</code> page matches: the window shows <code>notFound</code> there. Fix: correct the path or declare the page.</td></tr>
         <tr><td><code>unreachable</code></td><td>A statement after a <code>return</code>, <code>fail</code>, <code>break</code>, <code>continue</code>, <code>recover</code> or <code>rollback</code> in the same block (contract blocks excepted).</td></tr>
         <tr><td><code>empty-onerror</code></td><td>An <code>onerror</code> handler with nothing in it, so the error is dropped without a trace.</td></tr>

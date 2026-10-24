@@ -628,7 +628,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.proto</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>DBusConnection</code>, <code>dbusConnect</code>, <code>dbusSessionBusAddress</code>, <code>dbusSystemBusAddress</code></td><td>D-Bus client for the session and system buses (Linux)</td></tr>
-          <tr><td><code>DBusMessage</code>, <code>DBusWriter</code>, <code>DBusReader</code></td><td>D-Bus wire format</td></tr>
+          <tr><td><code>DBusMessage</code>, <code>DBusWriter</code>, <code>DBusReader</code></td><td>D-Bus wire format: a writer that aligns each type, with dictionary entries (<code>dictString</code>, <code>dictBool</code>, <code>dictBytes</code>, <code>beginEntry</code>) and nested arrays and structs (<code>beginArray</code>/<code>endArray</code>, <code>beginStruct</code>); a reader that walks a body by signature</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-jsonrpc">
@@ -751,9 +751,9 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-encoding">
         <h3><code>std.data.encoding</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>JSON</code>, <code>json</code></td><td>JSON</td></tr>
+          <tr><td><code>JSON</code>, <code>json</code></td><td>JSON: <code>encode</code>, <code>decode</code> into objects, <code>map&lt;string, any&gt;</code>, <code>any[]</code> and typed arrays (<code>User[]</code> from a top-level array), <code>parse</code> into plain values</td></tr>
           <tr><td><code>XMLNode</code>, <code>XMLWriter</code>, <code>XML</code></td><td>XML objects (<code>encode</code>, <code>decode</code>, <code>@xml</code>), tree, writer and well-formedness check</td></tr>
-          <tr><td><code>YAML</code>, <code>YAMLError</code></td><td>YAML 1.2: <code>parse</code> and <code>parseAll</code> into plain values, <code>decode</code> into objects, <code>encode</code>; errors with line and column</td></tr>
+          <tr><td><code>YAML</code>, <code>YAMLError</code></td><td>YAML 1.2: <code>parse</code> and <code>parseAll</code> into plain values, <code>decode</code> into objects and typed arrays (<code>User[]</code> from a top-level sequence), <code>encode</code>; errors with line and column</td></tr>
           <tr><td><code>TOML</code></td><td>TOML</td></tr>
           <tr><td><code>JSON.parse</code></td><td>JSON into maps, arrays and scalars</td></tr>
           <tr><td><code>CBOR</code>, <code>CBORValue</code>, <code>CBORReader</code>, <code>cbor</code></td><td>CBOR (RFC 8949), deterministic encoding</td></tr>
@@ -887,7 +887,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Image</code>, <code>load</code>, <code>info</code></td><td>image, implements <code>gfx.Raster</code></td></tr>
           <tr><td><code>ImageSequence</code>, <code>ImageFrame</code></td><td>animations: frames, delays, loops</td></tr>
           <tr><td><code>PNG</code>, <code>APNG</code>, <code>GIF</code>, <code>JPEG</code>, <code>WEBP</code>, <code>BMP</code>, <code>TIFF</code>, <code>PSD</code>, <code>TGA</code>, <code>PCX</code>, <code>XPM</code>, <code>ICO</code>, <code>CUR</code>, <code>ANI</code>, <code>PNM</code>, <code>JPEG2000</code>, <code>J2K</code></td><td>codecs; JPEG 2000 decodes all of Part 1 and encodes lossless or lossy (<code>JPEG2000</code> writes <code>.jp2</code>, <code>J2K</code> raw codestreams); JPEG decodes every process but hierarchical (12-bit, lossless, arithmetic, CMYK) as libjpeg-turbo does and keeps <code>iccProfile</code> and <code>exif</code>; PNM reads and writes PBM, PGM, PPM, PAM and PFM (<code>PNMFormat</code>)</td></tr>
-          <tr><td><code>SVG.decode</code>, <code>SVG.picture</code></td><td>SVG and SVGZ rendering, SMIL animation at a given time</td></tr>
+          <tr><td><code>SVG.decode</code>, <code>SVG.picture</code></td><td>SVG and SVGZ rendering, SMIL animation at a given time; <code>picture(data, foreground = ink)</code> draws <code>currentColor</code> and unset fills in a text colour, as a page does an inline SVG</td></tr>
           <tr><td><code>SVG.encode</code></td><td>canvas pictures as SVG</td></tr>
           <tr><td><code>SVG.parsePath</code>, <code>SVG.pathData</code></td><td>SVG path data</td></tr>
           <tr><td><code>exif.Tag</code>, <code>exif.IFD</code>, <code>exif.ImageTag</code>, <code>exif.PhotoTag</code>, <code>exif.GPSInfoTag</code></td><td>EXIF tags</td></tr>
@@ -1618,13 +1618,14 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>ClickEvent</code>, <code>KeyEvent</code>, <code>MouseMoveEvent</code>, <code>TextInputEvent</code>, …</td><td>events; <code>target</code> is the component under the pointer, the window's root when no other is</td></tr>
           <tr><td><code>Key</code>, <code>KeyCode</code>, <code>typesCharacter</code></td><td>the key of a <code>KeyEvent</code> by its meaning in the layout (<code>Key.A</code>, <code>Key.Enter</code>, <code>Key.F5</code>); whether a key types a character</td></tr>
           <tr><td><code>Display</code>, <code>Appearance</code>, <code>ColorScheme</code>, <code>Contrast</code></td><td>displays and system appearance (Linux)</td></tr>
+          <tr><td><code>pickFolder</code>, <code>pickFiles</code>, <code>saveFile</code>, <code>FileFilter</code></td><td>the system's file dialogs (the desktop portal on Linux, the common item dialog on Windows), shown over the active window: <code>let picked = try await pickFiles("Open", filters = [FileFilter{name: "Images", patterns: ["*.png"]}], multiple = true)</code>; none or an empty array when cancelled. Run them on a task from a handler.</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-ui-icons">
         <h3><code>std.ui.icons</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>@icons</code></td><td>on a <code>partial type</code>: turns a folder of SVG files into an icon set while the program is built (<code>@icons("assets/icons") partial type AppIcons {}</code>); the type gets <code>set() !IconSet</code> for <code>UI.addIcons</code> and one name per file (<code>arrow-left.svg</code> is <code>ArrowLeft</code>)</td></tr>
-          <tr><td><code>fromSvg</code></td><td>an <code>IconSet</code> from SVG documents read at run time</td></tr>
+          <tr><td><code>fromSvg</code></td><td>an <code>IconSet</code> from SVG documents read at run time; a tinted icon follows the text colour where it says <code>currentColor</code> or sets no fill, and keeps the colours it sets</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-ui-styles">
@@ -1694,7 +1695,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>MenuBar</code>, <code>Menu</code>, <code>MenuItem</code>, <code>SubMenu</code>, <code>MenuSeparator</code>, <code>ContextMenu</code></td><td>menus</td></tr>
           <tr><td><code>Tabs</code>, <code>Tab</code>, <code>TabStrip</code>, <code>Breadcrumbs</code>, <code>Accordion</code>, <code>AccordionItem</code>, <code>Toolbar</code>, <code>StatusBar</code></td><td>pages, sections, bars</td></tr>
           <tr><td><code>Popover</code>, <code>Dialog</code>, <code>Drawer</code>, <code>HoverCard</code>, <code>Tooltip</code>, <code>Toast</code>, <code>Side</code></td><td>content that floats over the window; the side it opens on</td></tr>
-          <tr><td><code>Toasts</code>, <code>ToastHost</code>, <code>ToastKind</code></td><td>notices asked for in code: <code>Toasts</code> is an interface (<code>show(text, kind, lasts, action, onAction)</code>, <code>dismiss(number)</code>, <code>clear()</code>) found with <code>context&lt;Toasts&gt;()</code>; <code>ToastHost(limit = 3) { ... }</code> provides the standard one and stacks its notices; <code>Toast</code> has <code>kind</code>, <code>action</code> and <code>onAction</code></td></tr>
+          <tr><td><code>Toasts</code>, <code>ToastHost</code>, <code>ToastKind</code>, <code>ToastNotice</code>, <code>ToastAction</code></td><td>notices asked for in code: <code>Toasts</code> is an interface (<code>show(text, kind, lasts, action, onAction)</code>, <code>show(ToastNotice)</code>, <code>dismiss(number)</code>, <code>clear()</code>) found with <code>context&lt;Toasts&gt;()</code>, callable from any task; <code>ToastNotice</code> has <code>title</code>, <code>body</code>, <code>kind</code>, <code>lasts</code>, <code>actions</code> (<code>ToastAction{label, run}</code>), <code>progress</code> (a bar; the notice stays while it is below 1) and <code>replaces</code> (the number of a shown notice to update in place); <code>ToastHost(limit = 3) { ... }</code> provides the standard one and stacks its notices; <code>Toast</code> has <code>body</code>, <code>kind</code>, <code>action</code>, <code>onAction</code>, <code>actions</code> and <code>progress</code></td></tr>
           <tr><td><code>WindowChrome</code></td><td>the frame of a window drawn by the application, given as <code>WindowConfig.chrome</code>: <code>title</code>, <code>icon</code>, <code>header</code>, <code>minimize</code>, <code>maximize</code>, <code>close</code></td></tr>
           <tr><td><code>ProgressBar</code>, <code>Spinner</code></td><td>progress</td></tr>
           <tr><td><code>ButtonStyle</code>, <code>ToggleButtonStyle</code>, <code>TextStyle</code>, <code>TextFieldStyle</code>, <code>MenuItemStyle</code>, <code>PanelStyle</code>, <code>RowStyle</code>, <code>ColumnStyle</code>, <code>GridStyle</code>, <code>ScrollViewStyle</code>, <code>DialogStyle</code>, <code>PopoverStyle</code>, <code>DropdownStyle</code>, <code>MenuBarStyle</code>, <code>AccordionItemStyle</code>, <code>ControlStyle</code>, <code>MarkedStyle</code>, <code>MarkStyle</code>, <code>BarStyle</code>, <code>FigureStyle</code>, <code>BoxStyle</code></td><td>the components' styles</td></tr>
@@ -1706,6 +1707,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Host</code>, <code>GLSurface</code>, <code>VulkanSurface</code>, <code>PixelSurface</code></td><td>what a window system provides: windows, events, text input, clipboard, displays, tray; OpenGL or Vulkan surfaces, or windows that take pixels</td></tr>
           <tr><td><code>Renderer</code>, <code>getRenderer</code></td><td>renderer interface</td></tr>
           <tr><td><code>Window</code>, <code>WindowConfig</code>, <code>PlatformEvent</code>, <code>Frame</code></td><td>windows, low-level events, frames</td></tr>
+          <tr><td><code>NativeWindow</code>, <code>WindowHandles</code></td><td>a window as the window system names it (X11 id, HWND, NSWindow), from a host that implements <code>WindowHandles</code>; what a native dialog is shown over</td></tr>
           <tr><td><code>opengl</code>, <code>vulkan</code>, <code>cpu</code></td><td>renderers: OpenGL, Vulkan 1.2 or newer (the same GPU canvas as SPIR-V, in floats on a device without doubles), the CPU canvas shown as pixels with no GPU (desktop windows and web canvases alike)</td></tr>
         </table>
       </div>
@@ -1801,7 +1803,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>typeName</code>, <code>kindOf</code></td><td>runtime type info</td></tr>
           <tr><td><code>MetaContext</code>, …</td><td>meta contexts</td></tr>
           <tr><td><code>receive</code>, <code>close</code></td><td>a channel carried as <code>any</code>, whatever its element type: the next message boxed and whether there was one; closing it</td></tr>
-          <tr><td><code>instantiate</code>, <code>field</code>, <code>elements</code>, <code>arrayOf</code>, <code>mapOf</code>, <code>defaultOf</code></td><td><code>defaultOf</code> computes the default a parameter of an annotated function is declared with; building and reading values by descriptor; <code>arrayOf</code> makes an array of a described element type from boxed values, <code>mapOf</code> a <code>map&lt;string, V&gt;</code> of a described value type</td></tr>
+          <tr><td><code>instantiate</code>, <code>field</code>, <code>arrayField</code>, <code>elements</code>, <code>arrayOf</code>, <code>mapOf</code>, <code>defaultOf</code></td><td><code>arrayField</code> addresses an array carried as <code>any</code> as a <code>Field</code> of its own; <code>defaultOf</code> computes the default a parameter of an annotated function is declared with; building and reading values by descriptor; <code>arrayOf</code> makes an array of a described element type from boxed values, <code>mapOf</code> a <code>map&lt;string, V&gt;</code> of a described value type</td></tr>
           <tr><td><code>TypeDescriptor</code>, <code>TypeKind</code></td><td>a type as spelled in a signature or field: <code>kind</code>, <code>typeName</code>, the <code>optional</code>/<code>errorable</code>/<code>future</code> flags, an array's, map's or channel's <code>element</code>, a map's <code>key</code>, a tuple's <code>elements</code></td></tr>
           <tr><td><code>EmbeddedFile</code></td><td>a file an annotation builds into the program</td></tr>
           <tr><td><code>BuildMetaContext&lt;T&gt;</code></td><td>context of an <a href="annotations.html#writing">annotation that runs during the build</a></td></tr>

@@ -322,7 +322,7 @@
 
     <section class="docs-section" id="area-type">
       <h2>Types</h2>
-      <p>Types, expressions and statements. 203 codes.</p>
+      <p>Types, expressions and statements. 204 codes.</p>
       <table class="docs-table diag-table">
         <tr id="E-TYPE-0001"><td><code>E-TYPE-0001</code></td><td>error</td><td><span class="diag-hole">%s</span> is only valid inside functions</td></tr>
         <tr id="E-TYPE-0002"><td><code>E-TYPE-0002</code></td><td>error</td><td>datatype fields cannot be marked weak</td></tr>
@@ -526,6 +526,7 @@
         <tr id="E-TYPE-0200"><td><code>E-TYPE-0200</code></td><td>error</td><td>Permission spec must name a type</td></tr>
         <tr id="E-TYPE-0201"><td><code>E-TYPE-0201</code></td><td>error</td><td>cannot assign <span class="diag-hole">%s</span> to field <span class="diag-hole">%q</span> of type <span class="diag-hole">%s</span></td></tr>
         <tr id="E-TYPE-0202"><td><code>E-TYPE-0202</code></td><td>error</td><td>where constraints must reference types</td></tr>
+        <tr id="E-TYPE-0203"><td><code>E-TYPE-0203</code></td><td>error</td><td>dispose takes no parameters: it is the destructor, run with the instance alone when its last reference goes; give a method that takes arguments another name</td></tr>
         <tr id="W-TYPE-0001"><td><code>W-TYPE-0001</code></td><td>warning</td><td><span class="diag-hole">%s</span> is deprecated<span class="diag-hole">%s</span></td></tr>
       </table>
     </section>
@@ -715,6 +716,7 @@
         <tr id="E-UI-0071"><td><code>E-UI-0071</code></td><td>error</td><td><span class="diag-hole">%s</span> is a function, not an action: an Action is a method its controller declares with @action</td></tr>
         <tr id="E-UI-0072"><td><code>E-UI-0072</code></td><td>error</td><td><span class="diag-hole">%s</span> has no @action: declare it with @action(&quot;Label&quot;) to use it as an Action</td></tr>
         <tr id="E-UI-0073"><td><code>E-UI-0073</code></td><td>error</td><td><span class="diag-hole">%s</span> is a component: make it with a call, <code><span class="diag-hole">%s</span>() { ... }</code></td></tr>
+        <tr id="E-UI-0074"><td><code>E-UI-0074</code></td><td>error</td><td><span class="diag-hole">%q</span> is a member of <span class="diag-hole">%s</span>, which a style body reads through <code>self</code>: <code>self.<span class="diag-hole">%s</span></code></td></tr>
       </table>
     </section>
 
