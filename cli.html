@@ -304,7 +304,7 @@ adm fmt --check src/</code></pre>
         </div>
         <pre><code data-hl="off" class="nohighlight">adm run [appName | file.adm | dir] [-- appArgs...] [flags]</code></pre>
       </div>
-      <p>Builds an application, runs it and removes the executable afterwards. Arguments after <code>--</code> go to the program. A <code>.adm</code> file runs the application that file declares, with the modules beside it; a folder holding several applications needs the application's name.</p>
+      <p>Builds an application, runs it and removes the executable afterwards. Arguments after <code>--</code> go to the program. A <code>.adm</code> file runs the application that file declares, with the modules beside it; a folder holding several applications needs the application's name. <code>adm run</code> ends with the program's exit status (128 plus the signal for a program a signal ended), and stopping <code>adm run</code> stops the program: Ctrl+C reaches it from the terminal, and <code>adm</code> passes a SIGTERM it receives on to it, every ending signal when it runs without a terminal (from an editor or a script), so the program is never left running. <code>adm test</code> runs its suites the same way.</p>
       <table class="docs-table">
         <tr><th>Flag</th><th>Meaning</th></tr>
         <tr><td><code>--keep</code></td><td>Keep the executable.</td></tr>

@@ -264,6 +264,14 @@ type Remote {
         placed as if they were its parent's. A scoped component names no style and declares no
         <code>render</code>, and <code>isScoped</code> reads true on it.
       </p>
+      <h4><code>@previewSetup</code></h4>
+      <p>
+        Marks the function the IDE's designer preview runs before it shows the project's components:
+        what the application sets up before its first window (fonts, a theme, icons, translations).
+        Written <code>async def setup() !none</code> (another signature is an error); at most one in a
+        project. A project without one is previewed with the standard library's defaults; the
+        application's own startup may call it too.
+      </p>
       <h4><code>@action(label, shortcut = "", icon = "", enabled = none)</code></h4>
       <p>
         From <code>std.ui</code>: the method of a component's controller is an action, run by a button,

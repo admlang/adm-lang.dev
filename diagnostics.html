@@ -322,7 +322,7 @@
 
     <section class="docs-section" id="area-type">
       <h2>Types</h2>
-      <p>Types, expressions and statements. 204 codes.</p>
+      <p>Types, expressions and statements. 205 codes.</p>
       <table class="docs-table diag-table">
         <tr id="E-TYPE-0001"><td><code>E-TYPE-0001</code></td><td>error</td><td><span class="diag-hole">%s</span> is only valid inside functions</td></tr>
         <tr id="E-TYPE-0002"><td><code>E-TYPE-0002</code></td><td>error</td><td>datatype fields cannot be marked weak</td></tr>
@@ -528,6 +528,7 @@
         <tr id="E-TYPE-0202"><td><code>E-TYPE-0202</code></td><td>error</td><td>where constraints must reference types</td></tr>
         <tr id="E-TYPE-0203"><td><code>E-TYPE-0203</code></td><td>error</td><td>dispose takes no parameters: it is the destructor, run with the instance alone when its last reference goes; give a method that takes arguments another name</td></tr>
         <tr id="W-TYPE-0001"><td><code>W-TYPE-0001</code></td><td>warning</td><td><span class="diag-hole">%s</span> is deprecated<span class="diag-hole">%s</span></td></tr>
+        <tr id="W-TYPE-0002"><td><code>W-TYPE-0002</code></td><td>warning</td><td><span class="diag-hole">%s</span>: the call returns nothing, so it gives no value</td></tr>
       </table>
     </section>
 
@@ -641,7 +642,7 @@
 
     <section class="docs-section" id="area-ui">
       <h2>UI</h2>
-      <p>Components, views and styles. 73 codes.</p>
+      <p>Components, views and styles. 76 codes.</p>
       <table class="docs-table diag-table">
         <tr id="E-UI-0001"><td><code>E-UI-0001</code></td><td>error</td><td>component <span class="diag-hole">%q</span> must define a view block (inline or referenced)</td></tr>
         <tr id="E-UI-0002"><td><code>E-UI-0002</code></td><td>error</td><td>component <span class="diag-hole">%q</span> must define a style block (inline or referenced)</td></tr>
@@ -717,6 +718,8 @@
         <tr id="E-UI-0072"><td><code>E-UI-0072</code></td><td>error</td><td><span class="diag-hole">%s</span> has no @action: declare it with @action(&quot;Label&quot;) to use it as an Action</td></tr>
         <tr id="E-UI-0073"><td><code>E-UI-0073</code></td><td>error</td><td><span class="diag-hole">%s</span> is a component: make it with a call, <code><span class="diag-hole">%s</span>() { ... }</code></td></tr>
         <tr id="E-UI-0074"><td><code>E-UI-0074</code></td><td>error</td><td><span class="diag-hole">%q</span> is a member of <span class="diag-hole">%s</span>, which a style body reads through <code>self</code>: <code>self.<span class="diag-hole">%s</span></code></td></tr>
+        <tr id="E-UI-0075"><td><code>E-UI-0075</code></td><td>error</td><td><code><span class="diag-hole">%s</span>()</code> <span class="diag-hole">%s</span>, and the compiler writes it for <span class="diag-hole">%s</span> from its view: a method <span class="diag-hole">%s</span> declares under that name would replace it; give the method another name</td></tr>
+        <tr id="E-UI-0076"><td><code>E-UI-0076</code></td><td>error</td><td>@previewSetup is written <code>async def <span class="diag-hole">%s</span>() !none</code>: the preview awaits it, with nothing to pass, before its first window</td></tr>
       </table>
     </section>
 

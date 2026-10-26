@@ -2791,6 +2791,16 @@ def simulate(initial byte[], width int, height int, generations int) !byte[] {
 let b = a.mapElem(v =&gt; v + 1)
 let c = a.mapElem((v int) =&gt; v + 1)</code></pre>
         </div>
+        <p>
+          <code>param =&gt; { ... }</code> takes a statement body. Its result is what the place asks
+          for, with the parameter types written or not: handed to a <code>def (int) int</code> it
+          returns an <code>int</code>, handed to a <code>def (int)</code> or kept in an untyped
+          <code>let</code> it returns nothing, and a <code>return</code> with a value there is an error.
+          A call of a function that returns nothing gives no value either: <code>let x int = log("a")</code>
+          is warned of (<code>W-TYPE-0002</code>) and <code>x</code> holds its type's zero value, an untyped
+          <code>let y = log("a")</code> holds <code>none</code>, and <code>_ = log("a")</code> discards the call
+          without a warning.
+        </p>
       </div>
       <div class="docs-sub" id="defer">
         <h3>Defer</h3>
@@ -3825,7 +3835,7 @@ Card(title = "Profile") {
           Every component has the members of the prelude's <code>Component&lt;T&gt;</code>: inputs such as
           <code>enabled</code>, the tree (<code>childNodes</code>, <code>parent()</code>) and the lifecycle
           (<code>attached()</code>, <code>detached()</code>, <code>render(ctx)</code>, <code>rerun()</code> which runs its view again, <code>unmount()</code> which lets go of the children its view placed once it has left the tree, <code>setChildren(given)</code> which makes the components of <code>given</code> what the view places with <code>children()</code>, for a component made in code that holds others). A controller method
-          with the same name and parameters replaces one of them for that component. A value typed
+          with the same name and parameters replaces one of them for that component, except <code>rerun()</code> and <code>unmount()</code>, which the compiler writes from the component's view: declaring either is an error that asks for another name. A value typed
           <code>component</code> holds any component, and a call such as <code>c.render(ctx)</code> runs the
           method of the component it holds. <code>c is Scroller</code> tests whether that component's
           controller implements an interface and adds the interface's methods in the branch;
