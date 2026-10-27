@@ -1960,7 +1960,7 @@ Network.lab.conditions.unreachable = "*"         // offline</code></pre>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def sockets() SocketInfo[]</code></div>
-            <p class="api-doc">Returns runtime information for all sockets owned by the Network service.</p>
+            <p class="api-doc">Returns runtime information for all sockets owned by the Network service: each one's descriptor, domain, type, when it was opened, and its local and remote address.</p>
 
           </li>
           <li class="api-item">
@@ -2118,6 +2118,11 @@ Network.lab.conditions.unreachable = "*"         // offline</code></pre>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def memoryUsage() MemoryUsage</code></div>
             <p class="api-doc">Returns memory usage statistics for the current ADM runtime.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def cpuUsage() metrics.Histogram</code></div>
+            <p class="api-doc">The program's processor use: one sample a second since the program started, each the share of the machine's processor time (all its logical CPUs) the program used in that second, in percent, so 100 is every CPU busy. It holds the last minute; <code>cpuUsage().last()</code> is the latest second. On the web, which does not report processor time, every sample is 0.</p>
 
           </li>
           <li class="api-item">

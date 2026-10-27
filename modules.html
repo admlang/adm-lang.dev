@@ -328,7 +328,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.adm.lexer</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>tokenize</code></td><td>every token of ADM source, ending with <code>EOF</code>; comments optional, white space on request</td></tr>
-          <tr><td><code>Lexer</code></td><td><code>next()</code> one token at a time</td></tr>
+          <tr><td><code>Lexer</code></td><td><code>next()</code> one token at a time; <code>scan()</code> its kind and span without the text, allocating nothing</td></tr>
           <tr><td><code>Token</code></td><td>kind, character offsets <code>start</code>/<code>end</code>, text (identifiers in NFC)</td></tr>
           <tr><td><code>TokenKind</code></td><td>token classes; the value of a punctuation, operator or keyword member is its spelling</td></tr>
           <tr><td><code>isLiteral</code>, <code>isPunctuation</code>, <code>isOperator</code>, <code>isKeyword</code></td><td>classify a kind</td></tr>
@@ -360,6 +360,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>InlayHint</code>, <code>InlayHintKind</code></td><td>what <code>Navigator.inlayHints</code> shows over a range: the inferred type after a name declared without one, the parameter's name before a literal argument</td></tr>
           <tr><td><code>SignatureHelp</code>, <code>SignatureInfo</code>, <code>ParameterInfo</code></td><td>what <code>Navigator.signatureHelp</code> shows inside a call's parentheses: every overload, constructor or component's inputs, each parameter's type, default and <code>@param</code> text, the parameter being written and the overload the arguments choose</td></tr>
           <tr><td><code>UsageCount</code></td><td>how many places across the workspace name each declaration of a file, from <code>Navigator.usageCounts</code>, answered from per-file indexes without loading the whole workspace</td></tr>
+          <tr><td><code>DeclaredName</code></td><td>a top-level declaration from <code>Workspace.declaredNames(kind)</code>, known without parsing its file: name, kind, module, file and whether it is internal</td></tr>
           <tr><td><code>ImportCompletion</code></td><td>a completion from <code>Navigator.importCompletions</code> for a name or module the file does not import yet: the text to write and the edit that adds the <code>use</code>, merged into the file's imports</td></tr>
           <tr><td><code>TypeProblem</code></td><td>a type error from <code>Navigator.typeProblems</code> over a range, with the compiler's code and message: a value of another type in a typed <code>let</code>, an assignment, a <code>return</code> or a struct field, a call no overload takes, named arguments that do not fit, a value called that is no function, a dropped <code>!T</code> result; only what is certain is reported</td></tr>
           <tr><td><code>TypeRef</code></td><td>a type as written: its node, its file, and the type arguments its type parameters stand for through a member chain</td></tr>
@@ -1698,13 +1699,13 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>TextField</code>, <code>TextArea</code>, <code>SearchField</code>, <code>NumberField</code></td><td>text and number entry</td></tr>
           <tr><td><code>ColorPicker</code>, <code>ColorWell</code></td><td>a colour picked on a square of saturation and value, strips of hue and opacity, hex or swatches; a well opens a picker from a square of the colour</td></tr>
           <tr><td><code>Stepper</code>, <code>Step</code></td><td>the steps of a task done in order, one page shown at a time under a line of their titles</td></tr>
-          <tr><td><code>MenuBar</code>, <code>Menu</code>, <code>MenuItem</code>, <code>SubMenu</code>, <code>MenuSeparator</code>, <code>ContextMenu</code></td><td>menus</td></tr>
+          <tr><td><code>MenuBar</code>, <code>Menu</code>, <code>MenuItem</code>, <code>SubMenu</code>, <code>MenuSeparator</code>, <code>ContextMenu</code></td><td>menus; a long one scrolls its lines past twelve, and with <code>openAtChecked</code> opens at its checked line</td></tr>
           <tr><td><code>Tabs</code>, <code>Tab</code>, <code>TabStrip</code>, <code>Breadcrumbs</code>, <code>Accordion</code>, <code>AccordionItem</code>, <code>Toolbar</code>, <code>StatusBar</code></td><td>pages, sections, bars</td></tr>
           <tr><td><code>Popover</code>, <code>Dialog</code>, <code>Drawer</code>, <code>HoverCard</code>, <code>Tooltip</code>, <code>Toast</code>, <code>Side</code></td><td>content that floats over the window; the side it opens on</td></tr>
           <tr><td><code>Toasts</code>, <code>ToastHost</code>, <code>ToastKind</code>, <code>ToastNotice</code>, <code>ToastAction</code></td><td>notices asked for in code: <code>Toasts</code> is an interface (<code>show(text, kind, lasts, action, onAction)</code>, <code>show(ToastNotice)</code>, <code>dismiss(number)</code>, <code>clear()</code>) found with <code>context&lt;Toasts&gt;()</code>, callable from any task; <code>ToastNotice</code> has <code>title</code>, <code>body</code>, <code>kind</code>, <code>lasts</code>, <code>actions</code> (<code>ToastAction{label, run}</code>), <code>progress</code> (a bar; the notice stays while it is below 1) and <code>replaces</code> (the number of a shown notice to update in place); <code>ToastHost(limit = 3) { ... }</code> provides the standard one and stacks its notices; <code>Toast</code> has <code>body</code>, <code>kind</code>, <code>action</code>, <code>onAction</code>, <code>actions</code> and <code>progress</code></td></tr>
           <tr><td><code>WindowChrome</code></td><td>the frame of a window drawn by the application, given as <code>WindowConfig.chrome</code>: <code>title</code>, <code>icon</code>, <code>header</code>, <code>minimize</code>, <code>maximize</code>, <code>close</code></td></tr>
           <tr><td><code>ProgressBar</code>, <code>Spinner</code></td><td>progress</td></tr>
-          <tr><td><code>ButtonStyle</code>, <code>ToggleButtonStyle</code>, <code>TextStyle</code>, <code>TextFieldStyle</code>, <code>MenuItemStyle</code>, <code>PanelStyle</code>, <code>RowStyle</code>, <code>ColumnStyle</code>, <code>GridStyle</code>, <code>ScrollViewStyle</code>, <code>DialogStyle</code>, <code>PopoverStyle</code>, <code>DropdownStyle</code>, <code>MenuBarStyle</code>, <code>AccordionItemStyle</code>, <code>ControlStyle</code>, <code>MarkedStyle</code>, <code>MarkStyle</code>, <code>BarStyle</code>, <code>FigureStyle</code>, <code>BoxStyle</code></td><td>the components' styles</td></tr>
+          <tr><td><code>ButtonStyle</code>, <code>ToggleButtonStyle</code>, <code>TextStyle</code>, <code>TextFieldStyle</code>, <code>MenuItemStyle</code>, <code>PanelStyle</code>, <code>RowStyle</code>, <code>ColumnStyle</code>, <code>GridStyle</code>, <code>ScrollViewStyle</code>, <code>DialogStyle</code>, <code>PopoverStyle</code>, <code>MenuStyle</code>, <code>DropdownStyle</code>, <code>MenuBarStyle</code>, <code>AccordionItemStyle</code>, <code>ControlStyle</code>, <code>MarkedStyle</code>, <code>MarkStyle</code>, <code>BarStyle</code>, <code>FigureStyle</code>, <code>BoxStyle</code></td><td>the components' styles</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-ui-renderer">
@@ -1880,7 +1881,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.metrics</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Counter</code>, <code>Gauge</code>, <code>Histogram</code>, <code>Toggle</code></td><td>metrics (<code>Metric</code>)</td></tr>
-          <tr><td><code>Distribution</code></td><td>a histogram's counts by range, from <code>Histogram.distribution()</code></td></tr>
+          <tr><td><code>Distribution</code></td><td>a histogram's counts by range, from <code>Histogram.distribution()</code>; <code>Histogram.last()</code> is the newest sample</td></tr>
         </table>
       </div>
     </section>

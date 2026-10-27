@@ -408,11 +408,9 @@ let withOrders = try customers.query().include("orders").all()</code></pre>
       </div>
 
       <div class="docs-sub" id="database-elasticsearch">
-        <h3><code>adm.database.elasticsearch</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.database.elasticsearch</code></h3>
 
-        <p>An Elasticsearch and OpenSearch client in ADM over <code>std.net.http</code>: documents as typed structs, bulk indexing, search with a typed query builder, aggregations, and index management. It talks to Elasticsearch 8 and OpenSearch 2 and later.</p>
-
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>An Elasticsearch and OpenSearch client in ADM over <code>std.net.http</code>: documents as typed structs with conditional writes, a bulk writer, search with a typed query builder (k-NN included, written as each family needs), aggregations with typed results, paging through points in time and scrolls, and index management with mappings made from structs, aliases, rollover, templates and ingest pipelines. It talks to Elasticsearch 8 and OpenSearch 2 and later, over several nodes, with API keys, passwords, tokens and a CA fingerprint.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -438,9 +436,9 @@ struct Product {
 
 let es = try elasticsearch.connect("https://search.internal:9200", apiKey = key)
 let products = es.index&lt;Product&gt;("products")
-try products.put("7", {id: "7", name: "Kettle", price: 39.9, tags: ["kitchen"]})
+try products.put("7", Product{id: "7", name: "Kettle", price: 39.9, tags: ["kitchen"]})
 
-let query = elasticsearch.match("name", "kettle").and(elasticsearch.term("tags", "kitchen"))
+let query = elasticsearch.matches("name", "kettle").and(elasticsearch.term("tags", "kitchen"))
 let hits = try products.search(query, size = 20, sort = "price")
 for let hit in hits {
 	print("{hit.source.name} {hit.score}")
@@ -599,11 +597,9 @@ let link = try photos.presign("2026/cat.jpg", 1h) // a URL anyone can read for a
       </div>
 
       <div class="docs-sub" id="network-memcached">
-        <h3><code>adm.network.memcached</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.network.memcached</code></h3>
 
-        <p>A Memcached client. It speaks the text and meta protocols itself, in ADM, over <code>std.net</code>: there is no C library to install. It talks to memcached 1.6 and later and to the services that speak its protocol (ElastiCache, Memorystore).</p>
-
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>A Memcached client. It speaks the text and meta protocols itself, in ADM, over <code>std.net</code>: there is no C library to install. It talks to memcached 1.6 and later and to the services that speak its protocol (ElastiCache, Memorystore), over TCP, TLS or a Unix socket. Keys are spread over several servers by consistent hashing (ketama), and a server that stops answering is retired for a while. Multi-key reads and writes go to every server at once in one round trip each; stale-while-revalidate, check and set, and typed values (MessagePack, JSON or BSON, compressed above a size) are built in.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -622,9 +618,12 @@ let link = try photos.presign("2026/cat.jpg", 1h) // a URL anyone can read for a
 
 let cache = try memcached.connect("cache1.internal:11211", "cache2.internal:11211")
 try cache.set("session:7", data, expire = 30min)
-let session = try cache.get("session:7")           // ?bytes
+let session = try cache.get("session:7")           // ?byte[]
 let hits = try cache.increment("hits", 1, initial = 0)
-let many = try cache.getMany(["a", "b", "c"])      // map&lt;string, bytes&gt;
+let many = try cache.getMany(["a", "b", "c"])      // map&lt;string, byte[]&gt;
+
+let sessions = cache.values&lt;Session&gt;()             // MessagePack, compressed above 16 KiB
+try sessions.set("session:8", Session{user: "ana"}, expire = 30min)
 try cache.close()</code></pre>
       </div>
 
@@ -1283,11 +1282,9 @@ try repo.push("origin", "main", credentials = token)</code></pre>
       </div>
 
       <div class="docs-sub" id="dev-github">
-        <h3><code>adm.dev.github</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.dev.github</code></h3>
 
-        <p>A GitHub API client in ADM over <code>std.net.http</code>: REST and GraphQL, webhooks, and the three ways to be someone on GitHub (a token, an OAuth app, a GitHub App). GitHub Enterprise Server works through a base URL.</p>
-
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>A GitHub API client in ADM over <code>std.net.http</code>, as a token, an OAuth app's user (the device flow) or a GitHub App with installation tokens renewed before they expire; GitHub Enterprise Server through its URL. Every REST operation of repositories, issues, pull requests, checks, git, actions, organizations, teams, users, gists, search, packages and apps, on the repository, organization or user it belongs to, with typed answers, lists paged by <code>all()</code>, conditional requests and the rate limit waited for; GraphQL queries typed by a struct and connections paged by cursor; webhooks checked against their secret and handed out as typed events.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -1306,7 +1303,7 @@ try repo.push("origin", "main", credentials = token)</code></pre>
 
 let gh = try github.connect(token)                // GITHUB_TOKEN when left out
 let repo = gh.repo("admlang", "examples")
-for let issue in try repo.issues(state = github.State.Open).all() {
+for let issue in try repo.issues.list(state = github.State.Open).all() {
 	print("#{issue.number} {issue.title}")
 }
 let pr = try repo.pullRequests.create("feature", "main", title = "Add geo examples")
@@ -1314,18 +1311,16 @@ try pr.comment("Ready for review")
 
 // a webhook endpoint
 let hooks = new github.Webhooks(secret)
-server.handle("/github", hooks.handler((event github.Event) =&gt; print(event.name)))</code></pre>
+try server.handle("/github", hooks.handler((event github.WebhookEvent) =&gt; print(event.name)))</code></pre>
       </div>
 
         <p class="exports-note"><a href="https://github.com/admlang/dev/tree/main/github" target="_blank" rel="noopener">README and source</a></p>
       </div>
 
       <div class="docs-sub" id="dev-gitlab">
-        <h3><code>adm.dev.gitlab</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.dev.gitlab</code></h3>
 
-        <p>A GitLab API client in ADM over <code>std.net.http</code>: REST and GraphQL, webhooks, and the tokens GitLab issues to people, projects, groups and CI jobs. Self-managed instances work through a base URL.</p>
-
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>A GitLab API client in ADM over <code>std.net.http</code>, for gitlab.com or a self-managed instance, as a personal, project or group access token, a CI job token (found in a pipeline) or an OAuth user. Every REST operation of projects, groups, users, issues, merge requests (approvals, notes, discussions, diffs, merges), commits and statuses, branches and tags with their protection, pipelines, jobs and artifacts, variables, releases, packages, the container registry, snippets and search, on the project, group or user it belongs to, with lists paged by <code>all()</code> (offset or keyset) and the rate limit waited for; GraphQL queries typed by a struct and connections paged by cursor; webhooks checked against their secret token and handed out as typed events.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -1344,7 +1339,7 @@ server.handle("/github", hooks.handler((event github.Event) =&gt; print(event.na
 
 let gl = try gitlab.connect(token, url = "https://gitlab.example.com")   // GITLAB_TOKEN, gitlab.com when left out
 let project = gl.project("group/app")
-for let mr in try project.mergeRequests(state = gitlab.State.Opened).all() {
+for let mr in try project.mergeRequests.list(state = gitlab.State.Opened).all() {
 	print("!{mr.iid} {mr.title}")
 }
 let pipeline = try project.pipelines.create("main", variables = {"DEPLOY": "staging"})</code></pre>
@@ -1354,11 +1349,9 @@ let pipeline = try project.pipelines.create("main", variables = {"DEPLOY": "stag
       </div>
 
       <div class="docs-sub" id="dev-docker">
-        <h3><code>adm.dev.docker</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.dev.docker</code></h3>
 
-        <p>A Docker Engine API client in ADM over <code>std.net.http</code>, on a Unix socket or TCP with TLS. It also talks to Podman through its Docker-compatible API.</p>
-
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>A Docker Engine API client in ADM over <code>std.net.http</code>, on a Unix socket or TCP with TLS, found the way the Docker CLI finds its engine (<code>DOCKER_HOST</code>, contexts, the local sockets). It also talks to Podman through its Docker-compatible API. Containers with their whole configuration, logs and stats as streams, exec and attach with terminals, files in and out; images pulled, pushed and built (with <code>.dockerignore</code>), saved and loaded, with registry credentials from the CLI's configuration and credential helpers; volumes, networks and events.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -1391,11 +1384,9 @@ try pg.remove(volumes = true)</code></pre>
       </div>
 
       <div class="docs-sub" id="dev-kubernetes">
-        <h3><code>adm.dev.kubernetes</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.dev.kubernetes</code></h3>
 
-        <p>A Kubernetes API client in ADM over <code>std.net.http</code>: the API server, its resources typed or unstructured, and the credentials a kubeconfig or a pod carries.</p>
-
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>A Kubernetes API client in ADM over <code>std.net.http</code>, connected the way kubectl connects: kubeconfig files merged with their contexts, client certificates, tokens, exec plugins and OIDC refresh, or the service account of the pod it runs in, with impersonation. Typed resources for the core, apps, batch, networking, rbac, storage, autoscaling, policy and coordination groups, and unstructured objects for custom resources, with discovery and OpenAPI schemas; list with selectors and paging, patches of every kind, server-side apply and status subresources; watches that resume after a gap and an informer that keeps a local copy in step; pod logs, exec, attach and port-forward over WebSocket or SPDY; leader election on a lease; manifests of several YAML or JSON documents.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -1577,11 +1568,9 @@ let claims = try provider.verifyIdToken(idToken, audience = bundleId)</code></pr
       <p class="exports-note">Source: <a href="https://github.com/admlang/notify" target="_blank" rel="noopener">github.com/admlang/notify</a></p>
 
       <div class="docs-sub" id="notify-slack">
-        <h3><code>adm.notify.slack</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.notify.slack</code></h3>
 
-        <p>A Slack client in ADM over <code>std.net.http</code>: the Web API, Block Kit, incoming webhooks, and the two ways Slack calls an app back (HTTP with signed requests, Socket Mode over WebSocket).</p>
-
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>A Slack client in ADM over <code>std.net.http</code>: the Web API, Block Kit, incoming webhooks, the two ways Slack calls an app back (HTTP with signed requests, Socket Mode over WebSocket), and OAuth installation for distributed apps.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -1600,7 +1589,7 @@ let claims = try provider.verifyIdToken(idToken, audience = bundleId)</code></pr
 
 let bot = new slack.Client(botToken)              // SLACK_BOT_TOKEN when left out
 try bot.send("#deploys", "Release 1.4 is out")
-let message = new slack.Message()
+let message = new slack.Message("Release 1.4 is out")
 message.section("*Release 1.4* is out")
 message.button("Release notes", url = "https://example.com/notes/1.4")
 try bot.send("#deploys", message)
@@ -1656,11 +1645,9 @@ for let event in gw {
       </div>
 
       <div class="docs-sub" id="notify-telegram">
-        <h3><code>adm.notify.telegram</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.notify.telegram</code></h3>
 
-        <p>A Telegram Bot API client in ADM over <code>std.net.http</code>: messages, media, keyboards, and updates by long polling or webhook.</p>
-
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>A Telegram Bot API client in ADM over <code>std.net.http</code>: every method and object of Bot API 10.3 under the API's own names, uploads streamed from files or bytes (media groups included), inline and reply keyboard builders, updates by long polling as a stream or through a webhook handler that checks the secret token, MarkdownV2 and HTML escaping, file downloads, pacing to Telegram's message limits, and a local Bot API server.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -1678,7 +1665,7 @@ for let event in gw {
         <pre><code>use adm.notify.telegram
 
 let bot = new telegram.Bot(token)                 // TELEGRAM_BOT_TOKEN when left out
-try bot.send(chatId, "Release 1.4 is out", parseMode = telegram.ParseMode.MarkdownV2)
+try bot.send(chatId, "Release 1\\.4 is out", parseMode = telegram.ParseMode.MarkdownV2)
 let keyboard = new telegram.InlineKeyboard()
 keyboard.button("Release notes", url = "https://example.com/notes/1.4")
 try bot.send(chatId, "Details:", keyboard = keyboard)
@@ -1686,7 +1673,7 @@ try bot.send(chatId, "Details:", keyboard = keyboard)
 for let update in try bot.updates() {             // long polling
 	let message = update.message
 	continue when message is none
-	try bot.send(message.chat.id, "Got it")
+	try bot.reply(message, "Got it")
 }</code></pre>
       </div>
 
@@ -1694,11 +1681,9 @@ for let update in try bot.updates() {             // long polling
       </div>
 
       <div class="docs-sub" id="notify-twilio">
-        <h3><code>adm.notify.twilio</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.notify.twilio</code></h3>
 
-        <p>A Twilio client in ADM over <code>std.net.http</code>: SMS and MMS, WhatsApp, voice with TwiML, Verify, and the webhooks Twilio sends with their signatures checked.</p>
-
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>A Twilio client in ADM over <code>std.net.http</code>: SMS, MMS and WhatsApp messages (templates, messaging services, scheduling, status callbacks, media), number lookups of carrier and line type, voice calls answered by TwiML from typed builders (say, play, gather, dial, record, conference), call control, recordings and transcriptions, Verify over SMS, voice, WhatsApp and email with rate limits, API keys, subaccounts, usage and the regional edges, and a webhook handler that checks Twilio's signature, hands out typed events and answers with TwiML.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -1719,19 +1704,17 @@ let tw = new twilio.Client(accountSid, authToken)   // TWILIO_ACCOUNT_SID, TWILI
 let sms = try tw.messages.send("+15005550006", "+15551234567", "Your code is 482913")
 print(sms.sid)
 
-let check = try tw.verify("VA...").start("+15551234567", channel = twilio.Channel.Sms)
-let ok = try tw.verify("VA...").check("+15551234567", code)</code></pre>
+let started = try tw.verify("VA...").start("+15551234567", channel = twilio.Channel.Sms)
+let ok = try tw.verify("VA...").confirm("+15551234567", code)</code></pre>
       </div>
 
         <p class="exports-note"><a href="https://github.com/admlang/notify/tree/main/twilio" target="_blank" rel="noopener">README and source</a></p>
       </div>
 
       <div class="docs-sub" id="notify-sendgrid">
-        <h3><code>adm.notify.sendgrid</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.notify.sendgrid</code></h3>
 
-        <p>A SendGrid client in ADM over <code>std.net.http</code>: mail send v3 from <code>std.formats.mail</code> messages or dynamic templates, suppressions, the event webhook, inbound parse.</p>
-
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>A SendGrid client in ADM over <code>std.net.http</code>: mail send v3 from <code>std.formats.mail</code> messages or dynamic templates (personalizations, attachments and inline images, categories, custom arguments, scheduling and batches, tracking, the sandbox mode, with SendGrid's limits checked before sending), suppressions and unsubscribe groups, templates and their versions, verified senders, domain authentication, statistics and the activity feed, an event webhook handler that checks the ECDSA signature and hands out typed events, and an inbound parse handler that hands out <code>std.formats.mail</code> messages.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -1753,24 +1736,22 @@ let ok = try tw.verify("VA...").check("+15551234567", code)</code></pre>
 
 let sg = new sendgrid.Client(apiKey)              // SENDGRID_API_KEY when left out
 let message = new mail.Message()
-message.from = "Shop &lt;orders@example.com&gt;"
-message.to = ["ana@example.net"]
-message.subject = "Your order"
-message.text = "Thanks, Ana."
+	.from("orders@example.com", "Shop")
+	.to("ana@example.net")
+	.subject("Your order")
+	.text("Thanks, Ana.")
 try sg.send(message)
 
-try sg.send(new sendgrid.Template("d-1234", to = "ana@example.net", data = {"name": "Ana", "order": "7"}))</code></pre>
+try sg.send(new sendgrid.Template("d-1234", to = "ana@example.net", data = {"name": "Ana", "order": "7"}, from = "orders@example.com"))</code></pre>
       </div>
 
         <p class="exports-note"><a href="https://github.com/admlang/notify/tree/main/sendgrid" target="_blank" rel="noopener">README and source</a></p>
       </div>
 
       <div class="docs-sub" id="notify-postmark">
-        <h3><code>adm.notify.postmark</code> <span class="api-tag api-planned">planned</span></h3>
+        <h3><code>adm.notify.postmark</code></h3>
 
-        <p>A Postmark client in ADM over <code>std.net.http</code>: transactional mail from <code>std.formats.mail</code> messages or templates, batches, message streams, bounces, and Postmark's webhooks.</p>
-
-        <p class="exports-note">Not built yet: the example shows the API as designed.</p>
+        <p>A Postmark client in ADM over <code>std.net.http</code>: single and batch sends from <code>std.formats.mail</code> messages or templates (attachments and inline images, tags, metadata, message streams, open and link tracking, batches split to Postmark's limits), templates and layouts with validation, bounces and suppressions, outbound and inbound message search with opens and clicks, servers and sender signatures through the account token, and a webhook handler that checks Basic credentials or a header secret and hands out typed events, inbound mail as <code>std.formats.mail</code> messages.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
@@ -1792,10 +1773,10 @@ try sg.send(new sendgrid.Template("d-1234", to = "ana@example.net", data = {"nam
 
 let pm = new postmark.Client(serverToken)         // POSTMARK_SERVER_TOKEN when left out
 let message = new mail.Message()
-message.from = "Shop &lt;orders@example.com&gt;"
-message.to = ["ana@example.net"]
-message.subject = "Your order"
-message.html = "&lt;p&gt;Thanks, Ana.&lt;/p&gt;"
+	.from("orders@example.com", "Shop")
+	.to("ana@example.net")
+	.subject("Your order")
+	.html("&lt;p&gt;Thanks, Ana.&lt;/p&gt;")
 let sent = try pm.send(message, stream = "outbound", tag = "order")
 print(sent.messageId)</code></pre>
       </div>
