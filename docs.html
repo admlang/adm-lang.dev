@@ -3826,8 +3826,11 @@ Card(title = "Profile") {
           another value, a bound input assigned by the child. Any task may assign a state: a statement
           that reads or assigns one holds the program's state lock, which the UI loop holds for each
           pass and a task gives up while it waits. Numbers, strings and enums compare by
-          value, objects, arrays and maps by identity (a change in place is no assignment); an equal
-          value emits nothing, nor do the values a component is built with. A selector picks the changes
+          value, objects, arrays and maps by identity; an equal value emits nothing, nor do the values a
+          component is built with. A change in place of what the field holds counts as a change too
+          (<code>counts[key] = 1</code>, <code>items[i].done = true</code>, <code>files.push(f)</code>:
+          an element or member stored through it, or a <code>@mutates</code> method of a value reached
+          from it). A selector picks the changes
           a listener hears: <code>@on(UI.stateChange, ref("mainTabs").state("selected"))</code>, or
           <code>own().state("file")</code> in a method of the component itself.
         </p>
@@ -3835,7 +3838,7 @@ Card(title = "Profile") {
           Every component has the members of the prelude's <code>Component&lt;T&gt;</code>: inputs such as
           <code>enabled</code>, the tree (<code>childNodes</code>, <code>parent()</code>) and the lifecycle
           (<code>attached()</code>, <code>detached()</code>, <code>render(ctx)</code>, <code>rerun()</code> which runs its view again, <code>unmount()</code> which lets go of the children its view placed once it has left the tree, <code>setChildren(given)</code> which makes the components of <code>given</code> what the view places with <code>children()</code>, for a component made in code that holds others). A controller method
-          with the same name and parameters replaces one of them for that component, except <code>rerun()</code> and <code>unmount()</code>, which the compiler writes from the component's view: declaring either is an error that asks for another name. A value typed
+          with the same name and parameters replaces one of them for that component, except <code>rerun()</code> and <code>unmount()</code>, which the compiler writes from the component's view: declaring either is an error that asks for another name. The UI draws a component through <code>render(ctx RenderContext)</code> only, so a controller whose <code>render</code> methods all take something else (<code>render(ctx DrawContext)</code>, <code>render()</code>) is an error too: none of them would ever run. A value typed
           <code>component</code> holds any component, and a call such as <code>c.render(ctx)</code> runs the
           method of the component it holds. <code>c is Scroller</code> tests whether that component's
           controller implements an interface and adds the interface's methods in the branch;
@@ -3848,7 +3851,8 @@ Card(title = "Profile") {
           value, it called <code>redraw()</code>, a component it names with <code>ref</code> changed, or
           the window, the theme or a state such as <code>hover</code> did. An argument whose value
           differs from what was passed the last time is then assigned to the child's input, which
-          changes the child in turn. What a view reads through any other reference (a model object
+          changes the child in turn; so is one that is, or comes from, a <code>@state</code> or
+          <code>@input</code> field changed in place since the last run, though it is the same object. What a view reads through any other reference (a model object
           changed in place, a service, a global) shows once the component, or one above it, calls
           <code>redraw()</code>. An <code>if</code>, <code>match</code> or <code>when</code> in a view is
           evaluated again too, so components enter and leave with their branch, and a loop is iterated
@@ -4496,6 +4500,7 @@ let results = try instance.invoke("add", wasm.Value[
         <tr><td><code>__debug__</code></td><td>True when compiling in debug mode.</td></tr>
         <tr><td><code>__release__</code></td><td>True when compiling in release/optimized mode.</td></tr>
         <tr><td><code>__in_test__</code></td><td>True when compiling in test mode.</td></tr>
+        <tr><td><code>__labs__</code></td><td>True in a build that has service labs: a test build (<code>adm test</code>) and a build the IDE runs.</td></tr>
         <tr><td><code>__git_commit__</code></td><td>Git commit hash of the build (empty outside a Git repository).</td></tr>
         <tr><td><code>__git_branch__</code></td><td>Git branch name of the build (empty outside a Git repository).</td></tr>
         <tr><td><code>__git_tag__</code></td><td>Git tag name of the build (empty outside a Git repository).</td></tr>

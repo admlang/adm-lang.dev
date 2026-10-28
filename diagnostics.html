@@ -605,7 +605,7 @@
 
     <section class="docs-section" id="area-service">
       <h2>Services</h2>
-      <p>Services, events and <code>@remote</code>. 30 codes.</p>
+      <p>Services, events and <code>@remote</code>. 31 codes.</p>
       <table class="docs-table diag-table">
         <tr id="E-SERVICE-0001"><td><code>E-SERVICE-0001</code></td><td>error</td><td>service <span class="diag-hole">%q</span> does not satisfy ServiceDescriptor<span class="diag-hole">%s</span></td></tr>
         <tr id="E-SERVICE-0002"><td><code>E-SERVICE-0002</code></td><td>error</td><td>service <span class="diag-hole">%q</span> must declare <span class="diag-hole">%s</span> <span class="diag-hole">%s</span></td></tr>
@@ -637,12 +637,13 @@
         <tr id="E-SERVICE-0029"><td><code>E-SERVICE-0029</code></td><td>error</td><td>IPC.connect&lt;<span class="diag-hole">%s</span>&gt;: <span class="diag-hole">%s</span> is not an interface</td></tr>
         <tr id="E-SERVICE-0030"><td><code>E-SERVICE-0030</code></td><td>error</td><td>IPC.<span class="diag-hole">%s</span>: <span class="diag-hole">%s</span> is not marked @remote&lt;Interface&gt;; mark it for each interface it serves</td></tr>
         <tr id="E-SERVICE-0031"><td><code>E-SERVICE-0031</code></td><td>error</td><td>service dependency cycle: <span class="diag-hole">%s</span></td></tr>
+        <tr id="E-SERVICE-0032"><td><code>E-SERVICE-0032</code></td><td>error</td><td><span class="diag-hole">%s</span> is for tests: outside its service, a lab is named only in a test file (_test.adm)</td></tr>
       </table>
     </section>
 
     <section class="docs-section" id="area-ui">
       <h2>UI</h2>
-      <p>Components, views and styles. 76 codes.</p>
+      <p>Components, views and styles. 77 codes.</p>
       <table class="docs-table diag-table">
         <tr id="E-UI-0001"><td><code>E-UI-0001</code></td><td>error</td><td>component <span class="diag-hole">%q</span> must define a view block (inline or referenced)</td></tr>
         <tr id="E-UI-0002"><td><code>E-UI-0002</code></td><td>error</td><td>component <span class="diag-hole">%q</span> must define a style block (inline or referenced)</td></tr>
@@ -720,6 +721,7 @@
         <tr id="E-UI-0074"><td><code>E-UI-0074</code></td><td>error</td><td><span class="diag-hole">%q</span> is a member of <span class="diag-hole">%s</span>, which a style body reads through <code>self</code>: <code>self.<span class="diag-hole">%s</span></code></td></tr>
         <tr id="E-UI-0075"><td><code>E-UI-0075</code></td><td>error</td><td><code><span class="diag-hole">%s</span>()</code> <span class="diag-hole">%s</span>, and the compiler writes it for <span class="diag-hole">%s</span> from its view: a method <span class="diag-hole">%s</span> declares under that name would replace it; give the method another name</td></tr>
         <tr id="E-UI-0076"><td><code>E-UI-0076</code></td><td>error</td><td>@previewSetup is written <code>async def <span class="diag-hole">%s</span>() !none</code>: the preview awaits it, with nothing to pass, before its first window</td></tr>
+        <tr id="E-UI-0077"><td><code>E-UI-0077</code></td><td>error</td><td>the UI draws <span class="diag-hole">%s</span> through <code>render(ctx RenderContext)</code> and never calls <code><span class="diag-hole">%s</span></code>: take a RenderContext, whose <code>draw</code> is the canvas, or give the method another name</td></tr>
       </table>
     </section>
 

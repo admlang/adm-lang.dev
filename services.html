@@ -306,8 +306,18 @@ service Depot {
 Depot.lab.conditions.fullAt = 0.6</code></pre>
         </div>
         <p>
-          Labs are for development and tests. A <code>--release</code> build has none: its services
-          run no lab check, and setting a condition there stops the program with a message.
+          Labs are for tests and the IDE: only a test build (<code>adm test</code>) and a program the
+          IDE runs have them (the build constant <code>__labs__</code>). Any other build, debug or
+          <code>--release</code>, has none: its services run no lab code, and a rule set there stops
+          the program with a message. Outside its service a lab is named only in a test file
+          (<code>_test.adm</code>); anywhere else <code>Storage.lab</code> is a compile error. The IDE
+          sets the labs of the program it runs from its service panel.
+        </p>
+        <p>
+          The lab's methods can be called from any task at any time, and every read of
+          <code>conditions</code> holds what it read, so a <code>reset</code> under a call in flight
+          takes nothing from it. The fields themselves are an object's like any other: set them
+          while no other task is calling the service.
         </p>
       </div>
       <p>
@@ -2694,38 +2704,38 @@ step.end()</code></pre>
         <p>Windows, the renderer, displays and input events. Lives in <code>std.ui</code>: <code>use std.ui::(UI)</code>.</p>
         <ul class="api-list">
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def openWindow&lt;T: component&gt;(root T, cfg r.WindowConfig) !r.Window</code></div>
-            <p class="api-doc">Opens a window that shows root: the component that stands for the window. Call it again for each further window; run serves them all. With <code>cfg.persist = "main"</code> the window opens with the size, place and state (maximized, fullscreen) it had when it was last open, on a display that still shows that place, and keeps them as the user changes them; the name is a key of the <code>@persist</code> store (<a href="#svc-vault"><code>Vault</code></a>, <code>persist.&lt;name&gt;</code>). A second window opened under a name an open window already keeps opens as written and is not kept.</p>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def openWindow&lt;T: component&gt;(root T, cfg r.WindowConfig) !r.Window</code></div>
+            <p class="api-doc">Opens a window that shows root: the component that stands for the window. Call it again for each further window; run serves them all. With <code>cfg.persist = "main"</code> the window opens with the size, place and state (maximized, fullscreen) it had when it was last open, on a display that still shows that place, and keeps them as the user changes them; the name is a key of the <code>@persist</code> store (<a href="#svc-vault"><code>Vault</code></a>, <code>persist.&lt;name&gt;</code>). A second window opened under a name an open window already keeps opens as written and is not kept. From any task: while <code>run</code> serves the windows, a call from another task is made on the windows&#39; loop at its next pass, and returns once it ran there.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def openDefaultWindow&lt;T: component&gt;(root T) !r.Window</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def openDefaultWindow&lt;T: component&gt;(root T) !r.Window</code></div>
             <p class="api-doc">Opens a window with the `UIConfig.defaultWindow` settings and root as the component it renders.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def closeWindow(win r.Window) !none</code></div>
-            <p class="api-doc">Closes the window.</p>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def closeWindow(win r.Window) !none</code></div>
+            <p class="api-doc">Closes the window. From any task, as <code>openWindow</code>.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def window(title string = &quot;&quot;, name string = &quot;&quot;) ?r.Window</code></div>
             <p class="api-doc">The open window with that title, or that was opened with that `WindowConfig.name`; with both, the one that has both. The first opened when several fit; none when none does.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def raiseWindow(win r.Window) !none</code></div>
-            <p class="api-doc">Puts a window above the others.</p>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def raiseWindow(win r.Window) !none</code></div>
+            <p class="api-doc">Puts a window above the others. From any task, as <code>openWindow</code>.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setWindowTitle(win r.Window, title string) !none</code></div>
-            <p class="api-doc">Sets a window's title. While a <code>Page</code> shown in it declares a title, the page's is shown and this one comes back when no page declares one any more.</p>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def setWindowTitle(win r.Window, title string) !none</code></div>
+            <p class="api-doc">Sets a window's title. While a <code>Page</code> shown in it declares a title, the page's is shown and this one comes back when no page declares one any more. From any task, as <code>openWindow</code>.</p>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setPageTitle(win r.Window, page component, title ?string) !none</code></div>
-            <p class="api-doc">Declares the title of <code>page</code>, shown in <code>win</code>, in place of the window's own; none takes it back. The title of the page that declared last is shown: the innermost of pages that hold others. What <code>Page</code> calls.</p>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def setPageTitle(win r.Window, page component, title ?string) !none</code></div>
+            <p class="api-doc">Declares the title of <code>page</code>, shown in <code>win</code>, in place of the window's own; none takes it back. The title of the page that declared last is shown: the innermost of pages that hold others. What <code>Page</code> calls. From any task, as <code>openWindow</code>.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setWindowIcon(win r.Window, icon image.Image) !none</code></div>
-            <p class="api-doc">Sets a window's icon.</p>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def setWindowIcon(win r.Window, icon image.Image) !none</code></div>
+            <p class="api-doc">Sets a window's icon. From any task, as <code>openWindow</code>.</p>
 
           </li>
           <li class="api-item">
@@ -2767,7 +2777,7 @@ step.end()</code></pre>
             <p class="api-doc">It is one object, kept in step with <code>appearanceChange</code>.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def setTheme(theme Theme)</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def setTheme(theme Theme)</code></div>
             <p class="api-doc">Makes `theme` the one styles read when no component above theirs provides another (`Themed`, a window opened with a theme): `theme()` returns it from now on, and every style takes again what its body assigns from the theme on the next frame.</p>
             <p class="api-doc">A theme given this way is the program's: it keeps its values when the platform's look changes.</p>
           </li>
@@ -2789,7 +2799,7 @@ step.end()</code></pre>
             <p class="api-doc">Emitted when `setTheme` gave styles another theme.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def addIcons(set IconSet)</code></div>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def addIcons(set IconSet)</code></div>
             <p class="api-doc">Makes the icons of `set` known by name to components (`Icon("save")`, `Button(icon = "save")`). A set added later is looked in first; one with the name of a set already there replaces it.</p>
           </li>
           <li class="api-item">
@@ -2797,12 +2807,12 @@ step.end()</code></pre>
             <p class="api-doc">The picture of the icon called `name` (`set/name` for the one of that set); none when no set holds it.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def showTray(icon image.Image, tooltip string = &quot;&quot;, menu MenuEntry[] = []) !none</code></div>
-            <p class="api-doc">Shows the application's icon in the system tray, or replaces what the tray shows. `menu` opens from the icon. Fails when the desktop has no tray.</p>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def showTray(icon image.Image, tooltip string = &quot;&quot;, menu MenuEntry[] = []) !none</code></div>
+            <p class="api-doc">Shows the application's icon in the system tray, or replaces what the tray shows. `menu` opens from the icon. Fails when the desktop has no tray. From any task, as <code>openWindow</code>.</p>
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def hideTray() !none</code></div>
-            <p class="api-doc">Removes the tray icon.</p>
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def hideTray() !none</code></div>
+            <p class="api-doc">Removes the tray icon. From any task, as <code>openWindow</code>.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def closeRequested(request CloseRequest) CloseRequest</code></div>

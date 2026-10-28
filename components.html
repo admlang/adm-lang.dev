@@ -1411,7 +1411,7 @@ UI.theme().follow(UI.appearance())</code></pre>
 @icons("assets/icons")
 partial type AppIcons {}
 
-// once, after UI.start()
+// once, after UI.start(), or later from any task
 let app = new AppIcons()
 UI.addIcons(try app.set())
 
@@ -1642,7 +1642,9 @@ def keep(evt Event&lt;CloseRequest&gt;) {
           Also on the service: <code>closeWindow</code>, <code>raiseWindow</code>, <code>setWindowTitle</code>, <code>setPageTitle</code>,
           <code>setWindowIcon</code>, <code>showTray(icon, tooltip, menu)</code> and <code>hideTray()</code>,
           <code>displays()</code>, <code>appearance()</code> and <code>theme()</code>,
-          <code>addIcons(set)</code>, <code>redraw()</code>, <code>stop()</code>. The full list with every
+          <code>addIcons(set)</code>, <code>redraw()</code>, <code>stop()</code>; <code>addIcons</code>,
+          <code>addStyles</code>, <code>setTheme</code> and <code>redraw</code> may be called from any task
+          while the windows run (a set decoded in the background is added when ready). The full list with every
           event is on the <a href="services.html#svc-ui">services page</a>.
         </p>
       </div>
