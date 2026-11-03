@@ -232,7 +232,7 @@ acme:core 2.1.0
 acme:core:41ab…:2.1.0 publisher=k7… permissions=adm.clipboard.read</code></pre>
 </div>
 
-<p>The lock is the compiled layer: the grants baked into the binary, per package. The application itself holds everything its own code reaches, because its author wrote those calls. A package that was never asked holds nothing.</p>
+<p>The lock is the compiled layer: the grants baked into the binary, per package. The application itself holds everything its own code reaches, because its author wrote those calls. A package that was never asked holds nothing. In a tree with several applications, a build for one holds what that one can run, not what its neighbours reach; <code>adm audit</code> lists the same.</p>
 
 <h3 id="foreign">Foreign code: an acceptance, not a permission</h3>
 <p>Interop is a language feature. A module binds a C library with <code>@link</code>, <code>@c</code> or <code>@native</code>. An application's own bindings are the author's choice; there is no lint, warning or question about them.</p>

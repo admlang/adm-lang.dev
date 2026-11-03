@@ -856,6 +856,28 @@ rule.valid()                   // true: the pattern compiles
 rule.test("Ana@Example.com")   // true
 new regex("(a", "").valid()    // false: it matches nothing</code></pre>
         </div>
+        <p>A lexer or parser over bytes uses a <code>searcher()</code>, which allocates nothing per search. <code>search</code> works at byte offsets, anchored or not; <code>end</code> is where the text ends for <code>$</code> and <code>\b</code>, and <code>limit</code> stops a search that reads too far. <code>RegexRules</code> searches a list of patterns in one pass and says which matched, the earliest in the list winning:</p>
+        <div class="code-window">
+          <div class="code-titlebar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="code-filename">regex_rules.adm</span>
+          </div>
+          <pre><code>let rules = new RegexRules(["if\\b", "[a-z]+", "\\d+"])
+let s = rules.searcher()
+let raw = "iffy 42".bytes()
+s.search(raw, anchored = true)    // true
+s.rule()                          // 1
+s.start()                         // 0
+s.end()                           // 4
+s.search(raw, from = 5, anchored = true)
+s.rule()                          // 2
+
+let at = [0, 0, 0, 0, 0, 0]
+let pair = /(\w+)=(\d+)/.searcher()
+pair.search("a=1".bytes())
+pair.groups("a=1".bytes(), at)    // at: 0 3 0 1 2 3</code></pre>
+        </div>
+        <p>A <code>RegexRules</code> is shared between tasks, each with its own searcher. <code>maxProgram</code> bounds what it compiles to, for patterns from a source that is not trusted; past it <code>valid()</code> is false and <code>failure()</code> says which rule.</p>
 
         <p>
           SIMD's <code>vec2/4/8/16/32/64/128</code> and <code>mask2/4/8/16/32/64/128</code> types get their

@@ -224,7 +224,7 @@ fetching cthackers:humanize 0.1.0 from https://github.com/cthackers/humanize...
 lock: ./adm.lock</code></pre>
       </div>
 
-      <p><code>adm get</code> resolves the highest version that is not yanked, downloads the package from the library's repository (the release asset the index line names, through <code>gh</code> for a private repository), verifies it exactly as the registry did, installs it into the package cache and records it in <code>adm.lock</code>. Dependencies the library declares are fetched the same way. A bare name that several accounts publish is refused with the list; say which one. Ranges: <code>humanize@0.1.0</code>, <code>@^0.1</code>, <code>@~0.1.0</code>, <code>@&gt;=0.1</code>.</p>
+      <p><code>adm get</code> resolves the highest version that is not yanked, downloads the package from the library's repository (the release asset the index line names, through <code>gh</code> for a private repository), verifies it exactly as the registry did, installs it into the package cache and records it in <code>adm.lock</code>. Dependencies the library declares are fetched the same way. A bare name that several accounts publish is refused with the list; say which one. Ranges: <code>humanize@0.1.0</code>, <code>@^0.1</code>, <code>@~0.1.0</code>, <code>@&gt;=0.1</code>. A <code>^</code> range holds the leftmost non-zero part: <code>^1.2</code> stops before <code>2.0.0</code> and <code>^0.1</code> before <code>0.2.0</code>, since below 1.0 each minor is its own major release.</p>
       <p>In code the namespace disappears; the module is just its name:</p>
       <div class="code-window">
         <div class="code-titlebar">
@@ -246,7 +246,7 @@ application Report {
 
     <section class="docs-section" id="lock">
       <h2>adm.lock and vendoring</h2>
-      <p><code>adm.lock</code> pins every package to a version, a hash and a publisher, one line each. Commit it: a fresh checkout runs <code>adm install</code> with no arguments to fetch exactly what it names.</p>
+      <p><code>adm.lock</code> pins every package to a version, a hash and a publisher, one line each. Commit it: on a fresh checkout <code>adm build</code>, <code>run</code>, <code>test</code>, <code>check</code> and <code>lint</code> fetch exactly what it names before they compile, then any <code>[deps]</code> entry it does not answer yet, so there is no install step. A permission the lock has not accepted is asked as <code>adm get</code> asks it, and stops a build without a terminal. <code>ADM_NO_AUTO_FETCH=1</code> builds with what is installed.</p>
       <div class="code-window">
         <div class="code-titlebar">
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>

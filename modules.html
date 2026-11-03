@@ -56,10 +56,13 @@
           <li><a class="docs-nav-sub" href="#std-text-unicode">std.text.unicode</a></li>
           <li><a class="docs-nav-sub" href="#std-text-precis">std.text.precis</a></li>
           <li><a class="docs-nav-sub" href="#std-text-idna">std.text.idna</a></li>
+          <li><a class="docs-nav-sub" href="#std-text-grammar">std.text.grammar</a></li>
           <li><a class="docs-nav-sub" href="#std-text-jinja">std.text.templates.jinja</a></li>
           <li><a class="docs-nav-sub" href="#std-adm-lexer">std.adm.lexer</a></li>
           <li><a class="docs-nav-sub" href="#std-adm-syntax">std.adm.syntax</a></li>
           <li><a class="docs-nav-sub" href="#std-adm-symbols">std.adm.symbols</a></li>
+          <li><a class="docs-nav-sub" href="#std-adm-manifest">std.adm.manifest</a></li>
+          <li><a class="docs-nav-sub" href="#std-adm-lockfile">std.adm.lockfile</a></li>
           <li><a class="docs-nav-sub" href="#std-glob">std.glob</a></li>
           <li><a class="docs-nav-sub" href="#std-bytes">std.bytes</a></li>
           <li><a class="docs-nav-sub" href="#std-math">std.math</a></li>
@@ -287,6 +290,23 @@ use std.data.encoding::(json)</code></pre>
         </table>
         <p class="exports-note">Most string operations are methods on <code>string</code> in the prelude.</p>
       </div>
+      <div class="docs-sub" id="std-text-grammar">
+        <h3><code>std.text.grammar</code></h3>
+        <p>Tokenizing from a grammar that is data, for editors and tools: named states of ordered rules, run a line at a time on linear-time regexes with the work counted, so a bad grammar costs a bad colouring and not a hang.</p>
+        <table class="docs-table exports-table">
+          <thead><tr><th>Export</th><th>What it does</th></tr></thead>
+          <tbody>
+          <tr><td><code>compile</code></td><td>a <code>Grammar</code> from TOML text, or from the same tree of maps and arrays; fails naming the state, rule and line</td></tr>
+          <tr><td><code>Grammar</code></td><td><code>name</code>, <code>kinds</code>, <code>kindOf</code>, <code>kindsWithRole</code>, <code>labels</code>, <code>folding</code>, <code>startState</code>; shared between tasks</td></tr>
+          <tr><td><code>StateTable</code></td><td>gives each stack of states a small int, so comparing two line states is comparing ints; one per document</td></tr>
+          <tr><td><code>Scanner</code>, <code>ScanStop</code>, <code>GrammarResolver</code></td><td><code>scan(raw, from, end, state, out, budget, pause)</code> over a line of bytes; stops on a budget of bytes read and goes on; languages embedded by name come from the resolver</td></tr>
+          <tr><td><code>TokenBuffer</code></td><td>the tokens in flat arrays: <code>start</code>, <code>stop</code>, <code>kind</code>, <code>grammar</code>, <code>opens</code>, <code>closes</code>, <code>label</code>, <code>closeLabel</code></td></tr>
+          <tr><td><code>LineCheckpoints</code></td><td><code>visible</code> scans part of a very long line from the state kept before it</td></tr>
+          <tr><td><code>BlockWalker</code>, <code>Block</code>, <code>indentBlocks</code></td><td>folds and nesting from the tokens that open and close blocks, or from indentation</td></tr>
+          </tbody>
+        </table>
+      </div>
+
       <div class="docs-sub" id="std-text-unicode">
         <h3><code>std.text.unicode</code></h3>
         <table class="docs-table exports-table">
@@ -341,6 +361,27 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>SyntaxTree</code>, <code>SyntaxNode</code></td><td>navigation by offset, children, siblings, ancestors; <code>edit()</code> reparses one block and shares the rest; <code>dump()</code></td></tr>
           <tr><td><code>Green</code>, <code>greenTokens</code></td><td>the immutable, position-free elements with their trivia</td></tr>
           <tr><td><code>SyntaxKind</code>, <code>TriviaKind</code>, <code>Trivia</code>, <code>Diagnostic</code></td><td>kinds, trivia pieces and parse diagnostics</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-adm-manifest">
+        <h3><code>std.adm.manifest</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>parse</code>, <code>load</code>, <code>find</code></td><td>read <code>adm.toml</code> as <code>adm</code> reads it; the nearest manifest above a folder</td></tr>
+          <tr><td><code>Manifest</code></td><td>typed reads, <code>problems()</code> with positions, <code>resolve</code> and <code>packageFor</code>, <code>settings</code>, <code>files</code>, <code>overriddenBy</code>, <code>available</code>; edits that keep comments, key order and unknown keys: <code>set</code>, <code>remove</code>, <code>removeIfEmpty</code>, <code>addDep</code>, <code>bumpVersion</code>, <code>lineOf</code>; <code>text</code>, <code>save</code></td></tr>
+          <tr><td><code>Problem</code>, <code>ProblemKind</code></td><td>what is wrong at a place in the text: byte span, line, column, key</td></tr>
+          <tr><td><code>Publisher</code>, <code>Update</code>, <code>Package</code>, <code>FileRule</code>, <code>Dep</code>, <code>Plugins</code>, <code>Registry</code>, <code>App</code>, <code>Compat</code>, <code>Resolved</code></td><td>the file's tables, and what identity and updates come to for an application</td></tr>
+          <tr><td><code>Setting</code>, <code>ValueSource</code>, <code>FileRow</code>, <code>Option</code>, <code>ValueKind</code>, <code>VersionPart</code></td><td>a section's values and where each comes from, what can still be added, what a key takes</td></tr>
+          <tr><td><code>publisherId</code>, <code>appId</code></td><td>the ids a publisher's key and an application derive to</td></tr>
+          <tr><td><code>fileName</code>, <code>legacyFileName</code>, <code>schemaVersion</code></td><td>the names of the file and the version of its format</td></tr>
+        </table>
+      </div>
+      <div class="docs-sub" id="std-adm-lockfile">
+        <h3><code>std.adm.lockfile</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>parse</code>, <code>load</code>, <code>find</code></td><td>read <code>adm.lock</code>; where a folder's lock is, and whether it exists</td></tr>
+          <tr><td><code>Lock</code></td><td><code>packages</code>, <code>find</code>, <code>get</code>, <code>byName</code>, <code>set</code>, <code>remove</code>, <code>problems</code>; <code>text</code> and <code>save</code> write the bytes <code>adm</code> writes</td></tr>
+          <tr><td><code>LockedPackage</code></td><td>an entry: namespace, name, version, hash, source, publisher, accepted permissions, foreign code</td></tr>
+          <tr><td><code>fileName</code>, <code>localNamespace</code></td><td>the name of the file and what it writes for an empty namespace</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-adm-symbols">
@@ -760,7 +801,8 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>JSON</code>, <code>json</code></td><td>JSON: <code>encode</code>, <code>decode</code> into objects, <code>map&lt;string, any&gt;</code>, <code>any[]</code> and typed arrays (<code>User[]</code> from a top-level array), <code>parse</code> into plain values</td></tr>
           <tr><td><code>XMLNode</code>, <code>XMLWriter</code>, <code>XML</code></td><td>XML objects (<code>encode</code>, <code>decode</code>, <code>@xml</code>), tree, writer and well-formedness check</td></tr>
-          <tr><td><code>YAML</code>, <code>YAMLError</code></td><td>YAML 1.2: <code>parse</code> and <code>parseAll</code> into plain values, <code>decode</code> into objects and typed arrays (<code>User[]</code> from a top-level sequence), <code>encode</code>; errors with line and column</td></tr>
+          <tr><td><code>YAML</code>, <code>YAMLError</code></td><td>YAML 1.2: <code>parse</code> and <code>parseAll</code> into plain values, <code>decode</code> into objects and typed arrays (<code>User[]</code> from a top-level sequence), <code>encode</code>; errors with line and column; for tools, <code>events</code> reads the event stream with byte offsets, and <code>validate</code> checks a stream with any node as a key</td></tr>
+          <tr><td><code>YAMLEvent</code>, <code>YAMLEventKind</code>, <code>YAMLScalarStyle</code></td><td>one event of a YAML stream with where its text stands, what it says, how a scalar is written</td></tr>
           <tr><td><code>TOML</code></td><td>TOML</td></tr>
           <tr><td><code>JSON.parse</code></td><td>JSON into maps, arrays and scalars</td></tr>
           <tr><td><code>CBOR</code>, <code>CBORValue</code>, <code>CBORReader</code>, <code>cbor</code></td><td>CBOR (RFC 8949), deterministic encoding</td></tr>
@@ -886,6 +928,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>MediaType</code>, <code>parseMediaType</code></td><td>MIME types</td></tr>
           <tr><td><code>typeByExtension</code>, <code>extensionsByType</code></td><td>extension table</td></tr>
           <tr><td><code>detectContentType</code></td><td>content sniffing</td></tr>
+          <tr><td><code>SupportedFormat</code></td><td>a format a family handles, from its <code>supportedFormats()</code> (<code>image.supportedFormats()</code>, <code>audio</code>, <code>video</code>, <code>archive</code>, <code>fonts</code>, <code>docs</code>, <code>sheets</code>, <code>models</code> and the rest): <code>name</code>, <code>extensions</code>, <code>mimeTypes</code></td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-image">

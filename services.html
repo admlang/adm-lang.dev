@@ -2823,6 +2823,14 @@ step.end()</code></pre>
             <p class="api-doc">Emitted when a window is minimized, maximized, restored or made fullscreen.</p>
           </li>
           <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def post(value any) !none</code></div>
+            <p class="api-doc">Gives a value to the windows' task, from any task: <code>@on(UI.posted)</code> listeners get it on the windows' loop on its next pass, in the order of the calls, and the caller does not wait. Before <code>run</code> serves the windows a value waits for the first pass; after <code>run</code> has returned it waits for the next <code>run</code>. Fails when the service is not running.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def posted(value any) any</code></div>
+            <p class="api-doc">Emitted on the windows' loop for each value given to <code>post</code>. A listener tells values apart by their type: <code>evt.result is LibraryRemoved</code>.</p>
+          </li>
+          <li class="api-item">
             <div class="api-head"><span class="api-tag api-emit">emit</span><code class="api-sig">def trayActivated() bool</code></div>
             <p class="api-doc">Emitted when the tray icon itself is clicked. The SDL3 host reports menu lines only, so it does not emit it.</p>
           </li>
