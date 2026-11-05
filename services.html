@@ -2301,8 +2301,8 @@ Storage.lab.conditions.corruptReads = 0.01</code></pre>
         </div>
         <ul class="api-list">
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def open(path Path, mode string) !int</code></div>
-            <p class="api-doc">Open a file or folder at the given path with the specified mode.</p>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def open(path Path, mode string, perm int64 = 0o644) !int</code></div>
+            <p class="api-doc">Open a file or folder at the given path with the specified mode. A file the open creates gets the permission bits <code>perm</code> (less the umask) from its first byte; one that exists keeps its own.</p>
 
           </li>
           <li class="api-item">
@@ -2331,8 +2331,8 @@ Storage.lab.conditions.corruptReads = 0.01</code></pre>
 
           </li>
           <li class="api-item">
-            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def writeFile(path Path, data byte[]) !none</code></div>
-            <p class="api-doc">Writes the bytes to a file, replacing any existing content.</p>
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def writeFile(path Path, data byte[], perm int64 = 0o644) !none</code></div>
+            <p class="api-doc">Writes the bytes to a file, replacing any existing content. A file the write creates gets the permission bits <code>perm</code>, as <code>open</code> gives them; one that exists keeps its own.</p>
 
           </li>
           <li class="api-item">
@@ -2465,6 +2465,11 @@ Storage.lab.conditions.corruptReads = 0.01</code></pre>
 
           </li>
           <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def readDirNames(path Path) !string[]</code></div>
+            <p class="api-doc">The names of a directory's entries, in the order the file system gives them and without their information: one read of the directory, no stat per entry, for what only needs the names (whether a folder is empty, holds a file of a kind, how many it holds).</p>
+            <p class="api-doc">Fails when the policy denies the path or the operating system refuses.</p>
+          </li>
+          <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def delete(path Path) !none</code></div>
             <p class="api-doc">Delete a file or a folder at the given path</p>
 
@@ -2488,6 +2493,11 @@ Storage.lab.conditions.corruptReads = 0.01</code></pre>
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def readLink(path Path) !string</code></div>
             <p class="api-doc">Returns the target a symbolic link holds, as written in the link: a relative target is relative to the link's folder and is not resolved.</p>
             <p class="api-doc">Fails when the policy denies the path, the path is not a link or the operating system refuses.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def realPath(path Path) !string</code></div>
+            <p class="api-doc">Returns the canonical absolute path of what <code>path</code> names: every symbolic link on the way followed, <code>.</code> and <code>..</code> resolved, so two names of one file give one path. On Windows a reparse point is followed the same way and the result is a drive letter path.</p>
+            <p class="api-doc">Fails when the policy denies the path, a component does not exist, links loop or the operating system refuses.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def openedFiles() OpenedFile[]</code></div>

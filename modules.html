@@ -65,6 +65,7 @@
           <li><a class="docs-nav-sub" href="#std-adm-lockfile">std.adm.lockfile</a></li>
           <li><a class="docs-nav-sub" href="#std-glob">std.glob</a></li>
           <li><a class="docs-nav-sub" href="#std-bytes">std.bytes</a></li>
+          <li><a class="docs-nav-sub" href="#std-bytes-diff">std.bytes.diff</a></li>
           <li><a class="docs-nav-sub" href="#std-math">std.math</a></li>
           <li><a class="docs-nav-sub" href="#std-math-geom">std.math.geom</a></li>
           <li><a class="docs-nav-sub" href="#std-math-geo">std.math.geo</a></li>
@@ -426,6 +427,14 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Endian</code>, <code>Whence</code></td><td>byte order, seek origin</td></tr>
         </table>
       </div>
+      <div class="docs-sub" id="std-bytes-diff">
+        <h3><code>std.bytes.diff</code></h3>
+        <table class="docs-table exports-table">
+          <tr><td><code>diff</code>, <code>patch</code>, <code>formatOf</code></td><td>binary diffs: a patch from one byte array to another, applied to it; the format told by the bytes</td></tr>
+          <tr><td><code>PatchFormat</code></td><td>bsdiff, VCDIFF as xdelta3 writes it, zstd <code>--patch-from</code>, HDiffPatch: a patch made here applies with the tool, and the tool's applies here</td></tr>
+          <tr><td><code>PatchError</code>, <code>PatchErrorKind</code></td><td>why a patch could not be applied: unknown format, damaged, unsupported option, old data not the patch's</td></tr>
+        </table>
+      </div>
       <div class="docs-sub" id="std-math">
         <h3><code>std.math</code></h3>
         <table class="docs-table exports-table">
@@ -616,7 +625,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.os</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>File</code></td><td>open file</td></tr>
-          <tr><td><code>readFile</code>, <code>writeFile</code>, <code>open</code>, <code>stat</code>, <code>readDir</code>, <code>exists</code>, <code>remove</code>, <code>rename</code>, <code>mkdir</code>, <code>rmdir</code>, <code>chmod</code>, <code>touch</code></td><td>file operations</td></tr>
+          <tr><td><code>readFile</code>, <code>writeFile</code>, <code>open</code>, <code>stat</code>, <code>readDir</code>, <code>exists</code>, <code>remove</code>, <code>rename</code>, <code>mkdir</code>, <code>rmdir</code>, <code>chmod</code>, <code>touch</code>, <code>readLink</code>, <code>realPath</code>, <code>replaceFile</code>, <code>readDirNames</code></td><td>file operations</td></tr>
           <tr><td><code>join</code>, <code>dir</code>, <code>base</code>, <code>extension</code>, <code>split</code>, <code>clean</code>, <code>isAbs</code>, <code>absolute</code></td><td>paths, in the system's form (on Windows with drives and shares, <code>\</code> and <code>/</code>)</td></tr>
           <tr><td><code>run</code>, <code>output</code></td><td>start a program (needs <code>adm.runtime.spawn</code>)</td></tr>
           <tr><td><code>Process</code>, <code>Pipe</code></td><td>a program started by <code>Runtime.start</code> that runs beside this one: <code>input</code>, <code>output</code> and <code>errors</code> pipes (<code>io.Reader</code>/<code>io.Writer</code>), <code>wait()</code>, <code>wait(timeout)</code>, <code>terminate()</code>, <code>kill()</code>, <code>id()</code></td></tr>
@@ -828,7 +837,7 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-codepages">
         <h3><code>std.data.encoding.codepages</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>CodePage</code></td><td>CP437, Windows-1252, Latin-1</td></tr>
+          <tr><td><code>CodePage</code></td><td>CP437, Windows-1252, Latin-1, the Mac and ISO 8859 pages, KOI8, Windows 125x, IBM 037 (EBCDIC)</td></tr>
           <tr><td><code>decode</code>, <code>encode</code>, <code>forCharset</code></td><td>conversion, lookup by charset name</td></tr>
         </table>
       </div>

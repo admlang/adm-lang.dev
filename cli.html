@@ -965,10 +965,10 @@ $ adm mcp install all            # every tool found</code></pre>
         </div>
         <pre><code data-hl="off" class="nohighlight">adm env [--json]</code></pre>
       </div>
-      <p>Prints the <code>ADM_HOME</code>, <code>ADM_BIN</code>, <code>ADM_CACHE</code>, <code>ADM_LIB</code> and <code>ADM_PATH</code> variables as set.</p>
+      <p>Prints the <code>ADM_HOME</code>, <code>ADM_BIN</code>, <code>ADM_CACHE</code>, <code>ADM_LIB</code>, <code>ADM_PATH</code> and <code>ADM_PKG</code> variables as set.</p>
       <table class="docs-table">
         <tr><th>Flag</th><th>Meaning</th></tr>
-        <tr><td><code>--json</code></td><td>The variables, plus what the compiler resolves from them: <code>version</code>, <code>lib</code> (the folder holding <code>prelude/</code> and <code>std/</code>), <code>cache</code>, and <code>prelude</code> and <code>std</code>, the folders a build started in the current directory loads.</td></tr>
+        <tr><td><code>--json</code></td><td>The variables, plus what the compiler resolves from them: <code>version</code>, <code>lib</code> (the folder holding <code>prelude/</code> and <code>std/</code>), <code>cache</code>, <code>packages</code> (the package store, where a locked package's sources are under <code>&lt;namespace or local&gt;/&lt;name&gt;/&lt;version&gt;</code>), and <code>prelude</code> and <code>std</code>, the folders a build started in the current directory loads.</td></tr>
       </table>
       <h3 id="fix"><code>adm fix</code></h3>
       <div class="code-window">
