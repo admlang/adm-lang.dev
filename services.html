@@ -715,7 +715,7 @@ Cache.lab.conditions.missRate = 0.25       // one read in four misses</code></pr
       </div>
       <div class="docs-sub" id="svc-clipboard">
         <h3><code>Clipboard</code></h3>
-        <p>Text copy and paste through the system clipboard. The service drives the desktop's clipboard program: wl-copy and wl-paste on Wayland, xclip or xsel on X11, pbcopy and pbpaste on macOS; on Windows it uses the system clipboard itself. A machine without one reports nothing available and the calls fail. Reading needs <code>adm.clipboard.read</code>, writing <code>adm.clipboard.write</code>, and a clipboard program runs through <code>Runtime.run</code>, so <code>adm.runtime.spawn</code> as well. <code>copy</code>, <code>paste</code> and <code>clear</code> are commits, so <code>@on(Clipboard.copy)</code>, <code>@on(Clipboard.paste)</code> and <code>@on(Clipboard.clear)</code> observe them. The programs run through the shell, which the OS sandbox refuses. A program with a window open uses the window system's clipboard instead: <code>std.ui</code> answers the <code>reading</code> and <code>writing</code> events for calls made on the task that runs the windows.</p>
+        <p>Text, and data of any MIME type such as a PNG picture, copied and pasted through the system clipboard. The service drives the desktop's clipboard program: wl-copy and wl-paste on Wayland, xclip or xsel on X11, pbcopy and pbpaste on macOS; on Windows it uses the system clipboard itself. A machine without one reports nothing available and the calls fail. Reading needs <code>adm.clipboard.read</code>, writing <code>adm.clipboard.write</code>, and a clipboard program runs through <code>Runtime.run</code>, so <code>adm.runtime.spawn</code> as well. <code>copy</code>, <code>paste</code> and <code>clear</code> are commits, so <code>@on(Clipboard.copy)</code>, <code>@on(Clipboard.paste)</code> and <code>@on(Clipboard.clear)</code> observe them. The programs run through the shell, which the OS sandbox refuses. A program with a window open uses the window system's clipboard instead: <code>std.ui</code> answers the <code>reading</code> and <code>writing</code> events for calls made on the task that runs the windows.</p>
         <ul class="api-list">
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def copy(text string) !none</code></div>
@@ -734,6 +734,20 @@ Cache.lab.conditions.missRate = 0.25       // one read in four misses</code></pr
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def has() !bool</code></div>
             <p class="api-doc">Whether the clipboard holds any text. Needs the read permission.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def copyData(mime string, data byte[]) !none</code></div>
+            <p class="api-doc">Puts data of the MIME type on the clipboard (<code>image/png</code> for a picture), replacing what was there. Through the window system when a window is open; else wl-clipboard or xclip. xsel, pbcopy, Windows' own clipboard and the browser carry text only.</p>
+            <p class="api-doc">Fails when the policy denies it, the type is not a plain MIME type, nothing on this machine carries data, or the program fails.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-commit">commit</span><code class="api-sig">def pasteData(mime string) !?byte[]</code></div>
+            <p class="api-doc">The clipboard's data of the MIME type; none when it offers none of it.</p>
+            <p class="api-doc">Fails when the policy denies it, the type is not a plain MIME type, nothing on this machine carries data, or the program fails.</p>
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def formats() !string[]</code></div>
+            <p class="api-doc">The MIME types the clipboard offers now; empty when it holds nothing. A carrier of text only answers <code>text/plain</code> when there is text. Needs the read permission.</p>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def capabilities() ClipboardCapabilities</code></div>

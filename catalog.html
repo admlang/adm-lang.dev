@@ -1351,7 +1351,7 @@ let pipeline = try project.pipelines.create("main", variables = {"DEPLOY": "stag
       <div class="docs-sub" id="dev-docker">
         <h3><code>adm.dev.docker</code></h3>
 
-        <p>A Docker Engine API client in ADM over <code>std.net.http</code>, on a Unix socket or TCP with TLS, found the way the Docker CLI finds its engine (<code>DOCKER_HOST</code>, contexts, the local sockets). It also talks to Podman through its Docker-compatible API. Containers with their whole configuration, logs and stats as streams, exec and attach with terminals, files in and out; images pulled, pushed and built (with <code>.dockerignore</code>), saved and loaded, with registry credentials from the CLI's configuration and credential helpers; volumes, networks and events.</p>
+        <p>A Docker Engine API client in ADM over <code>std.net.http</code>, on a Unix socket, TCP with TLS, or through an SSH server (<code>ssh://user@host</code>, the engine's socket reached over the connection), found the way the Docker CLI finds its engine (<code>DOCKER_HOST</code>, contexts, the local sockets). It also talks to Podman through its Docker-compatible API. Containers with their whole configuration, logs and stats as streams, exec and attach with terminals, files in and out; images pulled, pushed and built (with <code>.dockerignore</code>), saved and loaded, with registry credentials from the CLI's configuration and credential helpers; volumes, networks and events.</p>
 
       <div class="code-window">
         <div class="code-titlebar">
