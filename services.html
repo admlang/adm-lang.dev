@@ -2131,7 +2131,7 @@ Network.lab.conditions.unreachable = "*"         // offline</code></pre>
           </li>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def systemInfo() SystemInfo</code></div>
-            <p class="api-doc">Returns information about the host system running the ADM runtime.</p>
+            <p class="api-doc">Returns information about the host system running the ADM runtime: <code>hostname</code>, <code>kernelVersion</code>, <code>osVersion</code>, <code>architecture</code>, <code>cpuCount</code> (cores), <code>logicalCpuCount</code> (hardware threads) and <code>timezone</code> (an IANA name; on Windows the system's zone id). A text the system does not give is empty.</p>
 
           </li>
           <li class="api-item">
@@ -2142,6 +2142,11 @@ Network.lab.conditions.unreachable = "*"         // offline</code></pre>
           <li class="api-item">
             <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def memoryUsage() MemoryUsage</code></div>
             <p class="api-doc">Returns memory usage statistics for the current ADM runtime.</p>
+
+          </li>
+          <li class="api-item">
+            <div class="api-head"><span class="api-tag api-query">query</span><code class="api-sig">def systemMemory() SystemMemory</code></div>
+            <p class="api-doc">Returns the host's memory in bytes: <code>totalBytes</code>, how much it has, and <code>availableBytes</code>, how much of it programs can still be given without the system swapping, read when asked. A program asks before it takes a large amount (a model's weights, a decoded film). Both are 0 where the system does not say: today every system but Linux.</p>
 
           </li>
           <li class="api-item">

@@ -1957,7 +1957,7 @@ if password := /:alpha/ &amp;&amp; /:digit/ &amp;&amp; /:punct/ {
 }</code></pre>
         </div>
 
-        <p>Init and post can each carry more than one variable, sharing the clause:</p>
+        <p>Init and post can each carry more than one variable, sharing the clause as one multiple assignment (a step written <code>i++, j--</code> is not a statement and is refused with <code>E-SYNTAX-0179</code>):</p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -2502,7 +2502,7 @@ let s = add(a=2, b=3)
 let t = add(a=2)  // b defaults to 5</code></pre>
         </div>
 
-        <p>A trailing <code>...T</code> parameter collects any number of extra arguments into an array, and a matching array can be spread back out at the call site with the same <code>...</code>:</p>
+        <p>A trailing <code>...T</code> parameter collects any number of extra arguments into an array, and a matching array can be spread back out at the call site with the same <code>...</code>, alone or among other arguments (<code>sink(0, ...vals, 9)</code>, <code>xs.push(...ys, last)</code>; one spread a call):</p>
         <div class="code-window">
           <div class="code-titlebar">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -3879,7 +3879,7 @@ Card(title = "Profile") {
           <code>redraw()</code>. An <code>if</code>, <code>match</code> or <code>when</code> in a view is
           evaluated again too, so components enter and leave with their branch, and a loop is iterated
           again, keeping its children by position. A view body must therefore be cheap and without
-          effects. Literals and handlers (<code>onClick = f</code>) are bound when the component is built; a handler names a function, a method of the controller, or is a function literal closing over the controller and the view's locals (each child of a loop gets the values of its own pass). Optional and tuple arguments are compared member by member. <code>new Name(...)</code> on a component is the call <code>Name(...)</code>: the view is mounted.
+          effects. Literals and functions written in place (<code>onClick = () =&gt; count++</code>) are bound when the component is built; a function literal closes over the controller and the view's locals (each child of a loop gets the values of its own pass). Any other function value (<code>onClick = flip</code>, <code>onPick = handler()</code>) is compared by identity on every run: a method named is passed once, and a handler a call returns reaches the child whenever it changes or becomes <code>none</code>. Optional and tuple arguments are compared member by member. <code>new Name(...)</code> on a component is the call <code>Name(...)</code>: the view is mounted.
         </p>
         <p>
           <code>c.style</code> of a value typed <code>component</code> is typed <code>style</code>, the kind

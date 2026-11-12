@@ -56,6 +56,7 @@
           <li><a class="docs-nav-sub" href="#std-text-unicode">std.text.unicode</a></li>
           <li><a class="docs-nav-sub" href="#std-text-precis">std.text.precis</a></li>
           <li><a class="docs-nav-sub" href="#std-text-idna">std.text.idna</a></li>
+          <li><a class="docs-nav-sub" href="#std-terminal">std.terminal</a></li>
           <li><a class="docs-nav-sub" href="#std-text-grammar">std.text.grammar</a></li>
           <li><a class="docs-nav-sub" href="#std-text-jinja">std.text.templates.jinja</a></li>
           <li><a class="docs-nav-sub" href="#std-adm-lexer">std.adm.lexer</a></li>
@@ -291,6 +292,19 @@ use std.data.encoding::(json)</code></pre>
         </table>
         <p class="exports-note">Most string operations are methods on <code>string</code> in the prelude.</p>
       </div>
+      <div class="docs-sub" id="std-terminal">
+        <h3><code>std.terminal</code></h3>
+        <p>A terminal emulator's screen, headless: what a program written for a VT100 or xterm terminal writes, as a grid of cells with their attributes, a cursor, a scrollback and the modes it set. <code>std.ui.components.TerminalView</code> draws one and sends the program keys.</p>
+        <table class="docs-table exports-table">
+          <thead><tr><th>Export</th><th>What it does</th></tr></thead>
+          <tbody>
+          <tr><td><code>Screen</code></td><td><code>feed(bytes)</code> applies output in whatever pieces it arrives (CSI with <code>;</code> and <code>:</code> parameters, SGR 16/256/truecolor and underline styles, erase, insert and delete, scroll regions, origin mode, DEC private modes with the alternate screen 1049 and bracketed paste 2004, DEC graphics, UTF-8 cut across feeds, wide and combining characters); <code>responses()</code> what the program asked back; <code>resize</code>, <code>reset</code>; <code>line</code> (also scrolled back), <code>rowText</code>, <code>text</code>, <code>selection</code>, <code>takeDirty</code>, <code>generation</code>, <code>scrollbackLines</code>, <code>scrollbackLimit</code>; <code>cursor</code>, <code>cursorVisible</code>, <code>cursorShape</code>, <code>title</code>, <code>workingDirectory</code>, <code>bells</code>, <code>applicationCursorKeys</code>, <code>applicationKeypad</code>, <code>bracketedPaste</code>, <code>mouse</code>, <code>mouseSgr</code>, <code>focusReports</code>, <code>alternate</code></td></tr>
+          <tr><td><code>Cell</code>, <code>Attributes</code>, <code>CellColor</code>, <code>ColorMode</code>, <code>Underline</code></td><td>a cell's text and width (0, 1 or 2 columns), and what it is drawn with</td></tr>
+          <tr><td><code>Cursor</code>, <code>CursorShape</code>, <code>MouseReport</code>, <code>indexedRgb</code></td><td>the cursor's place and shape, which pointer events the program asked for, the components of the 256 indexed colours' cube and greys</td></tr>
+          </tbody>
+        </table>
+      </div>
+
       <div class="docs-sub" id="std-text-grammar">
         <h3><code>std.text.grammar</code></h3>
         <p>Tokenizing from a grammar that is data, for editors and tools: named states of ordered rules, run a line at a time on linear-time regexes with the work counted, so a bad grammar costs a bad colouring and not a hang.</p>
@@ -341,7 +355,7 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-text-jinja">
         <h3><code>std.text.templates.jinja</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>parse</code>, <code>Template</code>, <code>Options</code></td><td>Jinja2 templates</td></tr>
+          <tr><td><code>parse</code>, <code>Template</code>, <code>Options</code></td><td>Jinja2 templates; a render is held to a budget (<code>maxSteps</code>, <code>maxOutput</code>, <code>maxValue</code> in <code>Options</code>, 0 to lift one) and stops when its task is canceled, so a template from a file the program did not write cannot take the memory or the time it likes</td></tr>
           <tr><td><code>Safe</code></td><td>text marked safe from autoescape</td></tr>
         </table>
       </div>
@@ -628,6 +642,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>readFile</code>, <code>writeFile</code>, <code>open</code>, <code>stat</code>, <code>readDir</code>, <code>exists</code>, <code>remove</code>, <code>rename</code>, <code>mkdir</code>, <code>rmdir</code>, <code>chmod</code>, <code>touch</code>, <code>readLink</code>, <code>realPath</code>, <code>replaceFile</code>, <code>readDirNames</code></td><td>file operations</td></tr>
           <tr><td><code>join</code>, <code>dir</code>, <code>base</code>, <code>extension</code>, <code>split</code>, <code>clean</code>, <code>isAbs</code>, <code>absolute</code></td><td>paths, in the system's form (on Windows with drives and shares, <code>\</code> and <code>/</code>)</td></tr>
           <tr><td><code>run</code>, <code>output</code></td><td>start a program (needs <code>adm.runtime.spawn</code>)</td></tr>
+          <tr><td><code>shellWords</code>, <code>shellQuote</code></td><td>a command line split into its words as a POSIX shell would, expanding nothing, and words written back as one line</td></tr>
           <tr><td><code>Process</code>, <code>Pipe</code></td><td>a program started by <code>Runtime.start</code> that runs beside this one: <code>input</code>, <code>output</code> and <code>errors</code> pipes (<code>io.Reader</code>/<code>io.Writer</code>), <code>wait()</code>, <code>wait(timeout)</code>, <code>terminate()</code>, <code>kill()</code>, <code>id()</code></td></tr>
           <tr><td><code>mapFile</code>, <code>Mapping</code></td><td>memory-mapped files: <code>read</code> copies a range, <code>pages</code> is an array over the mapping's own pages (no copy; a file larger than memory)</td></tr>
           <tr><td><code>File.sync</code>, <code>File.lock</code>, <code>File.unlock</code></td><td>push writes to the device, advisory whole-file locks</td></tr>
@@ -810,7 +825,8 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>JSON</code>, <code>json</code></td><td>JSON: <code>encode</code>, <code>decode</code> into objects, <code>map&lt;string, any&gt;</code>, <code>any[]</code> and typed arrays (<code>User[]</code> from a top-level array), <code>parse</code> into plain values</td></tr>
           <tr><td><code>XMLNode</code>, <code>XMLSpan</code>, <code>XMLWriter</code>, <code>XML</code></td><td>XML objects (<code>encode</code>, <code>decode</code>, <code>@xml</code>), tree with source positions, writer and well-formedness check</td></tr>
-          <tr><td><code>YAML</code>, <code>YAMLError</code></td><td>YAML 1.2: <code>parse</code> and <code>parseAll</code> into plain values, <code>decode</code> into objects and typed arrays (<code>User[]</code> from a top-level sequence), <code>encode</code>; errors with line and column; for tools, <code>events</code> reads the event stream with byte offsets, and <code>validate</code> checks a stream with any node as a key</td></tr>
+          <tr><td><code>YAML</code>, <code>YAMLError</code></td><td>YAML 1.2: <code>parse</code> and <code>parseAll</code> into plain values, <code>decode</code> into objects and typed arrays (<code>User[]</code> from a top-level sequence), <code>encode</code>; errors with line and column; for tools, <code>events</code> reads the event stream with byte offsets, and <code>validate</code> checks a stream with any node as a key, <code>nodes</code> gives each document's node graph; <code>mergeKeys</code> applies YAML 1.1's <code>&lt;&lt;</code> as Compose reads it</td></tr>
+          <tr><td><code>YAMLNode</code>, <code>YAMLNodeKind</code></td><td>a node of the graph: kind, tag, anchor, line, column and byte offsets, a sequence's <code>items()</code>, a mapping's <code>keys()</code>, <code>values()</code> and <code>get(key)</code>, <code>value()</code> as <code>parse</code> reads it; an alias is the anchored node itself</td></tr>
           <tr><td><code>YAMLEvent</code>, <code>YAMLEventKind</code>, <code>YAMLScalarStyle</code></td><td>one event of a YAML stream with where its text stands, what it says, how a scalar is written</td></tr>
           <tr><td><code>TOML</code></td><td>TOML</td></tr>
           <tr><td><code>JSON.parse</code></td><td>JSON into maps, arrays and scalars</td></tr>
@@ -1151,12 +1167,14 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Mesh</code>, <code>Primitive</code>, <code>Topology</code>, <code>MorphTarget</code></td><td>geometry as flat attribute arrays and indices; normals, tangents, vertex merging, triangulation</td></tr>
           <tr><td><code>Material</code>, <code>Texture</code>, <code>TextureRef</code>, <code>TextureTransform</code>, <code>AlphaMode</code>, <code>Wrap</code>, <code>Filter</code></td><td>metallic-roughness shading with an emissive strength and the classic Phong fields, metadata for what the file attached beyond the fields, textures by resource name or URI, each reference with its coordinate set, strength and transform</td></tr>
           <tr><td><code>Camera</code>, <code>Light</code>, <code>Skin</code>, <code>Animation</code>, <code>Channel</code></td><td>cameras (<code>projection</code>), lights, skinning (<code>jointMatrices</code>) and keyframe animation (<code>sample</code>, <code>apply</code>, <code>duration</code>)</td></tr>
-          <tr><td><code>load</code>, <code>Model.save</code>, <code>Model.write</code></td><td>read and write by signature or extension</td></tr>
+          <tr><td><code>load</code>, <code>Model.save</code>, <code>Model.write</code></td><td>read and write by signature or extension; the files a model names (buffers, textures, material libraries) are opened only inside its own folder</td></tr>
           <tr><td><code>ModelCodec</code>, <code>ResourceReader</code>, <code>ResourceWriter</code>, <code>DirectoryResources</code>, <code>ModelError</code></td><td>the codec contract, with the files a model keeps beside it</td></tr>
           <tr><td><code>Stl</code></td><td>STL, text and binary, with VisCAM and Materialise colours</td></tr>
           <tr><td><code>Obj</code></td><td>Wavefront OBJ with its <code>.mtl</code> libraries and textures: objects and groups as nodes, polygons of any size, lines, points, vertex colours; <code>decodeMaterials</code>/<code>encodeMaterials</code> for a library on its own</td></tr>
           <tr><td><code>Gltf</code>, <code>Glb</code></td><td>glTF 2.0 as JSON with files beside it or data URIs (<code>embed</code>), and as one GLB: every core feature (scenes, nodes, meshes with every attribute, morph targets and sparse accessors, materials, textures and samplers, cameras, skins, animations) plus <code>KHR_lights_punctual</code>, <code>KHR_materials_unlit</code>, <code>KHR_materials_emissive_strength</code> and <code>KHR_texture_transform</code>; other extensions kept as text</td></tr>
-          <tr><td><code>Ply</code>, <code>Fbx</code>, <code>ThreeDS</code>, <code>Dxf</code>, <code>Dwg</code>, <code>Jt</code></td><td>codecs (declared)</td></tr>
+          <tr><td><code>Ply</code></td><td>Stanford PLY as text or binary of either byte order (<code>binary</code>, <code>bigEndian</code>): positions, normals, texture coordinates, colours per vertex or per face, faces of any size, triangle strips, edges as lines, point clouds</td></tr>
+          <tr><td><code>Dxf</code></td><td>AutoCAD DXF, text and binary, R12 to 2018 (<code>tolerance</code>, <code>layersAsNodes</code>, <code>binary</code>, <code>version</code>): layers as nodes, lines, arcs, circles, ellipses, splines and polylines flattened within the tolerance, faces, solids and polyface, polygon and subdivision meshes as triangles, thickness as surfaces, blocks placed by <code>INSERT</code> (grids too) as nodes sharing a mesh, colours as materials; writes polyface meshes, polylines and points on a layer per top-level node, as any release from <code>AC1009</code> to <code>AC1032</code></td></tr>
+          <tr><td><code>Fbx</code>, <code>ThreeDS</code>, <code>Dwg</code>, <code>Jt</code></td><td>codecs (declared)</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="formats-planned">
@@ -1599,7 +1617,10 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.ai.llm</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>LanguageModel</code>, <code>load</code>, <code>Device</code></td><td>language model from a GGUF file or a Hugging Face model folder (Llama, Mistral, Qwen2, Qwen3, Qwen3-MoE, Gemma 2/3, Phi-3), on the CPU or the GPU; <code>load</code>'s <code>gpuMemory</code> caps the GPU memory it takes, and a mixture-of-experts model larger than that keeps a part of its experts in host memory (<code>hostMemory</code> caps the page-locked copies); weights are read from the mapped file, so a model larger than memory loads</td></tr>
+          <tr><td><code>LanguageModelInfo</code></td><td><code>LanguageModel.info</code>: the architecture's numbers, <code>vision</code> and <code>audio</code>, and what the chat template allows: <code>tools</code> (it writes tool calls), <code>thinkingSwitch</code> (<code>Session.thinking = false</code> makes it answer directly), <code>alwaysReasons</code>, <code>reasoningLevels</code> (<code>Session.reasoning</code> applies), <code>systemTurn</code></td></tr>
           <tr><td><code>Session</code></td><td>conversation: sampling, generation, chat; <code>schema</code> and <code>fill(target, text)</code> hold the answer to a JSON Schema (a struct's, filled from the reply); <code>precision</code> runs prompt batches on the GPU's tensor cores</td></tr>
+          <tr><td><code>TokenChoice</code>, <code>TokenRoute</code></td><td>a reply's tokens as the model chose them (<code>Session.alternatives</code>, <code>Session.choices()</code>): each token's probability and the likeliest others; <code>Session.continueWith(at, token)</code> puts another token in a place of the reply and goes on from there</td></tr>
+          <tr><td><code>Session.attention</code>, <code>Session.tokens</code></td><td>the weights each query head of each layer gave the positions up to a token (<code>attention(position, layers)</code>, recomputed over the cache on the CPU or GPU); the context's tokens as the model holds them; <code>Stats.cacheBytes</code> and <code>tokenBytes</code>: what the keys and values take</td></tr>
           <tr><td><code>ChatMemory</code>, <code>Forgetting</code></td><td>a conversation kept within a budget of tokens: older turns summed up by the model or dropped, room made before each question</td></tr>
           <tr><td><code>LiveChat</code>, <code>LiveProvider</code>, <code>LiveConnection</code>, <code>LiveEvent</code>, <code>LiveEventKind</code>, <code>LiveSetup</code></td><td>a spoken conversation both ways at once with a hosted model (OpenAI's Realtime API, Gemini's Live API through the <code>adm.ai</code> libraries' <code>client.live()</code>): sound and text in, speech, words and calls out as they come</td></tr>
           <tr><td><code>ToolOutput</code></td><td>a tool result with pictures (a screenshot, a chart), from a tool's <code>look</code></td></tr>
@@ -1658,6 +1679,8 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>EmbeddingModel</code>, <code>load</code>, <code>Pooling</code></td><td>texts as vectors, from GGUF (BERT, Nomic BERT) or ONNX embedding models</td></tr>
           <tr><td><code>similarity</code>, <code>nearest</code></td><td>cosine similarity, the closest vectors of a list</td></tr>
+          <tr><td><code>principalComponents</code>, <code>Projection</code></td><td>the directions along which a set of vectors spreads most (<code>components</code>, the share of the variance each keeps in <code>explained</code>), and <code>project</code> for a vector's coordinates along them: texts or tokens as points on a plane</td></tr>
+          <tr><td><code>clusters</code>, <code>Clusters</code></td><td>k-means with k-means++ starts and a <code>seed</code>: each vector's group (<code>groups</code>), the groups' <code>centres</code>, and <code>group(vector)</code> for another vector</td></tr>
           <tr><td><code>Embedder</code></td><td>what turns texts into vectors: a loaded model, or a hosted one of the <code>adm.ai</code> libraries</td></tr>
           <tr><td><code>RerankModel</code>, <code>loadReranker</code>, <code>Reranker</code></td><td>cross-encoders (bge-reranker, ms-marco MiniLM; GGUF or ONNX): how well each passage answers a question, from 0 to 1</td></tr>
         </table>
@@ -1750,6 +1773,8 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>Text</code>, <code>Heading</code>, <code>Label</code>, <code>Link</code>, <code>Image</code>, <code>Icon</code>, <code>Badge</code>, <code>Chip</code>, <code>Avatar</code></td><td>text, pictures, icons by name, short notes and tokens</td></tr>
           <tr><td><code>Canvas</code></td><td>a box the application draws in itself</td></tr>
           <tr><td><code>Button</code>, <code>ToggleButton</code>, <code>SplitButton</code></td><td>buttons (any component takes <code>onClick</code>)</td></tr>
+          <tr><td><code>ModelView</code></td><td>a 3D model (<code>std.gfx.scene.PreparedModel</code>) seen from a <code>Viewpoint</code>: <code>ModelView(model = prepared, viewpoint = eye)</code>; drawn on the GPU by the OpenGL and Vulkan renderers, elsewhere on a task, smaller while the view moves and sharp when it rests; the application moves the viewpoint and calls <code>redraw()</code></td></tr>
+          <tr><td><code>TerminalView</code></td><td>a <code>std.terminal.Screen</code> drawn in the code font with the terminal colours, sending keys and pastes as xterm does, scrolling its scrollback, selecting with the pointer, reporting its size in cells</td></tr>
           <tr><td><code>Checkbox</code>, <code>Radio</code>, <code>Switch</code>, <code>Slider</code>, <code>Dropdown</code>, <code>ComboBox</code></td><td>choices; a dropdown and a combo box take options of any type, read through <code>text</code></td></tr>
           <tr><td><code>TextField</code>, <code>TextArea</code>, <code>SearchField</code>, <code>NumberField</code></td><td>text and number entry</td></tr>
           <tr><td><code>DateField</code>, <code>Calendar</code></td><td>a date typed in the region's short form or picked from a month; a month to pick a day from</td></tr>
@@ -1795,6 +1820,7 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>Canvas</code></td><td>CPU drawing surface, implements <code>gfx.Raster</code></td></tr>
           <tr><td><code>LiveRaster</code></td><td>a raster changed in place part by part: <code>mark(rect)</code> says what changed, and GPU renderers update only those rectangles of the texture they keep</td></tr>
+          <tr><td><code>drawModel</code>, <code>ModelPicture</code></td><td><code>drawModel(model, viewpoint, x, y, width, height, samples)</code> on <code>Canvas</code> and <code>DrawContext</code> draws a <code>std.gfx.scene.PreparedModel</code> over what is there, through the transform, clip and groups; the OpenGL and Vulkan renderers draw it on the GPU, others on the CPU</td></tr>
           <tr><td><code>Painter</code>, <code>DrawContext</code>, <code>Picture</code>, <code>record</code></td><td>drawing interface, recording, replay, picking, SVG and PDF export, comparing recordings call by call; <code>drawAtlas</code> for sprites, mesh warps</td></tr>
           <tr><td><code>Paint</code>, <code>LinearGradient</code>, <code>RadialGradient</code>, <code>ConicGradient</code>, <code>Pattern</code>, <code>Noise</code>, <code>MeshGradient</code>, <code>linear</code>, <code>radial</code>, <code>noise</code></td><td>colors, gradients (OKLab, linear light, sRGB), image and picture patterns, noise, mesh gradients</td></tr>
           <tr><td><code>ColorStop</code>, <code>Spread</code>, <code>ColorSpace</code></td><td>gradient stops, spread and interpolation space</td></tr>
@@ -1819,6 +1845,10 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>render</code></td><td><code>render(model, width, height, options)</code> draws the model into a new <code>Image</code></td></tr>
           <tr><td><code>RenderOptions</code></td><td><code>camera</code> (the node to look through), <code>time</code> (seconds into the animations), <code>background</code>, <code>samples</code> (drawn pixels per output pixel along each axis, 1 to 4)</td></tr>
+          <tr><td><code>PreparedModel</code></td><td>a model made ready once and drawn many times, never written to: <code>render(width, height, viewpoint, background, samples)</code> to a new image or <code>render(into, viewpoint, ...)</code> into one (cancelling the task stops the drawing and leaves no partial picture), <code>pick(viewpoint, width, height, x, y)</code> for the surface under a point, <code>pose(animation, time)</code>, <code>hide(node)</code>/<code>show(node)</code>, <code>bounds()</code>, <code>framing(aspect)</code>, <code>viewpoint(cameraNode)</code>, <code>lines</code>, <code>shading</code>, <code>wireColor</code>, <code>problems</code>, <code>reload()</code></td></tr>
+          <tr><td><code>Viewpoint</code></td><td>a camera placed freely: <code>eye</code>, <code>target</code>, <code>up</code>, <code>lens</code> (a <code>models.Camera</code>), <code>fitDepth</code> (near and far planes put around the model for each picture); <code>copy()</code>, <code>equals(other)</code></td></tr>
+          <tr><td><code>GpuScene</code>, <code>GpuMesh</code>, <code>GpuLight</code>, <code>GpuTexture</code></td><td>one picture of a prepared model as a GPU renderer draws it (<code>PreparedModel.gpuScene(viewpoint, width, height)</code>): the view, the lights, the meshes in view with their world-space vertices, the textures; <code>PreparedModel.id()</code> and <code>changes()</code> tell a renderer what it may keep, <code>modelAlive(id)</code> whether the prepared model is still held: a renderer frees a gone model's buffers at its next frame</td></tr>
+          <tr><td><code>SceneLine</code>, <code>SceneHit</code>, <code>Shading</code>, <code>RenderProblem</code></td><td>a depth-tested line drawn with the model; what <code>pick</code> found (node, primitive, triangle, position, distance); <code>Shaded</code>, <code>Wireframe</code> or <code>ShadedWireframe</code>; a texture drawn without, and why</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-gfx-processing">
