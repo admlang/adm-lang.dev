@@ -130,7 +130,7 @@ application MyApp {
   <tr><td>Windows</td><td><code>%APPDATA%\&lt;name&gt;</code></td></tr>
 </table>
       <p>The environment variable <code>ADM_APP_HOME</code> names the folder directly, for portable installs and tests; <code>adm test</code> sets it to a scratch directory so a <code>check</code> suite never touches the real folder.</p>
-      <p>A folder that already exists at that path with contents but no <code>version</code> marker belongs to some other program. <code>home()</code> refuses it with a message naming the path and <code>ADM_APP_HOME</code>; it never adopts, overwrites or deletes anything there. An empty folder is adopted.</p>
+      <p>A folder that already exists at that path with contents but no <code>version</code> marker belongs to some other program. <code>home()</code> refuses it with a message naming the path and <code>ADM_APP_HOME</code>; it never adopts, overwrites or deletes anything there. An empty folder is adopted, and so is one holding only files written before the application runs: the policy file <code>policy.toml</code> and logs (<code>*.log</code>, such as the <code>ide.log</code> that <code>adm ide</code> writes).</p>
     </section>
 
     <section class="docs-section" id="layout">

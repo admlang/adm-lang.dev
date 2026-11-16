@@ -1099,10 +1099,11 @@ adm lint --list</code></pre>
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           <span class="code-filename">usage</span>
         </div>
-        <pre><code data-hl="off" class="nohighlight">adm ide</code></pre>
+        <pre><code data-hl="off" class="nohighlight">adm ide
+adm ide my-project</code></pre>
       </div>
-      <p>Starts the IDE.</p>
-      <p><em>Not implemented yet.</em></p>
+      <p>Starts the IDE that came with this adm and returns at once. The IDE runs on its own, detached from the terminal, and opens the folder given as a project. It builds with the adm that started it.</p>
+      <p>Its output goes to <code>ide.log</code> in its home folder: <code>~/.local/share/adm-ide</code> on Linux, <code>%APPDATA%\adm-ide</code> on Windows, or <code>ADM_APP_HOME</code>. An IDE that fails as it starts is reported with that output. The Linux and Windows packages carry the IDE; there is none on macOS yet, where UI programs cannot open windows.</p>
     </section>
 
     <section class="docs-section" id="system">
@@ -1252,6 +1253,7 @@ adm lint --list</code></pre>
         <tr><td><code>ADM_IDE_PORT</code></td><td>Port on <code>127.0.0.1</code> where <code>std.ide</code> serves the IDE: the services' panels and actions, their labs, the program's metrics. It must also be set when the program is built (<code>adm run</code> does both): only such a build includes the service and, besides a test build, has service labs. The IDE sets it, with <code>ADM_IDE_TOKEN</code>, for the programs it runs.</td></tr>
         <tr><td><code>ADM_IDE_TOKEN</code></td><td>The secret a connection to that port must open with; without it the port stays closed. The program removes both variables from its environment as it starts, so the programs it runs never see them.</td></tr>
         <tr><td><code>ADM_MEM_STATS</code></td><td><code>1</code> prints live, allocated and freed counts every 200k allocations.</td></tr>
+        <tr><td><code>ADM_MEM_TRIM</code></td><td><code>0</code> keeps freed memory in the process. Unset: on Linux, once a program freed 64 MB it gives the free pages of its allocator back to the system, at most once a second.</td></tr>
         <tr><td><code>ADM_MEM_TRACE</code></td><td>File to record every allocation and free to, with backtraces.</td></tr>
       </table>
     </section>

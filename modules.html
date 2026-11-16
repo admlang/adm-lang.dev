@@ -333,6 +333,8 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>toLower</code>, <code>toUpper</code>, <code>toTitle</code>, <code>caseFold</code></td><td>Unicode case mapping and folding, full mappings, final sigma</td></tr>
           <tr><td><code>isCased</code>, <code>isCaseIgnorable</code>, <code>isNoncharacter</code>, <code>codePoints</code></td><td>casing properties, noncharacters, a text as code points</td></tr>
           <tr><td><code>decompositionType</code>, <code>joiningType</code>, <code>hangulSyllableType</code></td><td>decomposition tags, cursive joining, Hangul syllable types</td></tr>
+          <tr><td><code>block</code>, <code>blocks</code>, <code>Block</code></td><td>the block a code point belongs to (name and range, <code>No_Block</code> for unassigned ranges), every block in order</td></tr>
+          <tr><td><code>name</code>, <code>named</code></td><td>a character's Unicode name (computed for ideographs and Hangul syllables, the rest decoded on first use), and the characters whose name holds given words (the last one as a prefix while a query is typed)</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-text-precis">
@@ -950,6 +952,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.formats</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>FileFormat</code>, <code>SignatureMatcher</code></td><td>format detection by content</td></tr>
+          <tr><td><code>ExtensionAware</code></td><td>a codec whose format has a variant per extension (Netpbm): told the extension a file is written as before it encodes</td></tr>
           <tr><td><code>MediaType</code>, <code>parseMediaType</code></td><td>MIME types</td></tr>
           <tr><td><code>typeByExtension</code>, <code>extensionsByType</code></td><td>extension table</td></tr>
           <tr><td><code>detectContentType</code></td><td>content sniffing</td></tr>
@@ -1037,7 +1040,9 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>shape</code>, <code>features</code>, <code>ShapedRun</code>, <code>ShapedGlyph</code>, <code>ShapeOptions</code>, <code>TextDirection</code></td><td>OpenType shaping</td></tr>
           <tr><td><code>Hinting</code>, <code>Baselines</code>, <code>Axis</code></td><td>hinted outlines (TrueType, CFF), baselines</td></tr>
           <tr><td><code>VariableFace</code>, <code>VariationAxis</code>, <code>OpenTypeFace</code></td><td>variable fonts, OpenType tables</td></tr>
+          <tr><td><code>FontSet</code>, <code>systemFonts</code>, <code>IndexedFace</code>, <code>FaceRun</code></td><td>font sets: choosing faces, fallback, a family's faces (<code>faces</code>, <code>face</code>), the monospaced families from the index without loading a face (<code>families(monospaced = true)</code>, <code>monospaced(family)</code>)</td></tr>
           <tr><td><code>sfnt.Sfnt</code>, <code>sfnt.Cmap</code>, <code>sfnt.Head</code>, <code>sfnt.Hhea</code>, <code>sfnt.Names</code>, <code>sfnt.Os2</code>, <code>sfnt.Post</code></td><td>the SFNT container and its tables</td></tr>
+          <tr><td><code>sfnt.readCmap</code>, <code>sfnt.readName</code></td><td>a face's characters and name records, from an <code>Sfnt</code> or a table's bytes (any container: <code>OpenTypeFace.table</code>)</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-playlist">
@@ -1101,7 +1106,7 @@ use std.data.encoding::(json)</code></pre>
       <div class="docs-sub" id="std-formats-ai-onnx">
         <h3><code>std.formats.ai.onnx</code></h3>
         <table class="docs-table exports-table">
-          <tr><td><code>OnnxModel</code>, <code>load</code>, <code>decode</code></td><td>ONNX model file: graph, initializers, functions, external data; <code>encode</code>, <code>save</code></td></tr>
+          <tr><td><code>OnnxModel</code>, <code>load</code>, <code>decode</code></td><td>ONNX model file: graph, initializers, functions, external data (read only from the model's own folder); <code>encode</code>, <code>save</code></td></tr>
           <tr><td><code>Graph</code>, <code>Node</code>, <code>Attribute</code>, <code>Function</code></td><td>operator graph</td></tr>
           <tr><td><code>TensorData</code>, <code>SparseTensorData</code>, <code>decodeTensor</code></td><td>stored tensors of every element type</td></tr>
           <tr><td><code>ValueInfo</code>, <code>ValueType</code>, <code>ElementType</code></td><td>declared types of graph values</td></tr>
@@ -1455,6 +1460,7 @@ use std.data.encoding::(json)</code></pre>
           <tr><td><code>PrivateKey</code>, <code>PublicKey</code>, <code>generateKey</code>, <code>loadKey</code></td><td>keys</td></tr>
           <tr><td><code>Certificate</code></td><td>OpenSSH certificates</td></tr>
           <tr><td><code>Agent</code>, <code>KnownHosts</code></td><td>agent, known hosts</td></tr>
+          <tr><td><code>Forward</code></td><td>forwarding: <code>Client.forward(local, remote)</code> carries local connections to a <code>host:port</code> or a Unix socket on the server, <code>forwardRemote</code> the other way; <code>Client.dial</code> and <code>dialUnix</code> open one connection</td></tr>
         </table>
       </div>
       <div class="docs-sub" id="std-sftp">
@@ -1759,7 +1765,7 @@ use std.data.encoding::(json)</code></pre>
         <h3><code>std.ui.components</code></h3>
         <table class="docs-table exports-table">
           <tr><td><code>Row</code>, <code>Column</code>, <code>HBox</code>, <code>VBox</code>, <code>Grid</code>, <code>Layered</code>, <code>Panel</code>, <code>ScrollView</code>, <code>SplitPane</code>, <code>Spacer</code>, <code>Divider</code>, <code>WindowDrag</code></td><td>layout: rows, columns, grids, stacked layers, scrolling, panes a divider resizes, the bar an undecorated window is moved by</td></tr>
-          <tr><td><code>TabMove</code></td><td>a tab of a <code>TabStrip</code> dragged from one place to another (<code>onMove</code>, event <code>moved</code>); <code>onClose</code> gives each tab a cross; <code>mark</code> gives a tab a view at its end at rest (an unsaved dot, a lock), the cross then showing only under the pointer; tabs that do not fit fold behind a button that counts them and lists them with their headings, marks and a cross each (closed from the list by the cross or the middle button); <code>contextMenu</code> gives the lines the secondary button opens on a tab</td></tr>
+          <tr><td><code>TabMove</code></td><td>a tab of a <code>TabStrip</code> dragged from one place to another (<code>onMove</code>, event <code>moved</code>); <code>onClose</code> gives each tab a cross; <code>mark</code> gives a tab a view at its end at rest (an unsaved dot, a lock), the cross then showing only under the pointer; tabs that do not fit fold behind a button that counts them and lists them with their headings, marks and a cross each (closed from the list by the cross or the middle button); <code>contextMenu</code> gives the lines the secondary button opens on a tab; with <code>dragData</code> a tab taken out of the strip is dragged as a <code>DragData</code> to a <code>DropTarget</code> or another strip, which takes it into a gap between its tabs through <code>onDrop(data, index)</code> (filtered by <code>accepts</code>)</td></tr>
           <tr><td><code>FocusScope</code></td><td>remembers which component in it had the keyboard focus and gives it back when Tab returns; <code>trap</code> keeps Tab inside</td></tr>
           <tr><td><code>PersistScope</code></td><td>puts the kept values of what it holds under its name: <code>PersistScope("left") { Editor() }</code></td></tr>
           <tr><td><code>ViewHost</code>, <code>TakenView</code></td><td>views placed by key from code (<code>insert</code>, <code>remove</code>, <code>move</code>, <code>replace</code>); <code>take</code> moves a live view to another host</td></tr>
@@ -1845,7 +1851,7 @@ use std.data.encoding::(json)</code></pre>
         <table class="docs-table exports-table">
           <tr><td><code>render</code></td><td><code>render(model, width, height, options)</code> draws the model into a new <code>Image</code></td></tr>
           <tr><td><code>RenderOptions</code></td><td><code>camera</code> (the node to look through), <code>time</code> (seconds into the animations), <code>background</code>, <code>samples</code> (drawn pixels per output pixel along each axis, 1 to 4)</td></tr>
-          <tr><td><code>PreparedModel</code></td><td>a model made ready once and drawn many times, never written to: <code>render(width, height, viewpoint, background, samples)</code> to a new image or <code>render(into, viewpoint, ...)</code> into one (cancelling the task stops the drawing and leaves no partial picture), <code>pick(viewpoint, width, height, x, y)</code> for the surface under a point, <code>pose(animation, time)</code>, <code>hide(node)</code>/<code>show(node)</code>, <code>bounds()</code>, <code>framing(aspect)</code>, <code>viewpoint(cameraNode)</code>, <code>lines</code>, <code>shading</code>, <code>wireColor</code>, <code>problems</code>, <code>reload()</code></td></tr>
+          <tr><td><code>PreparedModel</code></td><td>a model made ready once and drawn many times, never written to: <code>render(width, height, viewpoint, background, samples)</code> to a new image or <code>render(into, viewpoint, ...)</code> into one (cancelling the task stops the drawing and leaves no partial picture), <code>pick(viewpoint, width, height, x, y)</code> for the surface under a point, <code>pose(animation, time)</code>, <code>hide(node)</code>/<code>show(node)</code>, <code>bounds()</code>, <code>framing(aspect)</code>, <code>viewpoint(cameraNode)</code>, <code>lines</code>, <code>shading</code>, <code>wireColor</code>, <code>problems</code>, <code>reload()</code>, <code>dispose()</code> (also run when its last reference goes: the GPU renderers free what they keep of it at their next frame)</td></tr>
           <tr><td><code>Viewpoint</code></td><td>a camera placed freely: <code>eye</code>, <code>target</code>, <code>up</code>, <code>lens</code> (a <code>models.Camera</code>), <code>fitDepth</code> (near and far planes put around the model for each picture); <code>copy()</code>, <code>equals(other)</code></td></tr>
           <tr><td><code>GpuScene</code>, <code>GpuMesh</code>, <code>GpuLight</code>, <code>GpuTexture</code></td><td>one picture of a prepared model as a GPU renderer draws it (<code>PreparedModel.gpuScene(viewpoint, width, height)</code>): the view, the lights, the meshes in view with their world-space vertices, the textures; <code>PreparedModel.id()</code> and <code>changes()</code> tell a renderer what it may keep, <code>modelAlive(id)</code> whether the prepared model is still held: a renderer frees a gone model's buffers at its next frame</td></tr>
           <tr><td><code>SceneLine</code>, <code>SceneHit</code>, <code>Shading</code>, <code>RenderProblem</code></td><td>a depth-tested line drawn with the model; what <code>pick</code> found (node, primitive, triangle, position, distance); <code>Shaded</code>, <code>Wireframe</code> or <code>ShadedWireframe</code>; a texture drawn without, and why</td></tr>

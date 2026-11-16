@@ -2823,6 +2823,11 @@ let c = a.mapElem((v int) =&gt; v + 1)</code></pre>
           <code>let y = log("a")</code> holds <code>none</code>, and <code>_ = log("a")</code> discards the call
           without a warning.
         </p>
+        <p>
+          Two function values are <code>==</code> when they are the same function of the same object
+          (<code>one.add == one.add</code>, but not <code>two.add</code>), or the same closure: two
+          literals written alike are two closures and differ.
+        </p>
       </div>
       <div class="docs-sub" id="defer">
         <h3>Defer</h3>

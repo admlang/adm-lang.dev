@@ -150,6 +150,15 @@
         </ul>
       </div>
 
+      <div class="docs-nav-group">
+        <a class="docs-nav-top" href="#more">Charts, maps and pages</a>
+        <ul class="docs-sub-list">
+          <li><a class="docs-nav-sub" href="#charts">Charts</a></li>
+          <li><a class="docs-nav-sub" href="#maps">Maps</a></li>
+          <li><a class="docs-nav-sub" href="#pages">Pages and routes</a></li>
+        </ul>
+      </div>
+
     </nav>
   </aside>
 
@@ -463,18 +472,30 @@ FileList(["main.adm", "lib.adm", "notes.md"]) {
           <code>disabled</code>, the window's size, the theme). On a run after the first, each argument
           is compared with what was passed the last time and assigned to the child's input when it
           differs; numbers, strings and enums compare by value, objects, arrays and maps by identity.
-          Literals and handlers are bound once, when the child is built. The same goes for the
-          component's style and <code>render</code>: a frame in which nothing changed runs no view, no
-          style, no layout and draws nothing.
+          Literals and functions written in place (<code>onClick = () =&gt; count++</code>) are bound
+          once, when the child is built, and a function literal keeps the view's locals as they are in
+          its pass: each child of a loop reads the values of its own pass. Any other function value
+          (<code>onClick = flip</code>, <code>onPick = handler()</code>) is compared by identity, so a
+          handler a call returns reaches the child whenever it changes or becomes <code>none</code>; a
+          <code>view</code> value passed on from elsewhere (<code>mark = markOf(i)</code>) is given again
+          when it differs. The same goes for the component's style and <code>render</code>: a frame in
+          which nothing changed runs no view, no style, no layout and draws nothing.
         </p>
         <ul>
           <li>A view body is cheap and has no effects.</li>
-          <li>What a view reads through another reference (a model object changed in place, a
-            service, a global) shows after the user's next press, key, text or drop, or a drag of a
-            component given a handler, which runs every view of the window again since a handler
-            may have changed it. A task, a timer or
-            the wheel that changes such a value calls <code>redraw()</code> on the component, or one
-            above it, which runs the views under it again too. <code>UI.redraw()</code> runs every view.</li>
+          <li>A function a view passes to a component (<code>Button(onClick = save)</code>,
+            <code>onChange = v =&gt; model.volume = v</code>) is that view's code: when it is called and
+            returns, the view that passed it runs again, so what it changed in a model object or a
+            module's value shows. This holds whoever calls it (an event, a task, a timer) and however
+            far it was passed on; a call made while a frame runs its views, lays out or draws (a
+            function that says how a row looks) runs nothing again. The same goes for a child writing
+            a bound place that is a member of another object (<code>TextField(model.name)</code>).</li>
+          <li>Anything else a view reads through another reference (a model object a task or a
+            service changed in place, a global) shows once the component, or one above it, calls
+            <code>redraw()</code>, which runs the views under it again too. A function held inside a
+            value (a field of a struct in an array of menu entries) is not wrapped this way: the code
+            that changes the model calls <code>redraw()</code>, or keeps what the view shows in a
+            <code>@state</code> field. <code>UI.redraw()</code> runs every view.</li>
           <li>An argument that builds an array or an object on every run is a new value on every run.
             Keep it in a field and pass the field.</li>
           <li>Frames are drawn when something happened in the window (an event, a state that changed,
@@ -693,7 +714,9 @@ def onRated(evt ComponentEvent&lt;int&gt;) {
         <h3>Built-in members</h3>
         <p>
           A controller method with the name and parameters of one every component has replaces it for that
-          component.
+          component. A controller field named like a property every component has
+          (<code>@state focused int</code>) hides that property: inside the component and through a
+          reference to it (<code>owner.focused</code>) the name reads the field.
         </p>
         <table class="docs-table">
           <thead><tr><th>Member</th><th>What it is</th></tr></thead>
@@ -898,7 +921,8 @@ style CardLook {
           <li>In a component's own style block <code>self</code> is the component:
             <code>gap = new Axes(self.gap)</code> takes the input <code>gap</code> and follows it.</li>
           <li>A style that embeds another takes what that style's body assigns too, as if it were
-            written where the style is named, and then makes its own assignments. So do the embedded
+            written where the style is named, and then makes its own assignments, which win over the
+            embedded style's, those that follow the theme included. So do the embedded
             style's <code>on</code>, <code>enter</code> and <code>exit</code>, which apply before its
             own.</li>
         </ul>
@@ -1761,7 +1785,7 @@ def keep(evt Event&lt;CloseRequest&gt;) {
             <div class="component-shot"><img src="assets/components/checkbox.png" width="300" height="80" alt="Checkbox" loading="lazy"></div>
             <div class="component-text">
               <h4><code>Checkbox</code></h4>
-              <p>A box that is checked or not, with a label after it.</p>
+              <p>A box that is checked or not, with a label after it; <code>indeterminate</code> shows a dash for neither (a click clears it and checks the box).</p>
               <pre><code>Checkbox(checked = agreed, label = "I agree")</code></pre>
             </div>
           </div>
@@ -1857,6 +1881,22 @@ def keep(evt Event&lt;CloseRequest&gt;) {
               <pre><code>ComboBox(value = city, options = cities, placeholder = "City")</code></pre>
             </div>
           </div>
+          <div class="component-card" id="c-datefield">
+            <div class="component-shot"><img src="assets/components/datefield.png" width="240" height="60" alt="DateField" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>DateField</code></h4>
+              <p>A field for a date. You can type it in the short form used in your region ("11/30/26" in the United States, "30.11.26" in Germany), and a four-digit year is understood too. The button at the end of the field, or the Down key, opens a <code>Calendar</code> under the field.</p>
+              <pre><code>DateField(value = due, onChange = setDue)</code></pre>
+            </div>
+          </div>
+          <div class="component-card" id="c-calendar">
+            <div class="component-shot"><img src="assets/components/calendar.png" width="280" height="300" alt="Calendar" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Calendar</code></h4>
+              <p>Shows a month so the user can pick a day. Month and day names and the first day of the week follow the region. Today has a ring and the selected day is filled with the accent colour. The arrow keys move by a day or a week, Page Up and Page Down by a month, and <code>min</code> and <code>max</code> limit which days can be picked.</p>
+              <pre><code>Calendar(value = day, onChange = pick)</code></pre>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1915,7 +1955,7 @@ def keep(evt Event&lt;CloseRequest&gt;) {
             <div class="component-shot"><img src="assets/components/splitpane.png" width="420" height="120" alt="SplitPane" loading="lazy"></div>
             <div class="component-text">
               <h4><code>SplitPane</code></h4>
-              <p>Panes that share the room by <code>sizes</code>, with dividers to drag; <code>stacked = true</code> puts them one above the other.</p>
+              <p>Panes that share the room by <code>sizes</code>, with dividers to drag; <code>stacked = true</code> puts them one above the other, <code>rule = false</code> leaves out the line of a divider at rest.</p>
               <pre><code>SplitPane(sizes = [1.0, 2.0]) { Files(); Editor() }</code></pre>
             </div>
           </div>
@@ -1937,15 +1977,15 @@ def keep(evt Event&lt;CloseRequest&gt;) {
             <div class="component-shot"><img src="assets/components/tabstrip.png" width="360" height="56" alt="TabStrip" loading="lazy"></div>
             <div class="component-text">
               <h4><code>TabStrip</code></h4>
-              <p>A strip of titles of which one is current; with <code>onClose</code> each has a cross.</p>
+              <p>A strip of titles of which one is current; with <code>onClose</code> each has a cross; with <code>dragData</code> a tab is dragged out to another strip (<code>onDrop</code>) or a <code>DropTarget</code>.</p>
               <pre><code>TabStrip(tabs = ["main.adm", "lib.adm"], current = tab)</code></pre>
             </div>
           </div>
           <div class="component-card" id="c-tabs">
             <div class="component-shot"><img src="assets/components/tabs.png" width="360" height="120" alt="Tabs" loading="lazy"></div>
             <div class="component-text">
-              <h4><code>Tabs</code></h4>
-              <p>Pages of which one shows, under a strip of their titles.</p>
+              <h4><code>Tabs</code>, <code>Tab</code></h4>
+              <p>Pages of which one is shown, with a strip of their titles above them. Each <code>Tab</code> is one page. Give it a <code>heading</code> to show components in its tab instead of the plain title.</p>
               <pre><code>Tabs(current = page) { Tab(title = "main.adm") { ... } }</code></pre>
             </div>
           </div>
@@ -2067,14 +2107,19 @@ toasts.show("Deleted", action = "Undo", onAction = restore) unless toasts is non
           <tbody>
             <tr><td><code>Image</code></td><td>A picture; <code>fit</code> says how it fills a box of another shape.</td></tr>
             <tr><td><code>Layered</code></td><td>Puts its children on top of each other, the last on top.</td></tr>
+            <tr><td><code>ViewHost</code></td><td>Holds content that is only known when the program runs, such as plugin panels or the panes of a dock layout. Your code adds and changes it by key with <code>insert</code>, <code>remove</code>, <code>move</code> and <code>replace</code>, and the change shows on the next frame. <code>take</code> removes a view so you can <code>insert</code> it into another host in the same window, keeping its state: <code>ViewHost(ref = tools)</code>, then <code>tools.insert("log", view { LogPanel() })</code>.</td></tr>
             <tr><td><code>Tooltip</code>, <code>HoverCard</code></td><td>Content shown beside what the pointer rests on; a hover card can be entered and used. For plain text every component has <code>tooltip = "..."</code>.</td></tr>
             <tr><td><code>ContextMenu</code>, <code>SubMenu</code>, <code>MenuItem</code>, <code>MenuSeparator</code></td><td>The parts of menus.</td></tr>
             <tr><td><code>Draggable</code>, <code>DropTarget</code></td><td>Drag and drop between components of a window.</td></tr>
             <tr><td><code>FocusScope</code></td><td>Remembers the focus of a part of a window; <code>trap = true</code> keeps Tab inside.</td></tr>
+            <tr><td><code>PersistScope</code></td><td>Gives the saved values of everything inside it a name of their own. A <code>@persist(key)</code> field of a component inside it is saved as <code>&lt;name&gt;.&lt;key&gt;</code>, and so is the <code>persist</code> name of a standard component (<code>ScrollView(persist = "log")</code>). This way two editors that save the same field keep separate values: <code>PersistScope("left") { Editor() }</code>.</td></tr>
             <tr><td><code>List</code></td><td>Many items one under another, mounting only the rows that show: <code>List(files, id = (f File) =&gt; f.path, selected = picked) { rowRenderer = (it RowItem&lt;File&gt;) =&gt; FileRow(it.content) }</code>. An item is its own identity, as a map key is (<code>selected</code> then holds items); <code>id</code> gives another, such as one field. Items are an array or a <code>Source</code> (<code>List(source = files)</code>); rows have one height (<code>rowHeight</code>) or are measured; a click, Shift, the command key and the arrow keys select, Enter or a double click opens.</td></tr>
             <tr><td><code>Tree</code></td><td>Nodes that hold other nodes, one row each, on a <code>List</code>: <code>Tree(roots, expand = (n Folder) =&gt; n.children, expanded = open) { rowRenderer = (it RowItem&lt;Folder&gt;) =&gt; FolderRow(it.content) }</code>. A node's children are asked for with <code>expand</code> when it first opens; a node shows an arrow when it has children; <code>leaf</code> says so without reading them, for a tree that is costly to read. Nodes are told apart as a list's items are (the node itself, or what <code>id</code> returns); <code>expanded</code> and <code>selected</code> hold those identities. A press on the arrow opens or closes a node; Right opens it or goes to its first child, Left closes it or goes to its parent; <code>it.depth</code> and <code>it.expanded</code> tell the row where it is.</td></tr>
             <tr><td><code>DataGrid</code></td><td>Rows in columns under a line of headers, on a <code>List</code>: <code>DataGrid(files, columns = [new GridColumn&lt;File&gt;("Name", cell = (it RowItem&lt;File&gt;) =&gt; Text(it.content.name), order = byName), new GridColumn&lt;File&gt;("Size", width = 80(px))])</code>. A cell is what its column's <code>cell</code> draws, or the row as text. A press on the header of a column with an <code>order</code> sorts by it, a second the other way round, a third as given (<code>sortBy</code>, <code>descending</code>, <code>onSort</code>); over a <code>Source</code> the grid only tells <code>onSort</code>. The end of a header is dragged for another width, or double-clicked to fit what the column holds; widths are kept between runs under <code>persist</code>. A text too long for its column ends in an ellipsis. Rows are selected and opened as a list's.</td></tr>
+            <tr><td><code>ModelView</code></td><td>A 3D model seen from a viewpoint: <code>ModelView(model = prepared, viewpoint = eye)</code>, with a <code>PreparedModel</code> and a <code>Viewpoint</code>; without a viewpoint it frames the whole model. Turning, moving and zooming are the application's, which changes the viewpoint (<code>PreparedModel.pick</code> gives the point under the pointer). A renderer that draws models on the GPU draws it every frame; elsewhere the picture is drawn on a task, smaller while the viewpoint moves.</td></tr>
+            <tr><td><code>TerminalView</code></td><td>A terminal: shows a <code>terminal.Screen</code> and sends what the user types as xterm does. The caller owns the stream: it feeds the screen what the program writes, and gets the bytes to write back through <code>onInput</code> and the size in cells through <code>onResize</code>. Copy and paste, a scrollback under the wheel, and selection by drag.</td></tr>
             <tr><td><code>Form</code>, <code>Field</code></td><td>A form that runs <code>onSubmit</code> only while no field has an error: <code>Form(onSubmit = save) { Field("Email", error = emailError()) { TextField(email) } }</code>.</td></tr>
+            <tr><td><code>Styled</code></td><td>Applies a style sheet to everything inside it. Its rules come after those of the style sheets further out: <code>Styled(compact) { ... }</code>.</td></tr>
             <tr><td><code>Themed</code></td><td>Gives what it holds a theme of its own: <code>Themed(theme = dark) { ... }</code>.</td></tr>
             <tr><td><code>Provide</code></td><td>Gives what it holds a value they find with <code>context&lt;V&gt;()</code>: <code>Provide(document) { ... }</code>.</td></tr>
             <tr><td><code>WindowDrag</code></td><td>The part of a window without a title bar that drags the window.</td></tr>
@@ -2084,6 +2129,78 @@ toasts.show("Deleted", action = "Undo", onAction = restore) unless toasts is non
         </table>
       </div>
 
+    </section>
+
+    <section class="docs-section" id="more">
+      <h2>Charts, maps and pages</h2>
+        <p>
+          These components live in modules of their own:
+          <a href="modules.html#std-ui-charts"><code>std.ui.charts</code></a>,
+          <a href="modules.html#std-ui-maps"><code>std.ui.maps</code></a> and
+          <a href="modules.html#std-ui-navigation"><code>std.ui.navigation</code></a>.
+          Import the module to use them.
+        </p>
+
+      <div class="docs-sub" id="charts">
+        <h3>Charts</h3>
+        <div class="component-gallery">
+          <div class="component-card" id="c-chart">
+            <div class="component-shot"><img src="assets/components/chart.png" width="420" height="240" alt="A Chart with a bar series, a line series, two axes and a legend" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>Chart</code></h4>
+              <p>Draws the series, axes and legend in its block, in that order. If <code>viewport</code> leaves the range of an axis empty, the chart fits that axis to the data. When <code>zoomable</code> is on, the wheel zooms around the pointer and a drag pans. With the focus, <code>+</code> and <code>-</code> zoom, the arrow keys pan and Home fits the data again. A click near a point selects it and runs <code>onPointSelected</code>.</p>
+              <pre><code>Chart() { LineSeries(load); Axis(); Legend() }</code></pre>
+            </div>
+          </div>
+        </div>
+        <p>Each series takes its values first and their x positions as <code>xs</code>. Without <code>xs</code>, the points sit at 0, 1, 2 and so on. A series is drawn in its <code>color</code>, or else in the next colour of the theme.</p>
+        <table class="docs-table">
+          <thead><tr><th>Component</th><th>What it is</th></tr></thead>
+          <tbody>
+            <tr><td><code>LineSeries</code></td><td>A line through the points. A NaN value is skipped, so the line runs from the point before it to the point after. When there are more than two points to a pixel column, the chart keeps the first, lowest, highest and last point of each column, so every peak still shows.</td></tr>
+            <tr><td><code>AreaSeries</code></td><td>A line with the area between it and 0 filled in a lighter shade of its colour.</td></tr>
+            <tr><td><code>BarSeries</code></td><td>A bar from 0 to each value. To put several bar series side by side, give each its own <code>offset</code>.</td></tr>
+            <tr><td><code>ScatterSeries</code></td><td>A dot at each point.</td></tr>
+            <tr><td><code>Axis</code></td><td>A line along one side of the plot with round values marked on it. <code>grid = true</code> also draws lines across the plot, and <code>format</code> says how a value is written.</td></tr>
+            <tr><td><code>Legend</code></td><td>The labels of the series with their colours, in the top corner of the plot. Series without a label are left out.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="docs-sub" id="maps">
+        <h3>Maps</h3>
+        <div class="component-gallery">
+          <div class="component-card" id="c-mapview">
+            <div class="component-shot"><img src="assets/components/map.png" width="420" height="240" alt="A MapView with a river, an area, a walking route and two markers" loading="lazy"></div>
+            <div class="component-text">
+              <h4><code>MapView</code></h4>
+              <p>A map of raster tiles with markers, lines and areas on it. The tiles come from a <code>TileSource</code>, such as <code>XyzTiles</code> for a tile server. Without one, the map draws its parts on a plain background, as in this picture. A drag pans, the wheel zooms around the pointer and a double click zooms in. The map writes <code>center</code> and <code>zoom</code> back as it moves, fetches tiles on its own tasks and keeps the 512 it showed last.</p>
+              <pre><code>MapView(center = here, tiles = osm) { Marker(at = here) }</code></pre>
+            </div>
+          </div>
+        </div>
+        <table class="docs-table">
+          <thead><tr><th>Component</th><th>What it is</th></tr></thead>
+          <tbody>
+            <tr><td><code>Marker</code></td><td>Puts what its block holds at a coordinate, with its bottom middle on that point: <code>Marker(at = office) { Badge("HQ") }</code>. With an empty block it draws a pin.</td></tr>
+            <tr><td><code>Polyline</code></td><td>A line through coordinates, in <code>color</code> and <code>width</code>.</td></tr>
+            <tr><td><code>Polygon</code></td><td>An area inside coordinates, with the last joined to the first. Without <code>fill</code> and <code>stroke</code> it uses the accent colour.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="docs-sub" id="pages">
+        <h3>Pages and routes</h3>
+        <p>A page is a component marked <code>@route</code> with its path. A <code>Link(to = "/docs")</code> goes to a page.</p>
+        <table class="docs-table">
+          <thead><tr><th>Component</th><th>What it is</th></tr></thead>
+          <tbody>
+            <tr><td><code>Routes</code></td><td>Shows the page for the current location at the root of a window's view. It creates the <code>Router</code> and gives it to everything under it, which finds it with <code>context&lt;Router&gt;()</code>. A location that no route takes shows <code>notFound</code>: <code>Routes(history = new MemoryHistory("/docs")) { notFound = view { Text("No such page") } }</code>.</td></tr>
+            <tr><td><code>Outlet</code></td><td>Where a page that holds other pages shows the deeper one. A layout marked <code>@route("/docs")</code> with an <code>Outlet()</code> in its view shows the page for <code>/docs/units</code> inside it.</td></tr>
+            <tr><td><code>Page</code></td><td>Describes the page it holds. On the desktop its <code>title</code> becomes the window's title while the page shows. On the web, <code>title</code>, <code>description</code> and the other inputs go into the page's head.</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
   </main>

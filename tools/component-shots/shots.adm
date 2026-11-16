@@ -6,12 +6,17 @@ module shots {
 	use (
 		std.formats.image
 		std.gfx.canvas
+		std.gfx.color::Color
+		std.math.geo
 		std.math.geom::(Axes, Corners, Edges, Point, Rect, Size)
 		std.ui::(Display, KeyEvent, MenuEntry, RenderContext, TextKind, UI, WindowState)
+		std.ui.charts as charts
 		std.ui.components::*
+		std.ui.maps as maps
 		std.ui.renderer as r
 		std.ui.renderer::(PlatformEvent, PlatformEventKind)
 		std.ui.styles::*
+		std.time::Date
 		std.units::(Extent, Pixels)
 	)
 
@@ -105,6 +110,18 @@ module shots {
 		}
 
 		def setClipboardText(text string) !none {
+			return none
+		}
+
+		def clipboardFormats() !string[] {
+			return []
+		}
+
+		def clipboardData(mime string) !?byte[] {
+			return none
+		}
+
+		def setClipboardData(mime string, data byte[]) !none {
 			return none
 		}
 
@@ -581,6 +598,27 @@ module shots {
 
 	let manyRows = numbered(1000)
 
+	// The chart's picture: visits on twelve days and their running average.
+	let days = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0]
+	let visits = [120.0, 135.0, 98.0, 160.0, 172.0, 150.0, 90.0, 140.0, 185.0, 196.0, 170.0, 110.0]
+	let average = [120.0, 127.5, 117.7, 128.3, 137.0, 139.2, 132.1, 133.1, 138.9, 144.6, 146.9, 143.8]
+
+	// The map's picture: the Tuileries garden and a walk from the Louvre to Notre-Dame.
+	let garden = [
+		new geo.Coordinate(48.8655, 2.3215), new geo.Coordinate(48.8622, 2.3335),
+		new geo.Coordinate(48.8606, 2.3322), new geo.Coordinate(48.8638, 2.3203),
+	]
+	let seine = [
+		new geo.Coordinate(48.8640, 2.3080), new geo.Coordinate(48.8622, 2.3240),
+		new geo.Coordinate(48.8598, 2.3340), new geo.Coordinate(48.8572, 2.3430),
+		new geo.Coordinate(48.8547, 2.3500), new geo.Coordinate(48.8508, 2.3590),
+	]
+	let walk = [
+		new geo.Coordinate(48.8606, 2.3376), new geo.Coordinate(48.8590, 2.3412),
+		new geo.Coordinate(48.8572, 2.3470), new geo.Coordinate(48.8553, 2.3480),
+		new geo.Coordinate(48.8530, 2.3499),
+	]
+
 	// Asks the `Toasts` above it for five notices, once it is drawn.
 	component Announcing {
 		type {
@@ -711,6 +749,28 @@ module shots {
 					ComboBox(value = "Ber", options = ["Amsterdam", "Athens", "Berlin", "Bern", "Oslo"], placeholder = "City")
 				case "dropdown":
 					Dropdown(options = ["Small", "Medium", "Large"], selected = 1)
+				case "datefield":
+					DateField(new Date(2026, 11, 30))
+				case "calendar":
+					Calendar(new Date(2026, 11, 13))
+				case "chart":
+					charts.Chart(charts.ChartViewport{left: 0.3, right: 12.7, bottom: 0.0, top: 300.0}, zoomable = false, style = {width: 396(px), height: 216(px)}) {
+						charts.BarSeries(visits, xs = days, label = "Visits")
+						charts.LineSeries(average, xs = days, label = "Average")
+						charts.Axis(side = charts.AxisSide.Bottom)
+						charts.Axis(side = charts.AxisSide.Left, grid = true)
+						charts.Legend()
+					}
+				case "map":
+					maps.MapView(new geo.Coordinate(48.8590, 2.3350), zoom = 13.6, interactive = false, style = {width: 396(px), height: 216(px)}) {
+						maps.Polyline(seine, color = new Color("#9cc3e6"), width = 9.0)
+						maps.Polygon(garden)
+						maps.Polyline(walk)
+						maps.Marker(walk[0])
+						maps.Marker(walk[walk.len() - 1]) {
+							Badge(label = "Notre-Dame")
+						}
+					}
 				case "tabstrip":
 					TabStrip(tabs = ["main.adm", "lib.adm", "notes.md"], current = 0)
 				case "tabs":
@@ -948,6 +1008,10 @@ module shots {
 			Wanted{name: "numberfield", wide: 260.0, high: 60.0},
 			Wanted{name: "combobox", wide: 240.0, high: 60.0},
 			Wanted{name: "dropdown", wide: 200.0, high: 60.0},
+			Wanted{name: "datefield", wide: 240.0, high: 60.0},
+			Wanted{name: "calendar", wide: 280.0, high: 300.0},
+			Wanted{name: "chart", wide: 420.0, high: 240.0},
+			Wanted{name: "map", wide: 420.0, high: 240.0},
 			Wanted{name: "tabstrip", wide: 360.0, high: 56.0},
 			Wanted{name: "tabs", wide: 360.0, high: 120.0},
 			Wanted{name: "breadcrumbs", wide: 320.0, high: 48.0},

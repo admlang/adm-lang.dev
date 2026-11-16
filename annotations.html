@@ -281,7 +281,8 @@ type Remote {
         annotation's label, keys and icon; <code>enabled</code> names a method of the same controller
         that takes nothing and returns <code>bool</code>, asked whenever the action shows or runs.
         The keys run the action while the focus is in its component, the innermost first, and may be
-        two chords pressed one after the other (<code>"Ctrl+K Ctrl+C"</code>). The method takes no
+        two chords pressed one after the other (<code>"Ctrl+K Ctrl+C"</code>); a punctuation key is
+        written as the character it types (<code>"Mod+]"</code>, <code>"Ctrl+,"</code>). The method takes no
         arguments; a shortcut that names no key, a function that is no method, or a method without
         <code>@action</code> where an <code>Action</code> is expected is a compile error.
         <code>actionsOf(c)</code> lists a component's actions, <code>UI.actions()</code> every one the
