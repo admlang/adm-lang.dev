@@ -627,8 +627,9 @@ plugin ImageTools {
         <ul>
           <li>Module names can be simple identifiers (<code>module utils</code>) or dotted namespaces
             (<code>module std.net.http</code>). A file may host multiple modules.</li>
-          <li><code>internal module</code> hides the module outside its package; <code>partial module</code>
-            lets you split it across files in the same directory.</li>
+          <li><code>internal module a.b.c</code> is visible only under its parent namespace (<code>a.b</code> and
+            every <code>a.b.*</code> module may <code>use</code> it); <code>internal a module a.b.c</code> widens that to
+            <code>a</code>. <code>partial module</code> lets you split a module across files in the same directory.</li>
           <li>Module bodies may contain <code>use</code> statements, constants, functions, types, structs,
             enums, unions, interfaces, datatypes, services, components, views, and styles.</li>
           <li>Modules cannot declare other top-level units - <code>application</code>, <code>library</code>,
@@ -936,7 +937,7 @@ xs.len()          // 3</code></pre>
           </div>
           <pre><code>let s = "abcd"
 
-s[0]      // "a"
+s[0]      // 'a' (a char)
 s[:1]     // "a"
 s[1:3]    // "bc"
 s[-2:]    // "cd"</code></pre>
@@ -1229,7 +1230,7 @@ let ten = fns.0(fns.1)            // calls twice(5)</code></pre>
         <p>
           <code>vec2/4/8/16/32/64/128&lt;T&gt;</code> are fixed-width SIMD vectors over a numeric lane
           type <code>T</code> - the number is the lane count, and operations run across all lanes at
-          once when hardware SIMD is available. <code>mask4/8/16/32/64/128&lt;T&gt;</code> hold the
+          once when hardware SIMD is available. <code>mask2/4/8/16/32/64/128&lt;T&gt;</code> hold the
           per-lane result of a comparison.
         </p>
 
@@ -1399,8 +1400,7 @@ enum Flags {
 }</code></pre>
         </div>
         <p>
-          <code>internal enum</code> keeps it visible only inside the declaring module, just like an
-          <code>internal module</code>.
+          <code>internal enum</code> keeps it visible only inside the declaring module.
         </p>
 
         <p>Access a member through the enum's name, and compare with <code>==</code> like any other value:</p>
@@ -1927,7 +1927,7 @@ if color := "white" || "black" || "blue" {
 // same as: if color == "white" || color == "black" || color == "blue" {}</code></pre>
         </div>
         <p>
-          <span class="api-tag api-planned">planned</span> The same trick works with regexes and <code>&amp;&amp;</code> - each regex tests the same
+          The same trick works with regexes and <code>&amp;&amp;</code> - each regex tests the same
           subject, which reads nicely for validating a password against several patterns at once:
         </p>
         <div class="code-window">
@@ -2105,7 +2105,9 @@ for let j = 0; j &lt; 3; j++ {
           loop calls it until it returns <code>none</code>; the type keeps its own cursor and resets it
           after exhaustion so the value can be walked again. An iterator, like a channel, has no
           index or key: with two names the first is <code>_</code> (<code>for let (_, v) in value</code>),
-          and two names never take an element apart, so an iterator of tuples is read with one name.
+          and two names never take an element apart, so an iterator of tuples is read with one name;
+          a group in parentheses inside the header (<code>for let (_, (a, b)) in pairs</code>) is an
+          error: bind the element and write <code>let (a, b) = pair</code> in the body.
           An <code>Iterator&lt;T&gt;</code> is a
           real interface value, so it can be stored and passed around:
         </p>
@@ -2471,7 +2473,7 @@ internal atomic async def funcName&lt;A, B: Serializable&gt;(a int, b string = "
         <h3>Params &amp; Returns</h3>
         <p>A function can carry any of these modifiers:</p>
         <ul>
-          <li><code>internal</code> - visible only inside the declaring module, same as everywhere else.</li>
+          <li><code>internal</code> - visible only inside the declaring module; an <code>internal</code> method only inside its type.</li>
           <li><code>atomic</code> - wraps the call in a per-instance lock, so only one caller runs it at
             a time; everyone else blocks until it's done. More under <a href="#concurrency">Concurrency</a>.</li>
           <li><code>async</code> - the function returns a future instead of running immediately. Covered
@@ -3555,7 +3557,7 @@ def log(evt Event&lt;string&gt;) {
         <tr><td>Config <span class="api-tag api-planned">planned</span></td><td>Layered configuration with profiles.</td></tr>
         <tr><td>Logging</td><td>Leveled logging with structured fields, to console, file and network writers.</td></tr>
         <tr><td>Messaging</td><td>In-memory queues by topic: consumer groups, priorities, retries and dead letters.</td></tr>
-        <tr><td>I18n <span class="api-tag api-planned">planned</span></td><td>Locale selection and message catalogs.</td></tr>
+        <tr><td>I18n</td><td>Locale selection and message catalogs.</td></tr>
         <tr><td>IPC</td><td>Remote interfaces between processes: <code>@remote&lt;I&gt;</code> serves an interface, <code>IPC.connect&lt;I&gt;</code> calls it, over TCP, TLS or Unix sockets.</td></tr>
         <tr><td>Telemetry</td><td>Sends metrics, logs, errors, usage events and spans to a configured server (OpenTelemetry), with the user's consent.</td></tr>
         <tr><td>Vault</td><td>Encrypted key/value store for secrets, values and keys.</td></tr>
@@ -3668,7 +3670,7 @@ def log(evt Event&lt;string&gt;) {
         <h3>Components</h3>
         <p>
           A <code>component</code> binds a view, a style, and a controller <code>type</code> together.
-          The UI service asks for a window or surface and renders the component tree - the same
+          The program asks the UI service for a window (<code>UI.openWindow(root, cfg)</code>), and the service renders the component tree in it - the same
           component source targets a desktop window or a WASM/web canvas; the backend decides which.
         </p>
         <p>Reference named view/style/type declarations, or write every piece anonymously inline - both are the same construct:</p>
@@ -3875,8 +3877,10 @@ Card(title = "Profile") {
           A view names its controller's fields, properties and methods directly in the arguments of the
           components it places (<code>Text(text = title)</code>). The view runs again in the next frame
           once its component changed: one of its fields (an input, a state or any other) took another
-          value, it called <code>redraw()</code>, a component it names with <code>ref</code> changed, or
-          the window, the theme or a state such as <code>hover</code> did. An argument whose value
+          value, it called <code>redraw()</code>, a component it names with <code>ref</code> changed (a field, or a state its style has a look for), or
+          the window, the theme or a state its view reads (<code>hover</code>, <code>pressed</code>,
+          <code>focused</code> and the others) did; a state no view reads changes the component's look
+          and runs nothing. An argument whose value
           differs from what was passed the last time is then assigned to the child's input, which
           changes the child in turn; so is one that is, or comes from, a <code>@state</code> or
           <code>@input</code> field changed in place since the last run, though it is the same object. What a view reads through any other reference (a model object
@@ -4006,7 +4010,7 @@ internal const region string</code></pre>
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             <span class="code-filename">meta_def.adm</span>
           </div>
-          <pre><code>meta def trim&lt;string&gt;(target reflection.ParameterMetaContext) {
+          <pre><code>meta def trim(target reflection.ParameterMetaContext) {
 	let v = string(target.get())
 	target.set(v.trim())
 }</code></pre>

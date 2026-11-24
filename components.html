@@ -489,7 +489,13 @@ FileList(["main.adm", "lib.adm", "notes.md"]) {
             module's value shows. This holds whoever calls it (an event, a task, a timer) and however
             far it was passed on; a call made while a frame runs its views, lays out or draws (a
             function that says how a row looks) runs nothing again. The same goes for a child writing
-            a bound place that is a member of another object (<code>TextField(model.name)</code>).</li>
+            a bound place that is a member of another object (<code>TextField(model.name)</code>),
+            and for a function the argument writes into a value it builds: a field of a literal
+            (<code>actions = [ToastAction{label: "Undo", run: undo}]</code>), an element of an
+            array or a tuple, an argument of a <code>new</code>. A value made elsewhere and passed
+            whole (<code>columns = columns()</code>) holds its functions as they are, and so does a
+            <code>view { ... }</code> value written outside a component (in a module's function, or
+            in a method of a type that is no component): it has no view to run again.</li>
           <li>Anything else a view reads through another reference (a model object a task or a
             service changed in place, a global) shows once the component, or one above it, calls
             <code>redraw()</code>, which runs the views under it again too. A function held inside a
